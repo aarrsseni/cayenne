@@ -51,8 +51,13 @@
 	</fileSets>
 
 	<files>
+		<!--<file>-->
+			<!--<source>../docs/docbook/getting-started/target/site/getting-started.pdf</source>-->
+			<!--<outputDirectory>doc</outputDirectory>-->
+			<!--<destName>getting-started.pdf</destName>-->
+		<!--</file>-->
 		<file>
-			<source>../docs/docbook/getting-started/target/site/getting-started.pdf</source>
+			<source>../docs/asciidoc/getting-started/target/generated-docs/getting-started.pdf</source>
 			<outputDirectory>doc</outputDirectory>
 			<destName>getting-started.pdf</destName>
 		</file>
