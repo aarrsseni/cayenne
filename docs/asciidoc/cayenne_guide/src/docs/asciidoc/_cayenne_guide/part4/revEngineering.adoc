@@ -12,6 +12,7 @@
 // the specific language governing permissions and limitations under the
 // License.
 [[toTop]]
+[[reverse]]
 === Reverse Engineering in Cayenne Modeler
 
 Alternative aproach to using xref:cImp[cdbimport] is doing reverse engineering from xref:runModeler[Cayenne Modeler]. Currently modeler GUI doesn't support all features of ant/maven tasks but it suffice for general DB import. Especially it's a good place to quickly start working on your data model.

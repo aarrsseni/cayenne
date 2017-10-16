@@ -12,6 +12,7 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+[[include]]
 === Including Cayenne in a Project
 
 ==== Jar Files
@@ -47,6 +48,7 @@ If you are using Maven, you won't have to deal with figuring out the dependencie
 
 Additionally Cayenne provides a Maven plugin with a set of goals to perform various project tasks, such as synching generated Java classes with the mapping, described in the following subsection. The full plugin name is _org.apache.cayenne.plugins:cayenne-maven-plugin_.
 
+[[cgen]]
 ===== cgen
 
 _cgen_ is a _cayenne-maven-plugin_ goal that generates and maintains source (.java) files of persistent objects based on a DataMap. By default, it is bound to the generate-sources phase. If "makePairs" is set to "true" (which is the recommended default), this task will generate a pair of classes (superclass/subclass) for each ObjEntity in the DataMap. Superclasses should not be changed manually, since they are always overwritten. Subclasses are never overwritten and may be later customized by the user. If "makePairs" is set to "false", a single class will be generated for each ObjEntity.
@@ -69,7 +71,7 @@ ${project.basedir}/src/main/resources/my.map.xml
 |===
 
 
-
+[[cgenOptional]]
 .cgen optional parameters
 [cols="1,1,7"]
 |===
@@ -186,6 +188,8 @@ ${project.basedir}/src/main/resources/my.map.xml
 .^|An object that contains Data Source parameters
 |===
 
+
+[[dataSourceParameteres]]
 .<dataSource> parameters
 [cols="2,1,1,5"]
 |===
@@ -212,7 +216,7 @@ ${project.basedir}/src/main/resources/my.map.xml
 .^|Database user password.
 |===
 
-
+[[cdbgenOptionl]]
 .cdbgen optional parameters
 [cols="2,2,5"]
 |===
@@ -302,7 +306,7 @@ _cdbimport_ is a _cayenne-maven-plugin_ goal that generates a DataMap based on a
 .^|An object that contains detailed reverse engineering rules about what DB objects should be processed. For full information about this parameter see xref:dbFirstFlow["DB-First Flow"] chapter.
 |===
 
-
+[[cdbimportDataSource]]
 .<dataSource> parameters
 [cols="2,1,1,5"]
 |===
@@ -329,7 +333,7 @@ _cdbimport_ is a _cayenne-maven-plugin_ goal that generates a DataMap based on a
 .^|Database user password.
 |===
 
-
+[[dbimportParameters]]
 .<dbimport> parameters
 [cols="2,2,5"]
 |===

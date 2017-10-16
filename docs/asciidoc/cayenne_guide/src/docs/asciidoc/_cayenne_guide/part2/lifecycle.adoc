@@ -24,7 +24,8 @@ Cayenne allows to build rather powerful and complex "workflows" or "processors" 
 
 Cayenne defines the following 8 types of lifecycle events for which callbacks can be regsitered:
 
-.cgen required parameters
+[[lifecycleEvent]]
+.Lifecycle Event Types
 [cols="3,6"]
 |===
 |Event |Occurs...

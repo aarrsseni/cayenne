@@ -142,7 +142,9 @@ GROUP BY t0.ARTIST_NAME, t0.ARTIST_ID, t0.DATE_OF_BIRTH
 HAVING COUNT(t1.PAINTING_ID) < ?
 ORDER BY COUNT(t1.PAINTING_ID) DESC, t0.ARTIST_NAME
 ----
+
 [[ejbqlquery]]
+[[ejbql]]
 ==== EJBQLQuery
 
 EJBQLQuery was created as a part of an experiment in adopting some of Java Persistence API (JPA) approaches in Cayenne. It is a parameterized object query that is created from query String. A String used to build EJBQLQuery must conform to JPQL (JPA query language):
@@ -444,6 +446,7 @@ The example above demonstrates the point made earlier in this chapter - even if 
 
 Variable substitution within the text uses "_object.toString()_" method to replace the variable value. Keep in mind that this may not be appropriate in all situations. E.g. passing a date object in a WHERE clause expression may be converted to a String not understood by the target RDBMS SQL parser. In such cases variable should be wrapped in _#bind_ directive as described below.
 
+[[directives]]
 ===== Directives
 
 These are the Cayenne directives used to customize SQLTemplate parsing and integrate it with the JDBC layer:

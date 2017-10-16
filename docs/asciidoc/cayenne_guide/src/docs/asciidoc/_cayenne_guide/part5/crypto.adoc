@@ -1,0 +1,116 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to you under the Apache License, Version
+// 2.0 (the "License"); you may not use this file except in compliance
+// with the License. You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+// applicable law or agreed to in writing, software distributed under the
+// License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for
+// the specific language governing permissions and limitations under the
+// License.
+
+=== Crypto extension
+
+==== Description
+
+Crypto module allows encrypt and decrypt values stored in DB transparently to your Java app.
+
+==== Including in a project
+
+===== Maven
+
+[source, XML]
+----
+<dependency>
+    <groupId>org.apache.cayenne</groupId>
+    <artifactId>cayenne-crypto</artifactId>
+    <version>4.1.M2-SNAPSHOT</version>
+</dependency>
+----
+
+===== Gradle
+
+[source]
+----
+compile 'org.apache.cayenne:cayenne-crypto:4.1.M2-SNAPSHOT'
+----
+
+==== Usage
+
+===== Setup your model and DB
+
+To use crypto module you must prepare your database to allow _byte[]_ storage and properly name columns that will contain encrypted values.
+
+Currently supported SQL types that can be used to store encrypted data are:
+
+. Binary types: _BINARY, BLOB, VARBINARY, LONGVARBINARY_. These types are preferred.
+
+. Character types, that will store _base64_ encoded value: _CHAR, NCHAR, CLOB, NCLOB, LONGVARCHAR, LONGNVARCHAR, VARCHAR, NVARCHAR_.
+
+====== Note
+
+Not all data types may be supported by your database.
+
+Default naming strategy that doesn't require additional setup suggests using "CRYPTO_" prefix. You can change this default strategy by injecting you own implementation of _org.apache.cayenne.crypto.map.ColumnMapper_ interface.
+
+[source, java]
+----
+ServerRuntime.builder()
+        .addModule(CryptoModule.extend()
+                .columnMapper(MyColumnMapper.class)
+                .module())
+----
+
+Here is an example of how _ObjEntity_ with two encrypted and two unencrypted properties can look like:
+
+image::../images/ext-crypto-obj-entity.png[align="left"]
+
+===== Setup keystore
+
+To perform encryption you must provide _KEYSTORE_URL_ and _KEY_PASSWORD_. Currently crypto module supports only Java "jceks" KeyStore.
+
+[source, java]
+----
+ServerRuntime.builder()
+        .addModule(CryptoModule.extend()
+                .keyStore(this.getClass().getResource("keystore.jcek"), "my-password".toCharArray(), "my-key-alias")
+                .module())
+----
+
+===== Additional settings
+
+Additionally to _ColumnMapper_ mentioned above you can customize other parts of _crypto module_. You can enable _gzip_ compression and _HMAC_ usage (later will ensure integrity of data).
+
+[source, java]
+----
+ServerRuntime.builder()
+        .addModule(CryptoModule.extend()
+                .compress()
+                .useHMAC()
+                .module())
+----
+
+Another useful extension point is support for custom Java value types. To add support for your data type you need to implement _org.apache.cayenne.crypto.transformer.value.BytesConverter_ interface that will convert required type to and from _byte[]_.
+
+[source, java]
+----
+ServerRuntime.builder()
+        .addModule(CryptoModule.extend()
+                .objectToBytesConverter(MyClass.class, new MyClassBytesConverter())
+                .module())
+----
+
+====== Note
+
+In addition to Java primitive types (and their object counterparts), _crypto module_ supports encryption only of _java.util.Date, java.math.BigInteger_ and _java.math.BigDecimal_ types.
+
+
+
+
+
+
+
+

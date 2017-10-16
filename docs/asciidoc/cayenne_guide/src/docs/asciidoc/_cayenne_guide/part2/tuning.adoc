@@ -218,7 +218,7 @@ The way pagination works internally, it first fetches a list of IDs for the root
 
 An obvious limitation of pagination is that if you eventually access all objects in the list, the memory use will end up being the same as with no pagination. However it is still a very useful approach. With some lists (e.g. multi-page search results) only a few top objects are normally accessed. At the same time pagination allows to estimate the full list size without fetching all the objects. And again - it is completely transparent and looks like a normal query.
 
-
+[[caching]]
 ==== Caching and Fresh Data
 
 ===== Object Caching

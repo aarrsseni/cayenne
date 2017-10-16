@@ -36,6 +36,9 @@
     <modules>
         <module>cayenne-asciidoc-extension</module>
         <module>getting-started</module>
+        <module>cayenne_guide</module>
+        <module>getting_started_rop</module>
+        <module>upgrade_guide</module>
     </modules>
 
     <properties>
