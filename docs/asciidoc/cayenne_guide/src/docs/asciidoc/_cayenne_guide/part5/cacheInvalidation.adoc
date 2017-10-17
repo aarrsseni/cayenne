@@ -27,7 +27,7 @@ Cache invalidation module is an extension that allows to define cache invalidati
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-cache-invalidation</artifactId>
-    <version>4.1.M2-SNAPSHOT</version>
+    <version>4.0.B2</version>
 </dependency>
 ----
 
@@ -35,7 +35,7 @@ Cache invalidation module is an extension that allows to define cache invalidati
 
 [source]
 ----
-compile 'org.apache.cayenne:cayenne-cache-invalidation:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-cache-invalidation:4.0.B2'
 ----
 
 ==== Usage

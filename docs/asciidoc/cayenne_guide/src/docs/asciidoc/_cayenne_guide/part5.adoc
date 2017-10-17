@@ -20,10 +20,11 @@ include::part5/commitLog.adoc[]
 
 include::part5/crypto.adoc[]
 
+include::part5/dbcpIntegration.adoc[]
+
+include::part5/java8.adoc[]
+
 include::part5/jCache.adoc[]
 
 include::part5/jodaTime.adoc[]
 
-include::part5/projectCompatibility.adoc[]
-
-include::part5/apacheVelocity.adoc[]

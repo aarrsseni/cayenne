@@ -27,7 +27,7 @@ The goal of this module is to capture commit changes and present them to interes
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-commitlog</artifactId>
-    <version>4.1.M2-SNAPSHOT</version>
+    <version>4.0.B2</version>
 </dependency>
 ----
 
@@ -35,7 +35,7 @@ The goal of this module is to capture commit changes and present them to interes
 
 [source]
 ----
-compile 'org.apache.cayenne:cayenne-commitlog:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-commitlog:4.0.B2'
 ----
 
 ==== Usage

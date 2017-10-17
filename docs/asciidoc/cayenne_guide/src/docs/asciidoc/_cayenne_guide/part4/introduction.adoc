@@ -41,7 +41,7 @@ Here is a simple Maven configuration of "cdbimport" (for details see xref:mavenC
 <plugin>
 		<groupId>org.apache.cayenne.plugins</groupId>
 		<artifactId>cayenne-maven-plugin</artifactId>
-		<version>4.1.M2-SNAPSHOT</version>
+		<version>4.0.B2</version>
 
 		<configuration>
 			<map>${project.basedir}/src/main/resources/datamap.map.xml</map>

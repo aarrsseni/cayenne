@@ -12,11 +12,11 @@
 // the specific language governing permissions and limitations under the
 // License.
 
-=== JCache integration
+=== Java 8 extension
 
 ==== Description
 
-This module allows to integrate any JCache (JSR 107) compatible caching provider with Cayenne.
+Java 8 module allows to use _java.time.LocalTime, java.time.LocalDate_ and _java.time.LocalDateTime_ types for entity attributes
 
 ==== Including in a project
 
@@ -26,7 +26,7 @@ This module allows to integrate any JCache (JSR 107) compatible caching provider
 ----
 <dependency>
     <groupId>org.apache.cayenne</groupId>
-    <artifactId>cayenne-jcache</artifactId>
+    <artifactId>cayenne-java8</artifactId>
     <version>4.0.B2</version>
 </dependency>
 ----
@@ -35,17 +35,9 @@ This module allows to integrate any JCache (JSR 107) compatible caching provider
 
 [source]
 ----
-compile 'org.apache.cayenne:cayenne-jcache:4.0.B2'
+compile 'org.apache.cayenne:cayenne-java8:4.0.B2'
 ----
 
 ==== Usage
 
-To use JCache provider in your app you need to include this module and caching provider libs (e.g. Ehcache). You can provide own implementation of _org.apache.cayenne.jcache.JCacheConfigurationFactory_ to customize cache configuration if required.
-
-For advanced configuration and management please use provider specific options and tools.
-
-===== Note
-
-You can read about using cache in Cayenne in xref:caching[this] chapter.
-
-You may else be interested in xref:cacheInvalidation[cache invalidation] extension.
+This module doesn't require any additional setup, you can just use new data types in your model.

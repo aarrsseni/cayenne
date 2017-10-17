@@ -12,15 +12,11 @@
 // the specific language governing permissions and limitations under the
 // License.
 
-=== Project compatibility extension
+===  Apache Commons DBCP integration
 
 ==== Description
 
-Since version 4.1 Cayenne doesn't allow to load project XML files from previous versions as this can lead to unexpected errors in runtime. This module allows to use project files from older versions performing their upgrade on the fly (without modifying files). This can be useful when using Cayenne models from third-party libraries in your app.
-
-===== Note
-
-You should prefer explicit project upgrade via Cayenne Modeler.
+This module enables usage of Apache Commons DBCP2 connection pool.
 
 ==== Including in a project
 
@@ -30,8 +26,8 @@ You should prefer explicit project upgrade via Cayenne Modeler.
 ----
 <dependency>
     <groupId>org.apache.cayenne</groupId>
-    <artifactId>cayenne-project-compatibility</artifactId>
-    <version>4.1.M2-SNAPSHOT</version>
+    <artifactId>cayenne-dbcp2</artifactId>
+    <version>4.0.B2</version>
 </dependency>
 ----
 
@@ -39,10 +35,11 @@ You should prefer explicit project upgrade via Cayenne Modeler.
 
 [source]
 ----
-compile 'org.apache.cayenne:cayenne-project-compatibility:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-dbcp2:4.0.B2'
 ----
 
 ==== Usage
 
-This module doesn't require any additional setup.
+To use DBCP2 pool you need to setup it in DataNode settings in Cayenne Modeler:
 
+image::../images/ext-dbcp-setup.png[align="center"]

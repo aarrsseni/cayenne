@@ -27,7 +27,7 @@ Crypto module allows encrypt and decrypt values stored in DB transparently to yo
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-crypto</artifactId>
-    <version>4.1.M2-SNAPSHOT</version>
+    <version>4.0.B2</version>
 </dependency>
 ----
 
@@ -35,7 +35,7 @@ Crypto module allows encrypt and decrypt values stored in DB transparently to yo
 
 [source]
 ----
-compile 'org.apache.cayenne:cayenne-crypto:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-crypto:4.0.B2'
 ----
 
 ==== Usage
