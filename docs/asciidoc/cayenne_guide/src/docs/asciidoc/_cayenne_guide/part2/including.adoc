@@ -653,7 +653,7 @@ Ant tasks are the same as Maven plugin goals described above, namely "cgen", "cd
 
 This is an Ant counterpart of "cdbimport" goal of cayenne-maven-plugin described above. It has exactly the same properties. Here is a usage example:
 
-[data, XML]
+[source, XML]
 ----
  <cdbimport map="${context.dir}/WEB-INF/my.map.xml"
     driver="com.mysql.jdbc.Driver"
