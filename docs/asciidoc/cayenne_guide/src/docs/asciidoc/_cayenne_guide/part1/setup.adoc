@@ -75,7 +75,7 @@ The Modeler can also be started from Maven. While it may look like an exotic way
         <plugin>
             <groupId>org.apache.cayenne.plugins</groupId>
             <artifactId>cayenne-modeler-maven-plugin</artifactId>
-            <version>4.0.B2</version>
+            <version>4.1.M1</version>
         </plugin>
     </plugins>
 </build>
