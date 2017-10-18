@@ -396,23 +396,22 @@ public class DoubleArrayType implements ExtendedType {
 }
 ----
 
-For Java7
-
-[source, Java]
-----
+//For Java7
+//
+//[source, Java]
+//----
 // add DoubleArrayType to list of user types
-ServerRuntime runtime = ServerRuntime.builder()
-                .addConfig("cayenne-project.xml")
-                .addModule(new Module() {
-                    @Override
-                    public void configure(Binder binder) {
-                        ServerModule.contributeUserTypes(binder).add(new DoubleArrayType());
-                    }
-                })
-                .build();
-----
+//ServerRuntime runtime = ServerRuntime.builder()
+//                .addConfig("cayenne-project.xml")
+//                .addModule(new Module() {
+//                    @Override
+//                    public void configure(Binder binder) {
+//                        ServerModule.contributeUserTypes(binder).add(new DoubleArrayType());
+//                    }
+//                })
+//                .build();
+//----
 
-For Java8
 
 [source, Java]
 ----
