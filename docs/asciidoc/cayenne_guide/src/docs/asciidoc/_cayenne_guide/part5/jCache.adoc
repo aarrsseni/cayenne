@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 === JCache integration
 
 ==== Description
@@ -22,20 +24,20 @@ This module allows to integrate any JCache (JSR 107) compatible caching provider
 
 ===== Maven
 
-[source, XML]
+[source, XML,subs="verbatim,attributes"]
 ----
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-jcache</artifactId>
-    <version>4.1.M2-SNAPSHOT</version>
+    <version>{version}</version>
 </dependency>
 ----
 
 ===== Gradle
 
-[source]
+[source,subs="verbatim,attributes"]
 ----
-compile 'org.apache.cayenne:cayenne-jcache:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-jcache:{version}'
 ----
 
 ==== Usage

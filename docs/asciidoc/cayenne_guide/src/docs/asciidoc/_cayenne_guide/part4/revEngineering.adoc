@@ -11,7 +11,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for
 // the specific language governing permissions and limitations under the
 // License.
-[[toTop]]
+
 [[reverse]]
 === Reverse Engineering in Cayenne Modeler
 
@@ -47,7 +47,7 @@ You can only select one catalog. If you need to import multiple catalogs you nee
 
 - *Procedure Name Pattern*: RegExp to filter procedures. Default pattern .* includes all stored procedures.
 
-- *Naming Strategy*: Currently there is only one naming strategy available. See ant/maven tools xref:toTop[documentation] for details about naming strategy.
+- *Naming Strategy*: Currently there is only one naming strategy available. See ant/maven tools xref:reverse[documentation] for details about naming strategy.
 
 - *Tables with Meaningful PK Pattern*: Comma separated list of RegExp's for tables that you want to have meaningful primary keys. By default no meaningful PKs are created.
 

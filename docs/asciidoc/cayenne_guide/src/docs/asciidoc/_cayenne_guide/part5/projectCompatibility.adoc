@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 === Project compatibility extension
 
 ==== Description
@@ -26,20 +28,20 @@ You should prefer explicit project upgrade via Cayenne Modeler.
 
 ===== Maven
 
-[source, XML]
+[source, XML,subs="verbatim,attributes"]
 ----
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-project-compatibility</artifactId>
-    <version>4.1.M2-SNAPSHOT</version>
+    <version>{version}</version>
 </dependency>
 ----
 
 ===== Gradle
 
-[source]
+[source,subs="verbatim,attributes"]
 ----
-compile 'org.apache.cayenne:cayenne-project-compatibility:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-project-compatibility:{version}'
 ----
 
 ==== Usage

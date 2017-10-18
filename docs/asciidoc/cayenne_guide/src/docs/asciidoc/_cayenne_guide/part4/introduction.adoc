@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 [[dbFirstFlow]]
 === Introduction
 
@@ -36,12 +38,12 @@ Here is simple maven configuration to start with:
 
 Here is a simple Maven configuration of "cdbimport" (for details see xref:mavenCdbimort[cayenne-maven-plugin] documentation)
 
-[source, XML]
+[source, XML,subs="verbatim,attributes"]
 ----
 <plugin>
 		<groupId>org.apache.cayenne.plugins</groupId>
 		<artifactId>cayenne-maven-plugin</artifactId>
-		<version>4.1.M2-SNAPSHOT</version>
+		<version>{version}</version>
 
 		<configuration>
 			<map>${project.basedir}/src/main/resources/datamap.map.xml</map>

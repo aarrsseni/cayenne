@@ -250,7 +250,7 @@ ServerRuntimeBuilder
 
 By default EhCache reads a file called "ehcache.xml" located on classpath. You can put your cache configuration in that file. E.g.:
 
-[source, Java]
+[source, XML]
 ----
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false"

@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 === Joda time extension
 
 ==== Description
@@ -22,20 +24,20 @@ Joda time module allows to use _org.joda.time.LocalTime_, _org.joda.time.LocalDa
 
 ===== Maven
 
-[source, XML]
+[source, XML,subs="verbatim,attributes"]
 ----
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-joda</artifactId>
-    <version>4.1.M2-SNAPSHOT</version>
+    <version>{version}</version>
 </dependency>
 ----
 
 ===== Gradle
 
-[source]
+[source,subs="verbatim,attributes"]
 ----
-compile 'org.apache.cayenne:cayenne-joda:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-joda:{version}'
 ----
 
 ==== Usage

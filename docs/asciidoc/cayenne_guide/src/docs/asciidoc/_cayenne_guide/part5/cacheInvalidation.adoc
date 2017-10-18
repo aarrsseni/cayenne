@@ -11,6 +11,9 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for
 // the specific language governing permissions and limitations under the
 // License.
+
+include::../var.adoc[]
+
 [[cacheInvalidation]]
 === Cache invalidation extension
 
@@ -22,20 +25,20 @@ Cache invalidation module is an extension that allows to define cache invalidati
 
 ===== Maven
 
-[source, XML]
+[source, XML,subs="verbatim,attributes"]
 ----
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-cache-invalidation</artifactId>
-    <version>4.1.M2-SNAPSHOT</version>
+    <version>{version}</version>
 </dependency>
 ----
 
 ===== Gradle
 
-[source]
+[source,subs="verbatim,attributes"]
 ----
-compile 'org.apache.cayenne:cayenne-cache-invalidation:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-cache-invalidation:{version}'
 ----
 
 ==== Usage
