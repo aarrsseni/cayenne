@@ -248,7 +248,7 @@ Now an example of overriding _QueryCache_ service. The default implementation of
 binder.bind(QueryCache.class).to(EhCacheQueryCache.class);
 ----
 
-==== Alternative Service Implementations
+==== Using custom data types
 
 ===== Value object type
 

@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 === Java 8 extension
 
 ==== Description
@@ -22,20 +24,20 @@ Java 8 module allows to use _java.time.LocalTime, java.time.LocalDate_ and _java
 
 ===== Maven
 
-[source, XML]
+[source, XML,subs="verbatim,attributes"]
 ----
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-java8</artifactId>
-    <version>4.0.B2</version>
+    <version>{version}</version>
 </dependency>
 ----
 
 ===== Gradle
 
-[source]
+[source,subs="verbatim,attributes"]
 ----
-compile 'org.apache.cayenne:cayenne-java8:4.0.B2'
+compile 'org.apache.cayenne:cayenne-java8:{version}'
 ----
 
 ==== Usage

@@ -31,7 +31,7 @@ You are able to skip relationships loading by the _<skipRelationshipsLoading>_ e
 
 Another useful Cayenne reverse engineering property is _<skipPrimaryKeyLoading>_. If you decide to support all relationships at the application layer and avoid their management in database, you’ll find useful to turn off primary keys synchronization at all.
 
-[source, Java]
+[source, XML]
 ----
  <dbimport>
         <skipPrimaryKeyLoading>true</skipPrimaryKeyLoading>

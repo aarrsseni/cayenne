@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 ===  Apache Commons DBCP integration
 
 ==== Description
@@ -22,20 +24,20 @@ This module enables usage of Apache Commons DBCP2 connection pool.
 
 ===== Maven
 
-[source, XML]
+[source, XML,subs="verbatim,attributes"]
 ----
 <dependency>
     <groupId>org.apache.cayenne</groupId>
     <artifactId>cayenne-dbcp2</artifactId>
-    <version>4.0.B2</version>
+    <version>{version}</version>
 </dependency>
 ----
 
 ===== Gradle
 
-[source]
+[source,subs="verbatim,attributes"]
 ----
-compile 'org.apache.cayenne:cayenne-dbcp2:4.0.B2'
+compile 'org.apache.cayenne:cayenne-dbcp2:{version}'
 ----
 
 ==== Usage

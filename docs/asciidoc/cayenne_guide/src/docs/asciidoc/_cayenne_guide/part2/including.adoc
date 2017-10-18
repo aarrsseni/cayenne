@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 [[include]]
 === Including Cayenne in a Project
 
@@ -19,11 +21,11 @@
 
 This is an overview of Cayenne jars that is agnostic of the build tool used. The following are the important libraries:
 
-- _cayenne-di-4.0.B2.jar_ - Cayenne dependency injection (DI) container library. All applications will require this file.
+- _cayenne-di-{version}.jar_ - Cayenne dependency injection (DI) container library. All applications will require this file.
 
-- _cayenne-server-4.0.B2.jar_ - contains main Cayenne runtime (adapters, DB access classes, etc.). Most applications will require this file.
+- _cayenne-server-{version}.jar_ - contains main Cayenne runtime (adapters, DB access classes, etc.). Most applications will require this file.
 
-- _cayenne-client-4.0.B2.jar_ - a client-side runtime for xref:rop[ROP applications].
+- _cayenne-client-{version}.jar_ - a client-side runtime for xref:rop[ROP applications].
 
 - Other cayenne-* jars - various Cayenne tools extensions.
 
@@ -37,12 +39,12 @@ Dependencies for non-standard configurations will need to be figured out by the 
 
 If you are using Maven, you won't have to deal with figuring out the dependencies. You can simply include cayenne-server artifact in your POM:
 
-[source,xml]
+[source,xml,subs="verbatim,attributes"]
 ----
 <dependency>
    <groupId>org.apache.cayenne</groupId>
    <artifactId>cayenne-server</artifactId>
-   <version>4.0.B2</version>
+   <version>{version}</version>
 </dependency>
 ----
 
@@ -144,12 +146,12 @@ ${project.basedir}/src/main/resources/my.map.xml
 
 Example - a typical class generation scenario, where pairs of classes are generated with default Maven source destination and superclass package:
 
-[source,xml]
+[source,xml,subs="verbatim,attributes"]
 ----
 <plugin>
     <groupId>org.apache.cayenne.plugins</groupId>
     <artifactId>cayenne-maven-plugin</artifactId>
-    <version>4.0.B2</version>
+    <version>{version}</version>
 
     <configuration>
         <map>${project.basedir}/src/main/resources/my.map.xml</map>
@@ -250,12 +252,12 @@ ${project.basedir}/src/main/resources/my.map.xml
 
 Example - creating a DB schema on a local HSQLDB database:
 
-[source,xml]
+[source,xml, subs="verbatim,attributes"]
 ----
 <plugin>
     <groupId>org.apache.cayenne.plugins</groupId>
     <artifactId>cayenne-maven-plugin</artifactId>
-    <version>4.0.B2</version>
+    <version>{version}</version>
     <executions>
         <execution>
             <configuration>
@@ -412,12 +414,12 @@ a|Detailed reverse engineering rules about what DB objects should be processed. 
 
 Example - loading a DB schema from a local HSQLDB database (essentially a reverse operation compared to the cdbgen example above) :
 
-[source, XML]
+[source, XML, subs="verbatim,attributes"]
 ----
 <plugin>
     <groupId>org.apache.cayenne.plugins</groupId>
     <artifactId>cayenne-maven-plugin</artifactId>
-    <version>4.0.B2</version>
+    <version>{version}</version>
 
     <executions>
         <execution>
@@ -446,9 +448,9 @@ To include Cayenne into your Gradle project you have two options:
 
 - Simply add Cayenne as a dependency:
 
-[source, XML]
+[source, subs="verbatim,attributes"]
 ----
-compile 'org.apache.cayenne:cayenne-server:4.1.M2-SNAPSHOT'
+compile 'org.apache.cayenne:cayenne-server:{version}'
 ----
 
 - Or you can use Cayenne Gradle plugin
@@ -457,7 +459,7 @@ compile 'org.apache.cayenne:cayenne-server:4.1.M2-SNAPSHOT'
 
 Cayenne Gradle plugin provides several tasks, such as synching generated Java classes with the mapping or synching mapping with the database. Plugin aslo provides _cayenne_ extension that have some useful utility methods. Here is example of how to include Cayenne plugin into your project:
 
-[source,Gradle]
+[source, subs="verbatim,attributes"]
 ----
 buildscript {
     // add Maven Central repository
@@ -466,7 +468,7 @@ buildscript {
     }
     // add Cayenne Gradle Plugin
     dependencies {
-        classpath group: 'org.apache.cayenne.plugins', name: 'cayenne-gradle-plugin', version: '4.0.B2'
+        classpath group: 'org.apache.cayenne.plugins', name: 'cayenne-gradle-plugin', version: '{version}'
     }
 }
 
@@ -494,7 +496,7 @@ Cgen task generates Java classes based on your DataMap, it has same configuratio
 
 Here is how you can change settings of the default _cgen_ task:
 
-[source, Gradle]
+[source]
 ----
 cgen {
     client = false
@@ -584,7 +586,7 @@ Cdbgen task drops and/or generates tables in a database on Cayenne DataMap. Full
 
 Here is example of how to configure default _cdbgen_ task:
 
-[source, Gradle]
+[source]
 ----
 cdbgen {
 
@@ -610,7 +612,7 @@ cdbgen {
 
 With gradle you can easily connect Cayenne tasks to default build lifecycle. Here is short example of how to connect defaut _cgen_ and _cdbimport_ tasks with _compileJava_ task:
 
-[source, Gradle]
+[source]
 ----
 cgen.dependsOn cdbimport
 compileJava.dependsOn cgen
