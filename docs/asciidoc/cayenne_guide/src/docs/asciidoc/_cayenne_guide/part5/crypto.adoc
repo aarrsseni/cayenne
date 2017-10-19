@@ -35,7 +35,7 @@ Crypto module allows encrypt and decrypt values stored in DB transparently to yo
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy,subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-crypto:{version}'
 ----

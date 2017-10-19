@@ -36,7 +36,7 @@ Cache invalidation module is an extension that allows to define cache invalidati
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy,subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-cache-invalidation:{version}'
 ----

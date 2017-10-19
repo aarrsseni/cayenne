@@ -16,7 +16,7 @@
 
 ==== Expressions Overview
 
-Cayenne provides a simple yet powerful object-based expression language. The most common usese of expressions are to build qualifiers and orderings of queries that are later converted to SQL by Cayenne and to evaluate in-memory against specific objects (to access certain values in the object graph or to perform in-memory object filtering and sorting). Cayenne provides API to build expressions in the code and a parser to create expressions from strings.
+Cayenne provides a simple yet powerful object-based expression language. The most common use of expressions are to build qualifiers and orderings of queries that are later converted to SQL by Cayenne and to evaluate in-memory against specific objects (to access certain values in the object graph or to perform in-memory object filtering and sorting). Cayenne provides API to build expressions in the code and a parser to create expressions from strings.
 
 ==== Path Expressions
 
@@ -189,7 +189,7 @@ Creating expressions from Strings is a powerful and dynamic approach, however a 
 ----
 // String expression: name like 'A%' and price < 1000
 Expression e1 = ExpressionFactory.likeExp("name", "A%");
-Expression e2 = ExpressionFactory.lessExp("price, 1000);
+Expression e2 = ExpressionFactory.lessExp("price", 1000);
 Expression finalExp = e1.andExp(e2);
 ----
 

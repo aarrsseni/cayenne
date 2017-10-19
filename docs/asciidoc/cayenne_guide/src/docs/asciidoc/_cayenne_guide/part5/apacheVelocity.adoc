@@ -36,7 +36,7 @@ This module enables usage of full featured Apache Velocity templates in _org.apa
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy, subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-velocity:{version}'
 ----

@@ -39,7 +39,7 @@ You should prefer explicit project upgrade via Cayenne Modeler.
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy,subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-project-compatibility:{version}'
 ----

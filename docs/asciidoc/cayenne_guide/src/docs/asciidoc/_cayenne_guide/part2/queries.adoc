@@ -37,7 +37,7 @@ List<Artist> objects = ObjectSelect.query(Artist.class).select(context);
 
 This returned all rows in the "ARTIST" table. If the logs were turned on, you might see the following SQL printed:
 
-[source, java]
+[source]
 ----
 INFO: SELECT t0.DATE_OF_BIRTH, t0.NAME, t0.ID FROM ARTIST t0
 INFO: === returned 5 row. - took 5 ms.
@@ -54,7 +54,7 @@ List<Artist> objects = ObjectSelect.query(Artist.class)
 
 The SQL will look different this time:
 
-[source, java]
+[source]
 ----
 INFO: SELECT t0.DATE_OF_BIRTH, t0.NAME, t0.ID FROM ARTIST t0 WHERE t0.NAME LIKE ?
 [bind: 1->NAME:'Pablo%']

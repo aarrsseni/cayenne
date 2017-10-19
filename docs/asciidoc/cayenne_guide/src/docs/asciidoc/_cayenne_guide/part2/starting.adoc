@@ -83,11 +83,20 @@ Web applications can use a variety of mechanisms to configure and start the "ser
 
 Still Cayenne includes a piece of web app configuration code that can assist in quickly setting up simple Cayenne-enabled web applications. We are talking about CayenneFilter. It is declared in web.xml:
 
-[source, java]
+[source, XML]
 ----
-ServerRuntime runtime = ServerRuntime.builder()
-                .addConfig("com/example/cayenne-project.xml")
-                .build();
+<web-app>
+    ...
+    <filter>
+        <filter-name>cayenne-project</filter-name>
+        <filter-class>org.apache.cayenne.configuration.web.CayenneFilter</filter-class>
+    </filter>
+     <filter-mapping>
+        <filter-name>cayenne-project</filter-name>
+        <url-pattern>/*</url-pattern>
+     </filter-mapping>
+    ...
+ </web-app>
 ----
 
 

@@ -99,14 +99,13 @@ $ mvn cayenne-modeler:run
 a|Name of the model file to open. Here is some simple example:
 [source,xml]
 ----
-<build>
-    <plugins>
-       <plugin>
-            <groupId>org.apache.cayenne.plugins</groupId>
-            <artifactId>cayenne-modeler-maven-plugin</artifactId>
-            <version>${cayenne.version}</version>
-        </plugin>
-    </plugins>
-</build>
+<plugin>
+    <groupId>org.apache.cayenne.plugins</groupId>
+    <artifactId>cayenne-modeler-maven-plugin</artifactId>
+    <version>${cayenne.version}</version>
+    <configuration>
+        <modelFile>src/main/resources/cayenne.xml</modelFile>
+    </configuration>
+</plugin>
 ----
 |===

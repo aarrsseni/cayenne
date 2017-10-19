@@ -35,7 +35,7 @@ This module allows to integrate any JCache (JSR 107) compatible caching provider
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy,subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-jcache:{version}'
 ----

@@ -35,7 +35,7 @@ The goal of this module is to capture commit changes and present them to interes
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy,subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-commitlog:{version}'
 ----
