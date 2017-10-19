@@ -52,9 +52,7 @@ Currently supported SQL types that can be used to store encrypted data are:
 
 . Character types, that will store _base64_ encoded value: _CHAR, NCHAR, CLOB, NCLOB, LONGVARCHAR, LONGNVARCHAR, VARCHAR, NVARCHAR_.
 
-====== Note
-
-Not all data types may be supported by your database.
+NOTE: Not all data types may be supported by your database.
 
 Default naming strategy that doesn't require additional setup suggests using "CRYPTO_" prefix. You can change this default strategy by injecting you own implementation of _org.apache.cayenne.crypto.map.ColumnMapper_ interface.
 
@@ -105,9 +103,7 @@ ServerRuntime.builder()
                 .module())
 ----
 
-====== Note
-
-In addition to Java primitive types (and their object counterparts), _crypto module_ supports encryption only of _java.util.Date, java.math.BigInteger_ and _java.math.BigDecimal_ types.
+NOTE: In addition to Java primitive types (and their object counterparts), _crypto module_ supports encryption only of _java.util.Date, java.math.BigInteger_ and _java.math.BigDecimal_ types.
 
 
 

@@ -159,8 +159,7 @@ JPQL details can be found in any JPA manual. Here we'll mention only how this fi
 
 Although most frequently EJBQLQuery is used as an alternative to SelectQuery, there are also DELETE and UPDATE varieties available.
 
-===== Note
-As of this version of Cayenne, DELETE and UPDATE do not change the state of objects in the ObjectContext. They are run directly against the database instead.
+NOTE: As of this version of Cayenne, DELETE and UPDATE do not change the state of objects in the ObjectContext. They are run directly against the database instead.
 
 
 [source, java]
@@ -278,9 +277,7 @@ int inserted = SQLExec
 
 _MappedSelect_ and _MappedExec_ is a queries that are just a reference to another queries stored in the DataMap. The actual stored query can be SelectQuery, SQLTemplate, EJBQLQuery, etc. Difference between _MappedSelect_ and _MappedExec_ is (as reflected in their names) whether underlying query intended to select data or just to perform some generic SQL code.
 
-====== Note
-
-These queries are "fluent" versions of deprecated _NamedQuery_ class.
+NOTE: These queries are "fluent" versions of deprecated _NamedQuery_ class.
 
 Here is example of how to use _MappedSelect_:
 
@@ -403,9 +400,7 @@ QueryResponse response = context.performGenericQuery(update);
 
 Cayenne doesn't make any attempt to make sense of the SQL semantics, so it doesn't know whether a given query is performing a select or update, etc. It is the the user's decision to run a given query as a selecting or "generic".
 
-===== Note
-
-Any data modifications done to DB as a result of SQLTemplate execution do not change the state of objects in the ObjectContext. So some objects in the context may become stale as a result.
+NOTE: Any data modifications done to DB as a result of SQLTemplate execution do not change the state of objects in the ObjectContext. So some objects in the context may become stale as a result.
 
 Another point to note is that the first argument to the SQLTemplate constructor - the Java class - has the same meaning as in SelectQuery only when the result can be converted to objects (e.g. when this is a selecting query and it is selecting all columns from one table). In this case it denotes the "root" entity of this query result. If the query does not denote a single entity result, this argument is only used for query routing, i.e. determining which database it should be run against. You are free to use any persistent class or even a DataMap instance in such situation. It will work as long as the passed "root" maps to the same database as the current query.
 
@@ -671,9 +666,7 @@ Full example:
 SELECT #result('ID' 'int'), #result('NAME' 'String'), #result('DATE_OF_BIRTH' 'java.util.Date') FROM ARTIST
 ----
 
-====== Note
-
-For advanced features you may look at the xref:velocity[Apache Velocity extension]
+NOTE: For advanced features you may look at the xref:velocity[Apache Velocity extension]
 
 ====== Mapping SQLTemplate Results
 

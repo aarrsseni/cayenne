@@ -55,9 +55,7 @@ public class MyEntity extends _MyEntity {
 
 After any modification of _MyEntity_ objects cache group "_some-group_" will be dropped from cache automatically.
 
-===== Note
-
-You can read more about cache and cache groups in corresponding xref:caching[chapter] of this documentation.
+NOTE: You can read more about cache and cache groups in corresponding xref:caching[chapter] of this documentation.
 
 In case you need some complex logic of cache invalidation you can disable default behaviour and provide your own.
 
@@ -85,9 +83,7 @@ ServerRuntime.builder()
                 .module())
 ----
 
-===== Note
-
-You can combine as many invalidation handlers as you need.
+NOTE: You can combine as many invalidation handlers as you need.
 
 
 

@@ -20,9 +20,7 @@ include::../var.adoc[]
 
 Since version 4.1 Cayenne doesn't allow to load project XML files from previous versions as this can lead to unexpected errors in runtime. This module allows to use project files from older versions performing their upgrade on the fly (without modifying files). This can be useful when using Cayenne models from third-party libraries in your app.
 
-===== Note
-
-You should prefer explicit project upgrade via Cayenne Modeler.
+NOTE: You should prefer explicit project upgrade via Cayenne Modeler.
 
 ==== Including in a project
 

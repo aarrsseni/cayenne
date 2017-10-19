@@ -617,9 +617,7 @@ cgen.dependsOn cdbimport
 compileJava.dependsOn cgen
 ----
 
-====== Note
-
-Running _cdbimport_ automatically with build not always a good choice, e.g. in case of complex model that you need to alter in the Cayenne Modeler after import.
+NOTE: Running _cdbimport_ automatically with build not always a good choice, e.g. in case of complex model that you need to alter in the Cayenne Modeler after import.
 
 ==== Ant Projects
 

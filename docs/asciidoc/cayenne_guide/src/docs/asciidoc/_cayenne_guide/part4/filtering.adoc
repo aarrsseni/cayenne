@@ -64,9 +64,7 @@ The same options are available for catalogs:
 </dbimport>
 ----
 
-===== Note
-
-Current version of reverse engineering doesn't support catalog filtering for Postgres database.
+NOTE: Current version of reverse engineering doesn't support catalog filtering for Postgres database.
 
 ==== Combine Schema and Catalog filters
 
@@ -362,9 +360,7 @@ Here is config sample for _Ant_ task:
 </catalog>
 ----
 
-===== Note
-
-In Ant task configuration all filter tags located inside root tag _<cdbimport>_ as there is no _<dbimport>_ tag.
+NOTE: In Ant task configuration all filter tags located inside root tag _<cdbimport>_ as there is no _<dbimport>_ tag.
 
 
 

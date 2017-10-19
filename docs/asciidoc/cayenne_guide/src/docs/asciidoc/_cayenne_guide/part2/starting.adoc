@@ -113,7 +113,5 @@ Of course the ObjectContext scope, and other behavior of the Cayenne runtime can
 
 For those interested in the DI container contents of the runtime created by CayenneFilter, it is the same ServerRuntime as would've been created by other means, but with an extra _org.apache.cayenne.configuration.web.WebModule_ module that provides _org.apache.cayenne.configuration.web.RequestHandler_ service. This is the service to override in the custom modules if you need to provide a different ObjectContext scope, etc.
 
-
-===== Note
-You should not think of CayenneFilter as the only way to start and use Cayenne in a web application. In fact CayenneFilter is entirely optional. Use it if you don't have any special design for application service management. If you do, simply integrate Cayenne into that design.
+NOTE: You should not think of CayenneFilter as the only way to start and use Cayenne in a web application. In fact CayenneFilter is entirely optional. Use it if you don't have any special design for application service management. If you do, simply integrate Cayenne into that design.
 

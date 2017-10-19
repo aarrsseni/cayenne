@@ -46,8 +46,6 @@ To use JCache provider in your app you need to include this module and caching p
 
 For advanced configuration and management please use provider specific options and tools.
 
-===== Note
-
-You can read about using cache in Cayenne in xref:caching[this] chapter.
+NOTE: You can read about using cache in Cayenne in xref:caching[this] chapter.
 
 You may else be interested in xref:cacheInvalidation[cache invalidation] extension.
