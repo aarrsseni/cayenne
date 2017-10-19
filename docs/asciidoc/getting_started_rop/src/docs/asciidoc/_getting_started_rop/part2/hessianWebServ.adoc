@@ -53,9 +53,7 @@ Now lets get back to the "tutorial" project that contains a web application and 
     </project>
 ----
 
-===== Note
-
-*Maven Optimization Hint* On a real project both server and client modules will likely share a common parent pom.xml where common repository delcaration can be placed, with child pom's "inheriting" it from parent. This would reduce build code duplication.
+NOTE: *Maven Optimization Hint* On a real project both server and client modules will likely share a common parent pom.xml where common repository delcaration can be placed, with child pom's "inheriting" it from parent. This would reduce build code duplication.
 
 ==== Client Classes on the Server
 
@@ -85,9 +83,7 @@ Cayenne web service is declared in the web.xml. It is implemented as a servlet "
     </web-app>
 ----
 
-===== Note
-
-*Extending Server Behavior via Callbacks* While no custom Java code is required on the server, just a service declaration, it is possible to customizing server-side behavior via callbacks and listeners (not shown in the tutorial).
+NOTE: *Extending Server Behavior via Callbacks* While no custom Java code is required on the server, just a service declaration, it is possible to customizing server-side behavior via callbacks and listeners (not shown in the tutorial).
 
 ==== Running ROP Server
 

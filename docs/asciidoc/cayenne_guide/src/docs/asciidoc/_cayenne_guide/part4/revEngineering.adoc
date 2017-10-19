@@ -39,9 +39,7 @@ Here is a list of options to tune what will be processed by reverse engineering:
 
 - *Select Catalog*: catalog to process
 
-===== Note
-
-You can only select one catalog. If you need to import multiple catalogs you need to run process several times.
+NOTE: You can only select one catalog. If you need to import multiple catalogs you need to run process several times.
 
 - *Table Name Pattern*: RegExp to filter tables. Default pattern .* includes all tables.
 

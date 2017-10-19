@@ -44,9 +44,7 @@ Open web.xml file in the server project and setup security constraints with BASI
 
 ==== Configuring Jetty for BASIC Authentication
 
-===== Note
-
-These instructions are specific to Jetty 6. Other containers (and versions of Jetty) will have different mechansims to achieve the same thing.
+NOTE: These instructions are specific to Jetty 6. Other containers (and versions of Jetty) will have different mechansims to achieve the same thing.
 
 Open pom.xml in the server project and configure a "userRealm" for the Jetty plugin:
 

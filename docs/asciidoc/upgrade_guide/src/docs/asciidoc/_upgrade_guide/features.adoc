@@ -223,7 +223,7 @@ As was mentioned above, cgen now includes Property<T> static variables for expre
 
 Cayenne now provides it's own Gradle Plugin that allows you easily integrate cdbimport and cgen tools into your build process. Here is example of it's usage:
 
-[source]
+[source, Groovy]
 ----
 buildscript {
     repositories {

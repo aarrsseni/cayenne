@@ -35,7 +35,7 @@ Crypto module allows encrypt and decrypt values stored in DB transparently to yo
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy, subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-crypto:{version}'
 ----
@@ -105,9 +105,7 @@ ServerRuntime.builder()
                 .module())
 ----
 
-====== Note
-
-In addition to Java primitive types (and their object counterparts), _crypto module_ supports encryption only of _java.util.Date, java.math.BigInteger_ and _java.math.BigDecimal_ types.
+NOTE: In addition to Java primitive types (and their object counterparts), _crypto module_ supports encryption only of _java.util.Date, java.math.BigInteger_ and _java.math.BigDecimal_ types.
 
 
 

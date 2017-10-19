@@ -35,7 +35,7 @@ This module enables usage of Apache Commons DBCP2 connection pool.
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy, subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-dbcp2:{version}'
 ----

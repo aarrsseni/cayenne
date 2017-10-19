@@ -35,7 +35,7 @@ Java 8 module allows to use _java.time.LocalTime, java.time.LocalDate_ and _java
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy, subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-java8:{version}'
 ----

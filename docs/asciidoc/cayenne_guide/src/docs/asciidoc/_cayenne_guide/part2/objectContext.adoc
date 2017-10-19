@@ -34,7 +34,7 @@ ObjectContext is serializable and does not permanently hold to any of the applic
 
 Cayenne can persist Java objects that implement _org.apache.cayenne.Persistent interface_. Generally persistent classes are generated from the model as described above, so users do not have to worry about superclass and property implementation details.
 
-Persistent interface provides access to 3 persistence-related properties - objectId, persistenceState and objectContext. All 3 are initialized by Cayenne runtime framework. Application code should not attempt to change them them. However it is allowed to read them, which provides valuable runtime information. E.g. ObjectId can be used for quick equality check of 2 objects, knowing persistence state would allow highlighting changed objects, etc.
+Persistent interface provides access to 3 persistence-related properties - objectId, persistenceState and objectContext. All 3 are initialized by Cayenne runtime framework. Application code should not attempt to change them. However it is allowed to read them, which provides valuable runtime information. E.g. ObjectId can be used for quick equality check of 2 objects, knowing persistence state would allow highlighting changed objects, etc.
 
 Each persistent object belongs to a single ObjectContext, and can be in one of the following persistence states (as defined in _org.apache.cayenne.PersistenceState_) :
 
@@ -147,7 +147,7 @@ Often an appliction needs to inspect mapping metadata. This information is store
 EntityResolver resolver = objectContext.getEntityResolver();
 ----
 
-Here we discussed the most commonly used subset of the ObjectContext API. There are other useful methods, e.g. those allowing to inspect registered objects state en bulk, etc. Check the latest JavaDocs for details.
+Here we discussed the most commonly used subset of the ObjectContext API. There are other useful methods, e.g. those allowing to inspect registered objects state in bulk, etc. Check the latest JavaDocs for details.
 
 ==== Cayenne Helper Class
 

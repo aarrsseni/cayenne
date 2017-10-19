@@ -35,7 +35,7 @@ Joda time module allows to use _org.joda.time.LocalTime_, _org.joda.time.LocalDa
 
 ===== Gradle
 
-[source,subs="verbatim,attributes"]
+[source, Groovy, subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-joda:{version}'
 ----

@@ -448,7 +448,7 @@ To include Cayenne into your Gradle project you have two options:
 
 - Simply add Cayenne as a dependency:
 
-[source, subs="verbatim,attributes"]
+[source, Groovy, subs="verbatim,attributes"]
 ----
 compile 'org.apache.cayenne:cayenne-server:{version}'
 ----
@@ -457,9 +457,9 @@ compile 'org.apache.cayenne:cayenne-server:{version}'
 
 ===== Gradle Plugin
 
-Cayenne Gradle plugin provides several tasks, such as synching generated Java classes with the mapping or synching mapping with the database. Plugin aslo provides _cayenne_ extension that have some useful utility methods. Here is example of how to include Cayenne plugin into your project:
+Cayenne Gradle plugin provides several tasks, such as synching generated Java classes with the mapping or synching mapping with the database. Plugin also provides _cayenne_ extension that have some useful utility methods. Here is example of how to include Cayenne plugin into your project:
 
-[source, subs="verbatim,attributes"]
+[source, Groovy, subs="verbatim,attributes"]
 ----
 buildscript {
     // add Maven Central repository
@@ -468,7 +468,7 @@ buildscript {
     }
     // add Cayenne Gradle Plugin
     dependencies {
-        classpath group: 'org.apache.cayenne.plugins', name: 'cayenne-gradle-plugin', version: '{version}'
+        classpath group: 'org.apache.cayenne.plugins', name: 'cayenne-gradle-plugin', version: '{plugin-version}'
     }
 }
 
@@ -496,7 +496,7 @@ Cgen task generates Java classes based on your DataMap, it has same configuratio
 
 Here is how you can change settings of the default _cgen_ task:
 
-[source]
+[source, Groovy]
 ----
 cgen {
     client = false
@@ -509,7 +509,7 @@ cgen {
 And here is example of how to define additional cgen task (e.g. for client classes if you are using ROP):
 
 
-[source, Gradle]
+[source, Groovy]
 ----
 task clientCgen(type: cayenne.cgen) {
     client = true
@@ -522,7 +522,7 @@ This task is for creating and synchronizing your Cayenne model from database sch
 
 Here is example of configuration for cdbimport task:
 
-[source, Gradle]
+[source, Groovy]
 ----
 cdbimport {
     // map can be skipped if it is defined in cayenne.defaultDataMap
@@ -586,7 +586,7 @@ Cdbgen task drops and/or generates tables in a database on Cayenne DataMap. Full
 
 Here is example of how to configure default _cdbgen_ task:
 
-[source]
+[source, Groovy]
 ----
 cdbgen {
 
@@ -612,15 +612,13 @@ cdbgen {
 
 With gradle you can easily connect Cayenne tasks to default build lifecycle. Here is short example of how to connect defaut _cgen_ and _cdbimport_ tasks with _compileJava_ task:
 
-[source]
+[source, Groovy]
 ----
 cgen.dependsOn cdbimport
 compileJava.dependsOn cgen
 ----
 
-====== Note
-
-Running _cdbimport_ automatically with build not always a good choice, e.g. in case of complex model that you need to alter in the Cayenne Modeler after import.
+NOTE: Running _cdbimport_ automatically with build not always a good choice, e.g. in case of complex model that you need to alter in the Cayenne Modeler after import.
 
 ==== Ant Projects
 
