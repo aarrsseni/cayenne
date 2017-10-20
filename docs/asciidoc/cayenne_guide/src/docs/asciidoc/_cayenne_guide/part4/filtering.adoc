@@ -211,7 +211,7 @@ Cayenne reverse engineering let you fine tune table, columns and stored procedur
 </excludeProcedure>
 ----
 
-All filtering tags _<includeTable>_, _<excludeTable>_, _<includeColumn>_, _<excludeColumn>_, _<includeProcedure>_ and _<excludeProcedure>_ have 2 ways to pass filtering RegExp.
+All filtering tags `<includeTable>`, `<excludeTable>`, `<includeColumn>`, `<excludeColumn>`, `<includeProcedure>` and `<excludeProcedure>` have 2 ways to pass filtering RegExp.
 
 1) text inside tag
 
@@ -229,7 +229,7 @@ All filtering tags _<includeTable>_, _<excludeTable>_, _<includeColumn>_, _<excl
      </includeTable>
 ----
 
-All filtering tags can be placed inside schema and catalog tags, but also inside _<dbimport>_ tag. It means that filtering rules will be applied for all schemas and catalogs.
+All filtering tags can be placed inside schema and catalog tags, but also inside `<dbimport>` tag. It means that filtering rules will be applied for all schemas and catalogs.
 
 ==== Complete filtering example
 
@@ -323,7 +323,7 @@ The cdbimport will execute reverse engineering task for all entities from “sho
 
 ==== Ant configuration example
 
-Here is config sample for _Ant_ task:
+Here is config sample for `Ant` task:
 
 [source, XML]
 ----
@@ -360,7 +360,7 @@ Here is config sample for _Ant_ task:
 </catalog>
 ----
 
-NOTE: In Ant task configuration all filter tags located inside root tag _<cdbimport>_ as there is no _<dbimport>_ tag.
+NOTE: In Ant task configuration all filter tags located inside root tag `<cdbimport>` as there is no `<dbimport>` tag.
 
 
 

@@ -16,7 +16,7 @@
 
 ==== Starting and Stopping ServerRuntime
 
-In runtime Cayenne is accessed via _org.apache.cayenne.configuration.server.ServerRuntime_. ServerRuntime is created by calling a convenient builder:
+In runtime Cayenne is accessed via `org.apache.cayenne.configuration.server.ServerRuntime`. ServerRuntime is created by calling a convenient builder:
 
 [source, java]
 ----
@@ -75,7 +75,7 @@ When the projects are merged, the following rules are applied:
 
 - If there are two or more DataNodes with the same name, only one DataNode is used in the merged project, the rest are discarded. DataNode coming from project with the highest index in the project list is chosen per precedence rule above.
 
-- There is a notion of "default" DataNode. After the merge if any DataMaps are not explicitly linked to DataNodes, their queries will be executed via a default DataNode. This makes it possible to build mapping "libraries" that are only associated with a specific database in runtime. If there's only one DataNode in the merged project, it will be automatically chosen as default. A possible way to explicitly designate a specific node as default is to override _DataDomainProvider.createAndInitDataDomain()_.
+- There is a notion of "default" DataNode. After the merge if any DataMaps are not explicitly linked to DataNodes, their queries will be executed via a default DataNode. This makes it possible to build mapping "libraries" that are only associated with a specific database in runtime. If there's only one DataNode in the merged project, it will be automatically chosen as default. A possible way to explicitly designate a specific node as default is to override `DataDomainProvider.createAndInitDataDomain()`.
 
 ==== Web Applications
 
@@ -111,7 +111,7 @@ When the application runs, all HTTP requests matching the filter url-pattern wil
 
 Of course the ObjectContext scope, and other behavior of the Cayenne runtime can be customized via dependency injection. For this another filter init parameter called "extra-modules" is used. "extra-modules" is a comma or space-separated list of class names, with each class implementing Module interface. These optional custom modules are loaded after the the standard ones, which allows users to override all standard definitions.
 
-For those interested in the DI container contents of the runtime created by CayenneFilter, it is the same ServerRuntime as would've been created by other means, but with an extra _org.apache.cayenne.configuration.web.WebModule_ module that provides _org.apache.cayenne.configuration.web.RequestHandler_ service. This is the service to override in the custom modules if you need to provide a different ObjectContext scope, etc.
+For those interested in the DI container contents of the runtime created by CayenneFilter, it is the same ServerRuntime as would've been created by other means, but with an extra `org.apache.cayenne.configuration.web.WebModule` module that provides `org.apache.cayenne.configuration.web.RequestHandler` service. This is the service to override in the custom modules if you need to provide a different ObjectContext scope, etc.
 
 NOTE: You should not think of CayenneFilter as the only way to start and use Cayenne in a web application. In fact CayenneFilter is entirely optional. Use it if you don't have any special design for application service management. If you do, simply integrate Cayenne into that design.
 

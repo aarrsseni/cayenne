@@ -42,9 +42,9 @@ compile 'org.apache.cayenne:cayenne-commitlog:{version}'
 
 ==== Usage
 
-In order to use _commitlog_ module you need to perform three steps:
+In order to use `commitlog` module you need to perform three steps:
 
-1) Mark all entities which changes you are interested in with _@org.apache.cayenne.commitlog.CommitLog_ annotation
+1) Mark all entities which changes you are interested in with `@org.apache.cayenne.commitlog.CommitLog` annotation
 
 [source, Java]
 ----
@@ -54,7 +54,7 @@ public class MyEntity extends _MyEntity {
 }
 ----
 
-2) Implement _CommitLogListener_ interface.
+2) Implement `CommitLogListener` interface.
 
 [source, java]
 ----
@@ -71,7 +71,7 @@ public class MyEntity extends _MyEntity {
 }
 ----
 
-3) Inject your listener into _ServerRuntime_
+3) Inject your listener into `ServerRuntime`
 
 [source, java]
 ----

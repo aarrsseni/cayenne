@@ -14,7 +14,7 @@
 
 == Appendix B. Service Collections
 
-Note that the collection keys below are defined as constants in _org.apache.cayenne.configuration.Constants_ interface.
+Note that the collection keys below are defined as constants in `org.apache.cayenne.configuration.Constants` interface.
 
 [[serviceCollections]]
 .Service Collection Keys Present in ServerRuntime and/or ClientRuntime
@@ -22,41 +22,41 @@ Note that the collection keys below are defined as constants in _org.apache.caye
 |===
 |Collection Property |Type |Description
 
-.^|_cayenne.properties_
-.^|_Map<String,String>_
+.^|`cayenne.properties`
+.^|`Map<String,String>`
 .^|Properties used by built-in Cayenne services. The keys in this map are the property names from the table in Appendix A. Separate copies of this map exist on the server and ROP client.
 
-.^|_cayenne.server.adapter_detectors_
-.^|_List<DbAdapterDetector>_
+.^|`cayenne.server.adapter_detectors`
+.^|`List<DbAdapterDetector>`
 .^|Contains objects that can discover the type of current database and install the correct DbAdapter in runtime.
 
-.^|_cayenne.server.domain_filters_
-.^|_List<DataChannelFilter>_
+.^|`cayenne.server.domain_filters`
+.^|`List<DataChannelFilter>`
 .^|Stores DataDomain filters.
 
 
-.^|_cayenne.server.project_locations_
-.^|_List<String>_
+.^|`cayenne.server.project_locations`
+.^|`List<String>`
 .^|Stores locations of the one of more project configuration files.
 
 
-.^|_cayenne.server.default_types_
-.^|_List<ExtendedType>_
-.^|Stores default adapter-agnostic ExtendedTypes. Default ExtendedTypes can be overridden / extended by DB-specific DbAdapters as well as by user-provided types configured in another colltecion (see "_cayenne.server.user_types_").
+.^|`cayenne.server.default_types`
+.^|`List<ExtendedType>`
+.^|Stores default adapter-agnostic ExtendedTypes. Default ExtendedTypes can be overridden / extended by DB-specific DbAdapters as well as by user-provided types configured in another colltecion (see `"cayenne.server.user_types"`).
 
 
-.^|_cayenne.server.user_types_
-.^|_List<ExtendedType>_
+.^|`cayenne.server.user_types`
+.^|`List<ExtendedType>`
 .^|Stores a user-provided ExtendedTypes. This collection will be merged into a full list of ExtendedTypes and would override any ExtendedTypes defined in a default list, or by a DbAdapter.
 
 
-.^|_cayenne.server.type_factories_
-.^|_List<ExtendedTypeFactory>_
+.^|`cayenne.server.type_factories`
+.^|`List<ExtendedTypeFactory>`
 .^|Stores default and user-provided ExtendedTypeFactories. ExtendedTypeFactory allows to define ExtendedTypes dynamically for the whole group of Java classes. E.g. Cayenne supplies a factory to map all Enums regardless of their type.
 
 
-.^|_cayenne.server.rop_event_bridge_properties_
-.^|_Map<String, String>_
-.^|Stores event bridge properties passed to the ROP client on bootstrap. This means that the map is configured by server DI, and passed to the client via the wire. The properties in this map are specific to EventBridgeFactory implementation (e.g JMS or XMPP connection prameters). One common property is "_cayenne.server.rop_event_bridge_factory_" that defines the type of the factory.
+.^|`cayenne.server.rop_event_bridge_properties`
+.^|`Map<String, String>`
+.^|Stores event bridge properties passed to the ROP client on bootstrap. This means that the map is configured by server DI, and passed to the client via the wire. The properties in this map are specific to EventBridgeFactory implementation (e.g JMS or XMPP connection prameters). One common property is `"cayenne.server.rop_event_bridge_factory"` that defines the type of the factory.
 
 |===

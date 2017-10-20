@@ -18,7 +18,7 @@ include::../var.adoc[]
 
 ==== Description
 
-Joda time module allows to use _org.joda.time.LocalTime_, _org.joda.time.LocalDate_, _org.joda.time.LocalDateTime_ and _org.joda.time.DateTime_ types for entity attributes.
+Joda time module allows to use `org.joda.time.LocalTime`, `org.joda.time.LocalDate`, `org.joda.time.LocalDateTime` and `org.joda.time.DateTime` types for entity attributes.
 
 ==== Including in a project
 

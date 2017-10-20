@@ -18,7 +18,7 @@ In databases relations are defined via foreign keys and there are a lot of diffe
 
 ==== Skip Relationships Loading
 
-You are able to skip relationships loading by the _<skipRelationshipsLoading>_ element.
+You are able to skip relationships loading by the `<skipRelationshipsLoading>` element.
 
 [source, XML]
 ----
@@ -29,7 +29,7 @@ You are able to skip relationships loading by the _<skipRelationshipsLoading>_ e
 
 ==== Skip Primary Keys Loading
 
-Another useful Cayenne reverse engineering property is _<skipPrimaryKeyLoading>_. If you decide to support all relationships at the application layer and avoid their management in database, you’ll find useful to turn off primary keys synchronization at all.
+Another useful Cayenne reverse engineering property is `<skipPrimaryKeyLoading>`. If you decide to support all relationships at the application layer and avoid their management in database, you’ll find useful to turn off primary keys synchronization at all.
 
 [source, XML]
 ----
@@ -40,7 +40,7 @@ Another useful Cayenne reverse engineering property is _<skipPrimaryKeyLoading>_
 
 ==== Table Types
 
-By default, cdbimport imports tables and views. Some databases may support other table-like objects, e.g. _SYSTEM TABLE, GLOBAL TEMPORARY, LOCAL TEMPORARY, ALIAS, SYNONYM,_ etc. To control which types should be included _<tableType></tableType>_ element is used. Some examples:
+By default, cdbimport imports tables and views. Some databases may support other table-like objects, e.g. `SYSTEM TABLE, GLOBAL TEMPORARY, LOCAL TEMPORARY, ALIAS, SYNONYM`, etc. To control which types should be included `<tableType></tableType>` element is used. Some examples:
 
 Import tables only (skip views and others and other types):
 

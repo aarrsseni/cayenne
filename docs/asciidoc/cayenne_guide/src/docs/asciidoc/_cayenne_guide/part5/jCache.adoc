@@ -42,7 +42,7 @@ compile 'org.apache.cayenne:cayenne-jcache:{version}'
 
 ==== Usage
 
-To use JCache provider in your app you need to include this module and caching provider libs (e.g. Ehcache). You can provide own implementation of _org.apache.cayenne.jcache.JCacheConfigurationFactory_ to customize cache configuration if required.
+To use JCache provider in your app you need to include this module and caching provider libs (e.g. Ehcache). You can provide own implementation of `org.apache.cayenne.jcache.JCacheConfigurationFactory` to customize cache configuration if required.
 
 For advanced configuration and management please use provider specific options and tools.
 
