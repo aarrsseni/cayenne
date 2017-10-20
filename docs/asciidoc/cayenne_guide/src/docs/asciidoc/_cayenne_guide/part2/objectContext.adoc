@@ -32,11 +32,11 @@ ObjectContext is serializable and does not permanently hold to any of the applic
 
 ==== Persistent Object and its Lifecycle
 
-Cayenne can persist Java objects that implement _org.apache.cayenne.Persistent interface_. Generally persistent classes are generated from the model as described above, so users do not have to worry about superclass and property implementation details.
+Cayenne can persist Java objects that implement `org.apache.cayenne.Persistent interface`. Generally persistent classes are generated from the model as described above, so users do not have to worry about superclass and property implementation details.
 
 Persistent interface provides access to 3 persistence-related properties - objectId, persistenceState and objectContext. All 3 are initialized by Cayenne runtime framework. Application code should not attempt to change them. However it is allowed to read them, which provides valuable runtime information. E.g. ObjectId can be used for quick equality check of 2 objects, knowing persistence state would allow highlighting changed objects, etc.
 
-Each persistent object belongs to a single ObjectContext, and can be in one of the following persistence states (as defined in _org.apache.cayenne.PersistenceState_) :
+Each persistent object belongs to a single ObjectContext, and can be in one of the following persistence states (as defined in `org.apache.cayenne.PersistenceState`) :
 
 [[persistenceStates]]
 .Persistence States
@@ -102,7 +102,7 @@ context.commitChanges();
 
 At this point all in-memory changes are analyzed and a minimal set of SQL statements is issued in a single transaction to synchronize the database with the in-memory state. In our example "commitChanges" commits just one object, but generally it can be any number of objects.
 
-If instead of commit, we wanted to reset all changed objects to the previously committed state, we'd call _rollbackChanges_ instead:
+If instead of commit, we wanted to reset all changed objects to the previously committed state, we'd call `rollbackChanges` instead:
 
 [source, java]
 ----
@@ -119,7 +119,7 @@ newArtist.setName("Picasso");
 
 It will only exist in memory until "commitChanges" is issued. On commit Cayenne might generate a new primary key (unless a user set it explicitly, or a PK was inferred from a relationship) and issue an INSERT SQL statement to permanently store the object.
 
-_deleteObjects_ method takes one or more Persistent objects and marks them as "DELETED":
+`deleteObjects` method takes one or more Persistent objects and marks them as "DELETED":
 
 [source, java]
 ----
@@ -129,7 +129,7 @@ context.deleteObjects(artist2, artist3, artist4);
 
 Additionally "deleteObjects" processes all delete rules modeled for the affected objects. This may result in implicitly deleting or modifying extra related objects. Same as insert and update, delete operations are sent to the database only when "commitChanges" is called. Similarly "rollbackChanges" will undo the effect of "newObject" and "deleteObjects".
 
-_localObject_ returns a copy of a given persistent object that is "local" to a given ObjectContext:
+`localObject` returns a copy of a given persistent object that is "local" to a given ObjectContext:
 
 Since an application often works with more than one context, "localObject" is a rather common operation. E.g. to improve performance a user might utilize a single shared context to select and cache data, and then occasionally transfer some selected objects to another context to modify and commit them:
 
@@ -151,7 +151,7 @@ Here we discussed the most commonly used subset of the ObjectContext API. There 
 
 ==== Cayenne Helper Class
 
-There is a useful helper class called "Cayenne" (fully-qualified name "_org.apache.cayenne.Cayenne_") that builds on ObjectContext API to provide a number of very common operations. E.g. get a primary key (most entities do not model PK as an object property) :
+There is a useful helper class called "Cayenne" (fully-qualified name `"org.apache.cayenne.Cayenne"`) that builds on ObjectContext API to provide a number of very common operations. E.g. get a primary key (most entities do not model PK as an object property) :
 
 [source, java]
 ----
@@ -262,9 +262,9 @@ Considering how much attention is given to managing transactions in most other O
 
 Two cases where transactions need to be taken into consideration are container-managed and application-managed transactions.
 
-If you are using an EJB container (or some other JTA environment), you'll likely need to switch Cayenne runtime into "external transactions mode". This is done by setting DI configuration property defined in _Constants.SERVER_EXTERNAL_TX_PROPERTY_ (see Appendix A). If this property is set to "true", Cayenne assumes that JDBC Connections obtained by runtime whenever that might happen are all coming from a transactional DataSource managed by the container. In this case Cayenne does not attempt to commit or rollback the connections, leaving it up to the container to do that when appropriate.
+If you are using an EJB container (or some other JTA environment), you'll likely need to switch Cayenne runtime into "external transactions mode". This is done by setting DI configuration property defined in `Constants.SERVER_EXTERNAL_TX_PROPERTY` (see Appendix A). If this property is set to "true", Cayenne assumes that JDBC Connections obtained by runtime whenever that might happen are all coming from a transactional DataSource managed by the container. In this case Cayenne does not attempt to commit or rollback the connections, leaving it up to the container to do that when appropriate.
 
-In the second scenario, an application might need to define its own transaction scope that spans more than one Cayenne operation. E.g. two sequential commits that need to be rolled back together in case of failure. This can be done via _ServerRuntime.performInTransaction_ method:
+In the second scenario, an application might need to define its own transaction scope that spans more than one Cayenne operation. E.g. two sequential commits that need to be rolled back together in case of failure. This can be done via `ServerRuntime.performInTransaction` method:
 
 [source, java]
 ----

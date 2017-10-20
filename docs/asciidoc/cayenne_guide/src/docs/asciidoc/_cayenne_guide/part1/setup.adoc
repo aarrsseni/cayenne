@@ -64,7 +64,7 @@ CayenneModeler GUI tool is intended to work with object relational mapping proje
 - Windows distribution contains CayenneModeler.exe file in the bin directory.
 - Cross-platform distribution (targeting Linux, but as the name implies, compatible with any OS) contains a runnable CayenneModeler.jar in the bin directory. It can be executed either by double-clicking, or if the environment is not configured to execute jars, by running from command-line:
 
-[source,bash]
+[source]
 ----
 $ java -jar CayenneModeler.jar
 ----
@@ -85,7 +85,7 @@ The Modeler can also be started from Maven. While it may look like an exotic way
 
 And then can be run as
 
-[source,bash]
+[source]
 ----
 $ mvn cayenne-modeler:run
 ----

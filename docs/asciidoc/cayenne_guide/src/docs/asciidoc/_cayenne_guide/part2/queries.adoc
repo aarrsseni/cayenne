@@ -85,7 +85,7 @@ There's a number of other useful methods in ObjectSelect that define what to sel
 
 ===== Selecting individual columns
 
-_ObjectSelect_ query can be used to fetch individual properties of objects via type-safe API:
+`ObjectSelect` query can be used to fetch individual properties of objects via type-safe API:
 
 [source, java]
 ----
@@ -93,7 +93,7 @@ List<String> names = ObjectSelect.columnQuery(Artist.class, Artist.ARTIST_NAME)
     .select(context);
 ----
 
-And here is example of selecting several properties, note that result will be _Object[]_:
+And here is example of selecting several properties, note that result will be `Object[]`:
 
 [source, java]
 ----
@@ -131,7 +131,7 @@ for(Object[] next : artistAndPaintingCount) {
 }
 ----
 
-Here is generated _SQL_ for this query:
+Here is generated `SQL` for this query:
 
 [source, SQL]
 ----
@@ -143,7 +143,6 @@ HAVING COUNT(t1.PAINTING_ID) < ?
 ORDER BY COUNT(t1.PAINTING_ID) DESC, t0.ARTIST_NAME
 ----
 
-[[ejbqlquery]]
 [[ejbql]]
 ==== EJBQLQuery
 
@@ -233,7 +232,7 @@ While Cayenne Expressions discussed previously can be thought of as identical to
 
 ===== SelectById
 
-This query allows to search objects by their ID. It's introduced in Cayenne 4.0 and uses new "fluent" API same as _ObjectSelect_ query.
+This query allows to search objects by their ID. It's introduced in Cayenne 4.0 and uses new "fluent" API same as `ObjectSelect` query.
 
 Here is example of how to use it:
 
@@ -247,7 +246,7 @@ Artist artistWithId1 = SelectById.query(Artist.class, 1)
 
 ===== SQLSelect and SQLExec
 
-_SQLSelect_ and _SQLExec_ are essentially a "fluent" versions of older _SQLTemplate_ query. _SQLSelect_ can be used (as name suggests) to select custom data in form of entities, separate columns or collection of _DataRow_. _SQLExec_ is designed to just execute any raw SQL code (e.g. updates, deletes, DDLs, etc.) This queries support all directives described in xref:sqltemplate[SQLTemplate] section.
+`SQLSelect` and `SQLExec` are essentially a "fluent" versions of older `SQLTemplate` query. `SQLSelect` can be used (as name suggests) to select custom data in form of entities, separate columns or collection of `DataRow. SQLExec` is designed to just execute any raw SQL code (e.g. updates, deletes, DDLs, etc.) This queries support all directives described in xref:sqltemplate[SQLTemplate] section.
 
 Here is example of how to use SQLSelect:
 
@@ -263,7 +262,7 @@ SQLSelect<Painting> q1 = SQLSelect
 ----
 
 
-And here is example of how to use _SQLExec_:
+And here is example of how to use `SQLExec`:
 
 [source, java]
 ----
@@ -275,11 +274,11 @@ int inserted = SQLExec
 
 ===== MappedSelect and MappedExec
 
-_MappedSelect_ and _MappedExec_ is a queries that are just a reference to another queries stored in the DataMap. The actual stored query can be SelectQuery, SQLTemplate, EJBQLQuery, etc. Difference between _MappedSelect_ and _MappedExec_ is (as reflected in their names) whether underlying query intended to select data or just to perform some generic SQL code.
+`MappedSelect` and `MappedExec` is a queries that are just a reference to another queries stored in the DataMap. The actual stored query can be SelectQuery, SQLTemplate, EJBQLQuery, etc. Difference between `MappedSelect` and `MappedExec` is (as reflected in their names) whether underlying query intended to select data or just to perform some generic SQL code.
 
-NOTE: These queries are "fluent" versions of deprecated _NamedQuery_ class.
+NOTE: These queries are "fluent" versions of deprecated `NamedQuery` class.
 
-Here is example of how to use _MappedSelect_:
+Here is example of how to use `MappedSelect`:
 
 [source, java]
 ----
@@ -288,7 +287,7 @@ List<Artist> results = MappedSelect.query("artistsByName", Artist.class) 
     .select(context);
 ----
 
-And here is example of _MappedExec_:
+And here is example of `MappedExec`:
 
 [source, java]
 ----
@@ -300,7 +299,7 @@ System.out.println("Rows updated: " + result.firstUpdateCount());
 
 ==== ProcedureCall
 
-Stored procedures are mapped as separate objects in CayenneModeler. _ProcedureCall_ provides a way to execute them with a certain set of parameters. This query is a "fluent" version of older _ProcedureQuery_. Just like with _SQLTemplate_, the outcome of a procedure can be anything - a single result set, multiple result sets, some data modification (returned as an update count), or a combination of these. So use root class to get a single result set, and use only procedure name for anything else:
+Stored procedures are mapped as separate objects in CayenneModeler. `ProcedureCall` provides a way to execute them with a certain set of parameters. This query is a "fluent" version of older `ProcedureQuery`. Just like with `SQLTemplate`, the outcome of a procedure can be anything - a single result set, multiple result sets, some data modification (returned as an update count), or a combination of these. So use root class to get a single result set, and use only procedure name for anything else:
 
 
 [source, java]
@@ -322,7 +321,7 @@ ProcedureResult result = ProcedureCall.query("my_procedure")
     .call();
 ----
 
-A stored procedure can return data back to the application as result sets or via OUT parameters. To simplify the processing of the query output, QueryResponse treats OUT parameters as if it was a separate result set. For stored procedures declaref any OUT or INOUT parameters, _ProcedureResult_ have convenient utility method to get them:
+A stored procedure can return data back to the application as result sets or via OUT parameters. To simplify the processing of the query output, QueryResponse treats OUT parameters as if it was a separate result set. For stored procedures declaref any OUT or INOUT parameters, `ProcedureResult` have convenient utility method to get them:
 
 [source, java]
 ----
@@ -337,7 +336,7 @@ There maybe a situation when a stored procedure handles its own transactions, bu
 
 ==== Custom Queries
 
-If a user needs some extra functionality not addressed by the existing set of Cayenne queries, he can write his own. The only requirement is to implement _org.apache.cayenne.query.Query_ interface. The easiest way to go about it is to subclass some of the base queries in Cayenne.
+If a user needs some extra functionality not addressed by the existing set of Cayenne queries, he can write his own. The only requirement is to implement `org.apache.cayenne.query.Query` interface. The easiest way to go about it is to subclass some of the base queries in Cayenne.
 
 E.g. to do something directly in the JDBC layer, you might subclass AbstractQuery:
 
@@ -421,7 +420,7 @@ query.setTemplate(PostgresAdapter.class.getName(), pgSQL);
 
 The most interesting aspect of SQLTemplate (and the reason why it is called a "template") is that a SQL string is treated by Cayenne as an Apache Velocity template. Before sending it to DB as a PreparedStatement, the String is evaluated in the Velocity context, that does variable substitutions, and performs special callbacks in response to various directives, thus controlling query interaction with the JDBC layer.
 
-Check Velocity docs for the syntax details. Here we'll just mention the two main scripting elements - "variables" (that look like _$var_) and "directives" (that look like _#directive(p1 p2 p3)_). All built-in Velocity directives are supported. Additionally Cayenne defines a number of its own directives to bind parameters to PreparedStatements and to control the structure of the ResultSet. These directives are described in the following sections.
+Check Velocity docs for the syntax details. Here we'll just mention the two main scripting elements - "variables" (that look like `$var`) and "directives" (that look like `#directive(p1 p2 p3)`). All built-in Velocity directives are supported. Additionally Cayenne defines a number of its own directives to bind parameters to PreparedStatements and to control the structure of the ResultSet. These directives are described in the following sections.
 
 
 ===== Variable Substitution
@@ -437,9 +436,9 @@ query.setParameters(Collections.singletonMap("tableName", "mydb.PAINTING"));
 // this will generate SQL like this: "delete from mydb.PAINTING"
 ----
 
-The example above demonstrates the point made earlier in this chapter - even if we don't know upfront which table the query will run against, we can still use a fixed "root" in constructor (_Artist.class_ in this case) , as we are not planning on converting the result to objects.
+The example above demonstrates the point made earlier in this chapter - even if we don't know upfront which table the query will run against, we can still use a fixed "root" in constructor (`Artist.class` in this case) , as we are not planning on converting the result to objects.
 
-Variable substitution within the text uses "_object.toString()_" method to replace the variable value. Keep in mind that this may not be appropriate in all situations. E.g. passing a date object in a WHERE clause expression may be converted to a String not understood by the target RDBMS SQL parser. In such cases variable should be wrapped in _#bind_ directive as described below.
+Variable substitution within the text uses `"object.toString()"` method to replace the variable value. Keep in mind that this may not be appropriate in all situations. E.g. passing a date object in a WHERE clause expression may be converted to a String not understood by the target RDBMS SQL parser. In such cases variable should be wrapped in `#bind` directive as described below.
 
 [[directives]]
 ===== Directives
@@ -448,7 +447,7 @@ These are the Cayenne directives used to customize SQLTemplate parsing and integ
 
 ====== #bind
 
-Creates a PreparedStatement positional parameter in place of the directive, binding the value to it before statement execution. _#bind_ is allowed in places where a "?" would be allowed in a PreparedStatement. And in such places it almost always makes sense to pass objects to the template via this or other forms of #bind instead of inserting them inline.
+Creates a PreparedStatement positional parameter in place of the directive, binding the value to it before statement execution. `#bind` is allowed in places where a "?" would be allowed in a PreparedStatement. And in such places it almost always makes sense to pass objects to the template via this or other forms of #bind instead of inserting them inline.
 
 Semantics:
 
@@ -461,11 +460,11 @@ Semantics:
 
 Arguments:
 
-- _value_ - can either be a char constant or a variable that is resolved from the query parameters. Note that the variable can be a collection, that will be automatically expanded into a list of individual value bindings. This is useful for instance to build IN conditions.
+- `value` - can either be a char constant or a variable that is resolved from the query parameters. Note that the variable can be a collection, that will be automatically expanded into a list of individual value bindings. This is useful for instance to build IN conditions.
 
-- _jdbcType_ - is a JDBC data type of the parameter as defined in _java.sql.Types_.
+- `jdbcType` - is a JDBC data type of the parameter as defined in `java.sql.Types`.
 
-- _scale_ - An optional scale of the numeric value. Same as "scale" in PreparedStatement.
+- `scale` - An optional scale of the numeric value. Same as "scale" in PreparedStatement.
 
 Usage:
 
@@ -487,7 +486,7 @@ update ARTIST set NAME = #bind($name) where ID = #bind($id)
 
 ====== #bindEqual
 
-Same as #bind, but also includes the "=" sign in front of the value binding. Look at the example below - we took the #bind example and replaced "_ID = #bind(..)_" with "ID _#bindEqual(..)_". While it looks like a clumsy shortcut to eliminate the equal sign, the actual reason why this is useful is that it allows the value to be null. If the value is not null, "_= ?_" is generated, but if it is, the resulting chunk of the SQL would look like "_IS NULL_" and will be compilant with what the DB expects.
+Same as #bind, but also includes the "=" sign in front of the value binding. Look at the example below - we took the #bind example and replaced `"ID = #bind(..)"` with `"ID #bindEqual(..)"`. While it looks like a clumsy shortcut to eliminate the equal sign, the actual reason why this is useful is that it allows the value to be null. If the value is not null, `"= ?"` is generated, but if it is, the resulting chunk of the SQL would look like `"IS NULL"` and will be compilant with what the DB expects.
 
 Semantics:
 
@@ -522,7 +521,7 @@ update ARTIST set NAME = #bind($name) where ID #bindEqual($id)
 
 ====== #bindNotEqual
 
-This directive deals with the same issue as _#bindEqual_ above, only it generates "not equal" in front of the value (or IS NOT NULL).
+This directive deals with the same issue as `#bindEqual` above, only it generates "not equal" in front of the value (or IS NOT NULL).
 
 Semantics:
 
@@ -566,11 +565,11 @@ Semantics:
 
 Arguments:
 
-- _value_ - must be a variable that is resolved from the query parameters to a Persistent or ObjectId.
+- `value` - must be a variable that is resolved from the query parameters to a Persistent or ObjectId.
 
-- _columns_ - the names of the columns to generate in the SQL.
+- `columns` - the names of the columns to generate in the SQL.
 
-- _idColumn_ - the names of the ID columns for a given entity. Must match the order of "columns" to match against.
+- `idColumn` - the names of the ID columns for a given entity. Must match the order of "columns" to match against.
 
 Usage:
 
@@ -639,13 +638,13 @@ Semantics:
 
 Arguments:
 
-- _column_ - the name of the column to render in SQL SELECT clause.
+- `column` - the name of the column to render in SQL SELECT clause.
 
-- _javaType_ - a fully-qualified Java class name for a given result column. For simplicity most common Java types used in JDBC can be specified without a package. These include all numeric types, primitives, String, SQL dates, BigDecimal and BigInteger. So "_#result('A' 'String')_", "_#result('B' 'java.lang.String')_" and "_#result('C' 'int')_" are all valid
+- `javaType` - a fully-qualified Java class name for a given result column. For simplicity most common Java types used in JDBC can be specified without a package. These include all numeric types, primitives, String, SQL dates, BigDecimal and BigInteger. So "_#result('A' 'String')_", "_#result('B' 'java.lang.String')_" and "_#result('C' 'int')_" are all valid
 
-- _alias_ - specifies both the SQL alias of the column and the value key in the DataRow. If omitted, "column" value is used.
+- `alias` - specifies both the SQL alias of the column and the value key in the DataRow. If omitted, "column" value is used.
 
-- _dataRowKey_ - needed if SQL 'alias' is not appropriate as a DataRow key on the Cayenne side. One common case when this happens is when a DataRow retrieved from a query is mapped using joint prefetch keys (see below). In this case DataRow must use database path expressions for joint column keys, and their format is incompatible with most databases alias format.
+- `dataRowKey` - needed if SQL 'alias' is not appropriate as a DataRow key on the Cayenne side. One common case when this happens is when a DataRow retrieved from a query is mapped using joint prefetch keys (see below). In this case DataRow must use database path expressions for joint column keys, and their format is incompatible with most databases alias format.
 
 Usage:
 
@@ -757,9 +756,9 @@ q.addPrefetch(Artist.PAINTINGS_PROPERTY)
 List<Artist> objects = context.performQuery(query);
 ----
 
-And the final tip deals with capitalization of the DataRow keys. Queries like "_SELECT * FROM..._" and even "_SELECT COLUMN1, COLUMN2, ... FROM ..._" can sometimes result in Cayenne exceptions on attempts to convert fetched DataRows to objects. Essentially any query that is not using a _#result_ directive to describe the result set is prone to this problem, as different databases may produce different capitalization of the java.sql.ResultSet columns.
+And the final tip deals with capitalization of the DataRow keys. Queries like `"SELECT * FROM..."` and even `"SELECT COLUMN1, COLUMN2, ... FROM ..."` can sometimes result in Cayenne exceptions on attempts to convert fetched DataRows to objects. Essentially any query that is not using a `#result` directive to describe the result set is prone to this problem, as different databases may produce different capitalization of the java.sql.ResultSet columns.
 
-The most universal way to address this issue is to describe each column explicitly in the SQLTemplate via _#result_, e.g.: "_SELECT #result('column1'), #result('column2'), .._". However this quickly becomes impractical for tables with lots of columns. For such cases Cayenne provides a shortcut based on the fact that an ORM mapping usually follows some naming convention for the column names. Simply put, for case-insensitive databases developers normally use either all lowercase or all uppercase column names. Here is the API that takes advantage of that user knowledge and forces Cayenne to follow a given naming convention for the DataRow keys (this is also available as a dropdown in the Modeler):
+The most universal way to address this issue is to describe each column explicitly in the SQLTemplate via `#result`, e.g.: `"SELECT #result('column1'), #result('column2'), .."`. However this quickly becomes impractical for tables with lots of columns. For such cases Cayenne provides a shortcut based on the fact that an ORM mapping usually follows some naming convention for the column names. Simply put, for case-insensitive databases developers normally use either all lowercase or all uppercase column names. Here is the API that takes advantage of that user knowledge and forces Cayenne to follow a given naming convention for the DataRow keys (this is also available as a dropdown in the Modeler):
 
 [source, Java]
 ----

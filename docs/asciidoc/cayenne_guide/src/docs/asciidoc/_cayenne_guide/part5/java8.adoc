@@ -18,7 +18,7 @@ include::../var.adoc[]
 
 ==== Description
 
-Java 8 module allows to use _java.time.LocalTime, java.time.LocalDate_ and _java.time.LocalDateTime_ types for entity attributes
+Java 8 module allows to use `java.time.LocalTime, java.time.LocalDate` and `java.time.LocalDateTime` types for entity attributes
 
 ==== Including in a project
 

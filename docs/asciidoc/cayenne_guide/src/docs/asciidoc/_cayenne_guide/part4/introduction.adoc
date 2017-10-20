@@ -24,11 +24,11 @@ An ORM system consists of three parts: database, OR mapping and persistent Java 
 
 - A SQL migrations framework is used to bring a local DB to a certain version. This is outside of the scope of Cayenne and is done with a third-party tool, such as Liquibase or Flyway.
 
-- OR mapping model (Cayenne XML files) are synchronized with the state of the database using "_cdbimport_" tool provdied by Cayenne.
+- OR mapping model (Cayenne XML files) are synchronized with the state of the database using `"cdbimport"` tool provdied by Cayenne.
 
-- Object layer of the OR mapping model is customized to the developer liking, usually via CayenneModeler. Subsequent runs of "_cdbimport_" will not override any customizations that you make.
+- Object layer of the OR mapping model is customized to the developer liking, usually via CayenneModeler. Subsequent runs of `"cdbimport"` will not override any customizations that you make.
 
-- Java classes are generated using "_cgen_" tool provided by Cayenne.
+- Java classes are generated using `"cgen"` tool provided by Cayenne.
 
 "cgen" and "cdbimport" tools can be invoked from Maven or Ant as discussed in the "Including Cayenne in a Project" chapter or run from CayenneModeler. This chapter will mostly focus on "cdbimport".
 
@@ -61,7 +61,7 @@ Here is a simple Maven configuration of "cdbimport" (for details see xref:mavenC
 		<dependencies>
 			<!-- jdbc driver dependency -->
 		</dependencies>
-	</plugin>
+</plugin>
 ----
 In the next chapters we will discuss various filtering and other reverse-engineering options.
 

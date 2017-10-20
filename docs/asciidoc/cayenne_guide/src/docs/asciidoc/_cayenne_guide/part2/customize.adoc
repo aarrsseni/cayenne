@@ -86,7 +86,7 @@ public class Service2Impl implements Service2 {
 }
 ----
 
-Now let's create a module implementing _org.apache.cayenne.tutorial.di.Module_ interface that will contain DI configuration. A module binds service objects to keys that are reference. Binder provided by container implements fluent API to connect the key to implementation, and to configure various binding options (the options, such as scope, are demonstrated later in this chapter). The simplest form of a key is a Java Class object representing service interface. Here is a module that binds Service1 and Service2 to corresponding default implementations:
+Now let's create a module implementing `org.apache.cayenne.tutorial.di.Module` interface that will contain DI configuration. A module binds service objects to keys that are reference. Binder provided by container implements fluent API to connect the key to implementation, and to configure various binding options (the options, such as scope, are demonstrated later in this chapter). The simplest form of a key is a Java Class object representing service interface. Here is a module that binds Service1 and Service2 to corresponding default implementations:
 
 [source, Java]
 ----
@@ -99,7 +99,7 @@ public class Module1 implements Module {
 }
 ----
 
-Once we have at least one module, we can create a DI container. _org.apache.cayenne.di.Injector_ is the container class in Cayenne:
+Once we have at least one module, we can create a DI container. `org.apache.cayenne.di.Injector` is the container class in Cayenne:
 
 [source, Java]
 ----
@@ -155,9 +155,9 @@ Another types of confiuguration that can be bound in the container are lists and
 
 ===== Service Lifecycle
 
-An important feature of the Cayenne DI container is instance scope. The default scope (implicitly used in all examples above) is "singleton", meaning that a binding would result in creation of only one service instance, that will be repeatedly returned from _Injector.getInstance(..)_, as well as injected into classes that declare it as a dependency.
+An important feature of the Cayenne DI container is instance scope. The default scope (implicitly used in all examples above) is "singleton", meaning that a binding would result in creation of only one service instance, that will be repeatedly returned from `Injector.getInstance(..)`, as well as injected into classes that declare it as a dependency.
 
-Singleton scope dispatches a "BeforeScopeEnd" event to interested services. This event occurs before the scope is shutdown, i.e. when _Injector.shutdown()_ is called. Note that the built-in Cayenne injector is shutdown behind the scenes when _ServerRuntime.shutdown()_ is invoked. Services may register as listeners for this event by annotating a no-argument method with _@BeforeScopeEnd_ annotation. Such method should be implemented if a service needs to clean up some resources, stop threads, etc.
+Singleton scope dispatches a "BeforeScopeEnd" event to interested services. This event occurs before the scope is shutdown, i.e. when `Injector.shutdown()` is called. Note that the built-in Cayenne injector is shutdown behind the scenes when `ServerRuntime.shutdown()` is invoked. Services may register as listeners for this event by annotating a no-argument method with `@BeforeScopeEnd` annotation. Such method should be implemented if a service needs to clean up some resources, stop threads, etc.
 
 Another useful scope is "no scope", meaning that every time a container is asked to provide a service instance for a given key, a new instance will be created and returned:
 
@@ -166,7 +166,7 @@ Another useful scope is "no scope", meaning that every time a container is asked
 binder.bind(Service2.class).to(Service2Impl.class).withoutScope();
 ----
 
-Users can also create their own scopes, e.g. a web application request scope or a session scope. Most often than not custom scopes can be created as instances of _org.apache.cayenne.di.spi.DefaultScope_ with startup and shutdown managed by the application (e.g. singleton scope is a DefaultScope managed by the Injector) .
+Users can also create their own scopes, e.g. a web application request scope or a session scope. Most often than not custom scopes can be created as instances of `org.apache.cayenne.di.spi.DefaultScope` with startup and shutdown managed by the application (e.g. singleton scope is a DefaultScope managed by the Injector) .
 
 ===== Overriding Services
 
@@ -205,7 +205,7 @@ There are two ways to set service properties. The most obvious one is to pass it
 $ java -Dcayenne.server.contexts_sync_strategy=false ...
 ----
 
-A second one is to contribute a property to _org.apache.cayenne.configuration.DefaultRuntimeProperties.properties_ map (see the next section on how to do that). This map contains the default property values and can accept application-specific values, overrding the defaults.
+A second one is to contribute a property to `org.apache.cayenne.configuration.DefaultRuntimeProperties.properties` map (see the next section on how to do that). This map contains the default property values and can accept application-specific values, overrding the defaults.
 
 Note that if a property value is a name of a Java class, when this Java class is instantiated by Cayenne, the container performs injection of instance variables. So even the dynamically specified Java classes can use @Inject annotation to get a hold of other Cayenne services.
 
@@ -213,7 +213,7 @@ If the same property is specified both in the command line and in the properties
 
 ===== Contributing to Service Collections
 
-Cayenne can be extended by adding custom objects to named maps or lists bound in DI. We are calling these lists/maps "service collections". A service collection allows things like appending a custom strategy to a list of built-in strategies. E.g. an application that needs to install a custom DbAdapter for some database type may contribute an instance of custom DbAdapterDetector to a _org.apache.cayenne.configuration.server.DefaultDbAdapterFactory.detectors_ list:
+Cayenne can be extended by adding custom objects to named maps or lists bound in DI. We are calling these lists/maps "service collections". A service collection allows things like appending a custom strategy to a list of built-in strategies. E.g. an application that needs to install a custom DbAdapter for some database type may contribute an instance of custom DbAdapterDetector to a `org.apache.cayenne.configuration.server.DefaultDbAdapterFactory.detectors` list:
 
 [source, Java]
 ----
@@ -233,15 +233,15 @@ binder.bindList(DefaultDbAdapterFactory.DETECTORS_LIST)
        .add(MyDbAdapterDetector.class);
 ----
 
-Maps are customized using a similar "_bindMap_" method.
+Maps are customized using a similar `"bindMap"` method.
 
 The names of built-in collections are listed in "Appendix B".
 
 ===== Alternative Service Implementations
 
-As mentioned above, custom modules are loaded by ServerRuntime after the built-in modules. So it is easy to redefine a built-in service in Cayenne by rebinding desired implementations or providers. To do that, first we need to know what those services to redefine are. While we describe some of them in the following sections, the best way to get a full list is to check the source code of the Cayenne version you are using and namely look in _org.apache.cayenne.configuration.server.ServerModule_ - the main built-in module in Cayenne.
+As mentioned above, custom modules are loaded by ServerRuntime after the built-in modules. So it is easy to redefine a built-in service in Cayenne by rebinding desired implementations or providers. To do that, first we need to know what those services to redefine are. While we describe some of them in the following sections, the best way to get a full list is to check the source code of the Cayenne version you are using and namely look in `org.apache.cayenne.configuration.server.ServerModule` - the main built-in module in Cayenne.
 
-Now an example of overriding _QueryCache_ service. The default implementation of this service is provided by _MapQueryCacheProvider_. But if we want to use _EhCacheQueryCache_ (a Cayenne wrapper for the EhCache framework), we can define it like this:
+Now an example of overriding `QueryCache` service. The default implementation of this service is provided by `MapQueryCacheProvider`. But if we want to use `EhCacheQueryCache` (a Cayenne wrapper for the EhCache framework), we can define it like this:
 
 [source, Java]
 ----
@@ -252,9 +252,9 @@ binder.bind(QueryCache.class).to(EhCacheQueryCache.class);
 
 ===== Value object type
 
-_ValueObjectType_ is a new and lightweight alternative to the Extended Types API described in the following section. In most cases is should be preferred as is it easier to understand and use. Currently only one case is known when _ExtendedType_ should be used: when your value object can be mapped on different JDBC types.
+`ValueObjectType` is a new and lightweight alternative to the Extended Types API described in the following section. In most cases is should be preferred as is it easier to understand and use. Currently only one case is known when `ExtendedType` should be used: when your value object can be mapped on different JDBC types.
 
-In order to use your custom data type you should implement _ValueObjectType_ describing it in terms of some type already known to Cayenne (e.g. backed by system or user ExtendedType). Let's assume we want to support some data type called _Money_:
+In order to use your custom data type you should implement `ValueObjectType` describing it in terms of some type already known to Cayenne (e.g. backed by system or user ExtendedType). Let's assume we want to support some data type called `Money`:
 
 [source, Java]
 ----
@@ -273,7 +273,7 @@ public class Money {
 }
 ----
 
-Here is how _ValueObjectType_ that will allow to store our _Money_ class as _BigDecimal_ can be implemented:
+Here is how `ValueObjectType` that will allow to store our `Money` class as `BigDecimal` can be implemented:
 
 [source, Java]
 ----
@@ -306,7 +306,7 @@ public class MoneyValueObjectType implements ValueObjectType<Money, BigDecimal> 
 }
 ----
 
-Last step is to register this new type in _ServerRuntime_:
+Last step is to register this new type in `ServerRuntime`:
 
 [source, Java]
 ----
@@ -324,7 +324,7 @@ JDBC specification defines a set of "standard" database column types (defined in
 
 ====== Supporting Non-Standard Types
 
-For supporting non-standard type you should define it via an interface _org.apache.cayenne.access.types.ExtendedType_. An implementation must provide _ExtendedType.getClassName()_ method that returns a fully qualified Java class name for the supported custom type, and a number of methods that convert data between JDBC and custom type. The following example demonstrates how to add a custom DoubleArrayType to store _java.lang.Double[]_ as a custom string in a database:
+For supporting non-standard type you should define it via an interface `org.apache.cayenne.access.types.ExtendedType`. An implementation must provide `ExtendedType.getClassName()` method that returns a fully qualified Java class name for the supported custom type, and a number of methods that convert data between JDBC and custom type. The following example demonstrates how to add a custom DoubleArrayType to store `java.lang.Double[]` as a custom string in a database:
 
 [source, Java]
 ----
@@ -425,17 +425,17 @@ ServerRuntime runtime = ServerRuntime.builder()
 
 ====== DbAdapters and Extended Types
 
-As shown in the example above, ExtendedTypes are stored by DbAdapter. In fact DbAdapters often install their own extended types to address incompatibilities, incompleteness and differences between JDBC drivers in handling "standard" JDBC types. For instance some drivers support reading large character columns (CLOB) as java.sql.Clob, but some other - as "character stream", etc. Adapters provided with Cayenne override _configureExtendedTypes()_ method to install their own types, possibly substituting Cayenne defaults. Custom DbAdapters can use the same technique.
+As shown in the example above, ExtendedTypes are stored by DbAdapter. In fact DbAdapters often install their own extended types to address incompatibilities, incompleteness and differences between JDBC drivers in handling "standard" JDBC types. For instance some drivers support reading large character columns (CLOB) as java.sql.Clob, but some other - as "character stream", etc. Adapters provided with Cayenne override `configureExtendedTypes()` method to install their own types, possibly substituting Cayenne defaults. Custom DbAdapters can use the same technique.
 
 ==== Noteworthy Built-in Services
 
 ===== JdbcEventLogger
 
-_org.apache.cayenne.log.JdbcEventLogger_ is the service that defines logging API for Cayenne internals. It provides facilities for logging queries, commits, transactions, etc. The default implementation is _org.apache.cayenne.log.Slf4jJdbcEventLogger_ that performs logging via slf4j-api library. Cayenne library includes another potentially useful logger - _org.apache.cayenne.log.FormattedSlf4jJdbcEventLogger_ that produces formatted multiline SQL output that can be easier to read.
+`org.apache.cayenne.log.JdbcEventLogger` is the service that defines logging API for Cayenne internals. It provides facilities for logging queries, commits, transactions, etc. The default implementation is `org.apache.cayenne.log.Slf4jJdbcEventLogger` that performs logging via slf4j-api library. Cayenne library includes another potentially useful logger - `org.apache.cayenne.log.FormattedSlf4jJdbcEventLogger` that produces formatted multiline SQL output that can be easier to read.
 
 ===== DataSourceFactory
 
-Factory that returns _javax.sql.DataSource_ object based on the configuration provided in the "nodeDescriptor".
+Factory that returns `javax.sql.DataSource` object based on the configuration provided in the "nodeDescriptor".
 
 ===== DataChannelFilter
 

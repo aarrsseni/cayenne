@@ -53,7 +53,7 @@ public class MyEntity extends _MyEntity {
 }
 ----
 
-After any modification of _MyEntity_ objects cache group "_some-group_" will be dropped from cache automatically.
+After any modification of `MyEntity` objects cache group `"some-group"` will be dropped from cache automatically.
 
 ===== Note
 
@@ -61,7 +61,7 @@ You can read more about cache and cache groups in corresponding xref:caching[cha
 
 In case you need some complex logic of cache invalidation you can disable default behaviour and provide your own.
 
-To do so you need to implement _org.apache.cayenne.cache.invalidation.InvalidationHandler_ interface and setup Cache Invalidation module to use it. Let's use implementation class called _CustomInvalidationHandler_ that will simply match all entities' types with "_custom-group_" cache group regardless of any annotations:
+To do so you need to implement `org.apache.cayenne.cache.invalidation.InvalidationHandler` interface and setup Cache Invalidation module to use it. Let's use implementation class called `CustomInvalidationHandler` that will simply match all entities' types with `"custom-group"` cache group regardless of any annotations:
 
 [source, java]
 ----
@@ -73,7 +73,7 @@ public class CustomInvalidationHandler implements InvalidationHandler {
 }
 ----
 
-Now we'll set up it's usage by _ServerRuntime_:
+Now we'll set up it's usage by `ServerRuntime`:
 
 [source, java]
 ----
