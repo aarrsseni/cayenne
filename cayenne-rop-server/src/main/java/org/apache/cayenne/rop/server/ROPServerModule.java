@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
-package org.apache.cayenne.configuration.rop.server;
+package org.apache.cayenne.rop.server;
 
 import org.apache.cayenne.configuration.Constants;
 import org.apache.cayenne.di.Binder;

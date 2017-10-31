@@ -16,20 +16,29 @@
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
-package org.apache.cayenne.configuration.web;
+package org.apache.cayenne.remote;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import org.apache.cayenne.remote.ClientMessage;
+import org.apache.cayenne.remote.RemoteService;
+import org.apache.cayenne.remote.RemoteSession;
 
-/**
- * A service invoked by {@link CayenneFilter} that provides a callback mechanism to bind
- * appropriate ObjectContext to the request thread, handle transactions, etc.
- * 
- * @since 3.1
- */
-public interface RequestHandler {
+import java.rmi.RemoteException;
 
-    void requestStart(ServletRequest request, ServletResponse response);
+public class MockRemoteService implements RemoteService {
 
-    void requestEnd(ServletRequest request, ServletResponse response);
+    public RemoteSession establishSession() throws RemoteException {
+        return null;
+    }
+
+    public RemoteSession establishSharedSession(String name) throws RemoteException {
+        return null;
+    }
+
+    public Object processMessage(ClientMessage message) throws RemoteException, Throwable {
+        return null;
+    }
+
+    @Override
+    public void close() throws RemoteException {
+    }
 }

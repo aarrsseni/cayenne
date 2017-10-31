@@ -16,20 +16,35 @@
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
-package org.apache.cayenne.configuration.web;
 
-import org.apache.cayenne.di.Binder;
-import org.apache.cayenne.di.Module;
+package org.apache.cayenne.remote.hessian;
 
-/**
- * @since 3.1
- */
-public class WebModule implements Module {
+import com.caucho.hessian.io.AbstractSerializerFactory;
+import com.caucho.hessian.io.Deserializer;
+import com.caucho.hessian.io.HessianProtocolException;
+import com.caucho.hessian.io.Serializer;
+import org.apache.cayenne.map.EntityResolver;
 
-    public void configure(Binder binder) {
-        binder
-                .bind(RequestHandler.class)
-                .to(SessionContextRequestHandler.class)
-                .withoutScope();
+public class MockAbstractSerializerFactory extends AbstractSerializerFactory {
+
+    protected EntityResolver entityResolver;
+
+    @Override
+    public Serializer getSerializer(Class cl) throws HessianProtocolException {
+        return null;
     }
+
+    @Override
+    public Deserializer getDeserializer(Class cl) throws HessianProtocolException {
+        return null;
+    }
+
+    public EntityResolver getEntityResolver() {
+        return entityResolver;
+    }
+
+    public void setEntityResolver(EntityResolver entityResolver) {
+        this.entityResolver = entityResolver;
+    }
+
 }
