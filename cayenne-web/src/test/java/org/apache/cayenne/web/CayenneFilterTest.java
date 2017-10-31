@@ -51,7 +51,6 @@ public class CayenneFilterTest {
 		config.setupServletContext(context);
 
 		CayenneFilter filter = new CayenneFilter();
-		System.out.println(context);
 		assertNull(WebUtil.getCayenneRuntime(context));
 		filter.init(config);
 
@@ -105,9 +104,6 @@ public class CayenneFilterTest {
 				Key.getListOf(String.class, Constants.SERVER_PROJECT_LOCATIONS_LIST));
 		assertEquals(Arrays.asList("cayenne-abc.xml"), locations);
 		Collection<Module> modules = runtime.getModules();
-		for(Module m : modules){
-			System.out.println(m.getClass().getName());
-		}
 		assertEquals(3, modules.size());
 
 		Object[] marray = modules.toArray();
@@ -138,9 +134,6 @@ public class CayenneFilterTest {
 		assertNotNull(runtime);
 
 		Collection<Module> modules = runtime.getModules();
-        for(Module m : modules){
-            System.out.println(m.getClass().getName());
-        }
 		assertEquals(5, modules.size());
 
 		Object[] marray = modules.toArray();

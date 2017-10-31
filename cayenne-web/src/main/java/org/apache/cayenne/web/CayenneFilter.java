@@ -69,7 +69,7 @@ public class CayenneFilter implements Filter {
         WebConfiguration configAdapter = new WebConfiguration(config);
 
         String configurationLocation = configAdapter.getConfigurationLocation();
-        Collection<Module> modules = configAdapter.createModules(new WebModule());
+        Collection<Module> modules = configAdapter.createModules();
         modules.addAll(getAdditionalModules());
 
         ServerRuntime runtime = ServerRuntime.builder()

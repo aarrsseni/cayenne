@@ -71,6 +71,7 @@
 		<module>cayenne-project-compatibility</module>
 		<module>cayenne-protostuff</module>
 		<module>cayenne-server</module>
+		<module>cayenne-web</module>
 		<module>cayenne-velocity</module>
 		<module>eventbridges</module>
 		<module>itests</module>
