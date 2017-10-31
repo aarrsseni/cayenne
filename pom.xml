@@ -80,6 +80,7 @@
 		<module>docs</module>
 		<module>assembly</module>
         <module>cayenne-web</module>
+        <module>cayenne-osgi</module>
     </modules>
 	<issueManagement>
 		<system>jira</system>
@@ -768,7 +769,7 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.20.1</version>
 				</plugin>
-				<plugin>   
+				<plugin>
 					<groupId>org.apache.felix</groupId>
   					<artifactId>maven-bundle-plugin</artifactId>
 					<version>3.3.0</version>
@@ -800,7 +801,7 @@
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>3.0.0-M1</version>
 					<configuration>
-						<!-- Java 8 is too strict about Javadoc omissions --> 
+						<!-- Java 8 is too strict about Javadoc omissions -->
 						<additionalparam>${javadoc.doclint.none}</additionalparam>
 					</configuration>
 				</plugin>
@@ -1198,7 +1199,7 @@
 			</build>
 		</profile>
 
-		<!-- DB profiles .. 
+		<!-- DB profiles ..
 				HSQL is used if no DB profile property is set explicitly.
 				Also there's a separate 'hsql' profile.
 		-->
