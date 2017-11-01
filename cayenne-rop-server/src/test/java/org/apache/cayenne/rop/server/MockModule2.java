@@ -16,35 +16,17 @@
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
+package org.apache.cayenne.rop.server;
 
-package org.apache.cayenne.remote.hessian;
 
-import com.caucho.hessian.io.AbstractSerializerFactory;
-import com.caucho.hessian.io.Deserializer;
-import com.caucho.hessian.io.HessianProtocolException;
-import com.caucho.hessian.io.Serializer;
-import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.di.Binder;
+import org.apache.cayenne.di.Module;
+import org.apache.cayenne.web.RequestHandler;
 
-public class MockAbstractSerializerFactory extends AbstractSerializerFactory {
+public class MockModule2 implements Module {
 
-    protected EntityResolver entityResolver;
-
-    @Override
-    public Serializer getSerializer(Class cl) throws HessianProtocolException {
-        return null;
-    }
-
-    @Override
-    public Deserializer getDeserializer(Class cl) throws HessianProtocolException {
-        return null;
-    }
-
-    public EntityResolver getEntityResolver() {
-        return entityResolver;
-    }
-
-    public void setEntityResolver(EntityResolver entityResolver) {
-        this.entityResolver = entityResolver;
+    public void configure(Binder binder) {
+        binder.bind(RequestHandler.class).to(MockRequestHandler.class);
     }
 
 }

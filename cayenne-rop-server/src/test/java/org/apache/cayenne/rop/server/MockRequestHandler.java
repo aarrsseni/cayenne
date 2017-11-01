@@ -16,25 +16,20 @@
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
-package org.apache.cayenne.configuration.web;
+package org.apache.cayenne.rop.server;
 
-import org.apache.cayenne.di.Injector;
-import org.apache.cayenne.di.spi.DefaultInjector;
-import org.junit.Test;
+import org.apache.cayenne.web.RequestHandler;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
-public class WebModuleTest {
 
-    @Test
-    public void testBind_Scopes() {
+public class MockRequestHandler implements RequestHandler {
 
-        Injector injector = new DefaultInjector(new WebModule());
-        RequestHandler handler = injector.getInstance(RequestHandler.class);
-        assertTrue(handler instanceof SessionContextRequestHandler);
-
-        RequestHandler handler1 = injector.getInstance(RequestHandler.class);
-        assertNotSame("Incorrect singleton scope for request handler", handler, handler1);
+    public void requestEnd(ServletRequest request, ServletResponse response) {
     }
+
+    public void requestStart(ServletRequest request, ServletResponse response) {
+    }
+
 }

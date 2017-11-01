@@ -28,7 +28,7 @@ import org.apache.cayenne.remote.RemoteService;
 public class ROPHessianServlet_ConfigModule implements Module {
 
     public void configure(Binder binder) {
-        
+
         DataDomain domain = new DataDomain("x");
         binder.bind(DataChannel.class).toInstance(domain);
         binder.bind(DataDomain.class).toInstance(domain);

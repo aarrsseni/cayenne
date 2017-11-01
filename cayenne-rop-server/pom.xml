@@ -33,9 +33,8 @@
         <dependency>
             <groupId>org.apache.cayenne</groupId>
             <artifactId>cayenne-web</artifactId>
-            <version>4.1.M2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
-
         <!-- TEST DEPENDENCIES -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -45,6 +44,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cayenne.build-tools</groupId>
+            <artifactId>cayenne-test-utilities</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

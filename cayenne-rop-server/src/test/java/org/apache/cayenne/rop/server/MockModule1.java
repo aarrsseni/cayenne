@@ -16,30 +16,15 @@
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
-package org.apache.cayenne.configuration.web;
+package org.apache.cayenne.rop.server;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import org.apache.cayenne.di.Binder;
+import org.apache.cayenne.di.Module;
 
-public class CayenneFilter_DispatchRequestHandler implements RequestHandler {
 
-    private int started;
-    private int ended;
+public class MockModule1 implements Module {
 
-    public void requestEnd(ServletRequest request, ServletResponse response) {
-        ended++;
-    }
-
-    public void requestStart(ServletRequest request, ServletResponse response) {
-        started++;
-    }
-
-    public int getStarted() {
-        return started;
-    }
-
-    public int getEnded() {
-        return ended;
+    public void configure(Binder binder) {
     }
 
 }

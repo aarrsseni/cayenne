@@ -32,19 +32,19 @@ public class WebUtilTest {
 	public void testGetCayenneRuntime() {
 		MockServletContext context = new MockServletContext();
 
-		assertNull(org.apache.cayenne.configuration.web.WebUtil.getCayenneRuntime(context));
+		assertNull(WebUtil.getCayenneRuntime(context));
 
 		CayenneRuntime runtime = mock(CayenneRuntime.class);
 
-		org.apache.cayenne.configuration.web.WebUtil.setCayenneRuntime(context, runtime);
-		assertSame(runtime, org.apache.cayenne.configuration.web.WebUtil.getCayenneRuntime(context));
+		WebUtil.setCayenneRuntime(context, runtime);
+		assertSame(runtime, WebUtil.getCayenneRuntime(context));
 
 		CayenneRuntime runtime1 = mock(CayenneRuntime.class);
 
-		org.apache.cayenne.configuration.web.WebUtil.setCayenneRuntime(context, runtime1);
-		assertSame(runtime1, org.apache.cayenne.configuration.web.WebUtil.getCayenneRuntime(context));
+		WebUtil.setCayenneRuntime(context, runtime1);
+		assertSame(runtime1, WebUtil.getCayenneRuntime(context));
 
-		org.apache.cayenne.configuration.web.WebUtil.setCayenneRuntime(context, null);
+		WebUtil.setCayenneRuntime(context, null);
 		assertNull(WebUtil.getCayenneRuntime(context));
 	}
 }
