@@ -91,36 +91,36 @@ public class ROPServletTest {
 		assertEquals(Arrays.asList(location), locations);
 	}
 
-//	@Test
-//	public void testInitWithStandardModules() throws Exception {
-//
-//		String name = "cayenne-org.apache.cayenne.configuration.rop.server.test-config";
-//
-//		MockServletConfig config = new MockServletConfig();
-//		config.setServletName(name);
-//
-//		MockServletContext context = new MockServletContext();
-//		config.setServletContext(context);
-//
-//		ROPServlet servlet = new ROPServlet();
-//		servlet.init(config);
-//
-//		runtime = WebUtil.getCayenneRuntime(context);
-//		assertNotNull(runtime);
-//
-//		List<String> locations = runtime.getInjector().getInstance(
-//				Key.getListOf(String.class, Constants.SERVER_PROJECT_LOCATIONS_LIST));
-//
-//		assertEquals(Arrays.asList(name + ".xml"), locations);
-//
-//		Collection<Module> modules = runtime.getModules();
-//		assertEquals(3, modules.size());
-//		Object[] marray = modules.toArray();
-//
-//		assertTrue(marray[0] instanceof ServerModule);
-//		// [2] is an inner class
-//		assertTrue(marray[1] instanceof ROPServerModule);
-//	}
+	@Test
+	public void testInitWithStandardModules() throws Exception {
+
+		String name = "cayenne-org.apache.cayenne.configuration.rop.server.test-config";
+
+		MockServletConfig config = new MockServletConfig();
+		config.setServletName(name);
+
+		MockServletContext context = new MockServletContext();
+		config.setServletContext(context);
+
+		ROPServlet servlet = new ROPServlet();
+		servlet.init(config);
+
+		runtime = WebUtil.getCayenneRuntime(context);
+		assertNotNull(runtime);
+
+		List<String> locations = runtime.getInjector().getInstance(
+				Key.getListOf(String.class, Constants.SERVER_PROJECT_LOCATIONS_LIST));
+
+		assertEquals(Arrays.asList(name + ".xml"), locations);
+
+		Collection<Module> modules = runtime.getModules();
+		assertEquals(3, modules.size());
+		Object[] marray = modules.toArray();
+
+		assertTrue(marray[0] instanceof ServerModule);
+		// [2] is an inner class
+		assertTrue(marray[1] instanceof ROPServerModule);
+	}
 
 //	@Test
 //	public void testInitWithExtraModules() throws Exception {
