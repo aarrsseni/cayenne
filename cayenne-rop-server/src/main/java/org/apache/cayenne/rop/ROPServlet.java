@@ -56,7 +56,8 @@ public class ROPServlet extends HttpServlet {
         String configurationLocation = configAdapter.getConfigurationLocation();
         Map<String, String> eventBridgeParameters = configAdapter.getOtherParameters();
 
-        Collection<Module> modules = configAdapter.createModules();
+        Collection<Module> modules = configAdapter.createModules(new ROPServerModule(
+                eventBridgeParameters));
 
         ServerRuntime runtime = ServerRuntime.builder()
                 .addConfig(configurationLocation)
