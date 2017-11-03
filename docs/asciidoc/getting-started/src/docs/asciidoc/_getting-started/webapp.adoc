@@ -31,6 +31,16 @@ session-scoped context._
 
 So let's convert the tutorial that we created to a web application:
 
+- Add dependency to your `pom.xml` to include cayenne-web module.
+[source,xml]
+----
+<dependency>
+      <groupId>org.apache.cayenne</groupId>
+      <artifactId>cayenne-web</artifactId>
+      <!-- Here specify the version of Cayenne you are actually using -->
+      <version>4.1.M2-SNAPSHOT</version>
+</dependency>
+----
 - In IDEA under "tutorial" project folder create a new folder `src/main/webapp/WEB-INF`.
 - Under `WEB-INF` create a new file `web.xml` (a standard web app descriptor):
 
@@ -50,7 +60,7 @@ So let's convert the tutorial that we created to a web application:
     -->
     <filter>
         <filter-name>cayenne-project</filter-name>
-        <filter-class>org.apache.cayenne.configuration.web.CayenneFilter</filter-class>
+        <filter-class>org.apache.cayenne.web.CayenneFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>cayenne-project</filter-name>
