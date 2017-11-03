@@ -49,7 +49,6 @@ public class Http2ROPServlet extends ROPServlet {
         Map<String, String> eventBridgeParameters = configAdapter.getOtherParameters();
 
         Collection<Module> modules = configAdapter.createModules(
-                new ROPServerModule(eventBridgeParameters),
                 new ProtostuffModule());
 
         ServerRuntime runtime = ServerRuntime
@@ -57,6 +56,14 @@ public class Http2ROPServlet extends ROPServlet {
                 .addConfig(configurationLocation)
                 .addModules(modules)
                 .build();
+
+        //      Add to make rop-server-module autoloaded
+        Collection<Module> mods = runtime.getModules();
+        for(Module m : mods){
+            if(m.getClass() == ROPServerModule.class){
+                ((ROPServerModule) m).setEventBridgeProperties(eventBridgeParameters);
+            }
+        }
 
         this.remoteService = runtime.getInjector().getInstance(RemoteService.class);
         this.serializationService = runtime.getInjector().getInstance(ROPSerializationService.class);

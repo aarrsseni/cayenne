@@ -28,6 +28,7 @@ import org.apache.cayenne.rop.ROPSerializationService;
 import org.apache.cayenne.rop.ServerHessianSerializationServiceProvider;
 import org.apache.cayenne.rop.ServerHttpRemoteService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -47,7 +48,11 @@ public class ROPServerModule implements Module {
         return binder.bindMap(String.class, Constants.SERVER_ROP_EVENT_BRIDGE_PROPERTIES_MAP);
     }
 
-    public ROPServerModule(Map<String, String> eventBridgeProperties) {
+    protected ROPServerModule() {
+        this.eventBridgeProperties = new HashMap<>();
+    }
+
+    public void setEventBridgeProperties(Map<String, String> eventBridgeProperties){
         this.eventBridgeProperties = eventBridgeProperties;
     }
 

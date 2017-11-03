@@ -4,6 +4,9 @@ Apache Cayenne Upgrade Information
 IMPORTANT: be sure to read all notes for the intermediate releases between your
            current release and the release you are upgrading to.
 -------------------------------------------------------------------------------
+UPGRADING TO 4.1.M2
+
+* Per CAY-2372 Web module became autoloaded. Rop-server module became autoloaded and added method to set eventBridgeProperties;
 
 UPGRADING TO 4.1.M1
 

@@ -115,10 +115,11 @@ public class ROPServletTest {
 
 		Collection<Module> modules = runtime.getModules();
 		assertEquals(4, modules.size());
-		Object[] marray = modules.toArray();
 
 //		Now we dont know correct order of modules.
-/*		assertTrue(marray[1] instanceof ServerModule);
+/*
+		Object[] marray = modules.toArray();
+		assertTrue(marray[1] instanceof ServerModule);
 		assertTrue(marray[2] instanceof ROPServerModule);*/
 	}
 
