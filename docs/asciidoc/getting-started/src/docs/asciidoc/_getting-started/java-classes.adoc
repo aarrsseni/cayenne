@@ -11,6 +11,9 @@
 //    CONDITIONS OF ANY KIND, either express or implied. See the License for
 //    the specific language governing permissions and limitations under the
 //    License.
+
+include::var.adoc[]
+
 === Creating Java Classes
 Here we'll generate the Java classes from the model that was created in the previous
 section. CayenneModeler can be used to also generate the database schema, but since we
@@ -50,7 +53,7 @@ The resulting POM should look like this:
             <groupId>org.apache.cayenne</groupId>
             <artifactId>cayenne-server</artifactId>
             <!-- Here specify the version of Cayenne you are actually using -->
-            <version>4.1.M2-SNAPSHOT</version>
+            <version>{version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
