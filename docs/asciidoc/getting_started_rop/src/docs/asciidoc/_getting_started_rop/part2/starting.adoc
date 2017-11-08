@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 === Starting Client Project
 
 ==== Create an ROP Client Project in Eclipse
@@ -46,7 +48,7 @@ image::../images/datamap-enableclient.png[align="center"]
 
 Now go back to Eclipse, right click on "tutorial-rop-client" project and select "Refresh" - you should see pairs of classes generated for each mapped entity, same as on the server. And again, we see a bunch of errors in those classes. Let's fix it now by adding two dependencies, "cayenne-client" and "resin-hessian", in the bottom of the pom.xml file. We also need to add Caucho M2 repository to pull Hessian jar files. The resulting POM should look like this:
 
-[source, XML]
+[source, XML,subs="verbatim,attributes"]
 ----
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -60,7 +62,7 @@ Now go back to Eclipse, right click on "tutorial-rop-client" project and select 
             <groupId>org.apache.cayenne</groupId>
             <artifactId>cayenne-client</artifactId>
             <!-- Here specify the version of Cayenne you are actually using -->
-            <version>4.0.M3</version>
+            <version>{version}</version>
         </dependency>
         <dependency>
         <groupId>com.caucho</groupId>
