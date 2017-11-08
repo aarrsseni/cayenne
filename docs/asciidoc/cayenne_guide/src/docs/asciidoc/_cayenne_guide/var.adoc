@@ -1,2 +1,1 @@
-:version: 4.1.M1
-:plugin-version: 4.0.B2
+:version: {project-version}

@@ -12,6 +12,8 @@
 // the specific language governing permissions and limitations under the
 // License.
 
+include::../var.adoc[]
+
 === Setup
 
 ==== System Requirements
@@ -68,14 +70,14 @@ $ java -jar CayenneModeler.jar
 ----
 
 The Modeler can also be started from Maven. While it may look like an exotic way to start a GUI application, it has its benefits - no need to download Cayenne distribution, the version of the Modeler always matches the version of the framework, the plugin can find mapping files in the project automatically. So it is an attractive option to some developers. Maven option requires a declaration in the POM:
-[source,xml]
+[source,xml,subs="verbatim,attributes"]
 ----
 <build>
     <plugins>
         <plugin>
             <groupId>org.apache.cayenne.plugins</groupId>
             <artifactId>cayenne-modeler-maven-plugin</artifactId>
-            <version>4.1.M1</version>
+            <version>{version}</version>
         </plugin>
     </plugins>
 </build>
