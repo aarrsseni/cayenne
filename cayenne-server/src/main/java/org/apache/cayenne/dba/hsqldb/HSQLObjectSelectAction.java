@@ -27,14 +27,14 @@ import org.apache.cayenne.query.SelectQuery;
 /**
  * @since 3.0
  */
-class HSQLSelectAction extends SelectAction {
+class HSQLObjectSelectAction extends ObjectSelectAction {
 
-	<T> HSQLSelectAction(SelectQuery<T> query, DataNode dataNode) {
-		super(query, dataNode);
-	}
+    <T> HSQLObjectSelectAction(FluentSelect<T> query, DataNode dataNode) {
+        super(query, dataNode);
+    }
 
-	@Override
-	protected int getInMemoryOffset(int queryOffset) {
-		return 0;
-	}
+    @Override
+    protected int getInMemoryOffset(int queryOffset) {
+        return 0;
+    }
 }
