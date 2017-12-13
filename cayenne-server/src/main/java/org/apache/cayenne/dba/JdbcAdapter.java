@@ -25,10 +25,7 @@ import org.apache.cayenne.access.translator.ParameterBinding;
 import org.apache.cayenne.access.translator.batch.BatchTranslatorFactory;
 import org.apache.cayenne.access.translator.ejbql.EJBQLTranslatorFactory;
 import org.apache.cayenne.access.translator.ejbql.JdbcEJBQLTranslatorFactory;
-import org.apache.cayenne.access.translator.select.DefaultSelectTranslator;
-import org.apache.cayenne.access.translator.select.QualifierTranslator;
-import org.apache.cayenne.access.translator.select.QueryAssembler;
-import org.apache.cayenne.access.translator.select.SelectTranslator;
+import org.apache.cayenne.access.translator.select.*;
 import org.apache.cayenne.access.types.ExtendedType;
 import org.apache.cayenne.access.types.ExtendedTypeFactory;
 import org.apache.cayenne.access.types.ExtendedTypeMap;
@@ -43,9 +40,7 @@ import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.query.Query;
-import org.apache.cayenne.query.SQLAction;
-import org.apache.cayenne.query.SelectQuery;
+import org.apache.cayenne.query.*;
 import org.apache.cayenne.resource.Resource;
 import org.apache.cayenne.resource.ResourceLocator;
 import org.apache.cayenne.util.Util;
@@ -523,6 +518,13 @@ public class JdbcAdapter implements DbAdapter {
 		return translator;
 	}
 
+	@Override
+	public QualifierObjectSelectTranslator getQualifierObjectSelectTranslator(QueryAssembler queryAssembler) {
+		QualifierObjectSelectTranslator translator = new QualifierObjectSelectTranslator(queryAssembler);
+		translator.setCaseInsensitive(caseInsensitiveCollations);
+		return translator;
+	}
+
 	/**
 	 * Uses JdbcActionBuilder to create the right action.
 	 *
@@ -536,6 +538,11 @@ public class JdbcAdapter implements DbAdapter {
 	@Override
 	public SelectTranslator getSelectTranslator(SelectQuery<?> query, EntityResolver entityResolver) {
 		return new DefaultSelectTranslator(query, this, entityResolver);
+	}
+
+	@Override
+	public SelectTranslator getSelectTranslator(FluentSelect<?> query, EntityResolver entityResolver) {
+		return new DefaultObjectSelectTranslator(query, this, entityResolver);
 	}
 
 	@Override

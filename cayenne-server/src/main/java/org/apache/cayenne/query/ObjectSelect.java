@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.cayenne.query;
 
+import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.DataRow;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.exp.Expression;
@@ -149,16 +150,16 @@ public class ObjectSelect<T> extends FluentSelect<T> {
     protected ObjectSelect() {
     }
 
-    /**
-     * Translates self to a SelectQuery.
-     */
-    @SuppressWarnings({"deprecation", "unchecked"})
-    @Override
-    protected Query createReplacementQuery(EntityResolver resolver) {
-        SelectQuery<?> replacement = (SelectQuery<?>) super.createReplacementQuery(resolver);
-        replacement.setFetchingDataRows(fetchingDataRows);
-        return replacement;
-    }
+//    /**
+//     * Translates self to a SelectQuery.
+//     */
+//    @SuppressWarnings({"deprecation", "unchecked"})
+//    @Override
+//    protected Query createReplacementQuery(EntityResolver resolver) {
+//        SelectQuery<?> replacement = (SelectQuery<?>) super.createReplacementQuery(resolver);
+//        replacement.setFetchingDataRows(fetchingDataRows);
+//        return replacement;
+//    }
 
     /**
      * Sets the type of the entity to fetch without changing the return type of
@@ -405,7 +406,6 @@ public class ObjectSelect<T> extends FluentSelect<T> {
     public ObjectSelect<T> limit(int fetchLimit) {
         if (this.limit != fetchLimit) {
             this.limit = fetchLimit;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -418,7 +418,6 @@ public class ObjectSelect<T> extends FluentSelect<T> {
     public ObjectSelect<T> offset(int fetchOffset) {
         if (this.offset != fetchOffset) {
             this.offset = fetchOffset;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -432,7 +431,6 @@ public class ObjectSelect<T> extends FluentSelect<T> {
     public ObjectSelect<T> pageSize(int pageSize) {
         if (this.pageSize != pageSize) {
             this.pageSize = pageSize;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -447,7 +445,6 @@ public class ObjectSelect<T> extends FluentSelect<T> {
     public ObjectSelect<T> statementFetchSize(int size) {
         if (this.statementFetchSize != size) {
             this.statementFetchSize = size;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -456,12 +453,10 @@ public class ObjectSelect<T> extends FluentSelect<T> {
     public ObjectSelect<T> cacheStrategy(QueryCacheStrategy strategy) {
         if (this.cacheStrategy != strategy) {
             this.cacheStrategy = strategy;
-            this.replacementQuery = null;
         }
 
         if(this.cacheGroup != null) {
             this.cacheGroup = null;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -473,7 +468,6 @@ public class ObjectSelect<T> extends FluentSelect<T> {
 
     public ObjectSelect<T> cacheGroup(String cacheGroup) {
         this.cacheGroup = cacheGroup;
-        this.replacementQuery = null;
         return this;
     }
 
@@ -534,6 +528,8 @@ public class ObjectSelect<T> extends FluentSelect<T> {
     @SuppressWarnings("unchecked")
     public ObjectSelect<DataRow> fetchDataRows() {
         this.fetchingDataRows = true;
+        //Add
+        this.metaData.setFetchingDataRows(true);
         return (ObjectSelect<DataRow>) this;
     }
 
@@ -653,5 +649,15 @@ public class ObjectSelect<T> extends FluentSelect<T> {
 
     public boolean isFetchingDataRows() {
         return fetchingDataRows;
+    }
+
+    @Override
+    public SQLAction createSQLAction(SQLActionVisitor visitor) {
+        return visitor.objectSelectAction(this);
+    }
+
+    @Override
+    protected BaseQueryMetadata getBaseMetaData() {
+        return metaData;
     }
 }

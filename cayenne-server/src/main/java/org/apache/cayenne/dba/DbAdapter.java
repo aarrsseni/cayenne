@@ -21,6 +21,7 @@ package org.apache.cayenne.dba;
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.translator.ParameterBinding;
 import org.apache.cayenne.access.translator.ejbql.EJBQLTranslatorFactory;
+import org.apache.cayenne.access.translator.select.QualifierObjectSelectTranslator;
 import org.apache.cayenne.access.translator.select.QualifierTranslator;
 import org.apache.cayenne.access.translator.select.QueryAssembler;
 import org.apache.cayenne.access.translator.select.SelectTranslator;
@@ -29,9 +30,7 @@ import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.query.Query;
-import org.apache.cayenne.query.SQLAction;
-import org.apache.cayenne.query.SelectQuery;
+import org.apache.cayenne.query.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -60,7 +59,11 @@ public interface DbAdapter {
 	 */
 	SelectTranslator getSelectTranslator(SelectQuery<?> query, EntityResolver entityResolver);
 
+	SelectTranslator getSelectTranslator(FluentSelect<?> query, EntityResolver entityResolver);
+
 	QualifierTranslator getQualifierTranslator(QueryAssembler queryAssembler);
+
+	QualifierObjectSelectTranslator getQualifierObjectSelectTranslator(QueryAssembler queryAssembler);
 
 	/**
 	 * Returns an instance of SQLAction that should handle the query.

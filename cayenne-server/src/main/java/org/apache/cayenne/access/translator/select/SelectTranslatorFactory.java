@@ -20,6 +20,7 @@ package org.apache.cayenne.access.translator.select;
 
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.query.FluentSelect;
 import org.apache.cayenne.query.SelectQuery;
 
 /**
@@ -33,5 +34,7 @@ public interface SelectTranslatorFactory {
 	 * Creates a proper translator for a BatchQuery
 	 */
 	SelectTranslator translator(SelectQuery<?> query, DbAdapter adapter, EntityResolver entityResolver);
+
+	SelectTranslator translator(FluentSelect<?> query, DbAdapter adapter, EntityResolver entityResolver);
 
 }

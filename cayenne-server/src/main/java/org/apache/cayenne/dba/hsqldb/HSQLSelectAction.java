@@ -19,15 +19,17 @@
 package org.apache.cayenne.dba.hsqldb;
 
 import org.apache.cayenne.access.DataNode;
+import org.apache.cayenne.access.jdbc.ObjectSelectAction;
 import org.apache.cayenne.access.jdbc.SelectAction;
+import org.apache.cayenne.query.FluentSelect;
 import org.apache.cayenne.query.SelectQuery;
 
 /**
  * @since 3.0
  */
-class HSQLSelectAction extends SelectAction {
+class HSQLSelectAction extends ObjectSelectAction {
 
-	<T> HSQLSelectAction(SelectQuery<T> query, DataNode dataNode) {
+	<T> HSQLSelectAction(FluentSelect<T> query, DataNode dataNode) {
 		super(query, dataNode);
 	}
 

@@ -37,7 +37,7 @@ import org.apache.cayenne.map.ObjEntity;
  *
  * @since 4.0
  */
-public abstract class FluentSelect<T> extends IndirectQuery implements Select<T> {
+public abstract class FluentSelect<T> extends AbstractQuery implements Select<T> {
 
     protected Class<?> entityType;
     protected String entityName;
@@ -52,29 +52,65 @@ public abstract class FluentSelect<T> extends IndirectQuery implements Select<T>
     protected QueryCacheStrategy cacheStrategy;
     protected String cacheGroup;
 
+    ObjectSelectQueryMetadata metaData = new ObjectSelectQueryMetadata();
+
     protected FluentSelect() {
     }
 
-    /**
-     * Translates self to a SelectQuery.
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    protected Query createReplacementQuery(EntityResolver resolver) {
+//    /**
+//     * Translates self to a SelectQuery.
+//     */
+//    @SuppressWarnings("unchecked")
+//    @Override
+//    protected Query createReplacementQuery(EntityResolver resolver) {
+//
+//        @SuppressWarnings("rawtypes")
+//        SelectQuery replacement = new SelectQuery();
+//
+//        if (entityType != null) {
+//            replacement.setRoot(entityType);
+//        } else if (entityName != null) {
+//
+//            ObjEntity entity = resolver.getObjEntity(entityName);
+//            if (entity == null) {
+//                throw new CayenneRuntimeException("Unrecognized ObjEntity name: %s", entityName);
+//            }
+//
+//            replacement.setRoot(entity);
+//        } else if (dbEntityName != null) {
+//
+//            DbEntity entity = resolver.getDbEntity(dbEntityName);
+//            if (entity == null) {
+//                throw new CayenneRuntimeException("Unrecognized DbEntity name: %s", dbEntityName);
+//            }
+//
+//            replacement.setRoot(entity);
+//        } else {
+//            throw new CayenneRuntimeException("Undefined root entity of the query");
+//        }
+//
+//        replacement.setQualifier(where);
+//        replacement.addOrderings(orderings);
+//        replacement.setPrefetchTree(prefetches);
+//        replacement.setCacheStrategy(cacheStrategy);
+//        replacement.setCacheGroup(cacheGroup);
+//        replacement.setFetchLimit(limit);
+//        replacement.setFetchOffset(offset);
+//        replacement.setPageSize(pageSize);
+//        replacement.setStatementFetchSize(statementFetchSize);
+//
+//        return replacement;
+//    }
 
-        @SuppressWarnings("rawtypes")
-        SelectQuery replacement = new SelectQuery();
-
+    protected void updateRoot(EntityResolver resolver){
         if (entityType != null) {
-            replacement.setRoot(entityType);
+            this.setRoot(entityType);
         } else if (entityName != null) {
-
             ObjEntity entity = resolver.getObjEntity(entityName);
             if (entity == null) {
                 throw new CayenneRuntimeException("Unrecognized ObjEntity name: %s", entityName);
             }
-
-            replacement.setRoot(entity);
+            this.setRoot(entity);
         } else if (dbEntityName != null) {
 
             DbEntity entity = resolver.getDbEntity(dbEntityName);
@@ -82,22 +118,44 @@ public abstract class FluentSelect<T> extends IndirectQuery implements Select<T>
                 throw new CayenneRuntimeException("Unrecognized DbEntity name: %s", dbEntityName);
             }
 
-            replacement.setRoot(entity);
+            this.setRoot(entity);
         } else {
             throw new CayenneRuntimeException("Undefined root entity of the query");
         }
+    }
+    @Override
+    public QueryMetadata getMetaData(EntityResolver resolver) {
+        updateRoot(resolver);
+        metaData.resolve(root, resolver, this);
 
-        replacement.setQualifier(where);
-        replacement.addOrderings(orderings);
-        replacement.setPrefetchTree(prefetches);
-        replacement.setCacheStrategy(cacheStrategy);
-        replacement.setCacheGroup(cacheGroup);
-        replacement.setFetchLimit(limit);
-        replacement.setFetchOffset(offset);
-        replacement.setPageSize(pageSize);
-        replacement.setStatementFetchSize(statementFetchSize);
+        // must force DataRows if DbEntity is fetched
+        if (root instanceof DbEntity) {
+            QueryMetadataWrapper wrapper = new QueryMetadataWrapper(metaData);
+            wrapper.override(QueryMetadata.FETCHING_DATA_ROWS_PROPERTY, Boolean.TRUE);
+            return wrapper;
+        } else {
+            return metaData;
+        }
+    }
 
-        return replacement;
+    @Override
+    public void route(QueryRouter router, EntityResolver resolver, Query substitutedQuery) {
+        super.route(router, resolver, substitutedQuery);
+
+        // suppress prefetches for paginated queries.. instead prefetches will
+        // be resolved
+        // per row...
+        if (metaData.getPageSize() <= 0) {
+            routePrefetches(router, resolver);
+        }
+    }
+
+    public boolean isFetchingDataRows() {
+        return (root instanceof DbEntity) || metaData.isFetchingDataRows();
+    }
+
+    void routePrefetches(QueryRouter router, EntityResolver resolver) {
+        new ObjectSelectQueryPrefetchRouterAction().route(this, router, resolver);
     }
 
     public String getCacheGroup() {

@@ -79,7 +79,7 @@ public class ColumnSelect<T> extends FluentSelect<T> {
      */
     protected ColumnSelect(ObjectSelect<T> select) {
         super();
-        this.name = select.name;
+//        this.name = select.name;
         this.entityType = select.entityType;
         this.entityName = select.entityName;
         this.dbEntityName = select.dbEntityName;
@@ -94,16 +94,16 @@ public class ColumnSelect<T> extends FluentSelect<T> {
         this.cacheGroup = select.cacheGroup;
     }
 
-    @Override
-    protected Query createReplacementQuery(EntityResolver resolver) {
-        SelectQuery<?> replacement = (SelectQuery)super.createReplacementQuery(resolver);
-        replacement.setColumns(columns);
-        replacement.setHavingQualifier(having);
-        replacement.setCanReturnScalarValue(singleColumn);
-        replacement.setDistinct(distinct);
-        replacement.setSuppressDistinct(suppressDistinct);
-        return replacement;
-    }
+//    @Override
+//    protected Query createReplacementQuery(EntityResolver resolver) {
+//        SelectQuery<?> replacement = (SelectQuery)super.createReplacementQuery(resolver);
+//        replacement.setColumns(columns);
+//        replacement.setHavingQualifier(having);
+//        replacement.setCanReturnScalarValue(singleColumn);
+//        replacement.setDistinct(distinct);
+//        replacement.setSuppressDistinct(suppressDistinct);
+//        return replacement;
+//    }
 
     /**
      * Sets the type of the entity to fetch without changing the return type of
@@ -302,7 +302,6 @@ public class ColumnSelect<T> extends FluentSelect<T> {
     public ColumnSelect<T> limit(int fetchLimit) {
         if (this.limit != fetchLimit) {
             this.limit = fetchLimit;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -315,7 +314,6 @@ public class ColumnSelect<T> extends FluentSelect<T> {
     public ColumnSelect<T> offset(int fetchOffset) {
         if (this.offset != fetchOffset) {
             this.offset = fetchOffset;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -329,7 +327,6 @@ public class ColumnSelect<T> extends FluentSelect<T> {
     public ColumnSelect<T> pageSize(int pageSize) {
         if (this.pageSize != pageSize) {
             this.pageSize = pageSize;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -344,7 +341,6 @@ public class ColumnSelect<T> extends FluentSelect<T> {
     public ColumnSelect<T> statementFetchSize(int size) {
         if (this.statementFetchSize != size) {
             this.statementFetchSize = size;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -353,12 +349,10 @@ public class ColumnSelect<T> extends FluentSelect<T> {
     public ColumnSelect<T> cacheStrategy(QueryCacheStrategy strategy) {
         if (this.cacheStrategy != strategy) {
             this.cacheStrategy = strategy;
-            this.replacementQuery = null;
         }
 
         if(this.cacheGroup != null) {
             this.cacheGroup = null;
-            this.replacementQuery = null;
         }
 
         return this;
@@ -370,7 +364,6 @@ public class ColumnSelect<T> extends FluentSelect<T> {
 
     public ColumnSelect<T> cacheGroup(String cacheGroup) {
         this.cacheGroup = cacheGroup;
-        this.replacementQuery = null;
         return this;
     }
 
@@ -658,5 +651,15 @@ public class ColumnSelect<T> extends FluentSelect<T> {
     @Override
     public T selectFirst(ObjectContext context) {
         return context.selectFirst(limit(1));
+    }
+
+    @Override
+    public SQLAction createSQLAction(SQLActionVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected BaseQueryMetadata getBaseMetaData() {
+        return null;
     }
 }

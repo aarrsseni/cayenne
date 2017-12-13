@@ -373,6 +373,8 @@ public class DefaultSelectTranslator extends QueryAssembler implements SelectTra
 		return (SelectQuery<?>) getQuery();
 	}
 
+
+
 	protected List<ColumnDescriptor> buildResultColumns() {
 
 		this.defaultAttributesByColumn = new HashMap<>();

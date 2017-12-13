@@ -20,18 +20,8 @@
 package org.apache.cayenne.dba;
 
 import org.apache.cayenne.access.DataNode;
-import org.apache.cayenne.access.jdbc.BatchAction;
-import org.apache.cayenne.access.jdbc.EJBQLAction;
-import org.apache.cayenne.access.jdbc.ProcedureAction;
-import org.apache.cayenne.access.jdbc.SQLTemplateAction;
-import org.apache.cayenne.access.jdbc.SelectAction;
-import org.apache.cayenne.query.BatchQuery;
-import org.apache.cayenne.query.EJBQLQuery;
-import org.apache.cayenne.query.ProcedureQuery;
-import org.apache.cayenne.query.SQLAction;
-import org.apache.cayenne.query.SQLActionVisitor;
-import org.apache.cayenne.query.SQLTemplate;
-import org.apache.cayenne.query.SelectQuery;
+import org.apache.cayenne.access.jdbc.*;
+import org.apache.cayenne.query.*;
 
 /**
  * A factory of default SQLActions. Adapters usually subclass JdbcActionBuilder to provide
@@ -69,6 +59,11 @@ public class JdbcActionBuilder implements SQLActionVisitor {
     @Override
     public <T> SQLAction objectSelectAction(SelectQuery<T> query) {
         return new SelectAction(query, dataNode);
+    }
+
+    @Override
+    public <T> SQLAction objectSelectAction(FluentSelect<T> query) {
+        return new ObjectSelectAction(query, dataNode);
     }
 
     @Override

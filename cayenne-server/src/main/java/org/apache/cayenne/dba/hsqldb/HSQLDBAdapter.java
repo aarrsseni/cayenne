@@ -41,6 +41,7 @@ import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.query.FluentSelect;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLAction;
 import org.apache.cayenne.query.SelectQuery;
@@ -98,13 +99,18 @@ public class HSQLDBAdapter extends JdbcAdapter {
 		return new HSQLSelectTranslator(query, this, entityResolver);
 	}
 
+	@Override
+	public SelectTranslator getSelectTranslator(FluentSelect<?> query, EntityResolver entityResolver) {
+		return new HSQLObjectSelectTranslator(query, this, entityResolver);
+	}
+
 	/**
 	 * Returns a trimming translator.
 	 * @since 4.0
 	 */
 	@Override
 	public QualifierTranslator getQualifierTranslator(QueryAssembler queryAssembler) {
-		QualifierTranslator translator = new HSQLQualifierTranslator(queryAssembler);
+		QualifierTranslator translator = new HSQLQualifierObjectSelectTranslator(queryAssembler);
 		translator.setCaseInsensitive(caseInsensitiveCollations);
 		return translator;
 	}

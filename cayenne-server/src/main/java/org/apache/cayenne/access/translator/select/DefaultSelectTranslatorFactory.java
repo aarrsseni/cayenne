@@ -20,6 +20,7 @@ package org.apache.cayenne.access.translator.select;
 
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.query.FluentSelect;
 import org.apache.cayenne.query.SelectQuery;
 
 /**
@@ -32,6 +33,11 @@ public class DefaultSelectTranslatorFactory implements SelectTranslatorFactory {
 
 	@Override
 	public SelectTranslator translator(SelectQuery<?> query, DbAdapter adapter, EntityResolver entityResolver) {
+		return adapter.getSelectTranslator(query, entityResolver);
+	}
+
+	@Override
+	public SelectTranslator translator(FluentSelect<?> query, DbAdapter adapter, EntityResolver entityResolver) {
 		return adapter.getSelectTranslator(query, entityResolver);
 	}
 }

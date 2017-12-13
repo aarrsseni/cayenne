@@ -28,6 +28,7 @@ import org.apache.cayenne.access.jdbc.reader.RowReader;
 import org.apache.cayenne.access.jdbc.reader.RowReaderFactory;
 import org.apache.cayenne.access.translator.batch.BatchTranslator;
 import org.apache.cayenne.access.translator.batch.BatchTranslatorFactory;
+import org.apache.cayenne.access.translator.select.ObjectSelectTranslatorFactory;
 import org.apache.cayenne.access.translator.select.SelectTranslator;
 import org.apache.cayenne.access.translator.select.SelectTranslatorFactory;
 import org.apache.cayenne.dba.DbAdapter;
@@ -37,10 +38,7 @@ import org.apache.cayenne.log.NoopJdbcEventLogger;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.query.BatchQuery;
-import org.apache.cayenne.query.Query;
-import org.apache.cayenne.query.QueryMetadata;
-import org.apache.cayenne.query.SelectQuery;
+import org.apache.cayenne.query.*;
 import org.apache.cayenne.tx.BaseTransaction;
 import org.apache.cayenne.tx.Transaction;
 import org.apache.cayenne.util.ToStringBuilder;
@@ -349,6 +347,13 @@ public class DataNode implements QueryEngine {
 	 * @since 4.0
 	 */
 	public SelectTranslator selectTranslator(SelectQuery<?> query) {
+		return selectTranslatorFactory.translator(query, getAdapter(), getEntityResolver());
+	}
+
+	/**
+	 * @since 4.0
+	 */
+	public SelectTranslator selectTranslator(FluentSelect<?> query) {
 		return selectTranslatorFactory.translator(query, getAdapter(), getEntityResolver());
 	}
 
