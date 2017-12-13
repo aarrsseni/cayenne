@@ -24,6 +24,7 @@ import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.translator.ParameterBinding;
 import org.apache.cayenne.access.translator.ejbql.EJBQLTranslatorFactory;
 import org.apache.cayenne.access.translator.ejbql.JdbcEJBQLTranslatorFactory;
+import org.apache.cayenne.access.translator.select.QualifierObjectSelectTranslator;
 import org.apache.cayenne.access.translator.select.QualifierTranslator;
 import org.apache.cayenne.access.translator.select.QueryAssembler;
 import org.apache.cayenne.access.translator.select.SelectTranslator;
@@ -110,7 +111,14 @@ public class HSQLDBAdapter extends JdbcAdapter {
 	 */
 	@Override
 	public QualifierTranslator getQualifierTranslator(QueryAssembler queryAssembler) {
-		QualifierTranslator translator = new HSQLQualifierObjectSelectTranslator(queryAssembler);
+		QualifierTranslator translator = new HSQLQualifierTranslator(queryAssembler);
+		translator.setCaseInsensitive(caseInsensitiveCollations);
+		return translator;
+	}
+
+	@Override
+	public QualifierObjectSelectTranslator getQualifierObjectSelectTranslator(QueryAssembler queryAssembler) {
+		QualifierObjectSelectTranslator translator = new HSQLQualifierObjectSelectTranslator(queryAssembler);
 		translator.setCaseInsensitive(caseInsensitiveCollations);
 		return translator;
 	}

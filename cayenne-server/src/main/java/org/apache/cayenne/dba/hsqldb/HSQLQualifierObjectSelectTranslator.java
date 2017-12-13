@@ -2,6 +2,7 @@ package org.apache.cayenne.dba.hsqldb;
 
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.access.translator.select.QueryAssembler;
+import org.apache.cayenne.access.translator.select.TrimmingQualifierObjectSelectTranslator;
 import org.apache.cayenne.access.translator.select.TrimmingQualifierTranslator;
 import org.apache.cayenne.exp.parser.ASTExtract;
 import org.apache.cayenne.exp.parser.ASTFunctionCall;
@@ -9,7 +10,7 @@ import org.apache.cayenne.exp.parser.PatternMatchNode;
 
 import java.io.IOException;
 
-public class HSQLQualifierObjectSelectTranslator extends TrimmingQualifierTranslator {
+public class HSQLQualifierObjectSelectTranslator extends TrimmingQualifierObjectSelectTranslator {
 
     public HSQLQualifierObjectSelectTranslator(QueryAssembler queryAssembler) {
         super(queryAssembler, HSQLDBAdapter.TRIM_FUNCTION);
