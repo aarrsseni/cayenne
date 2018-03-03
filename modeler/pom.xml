@@ -41,7 +41,28 @@
 		<module>cayenne-modeler-mac</module>
 		<module>cayenne-modeler-win</module>
         <module>cayenne-modeler-win-ext</module>
+		<module>cayenne-modeler-core</module>
     </modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.bootique.bom</groupId>
+				<artifactId>bootique-bom</artifactId>
+				<version>0.24</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.bootique</groupId>
+			<artifactId>bootique</artifactId>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<plugins>

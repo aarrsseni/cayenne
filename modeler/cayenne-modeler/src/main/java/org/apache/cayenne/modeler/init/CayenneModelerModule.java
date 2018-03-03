@@ -18,6 +18,8 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.init;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.cayenne.configuration.xml.DataChannelMetaData;
 import org.apache.cayenne.configuration.xml.DefaultDataChannelMetaData;
 import org.apache.cayenne.configuration.xml.HandlerFactory;
@@ -44,11 +46,13 @@ import org.xml.sax.XMLReader;
  */
 public class CayenneModelerModule implements Module {
 
+    @Inject
+    Provider<Application> applicationProvider;
+
     public void configure(Binder binder) {
 
         binder.bind(ActionManager.class).to(DefaultActionManager.class);
-        binder.bind(Application.class).to(Application.class);
-        binder.bind(PlatformInitializer.class).to(GenericPlatformInitializer.class);
+        binder.bind(Application.class).toProviderInstance(() -> applicationProvider.get());
         binder.bind(WidgetFactory.class).to(DefaultWidgetFactory.class);
         binder.bind(HandlerFactory.class).to(ExtensionAwareHandlerFactory.class);
         binder.bind(DataChannelMetaData.class).to(DefaultDataChannelMetaData.class);

@@ -73,7 +73,7 @@ public class CayenneModelerController extends CayenneController {
         super(application);
 
         this.frame = new CayenneModelerFrame(application.getActionManager());
-        application.getInjector().getInstance(PlatformInitializer.class).setupMenus(frame);
+        application.getPlatformInitializer().setupMenus(frame);
         this.projectController = new ProjectController(this);
         this.dbImportController = new DbImportController();
     }

@@ -19,13 +19,14 @@
 
 package org.apache.cayenne.modeler;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.xml.DataChannelMetaData;
-import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.di.Injector;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.dialog.LogConsole;
 import org.apache.cayenne.modeler.dialog.pref.ClasspathPreferences;
+import org.apache.cayenne.modeler.init.platform.PlatformInitializer;
 import org.apache.cayenne.modeler.undo.CayenneUndoManager;
 import org.apache.cayenne.modeler.util.AdapterMapping;
 import org.apache.cayenne.modeler.util.WidgetFactory;
@@ -77,11 +78,11 @@ public class Application {
 
     protected CayennePreference cayennePreference;
 
-    @Inject
-    protected Injector injector;
+    @com.google.inject.Inject
+    protected Injector cayenneInjector;
 
-    @Inject
-    protected DataChannelMetaData metaData;
+    @com.google.inject.Inject
+    protected PlatformInitializer platformInitializer;
 
     private String newProjectTemporaryName;
 
@@ -124,7 +125,7 @@ public class Application {
     }
 
     public Injector getInjector() {
-        return injector;
+        return cayenneInjector;
     }
 
     public Project getProject() {
@@ -151,7 +152,7 @@ public class Application {
      * Returns action controller.
      */
     public ActionManager getActionManager() {
-        return injector.getInstance(ActionManager.class);
+        return cayenneInjector.getInstance(ActionManager.class);
     }
 
     /**
@@ -274,10 +275,14 @@ public class Application {
     }
 
     public DataChannelMetaData getMetaData() {
-        return metaData;
+        return cayenneInjector.getInstance(DataChannelMetaData.class);
     }
 
     protected void initPreferences() {
         this.cayenneProjectPreferences = new CayenneProjectPreferences();
+    }
+
+    public PlatformInitializer getPlatformInitializer() {
+        return platformInitializer;
     }
 }
