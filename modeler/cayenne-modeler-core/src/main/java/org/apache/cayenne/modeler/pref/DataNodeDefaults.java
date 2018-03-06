@@ -16,17 +16,35 @@
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
+package org.apache.cayenne.modeler.pref;
 
-package org.apache.cayenne.pref;
+import org.apache.cayenne.pref.RenamedPreferences;
 
-/**
- * Defines an API of a preferences editor used for editing preferences without affecting
- * the rest of the application until the editing is finished.
- * 
- */
-public interface PreferenceEditor {
+import java.util.prefs.Preferences;
 
-    public void save();
+public class DataNodeDefaults extends RenamedPreferences {
 
-    public void revert();
+    private String localDataSource;
+
+    public static final String LOCAL_DATA_SOURCE_PROPERTY = "localDataSource";
+
+    public DataNodeDefaults(Preferences pref) {
+        super(pref);
+    }
+
+    public void setLocalDataSource(String localDataSource) {
+        if (getCurrentPreference() != null) {
+            this.localDataSource = localDataSource;
+            if (localDataSource != null) {
+                getCurrentPreference().put(LOCAL_DATA_SOURCE_PROPERTY, localDataSource);
+            }
+        }
+    }
+
+    public String getLocalDataSource() {
+        if (localDataSource == null) {
+            localDataSource = getCurrentPreference().get(LOCAL_DATA_SOURCE_PROPERTY, "");
+        }
+        return localDataSource;
+    }
 }

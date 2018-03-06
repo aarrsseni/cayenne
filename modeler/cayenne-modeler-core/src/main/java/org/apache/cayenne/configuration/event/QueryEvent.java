@@ -20,8 +20,8 @@
 package org.apache.cayenne.configuration.event;
 
 import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.map.event.MapEvent;
 
 /**
  * An event generated when a Query object is added to a DataMap, 

@@ -37,10 +37,12 @@ import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.adapters.JFileChooserAdapter;
 import org.apache.cayenne.modeler.dialog.ErrorDebugDialog;
 import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
 import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
 import org.apache.cayenne.modeler.pref.FSPath;
+import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
 import org.apache.cayenne.modeler.util.AdapterMapping;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.Comparators;
@@ -93,6 +95,8 @@ public class ImportEOModelAction extends CayenneAction {
      */
     protected void importEOModel() {
         JFileChooser fileChooser = getEOModelChooser();
+        BaseFileChooser baseFileChooser = new JFileChooserAdapter(fileChooser);
+
         int status = fileChooser.showOpenDialog(Application.getFrame());
 
         if (status == JFileChooser.APPROVE_OPTION) {
@@ -101,7 +105,7 @@ public class ImportEOModelAction extends CayenneAction {
             FSPath lastDir = getApplication()
                     .getFrameController()
                     .getLastEOModelDirectory();
-            lastDir.updateFromChooser(fileChooser);
+            lastDir.updateFromChooser(baseFileChooser);
 
             File file = fileChooser.getSelectedFile();
             if (file.isFile()) {
@@ -315,7 +319,9 @@ public class ImportEOModelAction extends CayenneAction {
         }
 
         FSPath lastDir = getApplication().getFrameController().getLastEOModelDirectory();
-        lastDir.updateChooser(eoModelChooser);
+        BaseFileChooser baseFileChooser = new JFileChooserAdapter(eoModelChooser);
+
+        lastDir.updateChooser(baseFileChooser);
 
         return eoModelChooser;
     }

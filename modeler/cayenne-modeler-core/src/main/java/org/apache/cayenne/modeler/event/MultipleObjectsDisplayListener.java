@@ -16,27 +16,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
-package org.apache.cayenne.pref;
+package org.apache.cayenne.modeler.event;
 
-import java.util.prefs.Preferences;
+import java.util.EventListener;
 
-public abstract class PreferenceDecorator implements Preference {
-
-    protected Preference delegate;
-
-    public PreferenceDecorator(Preference delegate) {
-        this.delegate = delegate;
-    }
-
-    public Preferences getCayennePreference() {
-        return delegate.getCayennePreference();
-    }
-
-    public Preferences getCurrentPreference() {
-        return delegate.getCurrentPreference();
-    }
-
-    public Preferences getRootPreference() {
-        return delegate.getRootPreference();
-    }
+/**
+ * Listener for multiple objects selections
+ */
+public interface MultipleObjectsDisplayListener extends EventListener {
+    /**
+     * Invoked when a new set of objects was displayed
+     */
+    public void currentObjectsChanged(MultipleObjectsDisplayEvent e);
 }

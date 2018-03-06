@@ -63,6 +63,7 @@ public class Application {
 
     private static Application instance;
 
+    @com.google.inject.Inject
     protected FileClassLoadingService modelerClassLoader;
 
     protected CayenneModelerController frameController;
@@ -234,7 +235,6 @@ public class Application {
      */
     @SuppressWarnings("unchecked")
     public void initClassLoader() {
-        final FileClassLoadingService classLoader = new FileClassLoadingService();
 
         // init from preferences...
         Preferences classLoaderPreference = Application.getInstance().getPreferencesNode(
@@ -256,19 +256,19 @@ public class Application {
         details.addAll(values);
 
         if (details.size() > 0) {
-            classLoader.setPathFiles(details.stream().map(File::new).collect(Collectors.toList()));
+            modelerClassLoader.setPathFiles(details.stream().map(File::new).collect(Collectors.toList()));
         }
 
-        this.modelerClassLoader = classLoader;
+
 
         // set as EventDispatch thread default class loader
         if (SwingUtilities.isEventDispatchThread()) {
-            Thread.currentThread().setContextClassLoader(classLoader.getClassLoader());
+            Thread.currentThread().setContextClassLoader(modelerClassLoader.getClassLoader());
         } else {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
-                    Thread.currentThread().setContextClassLoader(classLoader.getClassLoader());
+                    Thread.currentThread().setContextClassLoader(modelerClassLoader.getClassLoader());
                 }
             });
         }

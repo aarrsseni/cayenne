@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db.merge;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.event.DataMapEvent;
 import org.apache.cayenne.dba.DbAdapter;
@@ -48,6 +49,8 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ValidationResultBrowser;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
+import org.apache.cayenne.modeler.pref.helpers.CoreDataSourceFactory;
+import org.apache.cayenne.modeler.pref.helpers.CoreDbAdapterFactory;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.resource.Resource;
@@ -88,6 +91,11 @@ public class MergerOptions extends CayenneController {
     protected String defaultCatalog;
     protected String defaultSchema;
     private MergerTokenFactoryProvider mergerTokenFactoryProvider;
+
+    @Inject
+    protected CoreDbAdapterFactory dbAdapterFactory;
+    @Inject
+    protected CoreDataSourceFactory dataSourceFactory;
 
     public MergerOptions(ProjectController parent,
                          String title,
@@ -151,7 +159,7 @@ public class MergerOptions extends CayenneController {
      */
     protected void prepareMigrator() {
         try {
-            adapter = connectionInfo.makeAdapter(getApplication().getClassLoadingService());
+            adapter = dbAdapterFactory.createAdapter(connectionInfo);
 
             MergerTokenFactory mergerTokenFactory = mergerTokenFactoryProvider.get(adapter);
             tokens.setMergerTokenFactory(mergerTokenFactory);
@@ -167,7 +175,7 @@ public class MergerOptions extends CayenneController {
             DbLoaderConfiguration config = new DbLoaderConfiguration();
             config.setFiltersConfig(filters);
 
-            DataSource dataSource = connectionInfo.makeDataSource(getApplication().getClassLoadingService());
+            DataSource dataSource = dataSourceFactory.createDataSource(connectionInfo);
 
             DataMap dbImport;
             try (Connection conn = dataSource.getConnection();) {
@@ -259,8 +267,7 @@ public class MergerOptions extends CayenneController {
 
         DataSource dataSource;
         try {
-            dataSource = connectionInfo.makeDataSource(getApplication()
-                    .getClassLoadingService());
+            dataSource = dataSourceFactory.createDataSource(connectionInfo);
         } catch (SQLException ex) {
             reportError("Migration Error", ex);
             return;

@@ -376,7 +376,7 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
         });
     }
 
-    public void currentObjectsChanged(MultipleObjectsDisplayEvent e, Application application) {
+    public void currentObjectsChanged(MultipleObjectsDisplayEvent e) {
         if (e.getSource() == this || e.getParentNode() == null) {
             return;
         }
