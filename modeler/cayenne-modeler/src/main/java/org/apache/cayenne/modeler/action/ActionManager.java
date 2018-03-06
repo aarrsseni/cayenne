@@ -65,7 +65,7 @@ public interface ActionManager {
     /**
      * Invoked when several objects were selected in ProjectTree at time
      */
-    void multipleObjectsSelected(ConfigurationNode[] objects, Application application);
+    void multipleObjectsSelected(ConfigurationNode[] objects);
 
     /**
      * Replaces standard Cut, Copy and Paste action maps, so that accelerators like

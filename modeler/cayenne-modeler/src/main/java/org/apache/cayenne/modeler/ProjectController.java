@@ -1462,7 +1462,7 @@ public class ProjectController extends CayenneController {
         EventListener[] list = listenerList.getListeners(MultipleObjectsDisplayListener.class);
         for (EventListener listener : list) {
             MultipleObjectsDisplayListener temp = (MultipleObjectsDisplayListener) listener;
-            temp.currentObjectsChanged(e, getApplication());
+            temp.currentObjectsChanged(e);
         }
     }
 

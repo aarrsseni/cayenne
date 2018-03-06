@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
@@ -26,6 +27,8 @@ import org.apache.cayenne.modeler.dialog.pref.PreferenceDialog;
 import org.apache.cayenne.modeler.event.DataSourceModificationEvent;
 import org.apache.cayenne.modeler.event.DataSourceModificationListener;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
+import org.apache.cayenne.modeler.pref.helpers.CoreDataSourceFactory;
+import org.apache.cayenne.modeler.pref.helpers.CoreDbAdapterFactory;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
@@ -62,6 +65,12 @@ public class DataSourceWizard extends CayenneController {
 
 	private DbAdapter adapter;
 	private DataSource dataSource;
+
+	@Inject
+	protected CoreDbAdapterFactory dbAdapterFactory;
+
+	@Inject
+	protected CoreDataSourceFactory dataSourceFactory;
 
 	public DataSourceWizard(CayenneController parent, String title) {
 		super(parent);
@@ -169,11 +178,10 @@ public class DataSourceWizard extends CayenneController {
 	public void okAction() {
 		DBConnectionInfo info = getConnectionInfo();
 		ClassLoadingService classLoader = getApplication().getClassLoadingService();
-
 		// doing connection testing...
 		try {
-			this.adapter = info.makeAdapter(classLoader);
-			this.dataSource = info.makeDataSource(classLoader);
+			this.adapter = dbAdapterFactory.createAdapter(info);
+			this.dataSource = dataSourceFactory.createDataSource(info);
 			try (Connection connection = dataSource.getConnection()) {
 			} catch (SQLException ignore) {
 			}

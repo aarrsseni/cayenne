@@ -312,8 +312,7 @@ public class DefaultActionManager implements ActionManager {
      * Invoked when several objects were selected in ProjectTree at time
      */
     public void multipleObjectsSelected(
-            ConfigurationNode[] objects,
-            Application application) {
+            ConfigurationNode[] objects) {
         processActionsState(MULTIPLE_OBJECTS_ACTIONS);
 
         updateActions("Selected Objects");
@@ -326,7 +325,7 @@ public class DefaultActionManager implements ActionManager {
             canCopy = false;
         }
         else {
-            ConfigurationNodeParentGetter parentGetter = application
+            ConfigurationNodeParentGetter parentGetter = Application.getInstance()
                     .getInjector()
                     .getInstance(ConfigurationNodeParentGetter.class);
             Object parent = parentGetter.getParent(objects[0]);

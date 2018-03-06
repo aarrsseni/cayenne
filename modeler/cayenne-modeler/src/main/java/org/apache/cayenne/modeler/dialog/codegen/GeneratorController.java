@@ -30,9 +30,11 @@ import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.adapters.JFileChooserAdapter;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.FSPath;
+import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.CodeValidationUtil;
 import org.apache.cayenne.swing.BindingBuilder;
@@ -515,6 +517,8 @@ public abstract class GeneratorController extends CayenneController {
         String currentDir = outputFolder.getText();
 
         JFileChooser chooser = new JFileChooser();
+        BaseFileChooser baseFileChooser = new JFileChooserAdapter(chooser);
+
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
@@ -523,7 +527,7 @@ public abstract class GeneratorController extends CayenneController {
             chooser.setCurrentDirectory(new File(currentDir));
         } else {
             FSPath lastDir = Application.getInstance().getFrameController().getLastDirectory();
-            lastDir.updateChooser(chooser);
+            lastDir.updateChooser(baseFileChooser);
         }
 
         int result = chooser.showOpenDialog(getView());

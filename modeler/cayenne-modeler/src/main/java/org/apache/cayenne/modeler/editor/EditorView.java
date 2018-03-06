@@ -334,7 +334,7 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
         }
     }
 
-    public void currentObjectsChanged(MultipleObjectsDisplayEvent e, Application application) {
+    public void currentObjectsChanged(MultipleObjectsDisplayEvent e) {
         detailLayout.show(detailPanel, EMPTY_VIEW);
     }
 

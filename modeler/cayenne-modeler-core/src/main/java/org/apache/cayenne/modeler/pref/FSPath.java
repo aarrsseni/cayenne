@@ -19,12 +19,11 @@
 
 package org.apache.cayenne.modeler.pref;
 
+import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
+import org.apache.cayenne.pref.CayennePreference;
+
 import java.io.File;
 import java.util.prefs.Preferences;
-
-import javax.swing.JFileChooser;
-
-import org.apache.cayenne.pref.CayennePreference;
 
 
 /**
@@ -39,14 +38,14 @@ public class FSPath extends CayennePreference {
         setCurrentPreference(preferences);
     }
     
-    public void updateFromChooser(JFileChooser chooser) {
+    public void updateFromChooser(BaseFileChooser chooser) {
         File file = chooser.getSelectedFile();
         if (file != null) {
             setDirectory(file);
         }
     }
 
-    public void updateChooser(JFileChooser chooser) {
+    public void updateChooser(BaseFileChooser chooser) {
         File startDir = getExistingDirectory(false);
         if (startDir != null) {
             chooser.setCurrentDirectory(startDir);

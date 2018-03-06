@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db.gen;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.access.DbGenerator;
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.log.NoopJdbcEventLogger;
@@ -28,6 +29,7 @@ import org.apache.cayenne.modeler.dialog.ValidationResultBrowser;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.pref.DBGeneratorDefaults;
+import org.apache.cayenne.modeler.pref.helpers.CoreDbAdapterFactory;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.DbAdapterInfo;
 import org.apache.cayenne.swing.BindingBuilder;
@@ -65,6 +67,9 @@ public class DBGeneratorOptions extends CayenneController {
     protected String textForSQL;
 
     protected TableSelectorController tables;
+
+    @Inject
+    protected CoreDbAdapterFactory dbAdapterFactory;
 
     public DBGeneratorOptions(ProjectController parent, String title, Collection<DataMap> dataMaps) {
         super(parent);
@@ -162,8 +167,7 @@ public class DBGeneratorOptions extends CayenneController {
      */
     protected void prepareGenerator() {
         try {
-            DbAdapter adapter = connectionInfo.makeAdapter(getApplication()
-                    .getClassLoadingService());
+            DbAdapter adapter = dbAdapterFactory.createAdapter(connectionInfo);
             generators = new ArrayList<>();
             for (DataMap dataMap : dataMaps) {
                 this.generators.add(new DbGenerator(

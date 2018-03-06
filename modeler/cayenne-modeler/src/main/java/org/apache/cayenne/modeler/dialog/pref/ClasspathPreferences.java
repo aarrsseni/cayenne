@@ -34,6 +34,8 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.cayenne.modeler.adapters.JFileChooserAdapter;
+import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.FileFilters;
 import org.apache.cayenne.pref.CayennePreferenceEditor;
@@ -174,11 +176,13 @@ public class ClasspathPreferences extends CayenneController {
 
     protected void chooseClassEntry(FileFilter filter, String title, int selectionMode) {
         JFileChooser chooser = new JFileChooser();
+        BaseFileChooser baseFileChooser = new JFileChooserAdapter(chooser);
+
         chooser.setFileSelectionMode(selectionMode);
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
         chooser.setAcceptAllFileFilterUsed(true);
 
-        getLastDirectory().updateChooser(chooser);
+        getLastDirectory().updateChooser(baseFileChooser);
 
         if (filter != null) {
             chooser.addChoosableFileFilter(filter);
@@ -195,7 +199,7 @@ public class ClasspathPreferences extends CayenneController {
         if (selected != null) {
             if (!classPathEntries.contains(selected.getAbsolutePath())) {
                 // store last dir in preferences
-                getLastDirectory().updateFromChooser(chooser);
+                getLastDirectory().updateFromChooser(baseFileChooser);
 
                 int len = classPathEntries.size();
                 int key = ++counter;

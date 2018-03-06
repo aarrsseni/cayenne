@@ -26,7 +26,9 @@ import org.apache.cayenne.configuration.DataMapLoader;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.adapters.JFileChooserAdapter;
 import org.apache.cayenne.modeler.pref.FSPath;
+import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.FileFilters;
 import org.apache.cayenne.resource.Resource;
@@ -106,8 +108,11 @@ public class ImportDataMapAction extends CayenneAction {
 
         // configure dialog
         JFileChooser chooser = new JFileChooser();
+        BaseFileChooser baseFileChooser = new JFileChooserAdapter(chooser);
+
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        lastDir.updateChooser(chooser);
+
+        lastDir.updateChooser(baseFileChooser);
 
         chooser.addChoosableFileFilter(FileFilters.getDataMapFilter());
 
@@ -115,8 +120,9 @@ public class ImportDataMapAction extends CayenneAction {
         if (status == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
 
+
             // save to preferences...
-            lastDir.updateFromChooser(chooser);
+            lastDir.updateFromChooser(baseFileChooser);
 
             return file;
         }

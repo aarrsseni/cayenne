@@ -30,8 +30,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.adapters.JFileChooserAdapter;
 import org.apache.cayenne.modeler.graph.DataDomainGraphTab;
 import org.apache.cayenne.modeler.pref.FSPath;
+import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.FileFilters;
 import org.slf4j.Logger;
@@ -64,8 +66,10 @@ public class SaveAsImageAction extends CayenneAction {
 
 		// configure dialog
 		JFileChooser chooser = new JFileChooser();
+		BaseFileChooser baseFileChooser = new JFileChooserAdapter(chooser);
+
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		lastDir.updateChooser(chooser);
+		lastDir.updateChooser(baseFileChooser);
 
 		chooser.setAcceptAllFileFilterUsed(false);
 
@@ -74,7 +78,7 @@ public class SaveAsImageAction extends CayenneAction {
 
 		int status = chooser.showSaveDialog(Application.getFrame());
 		if (status == JFileChooser.APPROVE_OPTION) {
-			lastDir.updateFromChooser(chooser);
+			lastDir.updateFromChooser(baseFileChooser);
 
 			String path = chooser.getSelectedFile().getPath();
 			if (!path.endsWith("." + ext)) {
