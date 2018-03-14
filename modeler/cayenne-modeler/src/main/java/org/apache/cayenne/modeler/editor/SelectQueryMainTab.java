@@ -175,7 +175,7 @@ public class SelectQueryMainTab extends JPanel {
      * query is changed.
      */
     void initFromModel() {
-        QueryDescriptor descriptor = mediator.getCurrentQuery();
+        QueryDescriptor descriptor = mediator.getCurrentState().getQuery();
 
         if (descriptor == null || !QueryDescriptor.SELECT_QUERY.equals(descriptor.getType())) {
             setVisible(false);
@@ -199,7 +199,7 @@ public class SelectQueryMainTab extends JPanel {
         // since query root is fully resolved during map loading,
         // making it impossible to reference other DataMaps.
 
-        DataMap map = mediator.getCurrentDataMap();
+        DataMap map = mediator.getCurrentState().getDataMap();
         ObjEntity[] roots = map.getObjEntities().toArray(new ObjEntity[0]);
 
         if (roots.length > 1) {
@@ -216,11 +216,11 @@ public class SelectQueryMainTab extends JPanel {
     }
 
     protected SelectQueryDescriptor getQuery() {
-        if(mediator.getCurrentQuery() == null) {
+        if(mediator.getCurrentState().getQuery() == null) {
             return null;
         }
-        return QueryDescriptor.SELECT_QUERY.equals(mediator.getCurrentQuery().getType())
-                ? (SelectQueryDescriptor) mediator.getCurrentQuery()
+        return QueryDescriptor.SELECT_QUERY.equals(mediator.getCurrentState().getQuery().getType())
+                ? (SelectQueryDescriptor) mediator.getCurrentState().getQuery()
                 : null;
     }
 
@@ -298,7 +298,7 @@ public class SelectQueryMainTab extends JPanel {
             throw new ValidationException("SelectQuery name is required.");
         }
 
-        DataMap map = mediator.getCurrentDataMap();
+        DataMap map = mediator.getCurrentState().getDataMap();
         QueryDescriptor matchingQuery = map.getQueryDescriptor(newName);
 
         if (matchingQuery == null) {
@@ -374,7 +374,7 @@ public class SelectQueryMainTab extends JPanel {
                         String newPrefix = root.getName() + "Query";
                         newName = newPrefix;
                         
-                        DataMap map = mediator.getCurrentDataMap();
+                        DataMap map = mediator.getCurrentState().getDataMap();
                         long postfix = 1;
                         
                         while (map.getQueryDescriptor(newName) != null) {

@@ -68,17 +68,20 @@ public class DBGeneratorOptions extends CayenneController {
 
     protected TableSelectorController tables;
 
+    protected ProjectController projectController;
+
     @Inject
     protected CoreDbAdapterFactory dbAdapterFactory;
 
-    public DBGeneratorOptions(ProjectController parent, String title, Collection<DataMap> dataMaps) {
-        super(parent);
+    public DBGeneratorOptions(ProjectController projectController, String title, Collection<DataMap> dataMaps) {
+        super();
 
+        this.projectController = projectController;
         this.dataMaps = dataMaps;
-        this.tables = new TableSelectorController(parent);
+        this.tables = new TableSelectorController(getProjectController());
         this.view = new DBGeneratorOptionsView(tables.getView());
         this.connectionInfo = new DBConnectionInfo();
-        this.generatorDefaults = new DBGeneratorDefaults(parent
+        this.generatorDefaults = new DBGeneratorDefaults(getProjectController()
                 .getPreferenceForProject()
                 .node("DbGenerator"));
 
@@ -254,7 +257,7 @@ public class DBGeneratorOptions extends CayenneController {
     public void generateSchemaAction() {
 
         DataSourceWizard connectWizard = new DataSourceWizard(
-                this.getParent(),
+                projectController,
                 "Generate DB Schema: Connect to Database");
         if (!connectWizard.startupAction()) {
             return;
@@ -332,5 +335,9 @@ public class DBGeneratorOptions extends CayenneController {
     public void setConnectionInfo(DBConnectionInfo connectionInfo) {
         this.connectionInfo = connectionInfo;
         refreshView();
+    }
+
+    public ProjectController getProjectController() {
+        return projectController;
     }
 }

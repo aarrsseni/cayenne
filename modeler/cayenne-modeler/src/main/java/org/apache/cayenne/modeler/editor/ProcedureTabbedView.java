@@ -56,8 +56,8 @@ public class ProcedureTabbedView extends JTabbedPane implements ProcedureDisplay
         addTab("Parameters", procedureParameterPanel);
 
         // init listeners
-        eventController.addProcedureDisplayListener(this);
-        eventController.addProcedureParameterDisplayListener(this);
+        eventController.getEventController().addProcedureDisplayListener(this);
+        eventController.getEventController().addProcedureParameterDisplayListener(this);
         this.addChangeListener(new ChangeListener() {
 
             public void stateChanged(ChangeEvent e) {

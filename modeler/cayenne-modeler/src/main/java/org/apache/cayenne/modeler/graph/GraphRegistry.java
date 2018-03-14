@@ -58,7 +58,7 @@ public class GraphRegistry implements DomainListener {
         if (builder == null) {
             builder = graphMap.createGraphBuilder(type, true);
             
-            mediator.setDirty(true);
+            mediator.fireSaveFlag(true);
         }
         
         //marking this builder as default
@@ -101,6 +101,6 @@ public class GraphRegistry implements DomainListener {
      */
     public void unregister(ProjectController mediator) {
         unregisterDomain((DataChannelDescriptor)mediator.getProject().getRootNode());
-        mediator.removeDomainListener(this);
+        mediator.getEventController().removeDomainListener(this);
     }
 }

@@ -35,7 +35,7 @@ public abstract class DefaultsPreferencesController extends CayenneController {
     protected boolean allEntities;
 
     public DefaultsPreferencesController(ProjectController mediator, DataMap dataMap) {
-        super(mediator);
+        super();
         this.allEntities = true;
         this.dataMap = dataMap;
         this.mediator = mediator;

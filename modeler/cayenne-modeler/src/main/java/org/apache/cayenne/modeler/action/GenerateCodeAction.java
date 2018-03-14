@@ -46,15 +46,15 @@ public class GenerateCodeAction extends CayenneAction {
 
     public void performAction(ActionEvent e) {
         Collection<DataMap> dataMaps;
-        DataMap dataMap = getProjectController().getCurrentDataMap();
+        DataMap dataMap = getProjectController().getCurrentState().getDataMap();
 
         if (dataMap != null) {
             dataMaps = new ArrayList<>();
             dataMaps.add(dataMap);
 
             new CodeGeneratorController(getApplication().getFrameController(), dataMaps).startup();
-        } else if (getProjectController().getCurrentDataNode() != null) {
-            Collection<String> nodeMaps = getProjectController().getCurrentDataNode().getDataMapNames();
+        } else if (getProjectController().getCurrentState().getNode() != null) {
+            Collection<String> nodeMaps = getProjectController().getCurrentState().getNode().getDataMapNames();
             Project project = getProjectController().getProject();
             dataMaps = ((DataChannelDescriptor) project.getRootNode()).getDataMaps();
 

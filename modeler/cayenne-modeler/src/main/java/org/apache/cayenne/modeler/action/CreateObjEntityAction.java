@@ -63,7 +63,7 @@ public class CreateObjEntityAction extends CayenneAction {
                 src,
                 entity,
                 dataMap,
-                mediator.getCurrentDataNode(),
+                mediator.getCurrentState().getNode(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
         displayEvent.setMainTabFocus(true);
         mediator.fireObjEntityDisplayEvent(displayEvent);
@@ -82,7 +82,7 @@ public class CreateObjEntityAction extends CayenneAction {
     protected void createObjEntity() {
         ProjectController mediator = getProjectController();
 
-        DataMap dataMap = mediator.getCurrentDataMap();
+        DataMap dataMap = mediator.getCurrentState().getDataMap();
         ObjEntity entity = new ObjEntity();
         entity.setName(NameBuilder.builder(entity, dataMap).name());
 
@@ -90,7 +90,7 @@ public class CreateObjEntityAction extends CayenneAction {
         entity.setSuperClassName(dataMap.getDefaultSuperclass());
         entity.setDeclaredLockType(dataMap.getDefaultLockType());
 
-        DbEntity dbEntity = mediator.getCurrentDbEntity();
+        DbEntity dbEntity = mediator.getCurrentState().getDbEntity();
         if (dbEntity != null) {
             entity.setDbEntity(dbEntity);
 

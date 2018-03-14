@@ -48,10 +48,11 @@ public class DbRelationshipTarget extends CayenneController{
     protected DbRelationshipTargetView view;
     protected boolean toMany;
     protected boolean savePressed;
+
     
     @SuppressWarnings("unchecked")
-    public DbRelationshipTarget(ProjectController mediator,DbEntity source1, DbEntity source2) {
-        super(mediator);
+    public DbRelationshipTarget(ProjectController mediator, DbEntity source1, DbEntity source2) {
+        super();
         view = new DbRelationshipTargetView(source1, source2);
         initController();
         view.getSource1Button().setSelected(true);

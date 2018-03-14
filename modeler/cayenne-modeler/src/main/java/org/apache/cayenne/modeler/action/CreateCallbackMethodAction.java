@@ -68,7 +68,7 @@ public class CreateCallbackMethodAction extends CayenneAction {
      * @return CallbackMap instance where to create a method
      */
     public CallbackMap getCallbackMap() {
-        return getProjectController().getCurrentObjEntity().getCallbackMap();
+        return getProjectController().getCurrentState().getObjEntity().getCallbackMap();
     }
 
     /**
@@ -84,10 +84,10 @@ public class CreateCallbackMethodAction extends CayenneAction {
      * @param e event
      */
     public final void performAction(ActionEvent e) {
-        CallbackType callbackType = getProjectController().getCurrentCallbackType();
+        CallbackType callbackType = getProjectController().getCurrentState().getCallbackType();
 
         String methodName = NameBuilder
-                .builderForCallbackMethod(getProjectController().getCurrentObjEntity())
+                .builderForCallbackMethod(getProjectController().getCurrentState().getObjEntity())
                 .baseName(toMethodName(callbackType.getType()))
                 .name();
 

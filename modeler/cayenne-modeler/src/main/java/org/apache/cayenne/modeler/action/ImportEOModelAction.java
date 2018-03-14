@@ -104,7 +104,7 @@ public class ImportEOModelAction extends CayenneAction {
                 file = file.getParentFile();
             }
 
-            DataMap currentMap = getProjectController().getCurrentDataMap();
+            DataMap currentMap = getProjectController().getCurrentState().getDataMap();
 
             try {
                 URL url = file.toURI().toURL();
@@ -285,7 +285,7 @@ public class ImportEOModelAction extends CayenneAction {
             mediator.fireDataMapDisplayEvent(new DataMapDisplayEvent(Application
                     .getFrame(), map, (DataChannelDescriptor) mediator
                     .getProject()
-                    .getRootNode(), mediator.getCurrentDataNode()));
+                    .getRootNode(), mediator.getCurrentState().getNode()));
         }
         else {
             // fix DataMap name, as there maybe a map with the same name already

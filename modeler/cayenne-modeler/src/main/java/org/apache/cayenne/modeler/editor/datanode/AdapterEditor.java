@@ -40,9 +40,12 @@ public class AdapterEditor extends CayenneController {
     protected DataNodeDescriptor node;
     protected ObjectBinding adapterNameBinding;
 
-    public AdapterEditor(CayenneController parent) {
-        super(parent);
+    protected ProjectController projectController;
 
+    public AdapterEditor(ProjectController projectController) {
+        super();
+
+        this.projectController = projectController;
         this.view = new AdapterView();
         initController();
     }
@@ -50,14 +53,13 @@ public class AdapterEditor extends CayenneController {
     protected void initController() {
         // init bindings
         BindingBuilder builder = new BindingBuilder(
-                getApplication().getBindingFactory(),
-                this);
+                projectController.getApplication().getBindingFactory(), this);
 
         adapterNameBinding = builder.bindToTextField(
                 view.getCustomAdapter(),
                 "adapterName");
 
-        ((ProjectController) getParent())
+        projectController.getEventController()
                 .addDataNodeDisplayListener(new DataNodeDisplayListener() {
 
                     public void currentDataNodeChanged(DataNodeDisplayEvent e) {
@@ -68,8 +70,7 @@ public class AdapterEditor extends CayenneController {
         getView().addComponentListener(new ComponentAdapter() {
 
             public void componentShown(ComponentEvent e) {
-                refreshView(node != null ? node : ((ProjectController) getParent())
-                        .getCurrentDataNode());
+                refreshView(node != null ? node : projectController.getCurrentState().getNode());
             }
         });
     }
@@ -107,6 +108,6 @@ public class AdapterEditor extends CayenneController {
         node.setAdapterType(name);
         
         DataNodeEvent e = new DataNodeEvent(AdapterEditor.this, node);
-        ((ProjectController) getParent()).fireDataNodeEvent(e);
+        projectController.fireDataNodeEvent(e);
     }
 }

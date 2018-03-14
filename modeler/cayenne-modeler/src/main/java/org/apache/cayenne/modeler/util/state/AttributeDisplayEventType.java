@@ -74,17 +74,17 @@ class AttributeDisplayEventType extends EntityDisplayEventType {
     @Override
     public void saveLastDisplayEvent() {
         preferences.setEvent(AttributeDisplayEvent.class.getSimpleName());
-        preferences.setDomain(controller.getCurrentDataChanel().getName());
-        preferences.setNode(controller.getCurrentDataNode() != null ? controller.getCurrentDataNode().getName() : "");
-        preferences.setDataMap(controller.getCurrentDataMap().getName());
+        preferences.setDomain(controller.getCurrentState().getDomain().getName());
+        preferences.setNode(controller.getCurrentState().getNode() != null ? controller.getCurrentState().getNode().getName() : "");
+        preferences.setDataMap(controller.getCurrentState().getDataMap().getName());
 
-        if (controller.getCurrentObjEntity() != null) {
-            preferences.setObjEntity(controller.getCurrentObjEntity().getName());
-            preferences.setObjAttrs(parseToString(controller.getCurrentObjAttributes()));
+        if (controller.getCurrentState().getObjEntity() != null) {
+            preferences.setObjEntity(controller.getCurrentState().getObjEntity().getName());
+            preferences.setObjAttrs(parseToString(controller.getCurrentState().getObjAttrs()));
             preferences.setDbEntity(null);
-        } else if (controller.getCurrentDbEntity() != null) {
-            preferences.setDbEntity(controller.getCurrentDbEntity().getName());
-            preferences.setDbAttrs(parseToString(controller.getCurrentDbAttributes()));
+        } else if (controller.getCurrentState().getDbEntity() != null) {
+            preferences.setDbEntity(controller.getCurrentState().getDbEntity().getName());
+            preferences.setDbAttrs(parseToString(controller.getCurrentState().getDbAttrs()));
             preferences.setObjEntity(null);
         }
     }

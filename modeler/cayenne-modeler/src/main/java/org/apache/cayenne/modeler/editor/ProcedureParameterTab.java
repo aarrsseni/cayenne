@@ -93,8 +93,8 @@ public class ProcedureParameterTab extends JPanel implements ProcedureParameterL
 
         init();
 
-        eventController.addProcedureDisplayListener(this);
-        eventController.addProcedureParameterListener(this);
+        eventController.getEventController().addProcedureDisplayListener(this);
+        eventController.getEventController().addProcedureParameterListener(this);
 
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
@@ -231,8 +231,8 @@ public class ProcedureParameterTab extends JPanel implements ProcedureParameterL
         ProcedureParameterDisplayEvent ppde = new ProcedureParameterDisplayEvent(
                 this,
                 parameters,
-                eventController.getCurrentProcedure(),
-                eventController.getCurrentDataMap(),
+                eventController.getCurrentState().getProcedure(),
+                eventController.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) eventController.getProject().getRootNode());
         eventController.fireProcedureParameterDisplayEvent(ppde);
     }

@@ -76,9 +76,9 @@ public class DbEntityTabbedView extends JTabbedPane implements ChangeListener,
     }
 
     private void initController() {
-        projectController.addDbEntityDisplayListener(this);
-        projectController.addDbAttributeDisplayListener(this);
-        projectController.addDbRelationshipDisplayListener(this);
+        projectController.getEventController().addDbEntityDisplayListener(this);
+        projectController.getEventController().addDbAttributeDisplayListener(this);
+        projectController.getEventController().addDbRelationshipDisplayListener(this);
 
         addChangeListener(this);
     }

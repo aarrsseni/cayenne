@@ -225,23 +225,23 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
     }
 
 	private void setupMediator() {
-		mediator.addDomainListener(this);
-        mediator.addDomainDisplayListener(this);
-        mediator.addDataNodeListener(this);
-        mediator.addDataNodeDisplayListener(this);
-        mediator.addDataMapListener(this);
-        mediator.addDataMapDisplayListener(this);
-        mediator.addObjEntityListener(this);
-        mediator.addObjEntityDisplayListener(this);
-        mediator.addDbEntityListener(this);
-        mediator.addDbEntityDisplayListener(this);
-        mediator.addEmbeddableDisplayListener(this);
-        mediator.addEmbeddableListener(this);
-        mediator.addProcedureListener(this);
-        mediator.addProcedureDisplayListener(this);
-        mediator.addQueryListener(this);
-        mediator.addQueryDisplayListener(this);
-        mediator.addMultipleObjectsDisplayListener(this);
+		mediator.getEventController().addDomainListener(this);
+        mediator.getEventController().addDomainDisplayListener(this);
+        mediator.getEventController().addDataNodeListener(this);
+        mediator.getEventController().addDataNodeDisplayListener(this);
+        mediator.getEventController().addDataMapListener(this);
+        mediator.getEventController().addDataMapDisplayListener(this);
+        mediator.getEventController().addObjEntityListener(this);
+        mediator.getEventController().addObjEntityDisplayListener(this);
+        mediator.getEventController().addDbEntityListener(this);
+        mediator.getEventController().addDbEntityDisplayListener(this);
+        mediator.getEventController().addEmbeddableDisplayListener(this);
+        mediator.getEventController().addEmbeddableListener(this);
+        mediator.getEventController().addProcedureListener(this);
+        mediator.getEventController().addProcedureDisplayListener(this);
+        mediator.getEventController().addQueryListener(this);
+        mediator.getEventController().addQueryDisplayListener(this);
+        mediator.getEventController().addMultipleObjectsDisplayListener(this);
         mediator.getApplication().getActionManager().setupCutCopyPaste(
                 this,
                 CutAction.class,

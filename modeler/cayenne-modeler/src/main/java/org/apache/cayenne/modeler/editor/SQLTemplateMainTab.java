@@ -119,7 +119,7 @@ public class SQLTemplateMainTab extends JPanel {
      * query is changed.
      */
     void initFromModel() {
-        QueryDescriptor query = mediator.getCurrentQuery();
+        QueryDescriptor query = mediator.getCurrentState().getQuery();
 
         if (query == null || !QueryDescriptor.SQL_TEMPLATE.equals(query.getType())) {
             setVisible(false);
@@ -134,7 +134,7 @@ public class SQLTemplateMainTab extends JPanel {
     }
 
     protected QueryDescriptor getQuery() {
-        QueryDescriptor query = mediator.getCurrentQuery();
+        QueryDescriptor query = mediator.getCurrentState().getQuery();
         return (query != null && QueryDescriptor.SQL_TEMPLATE.equals(query.getType())) ? query : null;
     }
 
@@ -160,7 +160,7 @@ public class SQLTemplateMainTab extends JPanel {
             throw new ValidationException("Query name is required.");
         }
 
-        DataMap map = mediator.getCurrentDataMap();
+        DataMap map = mediator.getCurrentState().getDataMap();
 
         if (map.getQueryDescriptor(newName) == null) {
             // completely new name, set new name for entity
@@ -188,7 +188,7 @@ public class SQLTemplateMainTab extends JPanel {
         QueryDescriptor template = getQuery();
         if (template != null) {
             // in case of null entity, set root to DataMap
-            Object root = entity != null ? entity : mediator.getCurrentDataMap();
+            Object root = entity != null ? entity : mediator.getCurrentState().getDataMap();
             template.setRoot(root);
 
             mediator.fireQueryEvent(new QueryEvent(this, template));

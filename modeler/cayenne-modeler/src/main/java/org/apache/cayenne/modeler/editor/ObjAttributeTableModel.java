@@ -25,7 +25,6 @@ import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EmbeddedAttribute;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
@@ -321,8 +320,8 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
 
         mediator.fireObjEntityDisplayEvent(new EntityDisplayEvent(
                 this,
-                mediator.getCurrentObjEntity(),
-                mediator.getCurrentDataMap(),
+                mediator.getCurrentState().getObjEntity(),
+                mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode()));
 
         mediator.fireObjAttributeEvent(new AttributeEvent(
@@ -334,8 +333,8 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
         mediator.fireObjAttributeDisplayEvent(new AttributeDisplayEvent(
                 this,
                 attributeNew,
-                mediator.getCurrentObjEntity(),
-                mediator.getCurrentDataMap(),
+                mediator.getCurrentState().getObjEntity(),
+                mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode()));
     }
 

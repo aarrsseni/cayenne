@@ -67,8 +67,8 @@ public class EmbeddableTabbedView extends JTabbedPane implements
 
     private void initController() {
 
-        mediator.addEmbeddableAttributeDisplayListener(this);
-        mediator.addEmbeddableDisplayListener(this);
+        mediator.getEventController().addEmbeddableAttributeDisplayListener(this);
+        mediator.getEventController().addEmbeddableDisplayListener(this);
 
         addChangeListener(new ChangeListener() {
 

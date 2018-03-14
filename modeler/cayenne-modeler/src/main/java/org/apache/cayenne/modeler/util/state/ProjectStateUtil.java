@@ -32,8 +32,8 @@ public final class ProjectStateUtil {
     }
 
     public void saveLastState(ProjectController controller) {
-        EventObject displayEvent = controller.getLastDisplayEvent();
-        ConfigurationNode[] multiplyObjects = controller.getCurrentPaths();
+        EventObject displayEvent = controller.getCurrentState().getEvent();
+        ConfigurationNode[] multiplyObjects = controller.getCurrentState().getPaths();
 
         if (displayEvent == null && multiplyObjects == null) {
             return;

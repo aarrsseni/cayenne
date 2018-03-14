@@ -127,17 +127,17 @@ class ObjGraphBuilder extends BaseGraphBuilder implements ObjEntityListener,
     public void setProjectController(ProjectController mediator) {
         super.setProjectController(mediator);
 
-        mediator.addObjEntityListener(this);
-        mediator.addObjAttributeListener(this);
-        mediator.addObjRelationshipListener(this);
+        mediator.getEventController().addObjEntityListener(this);
+        mediator.getEventController().addObjAttributeListener(this);
+        mediator.getEventController().addObjRelationshipListener(this);
     }
 
     public void destroy() {
         super.destroy();
 
-        mediator.removeObjEntityListener(this);
-        mediator.removeObjAttributeListener(this);
-        mediator.removeObjRelationshipListener(this);
+        mediator.getEventController().removeObjEntityListener(this);
+        mediator.getEventController().removeObjAttributeListener(this);
+        mediator.getEventController().removeObjRelationshipListener(this);
     }
 
     public void objEntityAdded(EntityEvent e) {

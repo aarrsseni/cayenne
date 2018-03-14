@@ -87,9 +87,9 @@ public class ObjEntityTabbedView extends JTabbedPane implements ObjEntityDisplay
     }
 
     private void initController() {
-        projectController.addObjEntityDisplayListener(this);
-        projectController.addObjAttributeDisplayListener(this);
-        projectController.addObjRelationshipDisplayListener(this);
+        projectController.getEventController().addObjEntityDisplayListener(this);
+        projectController.getEventController().addObjAttributeDisplayListener(this);
+        projectController.getEventController().addObjRelationshipDisplayListener(this);
 
         addChangeListener(new ChangeListener() {
 

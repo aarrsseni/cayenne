@@ -55,8 +55,12 @@ public class TableSelectorController extends CayenneController {
 
     protected Map<String, String> validationMessages;
 
-    public TableSelectorController(ProjectController parent) {
-        super(parent);
+    protected ProjectController projectController;
+
+    public TableSelectorController(ProjectController projectController) {
+        super();
+
+        this.projectController = projectController;
         this.view = new TableSelectorView();
         this.excludedTables = new HashMap<>();
         this.selectableTablesList = new ArrayList<>();

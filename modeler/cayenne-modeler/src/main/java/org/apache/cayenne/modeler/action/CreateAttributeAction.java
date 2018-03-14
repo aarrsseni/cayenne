@@ -66,7 +66,7 @@ public class CreateAttributeAction extends CayenneAction {
         mediator.fireEmbeddableAttributeEvent(new EmbeddableAttributeEvent(src, attr, embeddable, MapEvent.ADD));
 
         EmbeddableAttributeDisplayEvent e = new EmbeddableAttributeDisplayEvent(src, embeddable, attr,
-                mediator.getCurrentDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode());
+                mediator.getCurrentState().getDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode());
 
         mediator.fireEmbeddableAttributeDisplayEvent(e);
     }
@@ -111,8 +111,8 @@ public class CreateAttributeAction extends CayenneAction {
     public void performAction(ActionEvent e) {
         ProjectController mediator = getProjectController();
 
-        if (getProjectController().getCurrentEmbeddable() != null) {
-            Embeddable embeddable = mediator.getCurrentEmbeddable();
+        if (getProjectController().getCurrentState().getEmbeddable() != null) {
+            Embeddable embeddable = mediator.getCurrentState().getEmbeddable();
 
             EmbeddableAttribute attr = new EmbeddableAttribute();
             attr.setName(NameBuilder
@@ -125,31 +125,31 @@ public class CreateAttributeAction extends CayenneAction {
                     new CreateEmbAttributeUndoableEdit(embeddable, new EmbeddableAttribute[]{attr}));
         }
 
-        if (getProjectController().getCurrentObjEntity() != null) {
+        if (getProjectController().getCurrentState().getObjEntity() != null) {
 
-            ObjEntity objEntity = mediator.getCurrentObjEntity();
+            ObjEntity objEntity = mediator.getCurrentState().getObjEntity();
 
             ObjAttribute attr = new ObjAttribute();
             attr.setName(NameBuilder.builder(attr, objEntity).name());
 
-            createObjAttribute(mediator.getCurrentDataMap(), objEntity, attr);
+            createObjAttribute(mediator.getCurrentState().getDataMap(), objEntity, attr);
 
             application.getUndoManager().addEdit(
                     new CreateAttributeUndoableEdit((DataChannelDescriptor) mediator.getProject().getRootNode(),
-                            mediator.getCurrentDataMap(), objEntity, attr));
-        } else if (getProjectController().getCurrentDbEntity() != null) {
-            DbEntity dbEntity = getProjectController().getCurrentDbEntity();
+                            mediator.getCurrentState().getDataMap(), objEntity, attr));
+        } else if (getProjectController().getCurrentState().getDbEntity() != null) {
+            DbEntity dbEntity = getProjectController().getCurrentState().getDbEntity();
 
             DbAttribute attr = new DbAttribute();
             attr.setName(NameBuilder.builder(attr, dbEntity).name());
             attr.setType(TypesMapping.NOT_DEFINED);
             attr.setEntity(dbEntity);
 
-            createDbAttribute(mediator.getCurrentDataMap(), dbEntity, attr);
+            createDbAttribute(mediator.getCurrentState().getDataMap(), dbEntity, attr);
 
             application.getUndoManager().addEdit(
                     new CreateAttributeUndoableEdit((DataChannelDescriptor) mediator.getProject().getRootNode(),
-                            mediator.getCurrentDataMap(), dbEntity, attr));
+                            mediator.getCurrentState().getDataMap(), dbEntity, attr));
         }
     }
 

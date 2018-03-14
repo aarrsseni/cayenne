@@ -22,6 +22,7 @@ package org.apache.cayenne.modeler.dialog.db;
 import com.google.inject.Inject;
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.modeler.ClassLoadingService;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
 import org.apache.cayenne.modeler.dialog.pref.PreferenceDialog;
 import org.apache.cayenne.modeler.event.DataSourceModificationEvent;
@@ -65,6 +66,7 @@ public class DataSourceWizard extends CayenneController {
 
 	private DbAdapter adapter;
 	private DataSource dataSource;
+	protected ProjectController projectController;
 
 	@Inject
 	protected CoreDbAdapterFactory dbAdapterFactory;
@@ -72,9 +74,10 @@ public class DataSourceWizard extends CayenneController {
 	@Inject
 	protected CoreDataSourceFactory dataSourceFactory;
 
-	public DataSourceWizard(CayenneController parent, String title) {
-		super(parent);
+	public DataSourceWizard(ProjectController projectController, String title) {
+		super();
 
+		this.projectController = projectController;
 		this.view = createView();
 		this.view.setTitle(title);
 		this.connectionInfo = new DBConnectionInfo();
@@ -112,6 +115,7 @@ public class DataSourceWizard extends CayenneController {
 			}
 		};
 		getApplication().getFrameController().getProjectController()
+				.getEventController()
 				.addDataSourceModificationListener(dataSourceListener);
 	}
 
@@ -126,6 +130,7 @@ public class DataSourceWizard extends CayenneController {
 
 	private void removeDataSourceListener() {
 		getApplication().getFrameController().getProjectController()
+				.getEventController()
 				.removeDataSourceModificationListener(dataSourceListener);
 	}
 

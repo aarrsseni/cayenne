@@ -115,9 +115,9 @@ public class EmbeddableAttributeTab extends JPanel implements
     }
 
     private void initController() {
-        mediator.addEmbeddableAttributeListener(this);
-        mediator.addEmbeddableDisplayListener(this);
-        mediator.addEmbeddableListener(this);
+        mediator.getEventController().addEmbeddableAttributeListener(this);
+        mediator.getEventController().addEmbeddableDisplayListener(this);
+        mediator.getEventController().addEmbeddableListener(this);
 
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
@@ -157,9 +157,9 @@ public class EmbeddableAttributeTab extends JPanel implements
 
         EmbeddableAttributeDisplayEvent ev = new EmbeddableAttributeDisplayEvent(
                 this,
-                mediator.getCurrentEmbeddable(),
+                mediator.getCurrentState().getEmbeddable(),
                 attrs,
-                mediator.getCurrentDataMap(),
+                mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
         mediator.fireEmbeddableAttributeDisplayEvent(ev);

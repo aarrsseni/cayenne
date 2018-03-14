@@ -51,7 +51,6 @@ import javax.swing.JTextField;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -472,10 +471,11 @@ public abstract class GeneratorController extends CayenneController {
      */
     public Predicate getDefaultClassFilter() {
         final ObjEntity selectedEntity = Application.getInstance().getFrameController().getProjectController()
-                .getCurrentObjEntity();
+                .getCurrentState().getObjEntity();
 
         final Embeddable selectedEmbeddable = Application.getInstance().getFrameController().getProjectController()
-                .getCurrentEmbeddable();
+                .getCurrentState()
+                .getEmbeddable();
 
         if (selectedEntity != null) {
             // select a single entity

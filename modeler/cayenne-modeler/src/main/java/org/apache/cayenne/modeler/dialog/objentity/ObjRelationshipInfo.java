@@ -77,7 +77,7 @@ public class ObjRelationshipInfo extends CayenneController implements TreeSelect
     protected String mapKey;
     protected ObjRelationshipInfoView view;
     protected String currentPath;
-    protected ProjectController mediator;
+    protected ProjectController projectController;
 
     /**
      * Starts options dialog.
@@ -91,10 +91,10 @@ public class ObjRelationshipInfo extends CayenneController implements TreeSelect
         view.setVisible(true);
     }
 
-    public ObjRelationshipInfo(ProjectController mediator, ObjRelationship relationship) {
-        super(mediator);
-        this.view = new ObjRelationshipInfoView(mediator);
-        this.mediator = mediator;
+    public ObjRelationshipInfo(ProjectController projectController, ObjRelationship relationship) {
+        super();
+        this.view = new ObjRelationshipInfoView(projectController);
+        this.projectController = projectController;
         getPathBrowser().addTreeSelectionListener(this);
         view.sourceEntityLabel.setText(relationship.getSourceEntity().getName());
         this.relationship = relationship;
@@ -305,7 +305,7 @@ public class ObjRelationshipInfo extends CayenneController implements TreeSelect
         }
 
         if (savePath()) {
-            mediator.fireObjRelationshipEvent(new RelationshipEvent(Application.getFrame(), getRelationship(),
+            projectController.fireObjRelationshipEvent(new RelationshipEvent(Application.getFrame(), getRelationship(),
                     getRelationship().getSourceEntity()));
         }
         view.sourceEntityLabel.setText(relationship.getSourceEntity().getName());
@@ -329,7 +329,7 @@ public class ObjRelationshipInfo extends CayenneController implements TreeSelect
         DbRelationship dbRel = getLastRelationship();
         DbEntity source = dbRel != null ? dbRel.getTargetEntity() : null;
 
-        DbRelationshipTarget targetModel = new DbRelationshipTarget(mediator, getStartEntity(), source);
+        DbRelationshipTarget targetModel = new DbRelationshipTarget(projectController, getStartEntity(), source);
         targetModel.startupAction();
 
         if (!targetModel.isSavePressed()) {

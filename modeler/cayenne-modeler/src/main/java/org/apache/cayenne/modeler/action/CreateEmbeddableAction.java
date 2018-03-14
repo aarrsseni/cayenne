@@ -53,7 +53,7 @@ public class CreateEmbeddableAction extends CayenneAction {
     public void performAction(ActionEvent e) {
         ProjectController mediator = getProjectController();
 
-        DataMap dataMap = mediator.getCurrentDataMap();
+        DataMap dataMap = mediator.getCurrentState().getDataMap();
 
         Embeddable embeddable = new Embeddable();
         String baseName = NameBuilder.builder(embeddable, dataMap).name();

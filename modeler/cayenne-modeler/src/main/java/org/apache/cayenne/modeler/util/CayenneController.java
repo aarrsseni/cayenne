@@ -57,7 +57,7 @@ public abstract class CayenneController implements BoundComponent {
     public CayenneController(){}
     
     public CayenneController(CayenneController parent) {
-        this.application = (parent != null) ? parent.getApplication() : null;
+        this.application = Application.getInstance();
         this.parent = parent;
     }
 
@@ -66,7 +66,7 @@ public abstract class CayenneController implements BoundComponent {
     }
 
     public Application getApplication() {
-        return application;
+        return Application.getInstance();
     }
 
     public CayenneController getParent() {
@@ -140,7 +140,7 @@ public abstract class CayenneController implements BoundComponent {
      * Centers view on parent window.
      */
     protected void centerView() {
-        Window parentWindow = parent.getWindow();
+        Window parentWindow = this.getWindow();
 
         Dimension parentSize = parentWindow.getSize();
         Dimension windowSize = getView().getSize();

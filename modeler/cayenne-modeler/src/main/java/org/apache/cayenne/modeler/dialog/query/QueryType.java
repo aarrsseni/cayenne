@@ -37,24 +37,24 @@ import java.awt.event.ActionListener;
 
 public class QueryType extends CayenneController{
 
-    protected ProjectController mediator;
+    protected ProjectController projectController;
     protected DataMap dataMap;
     protected DataChannelDescriptor domain;
 
     protected QueryTypeView view;
     protected String type;
     
-    public QueryType(ProjectController mediator, DataMap root) {
-        super(mediator);
+    public QueryType(ProjectController projectController, DataMap root) {
+        super();
 
         view = new QueryTypeView();
         initController();
 
         // by default use object query...
         this.type = QueryDescriptor.SELECT_QUERY;
-        this.mediator = mediator;
-        this.dataMap = mediator.getCurrentDataMap();
-        this.domain = (DataChannelDescriptor)mediator.getProject().getRootNode();
+        this.projectController = projectController;
+        this.dataMap = projectController.getCurrentState().getDataMap();
+        this.domain = (DataChannelDescriptor)projectController.getProject().getRootNode();
     }
 
     @Override
@@ -123,11 +123,11 @@ public class QueryType extends CayenneController{
         
         dataMap.addQueryDescriptor(query);
 
-        mediator.getApplication().getUndoManager().addEdit(
+        projectController.getApplication().getUndoManager().addEdit(
                 new CreateQueryUndoableEdit(domain, dataMap, query));
 
         // notify listeners
-        fireQueryEvent(this, mediator,dataMap, query);
+        fireQueryEvent(this, projectController, dataMap, query);
         view.dispose();
     }
 

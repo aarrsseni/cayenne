@@ -55,11 +55,11 @@ public class ShowGraphEntityAction extends CayenneAction {
         Entity entity = null;
 
         ProjectController mediator = getProjectController();
-        if (mediator.getCurrentDbEntity() != null) {
-            entity = mediator.getCurrentDbEntity();
+        if (mediator.getCurrentState().getDbEntity() != null) {
+            entity = mediator.getCurrentState().getDbEntity();
         }
-        else if (mediator.getCurrentObjEntity() != null) {
-            entity = mediator.getCurrentObjEntity();
+        else if (mediator.getCurrentState().getObjEntity() != null) {
+            entity = mediator.getCurrentState().getObjEntity();
         }
 
         if (entity != null) {

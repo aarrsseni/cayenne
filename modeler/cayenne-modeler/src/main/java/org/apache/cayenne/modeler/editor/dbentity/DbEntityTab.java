@@ -38,7 +38,6 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
@@ -184,7 +183,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
     }
 
     private void initController() {
-        mediator.addDbEntityDisplayListener(this);
+        mediator.getEventController().addDbEntityDisplayListener(this);
 
         pkGeneratorType.addItemListener(new ItemListener() {
 
@@ -194,7 +193,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
                 for (int i = 0; i < pkGeneratorDetail.getComponentCount(); i++) {
                     if (pkGeneratorDetail.getComponent(i).isVisible()) {
 
-                        DbEntity entity = mediator.getCurrentDbEntity();
+                        DbEntity entity = mediator.getCurrentState().getDbEntity();
                         PKGeneratorPanel panel = (PKGeneratorPanel) pkGeneratorDetail.getComponent(i);
                         panel.onInit(entity);
                         break;
@@ -205,8 +204,8 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
     }
 
     public void processExistingSelection(EventObject e) {
-        EntityDisplayEvent ede = new EntityDisplayEvent(this, mediator.getCurrentDbEntity(),
-                mediator.getCurrentDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode());
+        EntityDisplayEvent ede = new EntityDisplayEvent(this, mediator.getCurrentState().getDbEntity(),
+                mediator.getCurrentState().getDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode());
         mediator.fireDbEntityDisplayEvent(ede);
     }
 
@@ -269,7 +268,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
             newName = null;
         }
 
-        DbEntity entity = mediator.getCurrentDbEntity();
+        DbEntity entity = mediator.getCurrentState().getDbEntity();
 
         if (entity == null || Util.nullSafeEquals(newName, entity.getName())) {
             return;
@@ -295,7 +294,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
             text = null;
         }
 
-        DbEntity ent = mediator.getCurrentDbEntity();
+        DbEntity ent = mediator.getCurrentState().getDbEntity();
 
         if (ent != null && !Util.nullSafeEquals(ent.getCatalog(), text)) {
             ent.setCatalog(text);
@@ -309,7 +308,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
             text = null;
         }
 
-        DbEntity ent = mediator.getCurrentDbEntity();
+        DbEntity ent = mediator.getCurrentState().getDbEntity();
 
         if (ent != null && !Util.nullSafeEquals(ent.getSchema(), text)) {
             ent.setSchema(text);
@@ -323,7 +322,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
             qualifier = null;
         }
 
-        DbEntity ent = mediator.getCurrentDbEntity();
+        DbEntity ent = mediator.getCurrentState().getDbEntity();
 
         if (ent != null && !Util.nullSafeEquals(ent.getQualifier(), qualifier)) {
             ExpressionConvertor convertor = new ExpressionConvertor();
@@ -347,7 +346,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
     }
 
     private void setComment(String value) {
-        DbEntity entity = mediator.getCurrentDbEntity();
+        DbEntity entity = mediator.getCurrentState().getDbEntity();
 
         if(entity == null) {
             return;

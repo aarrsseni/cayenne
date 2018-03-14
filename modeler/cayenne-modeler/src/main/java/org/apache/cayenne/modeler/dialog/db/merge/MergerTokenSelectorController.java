@@ -23,6 +23,7 @@ import org.apache.cayenne.dbsync.merge.context.MergeDirection;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.ModelerUtil;
 import org.apache.cayenne.swing.BindingBuilder;
@@ -52,9 +53,11 @@ public class MergerTokenSelectorController extends CayenneController {
     protected List<MergerToken> selectableTokensList;
     protected MergerTokenFactory mergerTokenFactory;
     protected boolean isReverse;
+    protected ProjectController projectController;
 
-    public MergerTokenSelectorController(CayenneController parent) {
-        super(parent);
+    public MergerTokenSelectorController(ProjectController projectController) {
+        super();
+        this.projectController = projectController;
         this.view = new MergerTokenSelectorView();
         this.excludedTokens = new HashSet<>();
         this.selectableTokensList = new ArrayList<>();

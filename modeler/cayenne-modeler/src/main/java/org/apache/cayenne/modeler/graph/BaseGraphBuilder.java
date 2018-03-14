@@ -510,7 +510,7 @@ abstract class BaseGraphBuilder implements GraphBuilder, DataMapListener {
     public void setProjectController(ProjectController mediator) {
         this.mediator = mediator;
 
-        mediator.addDataMapListener(this);
+        mediator.getEventController().addDataMapListener(this);
     }
 
     public void setDataDomain(DataChannelDescriptor domain) {
@@ -524,7 +524,7 @@ abstract class BaseGraphBuilder implements GraphBuilder, DataMapListener {
 
     @Override
     public void destroy() {
-        mediator.removeDataMapListener(this);
+        mediator.getEventController().removeDataMapListener(this);
     }
 
     /**
@@ -596,7 +596,7 @@ abstract class BaseGraphBuilder implements GraphBuilder, DataMapListener {
     public void undoableEditHappened(UndoableEditEvent e) {
         if (!undoEventsDisabled) {
             // graph has been modified
-            mediator.setDirty(true);
+            mediator.fireSaveFlag(true);
 
             Application.getInstance().getUndoManager().undoableEditHappened(e);
         }

@@ -70,7 +70,6 @@ import javax.swing.table.TableColumn;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
@@ -150,9 +149,9 @@ public class ObjEntityRelationshipPanel extends JPanel implements ObjEntityDispl
     }
 
     private void initController() {
-        mediator.addObjEntityDisplayListener(this);
-        mediator.addObjEntityListener(this);
-        mediator.addObjRelationshipListener(this);
+        mediator.getEventController().addObjEntityDisplayListener(this);
+        mediator.getEventController().addObjEntityListener(this);
+        mediator.getEventController().addObjRelationshipListener(this);
 
         resolver = new ActionListener() {
 
@@ -240,7 +239,7 @@ public class ObjEntityRelationshipPanel extends JPanel implements ObjEntityDispl
      * Creates a list of ObjEntity names.
      */
     private Object[] createObjEntityComboModel() {
-        DataMap map = mediator.getCurrentDataMap();
+        DataMap map = mediator.getCurrentState().getDataMap();
 
         // this actually happens per CAY-221... can't reproduce though
         if (map == null) {
@@ -294,7 +293,7 @@ public class ObjEntityRelationshipPanel extends JPanel implements ObjEntityDispl
         }
 
         // If current model added/removed, do nothing.
-        ObjEntity entity = mediator.getCurrentObjEntity();
+        ObjEntity entity = mediator.getCurrentState().getObjEntity();
         if (entity == e.getEntity() || entity == null) {
             return;
         }
@@ -481,7 +480,7 @@ public class ObjEntityRelationshipPanel extends JPanel implements ObjEntityDispl
                 resolveMenu.setEnabled(enabledResolve);
             }
 
-            mediator.setCurrentObjRelationships(rels);
+            mediator.getCurrentState().setObjRels(rels);
             parentPanel.updateActions(rels);
         }
     }

@@ -92,23 +92,26 @@ public class MergerOptions extends CayenneController {
     protected String defaultSchema;
     private MergerTokenFactoryProvider mergerTokenFactoryProvider;
 
+    protected ProjectController projectController;
+
     @Inject
     protected CoreDbAdapterFactory dbAdapterFactory;
     @Inject
     protected CoreDataSourceFactory dataSourceFactory;
 
-    public MergerOptions(ProjectController parent,
+    public MergerOptions(ProjectController projectController,
                          String title,
                          DBConnectionInfo connectionInfo,
                          DataMap dataMap,
                          String defaultCatalog,
                          String defaultSchema,
                          MergerTokenFactoryProvider mergerTokenFactoryProvider) {
-        super(parent);
+        super();
 
+        this.projectController = projectController;
         this.mergerTokenFactoryProvider = mergerTokenFactoryProvider;
         this.dataMap = dataMap;
-        this.tokens = new MergerTokenSelectorController(parent);
+        this.tokens = new MergerTokenSelectorController(projectController);
         this.view = new MergerOptionsView(tokens.getView());
         this.connectionInfo = connectionInfo;
         this.defaultCatalog = defaultCatalog;
@@ -356,7 +359,7 @@ public class MergerOptions extends CayenneController {
         project.setModified(true);
 
         ProjectController projectController = getProjectController();
-        projectController.setDirty(true);
+        projectController.fireSaveFlag(true);
 
         projectController.fireDataMapEvent(new DataMapEvent(Application.getFrame(),
                 dataMap, MapEvent.REMOVE));

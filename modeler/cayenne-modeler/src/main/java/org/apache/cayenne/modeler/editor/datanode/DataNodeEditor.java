@@ -33,13 +33,13 @@ public class DataNodeEditor extends CayenneController {
 
     protected JTabbedPane view;
 
-    public DataNodeEditor(ProjectController parent) {
-        super(parent);
+    public DataNodeEditor(ProjectController projectController) {
+        super();
         
         this.view = new JTabbedPane();
-        view.addTab("Main", new JScrollPane(new MainDataNodeEditor(parent,this).getView()));
-        view.addTab("Adapter", new AdapterEditor(parent).getView());
-        view.addTab("Password Encoder", new PasswordEncoderEditor(parent).getView()) ;
+        view.addTab("Main", new JScrollPane(new MainDataNodeEditor(projectController,this).getView()));
+        view.addTab("Adapter", new AdapterEditor(projectController).getView());
+        view.addTab("Password Encoder", new PasswordEncoderEditor(projectController).getView()) ;
     }
 
     public Component getView() {

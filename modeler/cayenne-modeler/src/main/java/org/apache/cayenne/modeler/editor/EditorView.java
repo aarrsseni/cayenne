@@ -270,15 +270,15 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
 	private void initController() {
 		this.filterController = new FilterController(eventController,treePanel);
 		 
-        eventController.addDomainDisplayListener(this);
-        eventController.addDataNodeDisplayListener(this);
-        eventController.addDataMapDisplayListener(this);
-        eventController.addObjEntityDisplayListener(this);
-        eventController.addDbEntityDisplayListener(this);
-        eventController.addProcedureDisplayListener(this);
-        eventController.addQueryDisplayListener(this);
-        eventController.addMultipleObjectsDisplayListener(this);
-        eventController.addEmbeddableDisplayListener(this);
+        eventController.getEventController().addDomainDisplayListener(this);
+        eventController.getEventController().addDataNodeDisplayListener(this);
+        eventController.getEventController().addDataMapDisplayListener(this);
+        eventController.getEventController().addObjEntityDisplayListener(this);
+        eventController.getEventController().addDbEntityDisplayListener(this);
+        eventController.getEventController().addProcedureDisplayListener(this);
+        eventController.getEventController().addQueryDisplayListener(this);
+        eventController.getEventController().addMultipleObjectsDisplayListener(this);
+        eventController.getEventController().addEmbeddableDisplayListener(this);
 
         // Moving this to try-catch block per CAY-940. Exception will be stack-traced
         try {

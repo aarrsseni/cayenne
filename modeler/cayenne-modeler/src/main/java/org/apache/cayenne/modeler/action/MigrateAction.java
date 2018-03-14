@@ -51,7 +51,7 @@ public class MigrateAction extends DBWizardAction<DbActionOptionsDialog> {
             return;
         }
 
-        DataMap map = getProjectController().getCurrentDataMap();
+        DataMap map = getProjectController().getCurrentState().getDataMap();
         if (map == null) {
             throw new IllegalStateException("No current DataMap selected.");
         }

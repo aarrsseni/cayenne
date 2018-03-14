@@ -76,19 +76,19 @@ public class ObjAttributeInfoDialog extends CayenneController implements TreeSel
 	protected Map<String, Embeddable> stringToEmbeddables;
 	protected List<String> embeddableNames;
 
-	protected ProjectController mediator;
+	protected ProjectController projectController;
 	private Object lastObjectType;
 
-	public ObjAttributeInfoDialog(ProjectController mediator, int row, ObjAttributeTableModel model) {
-		super(mediator);
-		this.view = new ObjAttributeInfoDialogView(mediator);
-		this.mediator = mediator;
+	public ObjAttributeInfoDialog(ProjectController projectController, int row, ObjAttributeTableModel model) {
+		super();
+		this.view = new ObjAttributeInfoDialogView(projectController);
+		this.projectController = projectController;
 		this.model = model;
 		this.row = row;
 		this.stringToEmbeddables = new HashMap<>();
 		this.embeddableNames = new ArrayList<>();
 
-		for (Embeddable emb : mediator.getEmbeddablesInCurrentDataDomain()) {
+		for (Embeddable emb : projectController.getEmbeddablesInCurrentDataDomain()) {
 			stringToEmbeddables.put(emb.getClassName(), emb);
 			embeddableNames.add(emb.getClassName());
 		}
@@ -289,7 +289,7 @@ public class ObjAttributeInfoDialog extends CayenneController implements TreeSel
 			DbEntity currentEnt = ((ObjEntity) attributeSaved.getEntity()).getDbEntity();
 
 			if (currentEnt != null) {
-				nameAttr = ModelerUtil.getDbAttributeNames(mediator, currentEnt);
+				nameAttr = ModelerUtil.getDbAttributeNames(projectController, currentEnt);
 				embeddableModel.setCellEditor(nameAttr, view.getOverrideAttributeTable());
 				embeddableModel.setComboBoxes(
 						nameAttr,
@@ -319,7 +319,7 @@ public class ObjAttributeInfoDialog extends CayenneController implements TreeSel
 			}
 		}
 
-		embeddableModel = new OverrideEmbeddableAttributeTableModel(mediator, this, embAttrTempCopy, attributeSaved);
+		embeddableModel = new OverrideEmbeddableAttributeTableModel(projectController, this, embAttrTempCopy, attributeSaved);
 
 		view.getOverrideAttributeTable().setModel(embeddableModel);
 		view.getOverrideAttributeTable().setRowHeight(25);
@@ -480,20 +480,20 @@ public class ObjAttributeInfoDialog extends CayenneController implements TreeSel
 		model.getEntity().removeAttribute(attribute.getName());
 		model.getEntity().addAttribute(attributeSaved);
 
-		mediator.fireObjEntityEvent(new EntityEvent(this, model.getEntity(), MapEvent.CHANGE));
+		projectController.fireObjEntityEvent(new EntityEvent(this, model.getEntity(), MapEvent.CHANGE));
 
-		EntityDisplayEvent event = new EntityDisplayEvent(this, mediator.getCurrentObjEntity(),
-				mediator.getCurrentDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode());
+		EntityDisplayEvent event = new EntityDisplayEvent(this, projectController.getCurrentState().getObjEntity(),
+				projectController.getCurrentState().getDataMap(), (DataChannelDescriptor) projectController.getProject().getRootNode());
 
-		mediator.fireObjEntityDisplayEvent(event);
+		projectController.fireObjEntityDisplayEvent(event);
 
-		mediator.fireObjAttributeEvent(new AttributeEvent(this, attributeSaved, model.getEntity(), MapEvent.CHANGE));
+		projectController.fireObjAttributeEvent(new AttributeEvent(this, attributeSaved, model.getEntity(), MapEvent.CHANGE));
 
 		AttributeDisplayEvent eventAttr = new AttributeDisplayEvent(this, attributeSaved,
-				mediator.getCurrentObjEntity(), mediator.getCurrentDataMap(), (DataChannelDescriptor) mediator
-						.getProject().getRootNode());
+				projectController.getCurrentState().getObjEntity(), projectController.getCurrentState().getDataMap(),
+				(DataChannelDescriptor) projectController.getProject().getRootNode());
 
-		mediator.fireObjAttributeDisplayEvent(eventAttr);
+		projectController.fireObjAttributeDisplayEvent(eventAttr);
 
 	}
 

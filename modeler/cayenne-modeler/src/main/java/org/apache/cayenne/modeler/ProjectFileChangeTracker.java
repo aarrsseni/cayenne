@@ -113,7 +113,7 @@ public class ProjectFileChangeTracker extends Thread {
                                 .openProject(fileDirectory);
                     }
                 } else {
-                    mediator.setDirty(true);
+                    mediator.fireSaveFlag(true);
                 }
                 isShownChangeDialog = false;
             }
@@ -135,7 +135,7 @@ public class ProjectFileChangeTracker extends Thread {
                     } else if (dialog.shouldClose()) {
                         Application.getInstance().getFrameController().projectClosedAction();
                     } else {
-                        mediator.setDirty(true);
+                        mediator.fireSaveFlag(true);
                     }
                     isShownRemoveDialog = false;
                 }
