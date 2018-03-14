@@ -122,7 +122,7 @@ public class SQLTemplateMainTab extends BaseQueryMainTab {
      * query is changed.
      */
     void initFromModel() {
-        QueryDescriptor query = mediator.getCurrentQuery();
+        QueryDescriptor query = mediator.getCurrentState().getQuery();
 
         if (query == null || !QueryDescriptor.SQL_TEMPLATE.equals(query.getType())) {
             setVisible(false);
@@ -149,8 +149,46 @@ public class SQLTemplateMainTab extends BaseQueryMainTab {
 
     @Override
     protected QueryDescriptor getQuery() {
-        QueryDescriptor query = mediator.getCurrentQuery();
+        QueryDescriptor query = mediator.getCurrentState().getQuery();
         return (query != null && QueryDescriptor.SQL_TEMPLATE.equals(query.getType())) ? query : null;
+    }
+
+    /**
+     * Initializes Query name from string.
+     */
+    void setQueryName(String newName) {
+        if (newName != null && newName.trim().length() == 0) {
+            newName = null;
+        }
+
+        QueryDescriptor query = getQuery();
+
+        if (query == null) {
+            return;
+        }
+
+        if (Util.nullSafeEquals(newName, query.getName())) {
+            return;
+        }
+
+        if (newName == null) {
+            throw new ValidationException("Query name is required.");
+        }
+
+        DataMap map = mediator.getCurrentState().getDataMap();
+
+        if (map.getQueryDescriptor(newName) == null) {
+            // completely new name, set new name for entity
+            QueryEvent e = new QueryEvent(this, query, query.getName());
+            ProjectUtil.setQueryName(map, query, newName);
+            mediator.fireQueryEvent(e);
+        }
+        else {
+            // there is a query with the same name
+            throw new ValidationException("There is another query named '"
+                    + newName
+                    + "'. Use a different name.");
+        }
     }
 
     /**
@@ -165,7 +203,7 @@ public class SQLTemplateMainTab extends BaseQueryMainTab {
         QueryDescriptor template = getQuery();
         if (template != null) {
             // in case of null entity, set root to DataMap
-            Object root = entity != null ? entity : mediator.getCurrentDataMap();
+            Object root = entity != null ? entity : mediator.getCurrentState().getDataMap();
             template.setRoot(root);
 
             mediator.fireQueryEvent(new QueryEvent(this, template));

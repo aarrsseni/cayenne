@@ -34,10 +34,13 @@ public abstract class DataSourceEditor extends CayenneController {
     protected ObjectBinding[] fieldAdapters;
     private DataNodeDescriptor node;
     protected BindingDelegate nodeChangeProcessor;
+    protected ProjectController projectController;
 
-    public DataSourceEditor(ProjectController controller,
+    public DataSourceEditor(ProjectController projectController,
             BindingDelegate nodeChangeProcessor) {
-        super(controller);
+        super();
+
+        this.projectController = projectController;
         this.nodeChangeProcessor = nodeChangeProcessor;
         initBindings();
     }
@@ -60,7 +63,7 @@ public abstract class DataSourceEditor extends CayenneController {
 
     protected void initBindings() {
         BindingBuilder builder = new BindingBuilder(
-                getApplication().getBindingFactory(),
+                projectController.getApplication().getBindingFactory(),
                 this);
         builder.setDelegate(nodeChangeProcessor);
         prepareBindings(builder);

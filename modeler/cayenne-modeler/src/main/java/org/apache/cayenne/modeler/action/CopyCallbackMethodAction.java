@@ -61,7 +61,7 @@ public class CopyCallbackMethodAction extends CopyAction implements MultipleObje
 
     @Override
     public Object copy(ProjectController mediator) {
-        Object[] methods = getProjectController().getCurrentCallbackMethods();
+        Object[] methods = getProjectController().getCurrentState().getCallbackMethods();
 
         if (methods != null && methods.length > 0) {
             return Arrays.asList(methods);

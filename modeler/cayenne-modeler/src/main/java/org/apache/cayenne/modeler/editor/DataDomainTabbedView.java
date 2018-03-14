@@ -83,6 +83,7 @@ public class DataDomainTabbedView extends JTabbedPane
 
         graphTab = new DataDomainGraphTab(mediator);
         addTab("Graph", graphTab);
+        mediator.getEventController().addDomainDisplayListener(this);
     }
 
     public void stateChanged(ChangeEvent e) {

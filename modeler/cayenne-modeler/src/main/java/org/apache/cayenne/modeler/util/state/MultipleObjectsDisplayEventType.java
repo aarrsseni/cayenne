@@ -63,9 +63,9 @@ class MultipleObjectsDisplayEventType extends DisplayEventType {
     @Override
     public void saveLastDisplayEvent() {
         preferences.setEvent(MultipleObjectsDisplayEvent.class.getSimpleName());
-        preferences.setParentObject(getObjectName(controller.getCurrentParentPath()));
+        preferences.setParentObject(getObjectName(controller.getCurrentState().getParentPath()));
 
-        ConfigurationNode[] multipleObjects = controller.getCurrentPaths();
+        ConfigurationNode[] multipleObjects = controller.getCurrentState().getPaths();
         if (multipleObjects == null) {
             preferences.setMultipleObjects("");
         } else {

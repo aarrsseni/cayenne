@@ -93,8 +93,7 @@ public class JDBCDataSourceEditor extends DataSourceEditor {
 
         DataSourceInfo projectDSI = getNode().getDataSourceDescriptor();
 
-        ProjectController parent = (ProjectController) getParent();
-        String key = parent.getDataNodePreferences().getLocalDataSource();
+        String key = projectController.getDataNodePreferences().getLocalDataSource();
         if (key == null) {
             mainController.updateStatus("No Local DataSource selected for node...");
             return;

@@ -89,7 +89,7 @@ public class DataDomainGraphTab extends JPanel implements DomainDisplayListener,
 
     private void initView() {
         needRebuild = true;
-        mediator.addDomainDisplayListener(this);
+        mediator.getEventController().addDomainDisplayListener(this);
 
         setLayout(new BorderLayout());
         JToolBar toolbar = new JToolBar();

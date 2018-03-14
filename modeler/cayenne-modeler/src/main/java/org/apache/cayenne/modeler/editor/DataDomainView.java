@@ -100,7 +100,7 @@ public class DataDomainView extends JPanel implements DomainDisplayListener {
     }
 
     protected void initController() {
-        projectController.addDomainDisplayListener(this);
+        projectController.getEventController().addDomainDisplayListener(this);
 
         // add item listener to checkboxes
         objectValidation.addItemListener(e -> {

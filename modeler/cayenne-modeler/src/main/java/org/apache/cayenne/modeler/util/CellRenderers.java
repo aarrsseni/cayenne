@@ -144,7 +144,7 @@ public final class CellRenderers {
      */
     public static String asString(Object obj) {
         return asString(obj, Application.getInstance(). //none of these is suppeosed to be null
-           getFrameController().getProjectController().getCurrentDataMap());
+           getFrameController().getProjectController().getCurrentState().getDataMap());
     }
     
     /**
@@ -312,7 +312,7 @@ public final class CellRenderers {
                 int column) {
 
             Object oldValue = value;
-            value = CellRenderers.asString(value, mediator.getCurrentDataMap());
+            value = CellRenderers.asString(value, mediator.getCurrentState().getDataMap());
 
             super.getTableCellRendererComponent(
                     table,

@@ -73,7 +73,8 @@ public class RemoveProcedureParameterAction extends RemoveAction {
         ConfirmRemoveDialog dialog = getConfirmDeleteDialog(allowAsking);
 
         ProcedureParameter[] params = getProjectController()
-                .getCurrentProcedureParameters();
+                .getCurrentState()
+                .getProcedureParameters();
         if (params.length > 0) {
             if ((params.length == 1 && dialog.shouldDelete(
                     "procedure parameter",
@@ -87,8 +88,8 @@ public class RemoveProcedureParameterAction extends RemoveAction {
 
     protected void removeProcedureParameters() {
         ProjectController mediator = getProjectController();
-        ProcedureParameter[] parameters = mediator.getCurrentProcedureParameters();
-        removeProcedureParameters(mediator.getCurrentProcedure(), parameters);
+        ProcedureParameter[] parameters = mediator.getCurrentState().getProcedureParameters();
+        removeProcedureParameters(mediator.getCurrentState().getProcedure(), parameters);
     }
 
     public void removeProcedureParameters(

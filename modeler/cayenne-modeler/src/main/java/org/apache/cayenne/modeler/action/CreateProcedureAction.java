@@ -52,13 +52,13 @@ public class CreateProcedureAction extends CayenneAction {
      */
     static void fireProcedureEvent(Object src, ProjectController mediator, DataMap dataMap, Procedure procedure) {
         mediator.fireProcedureEvent(new ProcedureEvent(src, procedure, MapEvent.ADD));
-        mediator.fireProcedureDisplayEvent(new ProcedureDisplayEvent(src, procedure, mediator.getCurrentDataMap(),
+        mediator.fireProcedureDisplayEvent(new ProcedureDisplayEvent(src, procedure, mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode()));
     }
 
     public void performAction(ActionEvent e) {
         ProjectController mediator = getProjectController();
-        DataMap map = mediator.getCurrentDataMap();
+        DataMap map = mediator.getCurrentState().getDataMap();
 
         Procedure procedure = new Procedure();
         procedure.setName(NameBuilder.builder(procedure, map).name());

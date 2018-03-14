@@ -67,6 +67,8 @@ public class CayenneModelerController extends CayenneController {
 
 	private DbImportController dbImportController;
 
+    private SaveFlag enableToSave;
+
     public CayenneModelerController(){}
 
     public CayenneModelerController(Application application) {
@@ -74,6 +76,7 @@ public class CayenneModelerController extends CayenneController {
 
         this.frame = new CayenneModelerFrame(application.getActionManager());
         application.getPlatformInitializer().setupMenus(frame);
+        this.projectController = new ProjectController();
         this.projectController = new ProjectController(this);
         this.dbImportController = new DbImportController();
     }
@@ -176,7 +179,7 @@ public class CayenneModelerController extends CayenneController {
     }
 
     public void projectSavedAction() {
-        projectController.setDirty(false);
+        projectController.fireSaveFlag(false);
         projectController.updateProjectControllerPreferences();
         updateStatus("Project saved...");
         frame.setTitle(projectController.getProject().getConfigurationResource().getURL().getPath());
@@ -199,6 +202,8 @@ public class CayenneModelerController extends CayenneController {
         projectController.setProject(null);
 
         projectController.reset();
+        projectController.fireSaveFlag(false);
+
         application.getActionManager().projectClosed();
 
         updateStatus("Project Closed...");
@@ -215,7 +220,7 @@ public class CayenneModelerController extends CayenneController {
         editorView = new EditorView(projectController);
         frame.setView(editorView);
 
-        projectController.projectOpened();
+        projectOpened();
         application.getActionManager().projectOpened();
 
         // do status update AFTER the project is actually opened...
@@ -243,7 +248,7 @@ public class CayenneModelerController extends CayenneController {
         if (!loadFailures.isEmpty()) {
             // mark project as unsaved
             project.setModified(true);
-            projectController.setDirty(true);
+            projectController.fireSaveFlag(true);
             allFailures.addAll(loadFailures);
         }
 
@@ -254,6 +259,9 @@ public class CayenneModelerController extends CayenneController {
         if (!allFailures.isEmpty()) {
             ValidatorDialog.showDialog(frame, validationResult.getFailures());
         }
+
+        enableToSave = new SaveFlag(this);
+        enableToSave.initAll();
     }
 
     public EditorView getEditorView() {
@@ -355,5 +363,16 @@ public class CayenneModelerController extends CayenneController {
         getLastDirectory().setDirectory(newFile);
         frame.fireRecentFileListChanged();
     }
-	
+
+    public void projectOpened() {
+        CayenneModelerFrame frame = (CayenneModelerFrame) getView();
+        projectController.getEventController().addDataNodeDisplayListener(frame);
+        projectController.getEventController().addDataMapDisplayListener(frame);
+        projectController.getEventController().addObjEntityDisplayListener(frame);
+        projectController.getEventController().addDbEntityDisplayListener(frame);
+        projectController.getEventController().addQueryDisplayListener(frame);
+        projectController.getEventController().addProcedureDisplayListener(frame);
+        projectController.getEventController().addMultipleObjectsDisplayListener(frame);
+        projectController.getEventController().addEmbeddableDisplayListener(frame);
+    }
 }

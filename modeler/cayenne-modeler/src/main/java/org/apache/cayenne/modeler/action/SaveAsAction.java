@@ -27,6 +27,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.EventListenerList;
 
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.ConfigurationNode;
@@ -160,7 +161,6 @@ public class SaveAsAction extends CayenneAction {
         ValidationResult validationResult = projectValidator.validate(getCurrentProject().getRootNode());
         
         getProjectController().fireProjectOnSaveEvent(new ProjectOnSaveEvent(SaveAsAction.class));
-        
         try {
             if (!saveAll()) {
                 return;

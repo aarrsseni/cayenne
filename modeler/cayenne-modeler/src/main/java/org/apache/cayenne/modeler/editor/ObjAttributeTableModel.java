@@ -315,8 +315,8 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
 
         mediator.fireObjEntityDisplayEvent(new EntityDisplayEvent(
                 this,
-                mediator.getCurrentObjEntity(),
-                mediator.getCurrentDataMap(),
+                mediator.getCurrentState().getObjEntity(),
+                mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode()));
 
         mediator.fireObjAttributeEvent(new AttributeEvent(
@@ -328,8 +328,8 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
         mediator.fireObjAttributeDisplayEvent(new AttributeDisplayEvent(
                 this,
                 attributeNew,
-                mediator.getCurrentObjEntity(),
-                mediator.getCurrentDataMap(),
+                mediator.getCurrentState().getObjEntity(),
+                mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode()));
     }
 

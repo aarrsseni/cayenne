@@ -64,9 +64,9 @@ public class CopyRelationshipAction extends CopyAction implements MultipleObject
 
     @Override
     public Object copy(ProjectController mediator) {
-        Object[] rels = getProjectController().getCurrentObjRelationships();
+        Object[] rels = getProjectController().getCurrentState().getObjRels();
         if (rels == null || rels.length == 0) {
-            rels = getProjectController().getCurrentDbRelationships();
+            rels = getProjectController().getCurrentState().getDbRels();
         }
 
         if (rels != null && rels.length > 0) {

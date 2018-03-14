@@ -35,6 +35,8 @@ import org.apache.cayenne.modeler.dialog.datamap.LockingUpdateController;
 import org.apache.cayenne.modeler.dialog.datamap.PackageUpdateController;
 import org.apache.cayenne.modeler.dialog.datamap.SchemaUpdateController;
 import org.apache.cayenne.modeler.dialog.datamap.SuperclassUpdateController;
+import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
+import org.apache.cayenne.modeler.event.DataMapDisplayListener;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.util.CellRenderers;
 import org.apache.cayenne.modeler.util.Comparators;
@@ -52,6 +54,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Arrays;
 
 /**
@@ -213,7 +219,7 @@ public class DataMapView extends JPanel {
     }
 
     private void initController() {
-        eventController.addDataMapDisplayListener(e -> {
+        eventController.getEventController().addDataMapDisplayListener(e -> {
             DataMap map = e.getDataMap();
             if (map != null) {
                 initFromModel(map);
@@ -296,7 +302,7 @@ public class DataMapView extends JPanel {
     }
 
     void setDefaultLockType(int lockType) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -312,7 +318,7 @@ public class DataMapView extends JPanel {
     }
 
     void setClientSupport(boolean flag) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -327,7 +333,7 @@ public class DataMapView extends JPanel {
     }
 
     void setQuoteSQLIdentifiers(boolean flag) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -341,7 +347,7 @@ public class DataMapView extends JPanel {
     }
 
     void setDefaultPackage(String newDefaultPackage) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -367,7 +373,7 @@ public class DataMapView extends JPanel {
     }
 
     void setDefaultClientPackage(String newDefaultPackage) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -394,7 +400,7 @@ public class DataMapView extends JPanel {
     }
 
     void setDefaultClientSuperclass(String newSuperclass) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -414,7 +420,7 @@ public class DataMapView extends JPanel {
     }
 
     void setDefaultCatalog(String newCatalog) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -434,7 +440,7 @@ public class DataMapView extends JPanel {
     }
 
     void setDefaultSchema(String newSchema) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -454,7 +460,7 @@ public class DataMapView extends JPanel {
     }
 
     void setDefaultSuperclass(String newSuperclass) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -478,7 +484,7 @@ public class DataMapView extends JPanel {
             throw new ValidationException("Enter name for DataMap");
         }
 
-        DataMap map = eventController.getCurrentDataMap();
+        DataMap map = eventController.getCurrentState().getDataMap();
 
         // search for matching map name across domains, as currently they have to be
         // unique globally
@@ -512,13 +518,13 @@ public class DataMapView extends JPanel {
 
     void setDataNode() {
         DataNodeDescriptor node = (DataNodeDescriptor) nodeSelector.getSelectedItem();
-        DataMap map = eventController.getCurrentDataMap();
+        DataMap map = eventController.getCurrentState().getDataMap();
         LinkDataMapAction action = eventController.getApplication().getActionManager().getAction(LinkDataMapAction.class);
         action.linkDataMap(map, node);
     }
 
     void updateDefaultCatalog() {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -530,7 +536,7 @@ public class DataMapView extends JPanel {
     }
 
     void updateDefaultSchema() {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -542,7 +548,7 @@ public class DataMapView extends JPanel {
     }
 
     void updateDefaultSuperclass() {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -554,7 +560,7 @@ public class DataMapView extends JPanel {
     }
 
     void updateDefaultPackage() {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -566,7 +572,7 @@ public class DataMapView extends JPanel {
     }
 
     void updateDefaultClientPackage() {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -578,7 +584,7 @@ public class DataMapView extends JPanel {
     }
 
     void updateDefaultClientSuperclass() {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -590,7 +596,7 @@ public class DataMapView extends JPanel {
     }
 
     void updateDefaultLockType() {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
 
         if (dataMap == null) {
             return;
@@ -602,7 +608,7 @@ public class DataMapView extends JPanel {
     }
 
     void updateComment(String comment) {
-        DataMap dataMap = eventController.getCurrentDataMap();
+        DataMap dataMap = eventController.getCurrentState().getDataMap();
         if (dataMap == null) {
             return;
         }

@@ -80,12 +80,15 @@ public class MainDataNodeEditor extends CayenneController {
 	protected ObjectBinding[] bindings;
 	protected ObjectBinding localDataSourceBinding;
 
-	public MainDataNodeEditor(ProjectController parent, DataNodeEditor tabController) {
+	protected ProjectController projectController;
 
-		super(parent);
+	public MainDataNodeEditor(ProjectController projectController, DataNodeEditor tabController) {
 
+		super();
+
+		this.projectController = projectController;
 		this.tabbedPaneController = tabController;
-		this.view = new MainDataNodeView((ProjectController) getParent());
+		this.view = new MainDataNodeView(getProjectController());
 		this.datasourceEditors = new HashMap();
 		this.localDataSources = new ArrayList<String>();
 
@@ -98,11 +101,11 @@ public class MainDataNodeEditor extends CayenneController {
 					e.setOldName(oldValue != null ? oldValue.toString() : null);
 				}
 
-				((ProjectController) getParent()).fireDataNodeEvent(e);
+				getProjectController().fireDataNodeEvent(e);
 			}
 		};
 
-		this.defaultSubeditor = new CustomDataSourceEditor(parent, nodeChangeProcessor);
+		this.defaultSubeditor = new CustomDataSourceEditor(getProjectController(), nodeChangeProcessor);
 
 		initController();
 	}
@@ -148,9 +151,8 @@ public class MainDataNodeEditor extends CayenneController {
 			throw new ValidationException("Empty DataNode Name");
 		}
 
-		ProjectController parent = (ProjectController) getParent();
-		DataNodeDefaults oldPref = parent.getDataNodePreferences();
-		DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor) getApplication().getProject()
+		DataNodeDefaults oldPref = projectController.getDataNodePreferences();
+		DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor) projectController.getApplication().getProject()
 				.getRootNode();
 
 		Collection<DataNodeDescriptor> matchingNode = dataChannelDescriptor.getNodeDescriptors();
@@ -170,7 +172,7 @@ public class MainDataNodeEditor extends CayenneController {
 		// TODO: fixme....there is a slight chance that domain is different than
 		// the one
 		// cached node belongs to
-		ProjectUtil.setDataNodeName((DataChannelDescriptor) parent.getProject().getRootNode(), node, newName);
+		ProjectUtil.setDataNodeName((DataChannelDescriptor) projectController.getProject().getRootNode(), node, newName);
 
 		oldPref.copyPreferences(newName);
 	}
@@ -185,7 +187,8 @@ public class MainDataNodeEditor extends CayenneController {
 		view.getSchemaUpdateStrategy().setModel(new DefaultComboBoxModel(standardSchemaUpdateStrategy));
 
 		// init listeners
-		((ProjectController) getParent()).addDataNodeDisplayListener(new DataNodeDisplayListener() {
+		projectController.getEventController()
+				.addDataNodeDisplayListener(new DataNodeDisplayListener() {
 
 			public void currentDataNodeChanged(DataNodeDisplayEvent e) {
 				refreshView(e.getDataNode());
@@ -195,14 +198,14 @@ public class MainDataNodeEditor extends CayenneController {
 		getView().addComponentListener(new ComponentAdapter() {
 
 			public void componentShown(ComponentEvent e) {
-				refreshView(node != null ? node : ((ProjectController) getParent()).getCurrentDataNode());
+				refreshView(node != null ? node : projectController.getCurrentState().getNode());
 			}
 		});
 
-		BindingBuilder builder = new BindingBuilder(getApplication().getBindingFactory(), this);
+		BindingBuilder builder = new BindingBuilder(projectController.getApplication().getBindingFactory(), this);
 
 		localDataSourceBinding = builder.bindToComboSelection(view.getLocalDataSources(),
-				"parent.dataNodePreferences.localDataSource", NO_LOCAL_DATA_SOURCE);
+				"projectController.dataNodePreferences.localDataSource", NO_LOCAL_DATA_SOURCE);
 
 		// use delegate for the rest of them
 
@@ -226,7 +229,7 @@ public class MainDataNodeEditor extends CayenneController {
 	protected void refreshLocalDataSources() {
 		localDataSources.clear();
 
-		Map sources = getApplication().getCayenneProjectPreferences().getDetailObject(DBConnectionInfo.class)
+		Map sources = projectController.getApplication().getCayenneProjectPreferences().getDetailObject(DBConnectionInfo.class)
 				.getChildrenPreferences();
 
 		int len = sources.size();
@@ -277,11 +280,11 @@ public class MainDataNodeEditor extends CayenneController {
 		if (c == null) {
 
 			if (XMLPoolingDataSourceFactory.class.getName().equals(factoryName)) {
-				c = new JDBCDataSourceEditor((ProjectController) getParent(), nodeChangeProcessor);
+				c = new JDBCDataSourceEditor(projectController, nodeChangeProcessor);
 			} else if (JNDIDataSourceFactory.class.getName().equals(factoryName)) {
-				c = new JNDIDataSourceEditor((ProjectController) getParent(), nodeChangeProcessor);
+				c = new JNDIDataSourceEditor(projectController, nodeChangeProcessor);
 			} else if (DBCP_DATA_SOURCE_FACTORY.equals(factoryName)) {
-				c = new DBCP2DataSourceEditor((ProjectController) getParent(), nodeChangeProcessor);
+				c = new DBCP2DataSourceEditor(projectController, nodeChangeProcessor);
 			} else {
 				// special case - no detail view, just show it and bail..
 				defaultSubeditor.setNode(node);
@@ -312,6 +315,10 @@ public class MainDataNodeEditor extends CayenneController {
 		} else {
 			tabbedPaneController.getTabComponent().setEnabledAt(2, false);
 		}
+	}
+
+	public ProjectController getProjectController(){
+		return projectController;
 	}
 
 }

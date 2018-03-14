@@ -77,17 +77,17 @@ class DbGraphBuilder extends BaseGraphBuilder implements DbEntityListener,
     public void setProjectController(ProjectController mediator) {
         super.setProjectController(mediator);
 
-        mediator.addDbEntityListener(this);
-        mediator.addDbAttributeListener(this);
-        mediator.addDbRelationshipListener(this);
+        mediator.getEventController().addDbEntityListener(this);
+        mediator.getEventController().addDbAttributeListener(this);
+        mediator.getEventController().addDbRelationshipListener(this);
     }
 
     public void destroy() {
         super.destroy();
 
-        mediator.removeDbEntityListener(this);
-        mediator.removeDbAttributeListener(this);
-        mediator.removeDbRelationshipListener(this);
+        mediator.getEventController().removeDbEntityListener(this);
+        mediator.getEventController().removeDbAttributeListener(this);
+        mediator.getEventController().removeDbRelationshipListener(this);
     }
 
     public void dbEntityAdded(EntityEvent e) {

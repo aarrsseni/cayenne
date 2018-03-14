@@ -51,7 +51,6 @@ public class RemoveCallbackMethodAction extends RemoveAction {
     /**
      * Constructor.
      *
-     * @param actionName unique action name
      * @param application Application instance
      */
     public RemoveCallbackMethodAction(Application application) {
@@ -73,7 +72,7 @@ public class RemoveCallbackMethodAction extends RemoveAction {
     public void performAction(ActionEvent e, boolean allowAsking) {
         ConfirmRemoveDialog dialog = getConfirmDeleteDialog(allowAsking);
         
-        ObjCallbackMethod[] methods = getProjectController().getCurrentCallbackMethods();
+        ObjCallbackMethod[] methods = getProjectController().getCurrentState().getCallbackMethods();
 
         if ((methods.length == 1 && dialog.shouldDelete("callback method", methods[0].getName()))
         		|| (methods.length > 1 && dialog.shouldDelete("selected callback methods"))) {
@@ -87,9 +86,9 @@ public class RemoveCallbackMethodAction extends RemoveAction {
      */
     private void removeCallbackMethods(ActionEvent actionEvent) {
         ProjectController mediator = getProjectController();
-        CallbackType callbackType = mediator.getCurrentCallbackType();
+        CallbackType callbackType = mediator.getCurrentState().getCallbackType();
 
-        ObjCallbackMethod[] callbackMethods = mediator.getCurrentCallbackMethods();
+        ObjCallbackMethod[] callbackMethods = mediator.getCurrentState().getCallbackMethods();
 
         for (ObjCallbackMethod callbackMethod : callbackMethods) {
             removeCallbackMethod(callbackType, callbackMethod.getName());
@@ -123,7 +122,7 @@ public class RemoveCallbackMethodAction extends RemoveAction {
      * @return CallbackMap fom which remove callback method
      */
     public CallbackMap getCallbackMap() {
-        return getProjectController().getCurrentObjEntity().getCallbackMap();
+        return getProjectController().getCurrentState().getObjEntity().getCallbackMap();
     }
 
     public String getActionName(boolean multiple) {

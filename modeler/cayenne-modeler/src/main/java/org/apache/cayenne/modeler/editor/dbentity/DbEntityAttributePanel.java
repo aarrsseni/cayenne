@@ -100,8 +100,8 @@ public class DbEntityAttributePanel extends JPanel implements DbEntityDisplayLis
     }
 
     private void initController() {
-        mediator.addDbEntityDisplayListener(this);
-        mediator.addDbAttributeListener(this);
+        mediator.getEventController().addDbEntityDisplayListener(this);
+        mediator.getEventController().addDbAttributeListener(this);
 
         table.getSelectionModel().addListSelectionListener(new DbAttributeListSelectionListener());
 
@@ -223,7 +223,7 @@ public class DbEntityAttributePanel extends JPanel implements DbEntityDisplayLis
                 }
             }
 
-            mediator.setCurrentDbAttributes(attrs);
+            mediator.getCurrentState().setDbAttrs(attrs);
             parentPanel.updateActions(attrs);
         }
     }

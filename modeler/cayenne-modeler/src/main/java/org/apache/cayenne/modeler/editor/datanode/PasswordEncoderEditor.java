@@ -41,11 +41,13 @@ public class PasswordEncoderEditor extends CayenneController {
     protected ObjectBinding[] bindings;
     protected PasswordEncoderView view;
     protected BindingDelegate nodeChangeProcessor;
+    protected ProjectController projectController;
 
-    public PasswordEncoderEditor(CayenneController parent) {
+    public PasswordEncoderEditor(ProjectController projectController) {
 
-        super(parent);
+        super();
 
+        this.projectController = projectController;
         this.view = new PasswordEncoderView();
 
         this.nodeChangeProcessor = new BindingDelegate() {
@@ -56,7 +58,7 @@ public class PasswordEncoderEditor extends CayenneController {
                     Object newValue) {
 
                 DataNodeEvent e = new DataNodeEvent(PasswordEncoderEditor.this, node);
-                ((ProjectController) getParent()).fireDataNodeEvent(e);
+                projectController.fireDataNodeEvent(e);
             }
         };
 
@@ -65,7 +67,7 @@ public class PasswordEncoderEditor extends CayenneController {
 
     protected void initController() {
         BindingBuilder builder = new BindingBuilder(
-                getApplication().getBindingFactory(),
+                projectController.getApplication().getBindingFactory(),
                 this);
 
         builder.setDelegate(nodeChangeProcessor);
@@ -85,7 +87,7 @@ public class PasswordEncoderEditor extends CayenneController {
                 view.getPasswordSource(),
                 "node.dataSourceDescriptor.passwordSource");
 
-        ((ProjectController) getParent())
+        projectController.getEventController()
                 .addDataNodeDisplayListener(new DataNodeDisplayListener() {
 
                     public void currentDataNodeChanged(DataNodeDisplayEvent e) {
@@ -96,8 +98,7 @@ public class PasswordEncoderEditor extends CayenneController {
         getView().addComponentListener(new ComponentAdapter() {
 
             public void componentShown(ComponentEvent e) {
-                refreshView(node != null ? node : ((ProjectController) getParent())
-                        .getCurrentDataNode());
+                refreshView(node != null ? node : projectController.getCurrentState().getNode());
             }
         });
 

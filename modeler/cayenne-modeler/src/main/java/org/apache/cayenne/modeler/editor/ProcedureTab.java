@@ -113,19 +113,19 @@ public class ProcedureTab extends JPanel implements ProcedureDisplayListener, Ex
 
     private void initController() {
         returnsValue.addItemListener(e -> {
-            Procedure procedure = eventController.getCurrentProcedure();
+            Procedure procedure = eventController.getCurrentState().getProcedure();
             if (procedure != null && !ignoreChange) {
                 procedure.setReturningValue(returnsValue.isSelected());
                 eventController.fireProcedureEvent(new ProcedureEvent(ProcedureTab.this, procedure));
             }
         });
 
-        eventController.addProcedureDisplayListener(this);
+        eventController.getEventController().addProcedureDisplayListener(this);
     }
 
     public void processExistingSelection(EventObject e) {
-        ProcedureDisplayEvent pde = new ProcedureDisplayEvent(this, eventController.getCurrentProcedure(),
-                eventController.getCurrentDataMap(), (DataChannelDescriptor) eventController.getProject().getRootNode());
+        ProcedureDisplayEvent pde = new ProcedureDisplayEvent(this, eventController.getCurrentState().getProcedure(),
+                eventController.getCurrentState().getDataMap(), (DataChannelDescriptor) eventController.getProject().getRootNode());
         eventController.fireProcedureDisplayEvent(pde);
     }
 
@@ -153,7 +153,7 @@ public class ProcedureTab extends JPanel implements ProcedureDisplayListener, Ex
             newName = null;
         }
 
-        Procedure procedure = eventController.getCurrentProcedure();
+        Procedure procedure = eventController.getCurrentState().getProcedure();
 
         if (procedure == null || Util.nullSafeEquals(newName, procedure.getName())) {
             return;
@@ -177,7 +177,7 @@ public class ProcedureTab extends JPanel implements ProcedureDisplayListener, Ex
             text = null;
         }
 
-        Procedure procedure = eventController.getCurrentProcedure();
+        Procedure procedure = eventController.getCurrentState().getProcedure();
 
         if (procedure != null && !Util.nullSafeEquals(procedure.getSchema(), text)) {
             procedure.setSchema(text);
@@ -190,7 +190,7 @@ public class ProcedureTab extends JPanel implements ProcedureDisplayListener, Ex
             text = null;
         }
 
-        Procedure procedure = eventController.getCurrentProcedure();
+        Procedure procedure = eventController.getCurrentState().getProcedure();
 
         if (procedure != null && !Util.nullSafeEquals(procedure.getCatalog(), text)) {
             procedure.setCatalog(text);
@@ -199,7 +199,7 @@ public class ProcedureTab extends JPanel implements ProcedureDisplayListener, Ex
     }
 
     void setComment(String comment) {
-        Procedure procedure = eventController.getCurrentProcedure();
+        Procedure procedure = eventController.getCurrentState().getProcedure();
 
         if (procedure == null) {
             return;

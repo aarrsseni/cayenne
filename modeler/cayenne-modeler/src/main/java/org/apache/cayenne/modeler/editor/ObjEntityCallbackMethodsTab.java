@@ -57,7 +57,8 @@ public class ObjEntityCallbackMethodsTab extends AbstractCallbackMethodsTab  {
                 }
         );
 
-        mediator.addObjEntityDisplayListener(
+        mediator.getEventController()
+                .addObjEntityDisplayListener(
                 new ObjEntityDisplayListener() {
                     public void currentObjEntityChanged(EntityDisplayEvent e) {
                         if (ObjEntityCallbackMethodsTab.this.isVisible()) {
@@ -73,8 +74,8 @@ public class ObjEntityCallbackMethodsTab extends AbstractCallbackMethodsTab  {
      * @return CallbackMap with callback methods
      */
     protected CallbackMap getCallbackMap() {
-        if (mediator.getCurrentObjEntity() != null) {
-            return mediator.getCurrentObjEntity().getCallbackMap();
+        if (mediator.getCurrentState().getObjEntity() != null) {
+            return mediator.getCurrentState().getObjEntity().getCallbackMap();
         }
         return null;
     }

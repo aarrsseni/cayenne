@@ -36,9 +36,11 @@ public class LockingUpdateController extends CayenneController {
 
     protected LockingUpdateView view;
     protected DataMap dataMap;
+    protected ProjectController projectController;
 
-    public LockingUpdateController(ProjectController parent, DataMap dataMap) {
-        super(parent);
+    public LockingUpdateController(ProjectController projectController, DataMap dataMap) {
+        super();
+        this.projectController = projectController;
         this.dataMap = dataMap;
     }
 
@@ -84,19 +86,18 @@ public class LockingUpdateController extends CayenneController {
         boolean updateEntities = view.getEntities().isSelected();
         boolean updateAttributes = view.getAttributes().isSelected();
         boolean updateRelationships = view.getRelationships().isSelected();
-        ProjectController parent = (ProjectController) getParent();
 
         for (ObjEntity entity : dataMap.getObjEntities()) {
             if (updateEntities && defaultLockType != entity.getDeclaredLockType()) {
                 entity.setDeclaredLockType(defaultLockType);
-                parent.fireObjEntityEvent(new EntityEvent(this, entity));
+                projectController.fireObjEntityEvent(new EntityEvent(this, entity));
             }
 
             if (updateAttributes) {
                 for (ObjAttribute a : entity.getAttributes()) {
                     if (a.isUsedForLocking() != on) {
                         a.setUsedForLocking(on);
-                        parent.fireObjAttributeEvent(new AttributeEvent(this, a, entity));
+                        projectController.fireObjAttributeEvent(new AttributeEvent(this, a, entity));
                     }
                 }
             }
@@ -105,7 +106,7 @@ public class LockingUpdateController extends CayenneController {
                 for (ObjRelationship r : entity.getRelationships()) {
                     if (r.isUsedForLocking() != on) {
                         r.setUsedForLocking(on);
-                        parent.fireObjRelationshipEvent(new RelationshipEvent(
+                        projectController.fireObjRelationshipEvent(new RelationshipEvent(
                                 this,
                                 r,
                                 entity));

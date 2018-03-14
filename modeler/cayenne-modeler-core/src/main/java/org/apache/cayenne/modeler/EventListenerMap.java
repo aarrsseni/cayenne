@@ -1,5 +1,6 @@
 package org.apache.cayenne.modeler;
 
+import javax.swing.event.EventListenerList;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,10 +25,12 @@ public class EventListenerMap {
      */
     public <T extends EventListener> T[] getListeners(Class<T> key){
         //Order of listeners is important!
-        List<Object> result = new ArrayList<>(listenerMap.get(key));
-        Collections.reverse(result);
-//        Lists.reverse(listenerMap.get(key)).toArray((T[]) Array.newInstance(key, listenerMap.get(key).size()));
-        return result.toArray((T[]) Array.newInstance(key, result.size()));
+        if(listenerMap.containsKey(key)) {
+            List<Object> result = new ArrayList<>(listenerMap.get(key));
+            Collections.reverse(result);
+            return result.toArray((T[]) Array.newInstance(key, result.size()));
+        }
+        return (T[])Array.newInstance(key, 0);
     }
 
     /**
@@ -41,7 +44,9 @@ public class EventListenerMap {
      * @since 4.1
      */
     public synchronized <T extends EventListener> void remove(Class<T> key, T val){
-        listenerMap.get(key).remove(val);
+        if(listenerMap.containsKey(key)) {
+            listenerMap.get(key).remove(val);
+        }
     }
 
 }

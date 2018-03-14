@@ -60,7 +60,7 @@ public class CreateRelationshipAction extends CayenneAction {
 
         mediator.fireObjRelationshipEvent(new RelationshipEvent(src, rel, objEntity, MapEvent.ADD));
 
-        RelationshipDisplayEvent rde = new RelationshipDisplayEvent(src, rel, objEntity, mediator.getCurrentDataMap(),
+        RelationshipDisplayEvent rde = new RelationshipDisplayEvent(src, rel, objEntity, mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
         mediator.fireObjRelationshipDisplayEvent(rde);
@@ -73,7 +73,7 @@ public class CreateRelationshipAction extends CayenneAction {
 
         mediator.fireDbRelationshipEvent(new RelationshipEvent(src, rel, dbEntity, MapEvent.ADD));
 
-        RelationshipDisplayEvent rde = new RelationshipDisplayEvent(src, rel, dbEntity, mediator.getCurrentDataMap(),
+        RelationshipDisplayEvent rde = new RelationshipDisplayEvent(src, rel, dbEntity, mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
         mediator.fireDbRelationshipDisplayEvent(rde);
@@ -89,7 +89,7 @@ public class CreateRelationshipAction extends CayenneAction {
      */
     @Override
     public void performAction(ActionEvent e) {
-        ObjEntity objEnt = getProjectController().getCurrentObjEntity();
+        ObjEntity objEnt = getProjectController().getCurrentState().getObjEntity();
         if (objEnt != null) {
 
             ObjRelationship rel = new ObjRelationship();
@@ -99,7 +99,7 @@ public class CreateRelationshipAction extends CayenneAction {
             application.getUndoManager().addEdit(
                     new CreateRelationshipUndoableEdit(objEnt, new ObjRelationship[]{rel}));
         } else {
-            DbEntity dbEnt = getProjectController().getCurrentDbEntity();
+            DbEntity dbEnt = getProjectController().getCurrentState().getDbEntity();
             if (dbEnt != null) {
 
                 DbRelationship rel = new DbRelationship();

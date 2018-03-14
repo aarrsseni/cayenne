@@ -53,8 +53,8 @@ public class CreateDbEntityAction extends CayenneAction {
      */
     static void fireDbEntityEvent(Object src, ProjectController mediator, DbEntity entity) {
         mediator.fireDbEntityEvent(new EntityEvent(src, entity, MapEvent.ADD));
-        EntityDisplayEvent displayEvent = new EntityDisplayEvent(src, entity, mediator.getCurrentDataMap(),
-                mediator.getCurrentDataNode(), (DataChannelDescriptor) mediator.getProject().getRootNode());
+        EntityDisplayEvent displayEvent = new EntityDisplayEvent(src, entity, mediator.getCurrentState().getDataMap(),
+                mediator.getCurrentState().getNode(), (DataChannelDescriptor) mediator.getProject().getRootNode());
         displayEvent.setMainTabFocus(true);
         mediator.fireDbEntityDisplayEvent(displayEvent);
     }
@@ -69,7 +69,7 @@ public class CreateDbEntityAction extends CayenneAction {
     public void performAction(ActionEvent e) {
         ProjectController mediator = getProjectController();
 
-        DataMap map = mediator.getCurrentDataMap();
+        DataMap map = mediator.getCurrentState().getDataMap();
         DbEntity entity = new DbEntity();
         entity.setName(NameBuilder.builder(entity, map).name());
         createEntity(map, entity);

@@ -62,7 +62,7 @@ public class EmbeddableTab extends JPanel implements EmbeddableDisplayListener {
     }
 
     private void initController() {
-        mediator.addEmbeddableDisplayListener(this);
+        mediator.getEventController().addEmbeddableDisplayListener(this);
     }
 
     private void initView() {
@@ -106,7 +106,7 @@ public class EmbeddableTab extends JPanel implements EmbeddableDisplayListener {
             newClassName = null;
         }
 
-        Embeddable embeddable = mediator.getCurrentEmbeddable();
+        Embeddable embeddable = mediator.getCurrentState().getEmbeddable();
 
         if (embeddable == null) {
             return;
@@ -145,7 +145,7 @@ public class EmbeddableTab extends JPanel implements EmbeddableDisplayListener {
             String oldName = embeddable.getClassName();
             embeddable.setClassName(newClassName);
 
-            mediator.fireEmbeddableEvent(e, mediator.getCurrentDataMap());
+            mediator.fireEmbeddableEvent(e, mediator.getCurrentState().getDataMap());
 
             Iterator it = ((DataChannelDescriptor) mediator.getProject().getRootNode()).getDataMaps().iterator();
             while (it.hasNext()) {
@@ -196,14 +196,14 @@ public class EmbeddableTab extends JPanel implements EmbeddableDisplayListener {
     }
 
     void setComment(String comment) {
-        Embeddable embeddable = mediator.getCurrentEmbeddable();
+        Embeddable embeddable = mediator.getCurrentState().getEmbeddable();
 
         if (embeddable == null) {
             return;
         }
 
         ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), embeddable, ObjectInfo.COMMENT, comment);
-        mediator.fireEmbeddableEvent(new EmbeddableEvent(this, embeddable), mediator.getCurrentDataMap());
+        mediator.fireEmbeddableEvent(new EmbeddableEvent(this, embeddable), mediator.getCurrentState().getDataMap());
     }
 
     String getComment(Embeddable embeddable) {

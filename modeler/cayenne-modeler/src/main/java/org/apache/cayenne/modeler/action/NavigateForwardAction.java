@@ -51,6 +51,6 @@ public class NavigateForwardAction extends CayenneAction {
     public void performAction(ActionEvent e) {
         ProjectController mediator = getProjectController();
         EventObject newEvent = new EventObject(this);
-        mediator.fireNavigationEvent(newEvent);
+        mediator.fireForwardNavigationEvent();
     }
 }

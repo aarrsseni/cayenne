@@ -145,7 +145,7 @@ public class SelectQueryMainTab extends BaseQueryMainTab {
      * query is changed.
      */
     void initFromModel() {
-        QueryDescriptor descriptor = mediator.getCurrentQuery();
+        QueryDescriptor descriptor = mediator.getCurrentState().getQuery();
 
         if (descriptor == null || !QueryDescriptor.SELECT_QUERY.equals(descriptor.getType())) {
             setVisible(false);
@@ -169,7 +169,7 @@ public class SelectQueryMainTab extends BaseQueryMainTab {
         // since query root is fully resolved during map loading,
         // making it impossible to reference other DataMaps.
 
-        DataMap map = mediator.getCurrentDataMap();
+        DataMap map = mediator.getCurrentState().getDataMap();
         ObjEntity[] roots = map.getObjEntities().toArray(new ObjEntity[0]);
 
         if (roots.length > 1) {
@@ -187,11 +187,11 @@ public class SelectQueryMainTab extends BaseQueryMainTab {
 
     @Override
     protected SelectQueryDescriptor getQuery() {
-        if(mediator.getCurrentQuery() == null) {
+        if(mediator.getCurrentState().getQuery() == null) {
             return null;
         }
-        return QueryDescriptor.SELECT_QUERY.equals(mediator.getCurrentQuery().getType())
-                ? (SelectQueryDescriptor) mediator.getCurrentQuery()
+        return QueryDescriptor.SELECT_QUERY.equals(mediator.getCurrentState().getQuery().getType())
+                ? (SelectQueryDescriptor) mediator.getCurrentState().getQuery()
                 : null;
     }
 
@@ -248,6 +248,45 @@ public class SelectQueryMainTab extends BaseQueryMainTab {
     }
 
     /**
+     * Initializes Query name from string.
+     */
+    void setQueryName(String newName) {
+        if (newName != null && newName.trim().length() == 0) {
+            newName = null;
+        }
+
+        QueryDescriptor query = getQuery();
+
+        if (query == null) {
+            return;
+        }
+
+        if (Util.nullSafeEquals(newName, query.getName())) {
+            return;
+        }
+
+        if (newName == null) {
+            throw new ValidationException("SelectQuery name is required.");
+        }
+
+        DataMap map = mediator.getCurrentState().getDataMap();
+        QueryDescriptor matchingQuery = map.getQueryDescriptor(newName);
+
+        if (matchingQuery == null) {
+            // completely new name, set new name for entity
+            QueryEvent e = new QueryEvent(this, query, query.getName());
+            ProjectUtil.setQueryName(map, query, newName);
+            mediator.fireQueryEvent(e);
+        }
+        else if (matchingQuery != query) {
+            // there is a query with the same name
+            throw new ValidationException("There is another query named '"
+                    + newName
+                    + "'. Use a different name.");
+        }
+    }
+
+    /**
      * Advanced checking of an expression, needed because Expression.fromString()
      * might terminate normally, but returned Expression will not be appliable
      * for real Entities.
@@ -281,6 +320,76 @@ public class SelectQueryMainTab extends BaseQueryMainTab {
         }
         catch (ExpressionException eex) {
             throw new ValidationException(eex.getUnlabeledMessage());
+        }
+    }
+    
+    /**
+     * Handler to user's actions with root selection combobox
+     */
+    class RootSelectionHandler implements FocusListener, ActionListener {
+        String newName = null;
+        boolean needChangeName;
+
+        public void actionPerformed(ActionEvent ae) {
+            QueryDescriptor query = getQuery();
+            if (query != null) {
+                Entity root = (Entity) queryRoot.getModel().getSelectedItem();
+
+                if (root != null) {
+                    query.setRoot(root);
+                    
+                    if (needChangeName) { //not changed by user
+                        /*
+                         * Doing auto name change, following CAY-888 #2
+                         */
+                        String newPrefix = root.getName() + "Query";
+                        newName = newPrefix;
+                        
+                        DataMap map = mediator.getCurrentState().getDataMap();
+                        long postfix = 1;
+                        
+                        while (map.getQueryDescriptor(newName) != null) {
+                            newName = newPrefix + (postfix++);
+                        }
+                        
+                        name.setText(newName);
+                    }
+                }
+            }
+        }
+
+        public void focusGained(FocusEvent e) {
+            //reset new name tracking
+            newName = null;
+            
+            QueryDescriptor query = getQuery();
+            if (query != null) {
+                needChangeName = hasDefaultName(query);
+            } else {
+                needChangeName = false;
+            }
+        }
+
+        public void focusLost(FocusEvent e) {
+            if (newName != null) {
+                setQueryName(newName);
+            }
+            
+            newName = null;
+            needChangeName = false;
+        }
+
+        /**
+         * @return whether specified's query name is 'default' i.e. Cayenne generated
+         * A query's name is 'default' if it starts with 'UntitledQuery' or with root name.
+         * 
+         * We cannot follow user input because tab might be opened many times
+         */
+        boolean hasDefaultName(QueryDescriptor query) {
+            String prefix = query.getRoot() == null ? "UntitledQuery" :
+                CellRenderers.asString(query.getRoot()) + "Query";
+            
+            return name.getComponent().getText().startsWith(prefix);
         }
     }
 

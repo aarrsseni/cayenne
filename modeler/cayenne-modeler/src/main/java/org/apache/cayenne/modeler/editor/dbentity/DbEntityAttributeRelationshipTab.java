@@ -72,7 +72,7 @@ public class DbEntityAttributeRelationshipTab extends JPanel implements DbEntity
 
         init();
         initToolBar();
-        mediator.addDbEntityDisplayListener(this);
+        mediator.getEventController().addDbEntityDisplayListener(this);
     }
 
     private void init() {

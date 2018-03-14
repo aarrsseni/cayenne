@@ -174,9 +174,9 @@ public class ObjEntityAttributePanel extends JPanel implements ObjEntityDisplayL
     }
 
     private void initController() {
-        mediator.addObjEntityDisplayListener(this);
-        mediator.addObjEntityListener(this);
-        mediator.addObjAttributeListener(this);
+        mediator.getEventController().addObjEntityDisplayListener(this);
+        mediator.getEventController().addObjEntityListener(this);
+        mediator.getEventController().addObjAttributeListener(this);
 
         resolver = e -> {
             int row = table.getSelectedRow();
@@ -535,7 +535,7 @@ public class ObjEntityAttributePanel extends JPanel implements ObjEntityDisplayL
                 resolveMenu.setEnabled(enabledResolve);
             }
 
-            mediator.setCurrentObjAttributes(attrs);
+            mediator.getCurrentState().setObjAttrs(attrs);
             parentPanel.updateActions(attrs);
         }
     }

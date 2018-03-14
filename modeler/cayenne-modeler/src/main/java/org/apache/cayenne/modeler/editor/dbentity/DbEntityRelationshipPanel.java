@@ -20,7 +20,6 @@ package org.apache.cayenne.modeler.editor.dbentity;
 
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.event.DbEntityListener;
 import org.apache.cayenne.map.event.DbRelationshipListener;
@@ -134,9 +133,9 @@ public class DbEntityRelationshipPanel extends JPanel implements DbEntityDisplay
     }
 
     private void initController() {
-        this.mediator.addDbEntityDisplayListener(this);
-        this.mediator.addDbEntityListener(this);
-        this.mediator.addDbRelationshipListener(this);
+        this.mediator.getEventController().addDbEntityDisplayListener(this);
+        this.mediator.getEventController().addDbEntityListener(this);
+        this.mediator.getEventController().addDbRelationshipListener(this);
 
         resolver = e -> {
             int row = table.getSelectedRow();
@@ -284,8 +283,8 @@ public class DbEntityRelationshipPanel extends JPanel implements DbEntityDisplay
      */
     private void reloadEntityList(EntityEvent e) {
         if (e.getSource() == this
-            || mediator.getCurrentDbEntity() == e.getEntity()  // If current model added/removed, do nothing.
-            || mediator.getCurrentDbEntity() == null) { // If this is just loading new currentDbEntity, do nothing
+            || mediator.getCurrentState().getDbEntity() == e.getEntity()  // If current model added/removed, do nothing.
+            || mediator.getCurrentState().getDbEntity() == null) { // If this is just loading new currentDbEntity, do nothing
             return;
         }
 
@@ -345,7 +344,7 @@ public class DbEntityRelationshipPanel extends JPanel implements DbEntityDisplay
                 resolveMenu.setEnabled(enabledResolve);
             }
 
-            mediator.setCurrentDbRelationships(rels);
+            mediator.getCurrentState().setDbRels(rels);
             parentPanel.updateActions(rels);
         }
     }

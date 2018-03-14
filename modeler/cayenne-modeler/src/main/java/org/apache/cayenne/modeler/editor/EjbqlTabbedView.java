@@ -52,7 +52,7 @@ public class EjbqlTabbedView extends JTabbedPane {
     }
 
     private void initController() {
-        mediator.addQueryDisplayListener(new QueryDisplayListener() {
+        mediator.getEventController().addQueryDisplayListener(new QueryDisplayListener() {
 
             public void currentQueryChanged(QueryDisplayEvent e) {
                 initFromModel();
@@ -69,7 +69,7 @@ public class EjbqlTabbedView extends JTabbedPane {
     }
 
     void initFromModel() {
-        if (!QueryDescriptor.EJBQL_QUERY.equals(mediator.getCurrentQuery().getType())) {
+        if (!QueryDescriptor.EJBQL_QUERY.equals(mediator.getCurrentState().getQuery().getType())) {
             setVisible(false);
             return;
         }

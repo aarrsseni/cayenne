@@ -130,7 +130,7 @@ public class SelectQueryOrderingTab extends JPanel implements PropertyChangeList
     }
 
     protected void initFromModel() {
-        QueryDescriptor query = mediator.getCurrentQuery();
+        QueryDescriptor query = mediator.getCurrentState().getQuery();
 
         if (query == null || !QueryDescriptor.SELECT_QUERY.equals(query.getType())) {
             processInvalidModel("Unknown query.");

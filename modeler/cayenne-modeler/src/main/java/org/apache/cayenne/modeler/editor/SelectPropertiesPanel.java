@@ -204,7 +204,7 @@ public abstract class SelectPropertiesPanel extends JPanel {
     }
 
     QueryDescriptor getQuery() {
-        return mediator.getCurrentQuery();
+        return mediator.getCurrentState().getQuery();
     }
 
     public void setEnabled(boolean flag) {

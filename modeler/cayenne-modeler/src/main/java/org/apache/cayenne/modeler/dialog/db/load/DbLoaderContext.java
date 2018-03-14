@@ -173,7 +173,7 @@ public class DbLoaderContext {
     }
 
     private void prepareDataMap() {
-        dataMap = getProjectController().getCurrentDataMap();
+        dataMap = getProjectController().getCurrentState().getDataMap();
         existingMap = dataMap != null;
 
         if (!existingMap) {

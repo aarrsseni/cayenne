@@ -213,7 +213,7 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
      * listeners initialization
      */
     protected void initController() {
-        mediator.addCallbackMethodListener(new CallbackMethodListener() {
+        mediator.getEventController().addCallbackMethodListener(new CallbackMethodListener() {
 
             public void callbackMethodChanged(CallbackMethodEvent e) {
                 rebuildTables();
@@ -387,12 +387,12 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
     	}
     	
         public void actionPerformed(ActionEvent e) {
-        	mediator.setCurrentCallbackType(callbackType);
+        	mediator.getCurrentState().setCallbackType(callbackType);
         }
     } 
 
     protected final CallbackType getSelectedCallbackType() {
-    	return mediator.getCurrentCallbackType();
+    	return mediator.getCurrentState().getCallbackType();
     }
     
     private void selectAdded() {
@@ -460,7 +460,7 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
 
                 CallbackDescriptor callbackDescriptor =
                         ((CallbackDescriptorTableModel)table.getCayenneModel()).getCallbackDescriptor();
-                mediator.setDirty(callbackDescriptor.moveMethod(callbackMethod, rowIndex));
+                mediator.fireSaveFlag(callbackDescriptor.moveMethod(callbackMethod, rowIndex));
                 rebuildTables();
                 return true;
             }
@@ -500,12 +500,12 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
                         }
                     }
 
-	                mediator.setCurrentCallbackType(((CallbackDescriptorTableModel)table.getCayenneModel()).getCallbackType());
+	                mediator.getCurrentState().setCallbackType(((CallbackDescriptorTableModel)table.getCayenneModel()).getCallbackType());
                 }
 
                 if (table.getSelectedRow() != -1) {
                     int[] sel = table.getSelectedRows();
-                    CallbackType callbackType = mediator.getCurrentCallbackType();
+                    CallbackType callbackType = mediator.getCurrentState().getCallbackType();
                     
                     methods = new ObjCallbackMethod[sel.length];
                                         
@@ -517,7 +517,7 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
                     }
                 }
 
-                mediator.setCurrentCallbackMethods(methods);
+                mediator.getCurrentState().setCallbackMethods(methods);
                 boolean enabled = methods.length > 0;
                 boolean multiple = methods.length > 1;
 
@@ -588,7 +588,7 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
 
     			unselectAll();
             	
-    			mediator.setCurrentCallbackType(((CallbackDescriptorTableModel)table.getCayenneModel()).getCallbackType());
+    			mediator.getCurrentState().setCallbackType(((CallbackDescriptorTableModel)table.getCayenneModel()).getCallbackType());
             	popupMenu.show(e.getComponent(), e.getX(), e.getY());
             }
 	    }

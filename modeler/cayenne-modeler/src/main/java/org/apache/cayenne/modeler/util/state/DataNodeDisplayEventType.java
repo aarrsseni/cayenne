@@ -49,7 +49,7 @@ class DataNodeDisplayEventType extends DisplayEventType {
     @Override
     public void saveLastDisplayEvent() {
         preferences.setEvent(DataNodeDisplayEvent.class.getSimpleName());
-        preferences.setDomain(controller.getCurrentDataChanel().getName());
-        preferences.setNode(controller.getCurrentDataNode().getName());
+        preferences.setDomain(controller.getCurrentState().getDomain().getName());
+        preferences.setNode(controller.getCurrentState().getNode().getName());
     }
 }
