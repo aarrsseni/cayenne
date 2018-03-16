@@ -210,4 +210,9 @@ public class EventController {
     public void removeDataSourceModificationListener(DataSourceModificationListener listener) {
         listenerMap.remove(DataSourceModificationListener.class, listener);
     }
+
+//    TODO: Enable it when ProjectFileChangeTracker, ProjectFileChangeTrackerListener and ProjectFileChangeTrackerEvent will be able to move in core
+//    public void addProjectFileChangeTrackerListener(ProjectFileChangeTrackerListener listener) {
+//        listenerMap.add(ProjectFileChangeTrackerListener.class, listener);
+//    }
 }

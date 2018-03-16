@@ -23,6 +23,7 @@ import org.apache.cayenne.modeler.action.ExitAction;
 import org.apache.cayenne.modeler.action.OpenProjectAction;
 import org.apache.cayenne.modeler.dialog.validator.ValidatorDialog;
 import org.apache.cayenne.modeler.editor.EditorView;
+import org.apache.cayenne.modeler.event.SaveFlagEvent;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.pref.FSPath;
 import org.apache.cayenne.modeler.util.CayenneController;
@@ -64,6 +65,7 @@ public class CayenneModelerController extends CayenneController {
 	private EditorView editorView;
 
     private SaveFlag enableToSave;
+    private ProjectFileChangeTrackerDisplay fileProjectChangeTracker;
 
     public CayenneModelerController(){}
 
@@ -73,6 +75,8 @@ public class CayenneModelerController extends CayenneController {
         this.frame = new CayenneModelerFrame(application.getActionManager());
         application.getPlatformInitializer().setupMenus(frame);
         this.projectController = new ProjectController();
+
+        initHelpers();
     }
 
     @Override
@@ -173,7 +177,7 @@ public class CayenneModelerController extends CayenneController {
     }
 
     public void projectSavedAction() {
-        projectController.fireSaveFlag(false);
+        projectController.fireSaveFlagEvent(new SaveFlagEvent(this, false));
         projectController.updateProjectControllerPreferences();
         updateStatus("Project saved...");
         frame.setTitle(projectController.getProject().getConfigurationResource().getURL().getPath());
@@ -196,7 +200,7 @@ public class CayenneModelerController extends CayenneController {
         projectController.setProject(null);
 
         projectController.reset();
-        projectController.fireSaveFlag(false);
+        projectController.fireSaveFlagEvent(new SaveFlagEvent(this, false));
 
         application.getActionManager().projectClosed();
 
@@ -242,7 +246,7 @@ public class CayenneModelerController extends CayenneController {
         if (!loadFailures.isEmpty()) {
             // mark project as unsaved
             project.setModified(true);
-            projectController.fireSaveFlag(true);
+            projectController.fireSaveFlagEvent(new SaveFlagEvent(this,true));
             allFailures.addAll(loadFailures);
         }
 
@@ -253,9 +257,6 @@ public class CayenneModelerController extends CayenneController {
         if (!allFailures.isEmpty()) {
             ValidatorDialog.showDialog(frame, validationResult.getFailures());
         }
-
-        enableToSave = new SaveFlag(this);
-        enableToSave.initAll();
     }
 
     public EditorView getEditorView() {
@@ -364,5 +365,13 @@ public class CayenneModelerController extends CayenneController {
         projectController.getEventController().addProcedureDisplayListener(frame);
         projectController.getEventController().addMultipleObjectsDisplayListener(frame);
         projectController.getEventController().addEmbeddableDisplayListener(frame);
+    }
+
+    protected void initHelpers(){
+        enableToSave = new SaveFlag(this);
+        enableToSave.initAll();
+
+        fileProjectChangeTracker = new ProjectFileChangeTrackerDisplay(getProjectController());
+        fileProjectChangeTracker.initAll();
     }
 }

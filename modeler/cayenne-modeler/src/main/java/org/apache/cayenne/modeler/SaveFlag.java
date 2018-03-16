@@ -276,8 +276,8 @@ public class SaveFlag implements DomainListener, DataNodeListener, DataMapListen
     }
 
     @Override
-    public void saveFlagChange(boolean dirty) {
-        setDirty(dirty);
+    public void saveFlagChange(SaveFlagEvent e) {
+        setDirty(e.getDirty());
     }
 
     /**

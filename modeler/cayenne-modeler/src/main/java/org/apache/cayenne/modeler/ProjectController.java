@@ -23,83 +23,13 @@ import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.configuration.event.DataMapEvent;
-import org.apache.cayenne.configuration.event.DataMapListener;
-import org.apache.cayenne.configuration.event.DataNodeEvent;
-import org.apache.cayenne.configuration.event.DataNodeListener;
-import org.apache.cayenne.configuration.event.DomainEvent;
-import org.apache.cayenne.configuration.event.DomainListener;
-import org.apache.cayenne.configuration.event.ProcedureEvent;
-import org.apache.cayenne.configuration.event.ProcedureListener;
-import org.apache.cayenne.configuration.event.ProcedureParameterEvent;
-import org.apache.cayenne.configuration.event.ProcedureParameterListener;
-import org.apache.cayenne.configuration.event.QueryEvent;
-import org.apache.cayenne.configuration.event.QueryListener;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.event.AttributeEvent;
-import org.apache.cayenne.map.event.DbAttributeListener;
-import org.apache.cayenne.map.event.DbEntityListener;
-import org.apache.cayenne.map.event.DbRelationshipListener;
-import org.apache.cayenne.map.event.EmbeddableAttributeEvent;
-import org.apache.cayenne.map.event.EmbeddableAttributeListener;
-import org.apache.cayenne.map.event.EmbeddableEvent;
-import org.apache.cayenne.map.event.EmbeddableListener;
-import org.apache.cayenne.map.event.EntityEvent;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.map.event.ObjAttributeListener;
-import org.apache.cayenne.map.event.ObjEntityListener;
-import org.apache.cayenne.map.event.ObjRelationshipListener;
-import org.apache.cayenne.map.event.RelationshipEvent;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.CallbackMethodEvent;
-import org.apache.cayenne.modeler.event.CallbackMethodListener;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.DataMapDisplayListener;
-import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
-import org.apache.cayenne.modeler.event.DataNodeDisplayListener;
-import org.apache.cayenne.modeler.event.DataSourceModificationEvent;
-import org.apache.cayenne.modeler.event.DataSourceModificationListener;
-import org.apache.cayenne.modeler.event.DbAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.DbRelationshipDisplayListener;
-import org.apache.cayenne.modeler.event.DisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayListener;
-import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.EntityListenerEvent;
-import org.apache.cayenne.modeler.event.EntityListenerListener;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayListener;
-import org.apache.cayenne.modeler.event.ObjAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ObjRelationshipDisplayListener;
-import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureDisplayListener;
-import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureParameterDisplayListener;
-import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
-import org.apache.cayenne.modeler.event.ProjectOnSaveListener;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
-import org.apache.cayenne.modeler.event.QueryDisplayListener;
-import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
-import org.apache.cayenne.modeler.event.SaveListener;
+import org.apache.cayenne.configuration.event.*;
+import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.event.*;
+import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.DataNodeDefaults;
 import org.apache.cayenne.modeler.pref.ProjectStatePreferences;
-import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.CircularArray;
 import org.apache.cayenne.modeler.util.Comparators;
 import org.apache.cayenne.project.ConfigurationNodeParentGetter;
@@ -107,7 +37,6 @@ import org.apache.cayenne.project.Project;
 import org.apache.cayenne.util.IDUtil;
 
 import java.util.*;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
@@ -1351,12 +1280,33 @@ public class ProjectController{
     /**
      * @since 4.1
      */
-    public void fireSaveFlag(boolean dirty) {
+    public void fireSaveFlagEvent(SaveFlagEvent e) {
         for(EventListener listener : getEventController().getListenerMap().getListeners(SaveListener.class)) {
             SaveListener temp = (SaveListener) listener;
-            temp.saveFlagChange(dirty);
+            temp.saveFlagChange(e);
         }
     }
+
+    /**
+     * @since 4.1
+     */
+    public void fireDoOnRemoveEvent(ProjectFileChangeTrackerEvent e){
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileChangeTrackerListener.class)){
+            ProjectFileChangeTrackerListener temp = (ProjectFileChangeTrackerListener) listener;
+            temp.doOnRemove(e);
+        }
+    }
+
+    /**
+     * @since 4.1
+     */
+    public void fireDoOnChangeEvent(ProjectFileChangeTrackerEvent e){
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileChangeTrackerListener.class)){
+            ProjectFileChangeTrackerListener temp = (ProjectFileChangeTrackerListener) listener;
+            temp.doOnChange(e);
+        }
+    }
+
 
     public ArrayList<Embeddable> getEmbeddablesInCurrentDataDomain() {
         DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor) getProject().getRootNode();
