@@ -48,6 +48,7 @@ import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ValidationResultBrowser;
+import org.apache.cayenne.modeler.event.SaveFlagEvent;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.pref.helpers.CoreDataSourceFactory;
 import org.apache.cayenne.modeler.pref.helpers.CoreDbAdapterFactory;
@@ -359,7 +360,7 @@ public class MergerOptions extends CayenneController {
         project.setModified(true);
 
         ProjectController projectController = getProjectController();
-        projectController.fireSaveFlag(true);
+        projectController.fireSaveFlagEvent(new SaveFlagEvent(this,true));
 
         projectController.fireDataMapEvent(new DataMapEvent(Application.getFrame(),
                 dataMap, MapEvent.REMOVE));

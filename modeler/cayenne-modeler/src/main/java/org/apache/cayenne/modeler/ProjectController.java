@@ -146,7 +146,6 @@ import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.DataNodeDefaults;
 import org.apache.cayenne.modeler.pref.ProjectStatePreferences;
-import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.CircularArray;
 import org.apache.cayenne.modeler.util.Comparators;
 import org.apache.cayenne.project.ConfigurationNodeParentGetter;
@@ -154,7 +153,6 @@ import org.apache.cayenne.project.Project;
 import org.apache.cayenne.util.IDUtil;
 
 import java.util.*;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 /**
@@ -1402,12 +1400,33 @@ public class ProjectController{
     /**
      * @since 4.1
      */
-    public void fireSaveFlag(boolean dirty) {
+    public void fireSaveFlagEvent(SaveFlagEvent e) {
         for(EventListener listener : getEventController().getListenerMap().getListeners(SaveListener.class)) {
             SaveListener temp = (SaveListener) listener;
-            temp.saveFlagChange(dirty);
+            temp.saveFlagChange(e);
         }
     }
+
+    /**
+     * @since 4.1
+     */
+    public void fireDoOnRemoveEvent(ProjectFileChangeTrackerEvent e){
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileChangeTrackerListener.class)){
+            ProjectFileChangeTrackerListener temp = (ProjectFileChangeTrackerListener) listener;
+            temp.doOnRemove(e);
+        }
+    }
+
+    /**
+     * @since 4.1
+     */
+    public void fireDoOnChangeEvent(ProjectFileChangeTrackerEvent e){
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileChangeTrackerListener.class)){
+            ProjectFileChangeTrackerListener temp = (ProjectFileChangeTrackerListener) listener;
+            temp.doOnChange(e);
+        }
+    }
+
 
     public ArrayList<Embeddable> getEmbeddablesInCurrentDataDomain() {
         DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor) getProject().getRootNode();

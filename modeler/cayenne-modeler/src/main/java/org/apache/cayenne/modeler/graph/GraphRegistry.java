@@ -22,6 +22,7 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.DomainEvent;
 import org.apache.cayenne.configuration.event.DomainListener;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.SaveFlagEvent;
 import org.jgraph.JGraph;
 
 import java.util.HashMap;
@@ -58,7 +59,7 @@ public class GraphRegistry implements DomainListener {
         if (builder == null) {
             builder = graphMap.createGraphBuilder(type, true);
             
-            mediator.fireSaveFlag(true);
+            mediator.fireSaveFlagEvent(new SaveFlagEvent(this,true));
         }
         
         //marking this builder as default

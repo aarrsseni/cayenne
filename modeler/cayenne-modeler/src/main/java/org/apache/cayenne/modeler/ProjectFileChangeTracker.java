@@ -18,27 +18,22 @@
  ****************************************************************/
 package org.apache.cayenne.modeler;
 
+import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.modeler.event.ProjectFileChangeTrackerEvent;
+import org.apache.cayenne.project.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.modeler.action.OpenProjectAction;
-import org.apache.cayenne.modeler.action.SaveAction;
-import org.apache.cayenne.modeler.dialog.FileDeletedDialog;
-import org.apache.cayenne.project.Project;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * ProjectWatchdog class is responsible for tracking changes in cayenne.xml and
  * other Cayenne project files
- * 
+ *
  */
 public class ProjectFileChangeTracker extends Thread {
 
@@ -54,8 +49,8 @@ public class ProjectFileChangeTracker extends Thread {
      */
     protected Map<String, FileInfo> files;
     protected boolean paused;
-    protected boolean isShownChangeDialog;
     protected boolean isShownRemoveDialog;
+    protected boolean isShownChangeDialog;
     protected ProjectController mediator;
     public ProjectFileChangeTracker(ProjectController mediator) {
 
@@ -95,65 +90,9 @@ public class ProjectFileChangeTracker extends Thread {
         resumeWatching();
     }
 
-    protected void doOnChange() {
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                isShownChangeDialog = true;
-                if (showConfirmation("One or more project files were changed by external program. "
-                        + "Do you want to load the changes?")) {
-
-                    // Currently we are reloading all project
-                    if (mediator.getProject() != null) {
-
-                        File fileDirectory = new File(mediator.getProject().getConfigurationResource().getURL()
-                                .getPath());
-                        Application.getInstance().getActionManager().getAction(OpenProjectAction.class)
-                                .openProject(fileDirectory);
-                    }
-                } else {
-                    mediator.fireSaveFlag(true);
-                }
-                isShownChangeDialog = false;
-            }
-        });
-    }
-
-    protected void doOnRemove() {
-        if (mediator.getProject() != null) {
-
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    isShownRemoveDialog = true;
-                    FileDeletedDialog dialog = new FileDeletedDialog(Application.getFrame());
-                    dialog.show();
-
-                    if (dialog.shouldSave()) {
-                        Application.getInstance().getActionManager().getAction(SaveAction.class).performAction(null);
-                    } else if (dialog.shouldClose()) {
-                        Application.getInstance().getFrameController().projectClosedAction();
-                    } else {
-                        mediator.fireSaveFlag(true);
-                    }
-                    isShownRemoveDialog = false;
-                }
-            });
-        }
-    }
-
-    /**
-     * Shows confirmation dialog
-     */
-    private boolean showConfirmation(String message) {
-        return JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(Application.getFrame(), message, "File changed",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    }
-
     /**
      * Adds a new file to watch
-     * 
+     *
      * @param location
      *            path of file
      */
@@ -167,7 +106,7 @@ public class ProjectFileChangeTracker extends Thread {
 
     /**
      * Turns off watching for a specified file
-     * 
+     *
      * @param location
      *            path of file
      */
@@ -220,10 +159,18 @@ public class ProjectFileChangeTracker extends Thread {
         }
 
         if (hasDeletions && !isShownRemoveDialog) {
-            doOnRemove();
+            mediator.fireDoOnRemoveEvent(new ProjectFileChangeTrackerEvent(this, this));
         } else if (hasChanges && !isShownChangeDialog) {
-            doOnChange();
+            mediator.fireDoOnChangeEvent(new ProjectFileChangeTrackerEvent(this, this));
         }
+    }
+
+    public void setShownRemoveDialog(boolean isShownRemoveDialog) {
+        this.isShownRemoveDialog = isShownRemoveDialog;
+    }
+
+    public void setShownChangeDialog(boolean isShownChangeDialog) {
+        this.isShownChangeDialog = isShownChangeDialog;
     }
 
     public void run() {
@@ -271,7 +218,7 @@ public class ProjectFileChangeTracker extends Thread {
 
         /**
          * Creates new object
-         * 
+         *
          * @param location
          *            the file path
          */

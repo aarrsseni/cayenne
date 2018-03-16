@@ -51,6 +51,7 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.CreateAttributeAction;
 import org.apache.cayenne.modeler.action.CreateRelationshipAction;
+import org.apache.cayenne.modeler.event.SaveFlagEvent;
 import org.apache.cayenne.modeler.graph.action.EntityDisplayAction;
 import org.apache.cayenne.modeler.graph.action.RemoveEntityAction;
 import org.apache.cayenne.util.XMLEncoder;
@@ -596,7 +597,7 @@ abstract class BaseGraphBuilder implements GraphBuilder, DataMapListener {
     public void undoableEditHappened(UndoableEditEvent e) {
         if (!undoEventsDisabled) {
             // graph has been modified
-            mediator.fireSaveFlag(true);
+            mediator.fireSaveFlagEvent(new SaveFlagEvent(this,true));
 
             Application.getInstance().getUndoManager().undoableEditHappened(e);
         }
