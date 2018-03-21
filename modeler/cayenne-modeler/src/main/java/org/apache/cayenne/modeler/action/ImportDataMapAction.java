@@ -28,7 +28,7 @@ import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.pref.FSPath;
 import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
-import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
+import org.apache.cayenne.modeler.pref.BaseFileChooser;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.FileFilters;
 import org.apache.cayenne.resource.Resource;

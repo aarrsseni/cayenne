@@ -92,15 +92,15 @@ import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
 import org.apache.cayenne.modeler.event.ProcedureDisplayListener;
 import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
 import org.apache.cayenne.modeler.event.ProcedureParameterDisplayListener;
-import org.apache.cayenne.modeler.event.ProjectFileChangeTrackerEvent;
-import org.apache.cayenne.modeler.event.ProjectFileChangeTrackerListener;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
+import org.apache.cayenne.modeler.event.ProjectDirtyEventListener;
+import org.apache.cayenne.modeler.event.ProjectFileOnChangeTrackerEvent;
+import org.apache.cayenne.modeler.event.ProjectFileOnChangeEventListener;
 import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
 import org.apache.cayenne.modeler.event.ProjectOnSaveListener;
 import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.event.QueryDisplayListener;
 import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
-import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
-import org.apache.cayenne.modeler.event.ProjectDirtyEventListener;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.DataNodeDefaults;
 import org.apache.cayenne.modeler.pref.ProjectStatePreferences;
@@ -702,6 +702,9 @@ public class ProjectController {
         }
     }
 
+    /**
+     * @since 4.1
+     */
     public void fireForwardNavigationEvent() {
         int size = controllerStateHistory.size();
         if (size == 0)
@@ -741,6 +744,9 @@ public class ProjectController {
         runDisplayEvent(cs);
     }
 
+    /**
+     * @since 4.1
+     */
     public void fireBackwardNavigationEvent(){
         int size = controllerStateHistory.size();
         if (size == 0)
@@ -1385,19 +1391,9 @@ public class ProjectController {
     /**
      * @since 4.1
      */
-    public void fireDoOnRemoveEvent(ProjectFileChangeTrackerEvent e){
-        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileChangeTrackerListener.class)){
-            ProjectFileChangeTrackerListener temp = (ProjectFileChangeTrackerListener) listener;
-            temp.onRemove(e);
-        }
-    }
-
-    /**
-     * @since 4.1
-     */
-    public void fireDoOnChangeEvent(ProjectFileChangeTrackerEvent e){
-        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileChangeTrackerListener.class)){
-            ProjectFileChangeTrackerListener temp = (ProjectFileChangeTrackerListener) listener;
+    public void fireOnChangeEvent(ProjectFileOnChangeTrackerEvent e){
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileOnChangeEventListener.class)){
+            ProjectFileOnChangeEventListener temp = (ProjectFileOnChangeEventListener) listener;
             temp.onChange(e);
         }
     }
@@ -1470,6 +1466,9 @@ public class ProjectController {
         this.entityTabSelection = entityTabSelection;
     }
 
+    /**
+     * @since 4.1
+     */
     public com.google.inject.Injector getBootiqueInjector() {
         return bootiqueInjector;
     }

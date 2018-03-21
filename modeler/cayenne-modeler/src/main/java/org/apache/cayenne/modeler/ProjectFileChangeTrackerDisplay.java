@@ -1,20 +1,40 @@
+/*****************************************************************
+ *   Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ ****************************************************************/
+
 package org.apache.cayenne.modeler;
 
 import org.apache.cayenne.modeler.action.OpenProjectAction;
 import org.apache.cayenne.modeler.action.SaveAction;
 import org.apache.cayenne.modeler.dialog.FileDeletedDialog;
-import org.apache.cayenne.modeler.event.ProjectFileChangeTrackerEvent;
-import org.apache.cayenne.modeler.event.ProjectFileChangeTrackerListener;
 import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
+import org.apache.cayenne.modeler.event.ProjectFileOnChangeTrackerEvent;
+import org.apache.cayenne.modeler.event.ProjectFileOnChangeEventListener;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import java.io.File;
 
-/*
+/**
  * @since 4.1
  * Class is used to show file change dialog.
  */
-public class ProjectFileChangeTrackerDisplay implements ProjectFileChangeTrackerListener{
+public class ProjectFileChangeTrackerDisplay implements ProjectFileOnChangeEventListener {
 
     protected ProjectController projectController;
 
@@ -22,25 +42,21 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileChangeTracker
         this.projectController = projectController;
     }
 
+    /**
+     *
+     * @since 4.1
+     */
     @Override
-    public void onChange(ProjectFileChangeTrackerEvent e) {
+    public void onChange(ProjectFileOnChangeTrackerEvent e) {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
                 e.getProjectFileChangeTracker().setShownChangeDialog(true);
-                if (showConfirmation("One or more project files were changed by external program. "
-                        + "Do you want to load the changes?")) {
-
-                    // Currently we are reloading all project
-                    if (projectController.getProject() != null) {
-
-                        File fileDirectory = new File(projectController.getProject().getConfigurationResource().getURL()
-                                .getPath());
-                        Application.getInstance().getActionManager().getAction(OpenProjectAction.class)
-                                .openProject(fileDirectory);
-                    }
-                } else {
-                    projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
+                if("Change".equals(e.getType())) {
+                    onChangeDisplay();
+                }
+                else {
+                    onRemoveDisplay();
                 }
                 e.getProjectFileChangeTracker().setShownChangeDialog(false);
             }
@@ -55,31 +71,37 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileChangeTracker
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     }
 
-    @Override
-    public void onRemove(ProjectFileChangeTrackerEvent e) {
-        if (projectController.getProject() != null) {
+    private void onChangeDisplay() {
+        if (showConfirmation("One or more project files were changed by external program. "
+                + "Do you want to load the changes?")) {
 
-            SwingUtilities.invokeLater(new Runnable() {
+            // Currently we are reloading all project
+            if (projectController.getProject() != null) {
 
-                public void run() {
-                    e.getProjectFileChangeTracker().setShownRemoveDialog(true);
-                    FileDeletedDialog dialog = new FileDeletedDialog(Application.getFrame());
-                    dialog.show();
+                File fileDirectory = new File(projectController.getProject().getConfigurationResource().getURL()
+                        .getPath());
+                Application.getInstance().getActionManager().getAction(OpenProjectAction.class)
+                        .openProject(fileDirectory);
+            }
+        } else {
+            projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
+        }
+    }
 
-                    if (dialog.shouldSave()) {
-                        Application.getInstance().getActionManager().getAction(SaveAction.class).performAction(null);
-                    } else if (dialog.shouldClose()) {
-                        Application.getInstance().getFrameController().projectClosedAction();
-                    } else {
-                        projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this, true));
-                    }
-                    e.getProjectFileChangeTracker().setShownRemoveDialog(false);
-                }
-            });
+    private void onRemoveDisplay() {
+        FileDeletedDialog dialog = new FileDeletedDialog(Application.getFrame());
+        dialog.show();
+
+        if (dialog.shouldSave()) {
+            Application.getInstance().getActionManager().getAction(SaveAction.class).performAction(null);
+        } else if (dialog.shouldClose()) {
+            Application.getInstance().getFrameController().projectClosedAction();
+        } else {
+            projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this, true));
         }
     }
 
     public void initAll(){
-        projectController.getEventController().addProjectFileChangeTrackerListener(this);
+        projectController.getEventController().addProjectFileOnChangeEventListener(this);
     }
 }

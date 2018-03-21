@@ -30,8 +30,8 @@ import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.BindingDelegate;
 import org.apache.cayenne.swing.ObjectBinding;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JOptionPane;
+import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 

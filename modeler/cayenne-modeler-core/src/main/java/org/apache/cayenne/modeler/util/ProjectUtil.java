@@ -37,13 +37,12 @@ import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.util.Util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

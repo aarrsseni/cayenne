@@ -30,8 +30,6 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.DefaultActionManager;
 import org.apache.cayenne.modeler.graph.extension.GraphExtension;
-import org.apache.cayenne.modeler.init.platform.GenericPlatformInitializer;
-import org.apache.cayenne.modeler.init.platform.PlatformInitializer;
 import org.apache.cayenne.modeler.util.DefaultWidgetFactory;
 import org.apache.cayenne.modeler.util.WidgetFactory;
 import org.apache.cayenne.project.ProjectModule;

@@ -27,7 +27,7 @@ import org.apache.cayenne.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

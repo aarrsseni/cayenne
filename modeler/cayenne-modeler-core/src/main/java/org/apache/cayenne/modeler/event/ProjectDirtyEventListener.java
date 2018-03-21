@@ -7,9 +7,6 @@ import java.util.EventListener;
  */
 public interface ProjectDirtyEventListener extends EventListener {
 
-    /**
-     * @since 4.1
-     */
     void setProjectDirty(ProjectDirtyEvent e);
 
 }

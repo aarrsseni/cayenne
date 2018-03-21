@@ -35,7 +35,7 @@ import org.apache.cayenne.project.Project;
 import org.apache.cayenne.swing.BindingFactory;
 import org.apache.cayenne.util.IDUtil;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
