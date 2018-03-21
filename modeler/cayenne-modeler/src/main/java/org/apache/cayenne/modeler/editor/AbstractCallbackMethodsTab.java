@@ -34,7 +34,7 @@ import org.apache.cayenne.modeler.action.PasteAction;
 import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
 import org.apache.cayenne.modeler.event.CallbackMethodEvent;
 import org.apache.cayenne.modeler.event.CallbackMethodListener;
-import org.apache.cayenne.modeler.event.SaveFlagEvent;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.event.TablePopupHandler;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
 import org.apache.cayenne.modeler.util.CayenneAction;
@@ -250,7 +250,7 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
         });
 
         for (CayenneTable table : tables) {
-            mediator.getApplication().getActionManager().setupCutCopyPaste(
+            Application.getInstance().getActionManager().setupCutCopyPaste(
                     table,
                     CutCallbackMethodAction.class,
                     CopyCallbackMethodAction.class);
@@ -460,7 +460,7 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
 
                 CallbackDescriptor callbackDescriptor =
                         ((CallbackDescriptorTableModel)table.getCayenneModel()).getCallbackDescriptor();
-                mediator.fireSaveFlagEvent(new SaveFlagEvent(this, callbackDescriptor.moveMethod(callbackMethod, rowIndex)));
+                mediator.fireProjectDirtyEvent(new ProjectDirtyEvent(this, callbackDescriptor.moveMethod(callbackMethod, rowIndex)));
                 rebuildTables();
                 return true;
             }

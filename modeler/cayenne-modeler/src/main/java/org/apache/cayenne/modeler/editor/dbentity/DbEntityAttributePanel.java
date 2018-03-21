@@ -104,7 +104,7 @@ public class DbEntityAttributePanel extends JPanel implements DbEntityDisplayLis
 
         table.getSelectionModel().addListSelectionListener(new DbAttributeListSelectionListener());
 
-        mediator.getApplication().getActionManager().setupCutCopyPaste(
+        Application.getInstance().getActionManager().setupCutCopyPaste(
                 table,
                 CutAttributeRelationshipAction.class,
                 CopyAttributeRelationshipAction.class);

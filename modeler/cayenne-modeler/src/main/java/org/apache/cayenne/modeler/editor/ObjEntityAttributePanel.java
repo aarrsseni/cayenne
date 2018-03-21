@@ -29,63 +29,28 @@ import org.apache.cayenne.map.event.ObjAttributeListener;
 import org.apache.cayenne.map.event.ObjEntityListener;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CopyAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.CutAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.ObjEntityToSuperEntityAction;
-import org.apache.cayenne.modeler.action.PasteAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeRelationshipAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.dialog.objentity.ObjAttributeInfoDialog;
 import org.apache.cayenne.modeler.editor.wrapper.ObjAttributeWrapper;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
-import org.apache.cayenne.modeler.event.ProjectOnSaveListener;
-import org.apache.cayenne.modeler.event.TablePopupHandler;
+import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
-import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.modeler.util.CayenneTable;
-import org.apache.cayenne.modeler.util.CayenneTableModel;
-import org.apache.cayenne.modeler.util.DbAttributePathComboBoxRenderer;
-import org.apache.cayenne.modeler.util.DbAttributePathComboBoxEditor;
-import org.apache.cayenne.modeler.util.ModelerUtil;
-import org.apache.cayenne.modeler.util.PanelFactory;
-import org.apache.cayenne.modeler.util.ProjectUtil;
-import org.apache.cayenne.modeler.util.UIUtil;
+import org.apache.cayenne.modeler.util.*;
 import org.apache.cayenne.modeler.util.combo.AutoCompletion;
 import org.apache.cayenne.swing.components.image.FilteredIconFactory;
 
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Detail view of the ObjEntity attributes.
@@ -200,7 +165,7 @@ public class ObjEntityAttributePanel extends JPanel implements ObjEntityDisplayL
         table.getSelectionModel().addListSelectionListener(new ObjAttributeListSelectionListener());
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        mediator.getApplication().getActionManager().setupCutCopyPaste(
+        Application.getInstance().getActionManager().setupCutCopyPaste(
                 table,
                 CutAttributeRelationshipAction.class,
                 CopyAttributeRelationshipAction.class);

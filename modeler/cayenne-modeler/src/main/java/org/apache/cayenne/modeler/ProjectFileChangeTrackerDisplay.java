@@ -5,7 +5,7 @@ import org.apache.cayenne.modeler.action.SaveAction;
 import org.apache.cayenne.modeler.dialog.FileDeletedDialog;
 import org.apache.cayenne.modeler.event.ProjectFileChangeTrackerEvent;
 import org.apache.cayenne.modeler.event.ProjectFileChangeTrackerListener;
-import org.apache.cayenne.modeler.event.SaveFlagEvent;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 
 import javax.swing.*;
 import java.io.File;
@@ -23,7 +23,7 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileChangeTracker
     }
 
     @Override
-    public void doOnChange(ProjectFileChangeTrackerEvent e) {
+    public void onChange(ProjectFileChangeTrackerEvent e) {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
@@ -40,7 +40,7 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileChangeTracker
                                 .openProject(fileDirectory);
                     }
                 } else {
-                    projectController.fireSaveFlagEvent(new SaveFlagEvent(this,true));
+                    projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
                 }
                 e.getProjectFileChangeTracker().setShownChangeDialog(false);
             }
@@ -56,7 +56,7 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileChangeTracker
     }
 
     @Override
-    public void doOnRemove(ProjectFileChangeTrackerEvent e) {
+    public void onRemove(ProjectFileChangeTrackerEvent e) {
         if (projectController.getProject() != null) {
 
             SwingUtilities.invokeLater(new Runnable() {
@@ -71,7 +71,7 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileChangeTracker
                     } else if (dialog.shouldClose()) {
                         Application.getInstance().getFrameController().projectClosedAction();
                     } else {
-                        projectController.fireSaveFlagEvent(new SaveFlagEvent(this, true));
+                        projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this, true));
                     }
                     e.getProjectFileChangeTracker().setShownRemoveDialog(false);
                 }
@@ -79,8 +79,7 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileChangeTracker
         }
     }
 
-//    TODO Replace it with getEventController().addProjectFileChangeTrackerListener(e) when ProjectFileChangeTracker will be moved to core
     public void initAll(){
-        projectController.getEventController().listenerMap.add(ProjectFileChangeTrackerListener.class, this);
+        projectController.getEventController().addProjectFileChangeTrackerListener(this);
     }
 }

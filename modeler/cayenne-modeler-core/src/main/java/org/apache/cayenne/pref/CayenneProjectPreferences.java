@@ -18,14 +18,14 @@
  ****************************************************************/
 package org.apache.cayenne.pref;
 
+import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.modeler.pref.DBConnectionInfo;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 
 public class CayenneProjectPreferences {
 

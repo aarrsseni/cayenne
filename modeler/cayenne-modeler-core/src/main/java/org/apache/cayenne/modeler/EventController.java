@@ -171,8 +171,8 @@ public class EventController {
         listenerMap.add(MultipleObjectsDisplayListener.class, listener);
     }
 
-    public void addEnableToSaveListener(SaveListener listener) {
-        listenerMap.add(SaveListener.class, listener);
+    public void addEnableToSaveListener(ProjectDirtyEventListener listener) {
+        listenerMap.add(ProjectDirtyEventListener.class, listener);
     }
 
     /**
@@ -211,8 +211,11 @@ public class EventController {
         listenerMap.remove(DataSourceModificationListener.class, listener);
     }
 
-//    TODO: Enable it when ProjectFileChangeTracker, ProjectFileChangeTrackerListener and ProjectFileChangeTrackerEvent will be able to move in core
-//    public void addProjectFileChangeTrackerListener(ProjectFileChangeTrackerListener listener) {
-//        listenerMap.add(ProjectFileChangeTrackerListener.class, listener);
-//    }
+    public void addActionManagerChangesListener(ActionManagerChangesListener listener) {
+        listenerMap.add(ActionManagerChangesListener.class, listener);
+    }
+
+    public void addProjectFileChangeTrackerListener(ProjectFileChangeTrackerListener listener) {
+        listenerMap.add(ProjectFileChangeTrackerListener.class, listener);
+    }
 }

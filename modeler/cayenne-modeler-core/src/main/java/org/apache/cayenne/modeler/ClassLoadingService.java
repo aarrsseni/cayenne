@@ -19,6 +19,9 @@
 
 package org.apache.cayenne.modeler;
 
+import java.io.File;
+import java.util.Collection;
+
 /**
  * An interface defining a service for locating external Java resources.
  */
@@ -29,6 +32,8 @@ public interface ClassLoadingService {
      * service.
      */
     ClassLoader getClassLoader();
+
+    void setPathFiles(Collection<File> files);
 
     /**
      * Returns a class for given class name.

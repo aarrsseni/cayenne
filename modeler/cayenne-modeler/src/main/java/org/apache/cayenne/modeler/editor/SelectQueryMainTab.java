@@ -19,50 +19,30 @@
 
 package org.apache.cayenne.modeler.editor;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.Arrays;
-import java.util.Iterator;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.configuration.event.QueryEvent;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionException;
 import org.apache.cayenne.exp.parser.ASTPath;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.map.SelectQueryDescriptor;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.util.CellRenderers;
-import org.apache.cayenne.modeler.util.Comparators;
-import org.apache.cayenne.modeler.util.ExpressionConvertor;
-import org.apache.cayenne.modeler.util.ProjectUtil;
-import org.apache.cayenne.modeler.util.TextAdapter;
-import org.apache.cayenne.modeler.util.ValidatorTextAdapter;
+import org.apache.cayenne.modeler.util.*;
 import org.apache.cayenne.modeler.util.combo.AutoCompletion;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
-import org.apache.cayenne.query.*;
+import org.apache.cayenne.query.SelectQuery;
+import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.util.CayenneMapEntry;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * A tabbed pane that contains editors for various SelectQuery parts.
@@ -427,11 +407,11 @@ public class SelectQueryMainTab extends JPanel {
         if (query == null) {
             return;
         }
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), query, ObjectInfo.COMMENT, text);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), query, ObjectInfo.COMMENT, text);
         mediator.fireQueryEvent(new QueryEvent(this, query));
     }
 
     private String getQueryComment(QueryDescriptor queryDescriptor) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), queryDescriptor, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), queryDescriptor, ObjectInfo.COMMENT);
     }
 }

@@ -19,13 +19,13 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.CayenneModelerController;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.UnsavedChangesDialog;
 import org.apache.cayenne.modeler.util.CayenneAction;
+
+import java.awt.event.ActionEvent;
 
 /**
  */

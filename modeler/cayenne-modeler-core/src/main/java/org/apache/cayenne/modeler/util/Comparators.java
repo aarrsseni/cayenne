@@ -19,19 +19,12 @@
 
 package org.apache.cayenne.modeler.util;
 
-import java.util.Comparator;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.query.Query;
+
+import java.util.Comparator;
 
 /**
  * A collection of useful Comparators used by the modeler.
@@ -88,8 +81,8 @@ public class Comparators {
 
         public int compare(ConfigurationNode o1, ConfigurationNode o2) {
 
-            String name1 = ModelerUtil.getObjectName(o1);
-            String name2 = ModelerUtil.getObjectName(o2);
+            String name1 = CoreModelerUtil.getObjectName(o1);
+            String name2 = CoreModelerUtil.getObjectName(o2);
 
             if (name1 == null) {
                 return (name2 != null) ? -1 : 0;

@@ -19,15 +19,6 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
@@ -38,6 +29,9 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneTableModel;
 import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
+
+import javax.swing.*;
+import java.util.*;
 
 /**
  * Model for DbEntity attributes. Allows adding/removing attributes, modifying types and names.
@@ -224,7 +218,7 @@ public class DbAttributeTableModel extends CayenneTableModel<DbAttribute> {
     }
 
     public String getComment(DbAttribute attr) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), attr, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), attr, ObjectInfo.COMMENT);
     }
 
     public void setMaxLength(String newVal, DbAttribute attr) {
@@ -326,7 +320,7 @@ public class DbAttributeTableModel extends CayenneTableModel<DbAttribute> {
     }
 
     public void setComment(String newVal, DbAttribute attr) {
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), attr, ObjectInfo.COMMENT, newVal);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), attr, ObjectInfo.COMMENT, newVal);
     }
 
     public boolean isCellEditable(int row, int col) {

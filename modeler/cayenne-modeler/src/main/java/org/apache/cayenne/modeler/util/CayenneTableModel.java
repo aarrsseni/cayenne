@@ -19,6 +19,16 @@
 
 package org.apache.cayenne.modeler.util;
 
+import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.undo.CayenneTableModelUndoableEdit;
+import org.apache.cayenne.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -27,17 +37,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.swing.JOptionPane;
-import javax.swing.table.AbstractTableModel;
-
-import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.undo.CayenneTableModelUndoableEdit;
-import org.apache.cayenne.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Superclass of CayenneModeler table model classes.
@@ -66,8 +65,8 @@ public abstract class CayenneTableModel<T> extends AbstractTableModel {
             Object oldValue = getValueAt(row, col);
             if (!Util.nullSafeEquals(newVal, oldValue)) {
                 setUpdatedValueAt(newVal, row, col);
-                
-                this.mediator.getApplication().getUndoManager().addEdit(
+
+                Application.getInstance().getUndoManager().addEdit(
                         new CayenneTableModelUndoableEdit(this, oldValue, newVal, row, col));
             }
         } catch (IllegalArgumentException e) {

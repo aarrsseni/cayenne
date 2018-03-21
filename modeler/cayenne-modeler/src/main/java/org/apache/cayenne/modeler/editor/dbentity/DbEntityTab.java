@@ -19,19 +19,6 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.EventObject;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
@@ -41,12 +28,7 @@ import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CreateAttributeAction;
-import org.apache.cayenne.modeler.action.CreateObjEntityAction;
-import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.action.DbEntityCounterpartAction;
-import org.apache.cayenne.modeler.action.DbEntitySyncAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.editor.ExistingSelectionProcessor;
 import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
 import org.apache.cayenne.modeler.event.EntityDisplayEvent;
@@ -56,6 +38,12 @@ import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.EventObject;
 
 /**
  * Detail view of the DbEntity properties.
@@ -342,7 +330,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
     }
 
     private String getComment(DbEntity entity) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), entity, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), entity, ObjectInfo.COMMENT);
     }
 
     private void setComment(String value) {
@@ -352,7 +340,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
             return;
         }
 
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), entity, ObjectInfo.COMMENT, value);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), entity, ObjectInfo.COMMENT, value);
         mediator.fireDbEntityEvent(new EntityEvent(this, entity));
     }
 }

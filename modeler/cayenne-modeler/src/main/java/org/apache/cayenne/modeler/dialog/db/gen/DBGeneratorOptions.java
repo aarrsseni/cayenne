@@ -19,7 +19,6 @@
 
 package org.apache.cayenne.modeler.dialog.db.gen;
 
-import com.google.inject.Inject;
 import org.apache.cayenne.access.DbGenerator;
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.log.NoopJdbcEventLogger;
@@ -36,13 +35,10 @@ import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
 import org.apache.cayenne.validation.ValidationResult;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.Component;
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -70,15 +66,17 @@ public class DBGeneratorOptions extends CayenneController {
 
     protected ProjectController projectController;
 
-    @Inject
     protected CoreDbAdapterFactory dbAdapterFactory;
 
     public DBGeneratorOptions(ProjectController projectController, String title, Collection<DataMap> dataMaps) {
         super();
 
         this.projectController = projectController;
+
+        this.dbAdapterFactory = getProjectController().getBootiqueInjector().getInstance(CoreDbAdapterFactory.class);
+
         this.dataMaps = dataMaps;
-        this.tables = new TableSelectorController(getProjectController());
+        this.tables = new TableSelectorController(projectController);
         this.view = new DBGeneratorOptionsView(tables.getView());
         this.connectionInfo = new DBConnectionInfo();
         this.generatorDefaults = new DBGeneratorDefaults(getProjectController()

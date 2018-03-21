@@ -157,7 +157,7 @@ public class DbEntityRelationshipPanel extends JPanel implements DbEntityDisplay
 
         table.getSelectionModel().addListSelectionListener(new DbRelationshipListSelectionListener());
 
-        mediator.getApplication().getActionManager().setupCutCopyPaste(
+        Application.getInstance().getActionManager().setupCutCopyPaste(
                 table,
                 CutAttributeRelationshipAction.class,
                 CopyAttributeRelationshipAction.class);

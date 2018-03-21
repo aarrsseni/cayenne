@@ -19,18 +19,19 @@
 
 package org.apache.cayenne.modeler.editor.datanode;
 
-import java.awt.Component;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.event.DataNodeEvent;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
 import org.apache.cayenne.modeler.event.DataNodeDisplayListener;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
+
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 /**
  */
@@ -53,7 +54,7 @@ public class AdapterEditor extends CayenneController {
     protected void initController() {
         // init bindings
         BindingBuilder builder = new BindingBuilder(
-                projectController.getApplication().getBindingFactory(), this);
+                Application.getInstance().getBindingFactory(), this);
 
         adapterNameBinding = builder.bindToTextField(
                 view.getCustomAdapter(),

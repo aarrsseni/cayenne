@@ -19,23 +19,6 @@
 
 package org.apache.cayenne.modeler.dialog.pref;
 
-import java.awt.Component;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
-
 import org.apache.cayenne.datasource.DriverDataSource;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.FileClassLoadingService;
@@ -47,6 +30,17 @@ import org.apache.cayenne.pref.ChildrenMapPreference;
 import org.apache.cayenne.pref.PreferenceEditor;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.List;
+import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
 /**
  * Editor for the local DataSources configured in preferences.

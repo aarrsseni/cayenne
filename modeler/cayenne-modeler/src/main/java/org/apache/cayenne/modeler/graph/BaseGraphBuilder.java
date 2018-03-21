@@ -18,25 +18,8 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.graph;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.swing.JPopupMenu;
-import javax.swing.border.LineBorder;
-import javax.swing.event.UndoableEditEvent;
-
+import com.jgraph.layout.JGraphFacade;
+import com.jgraph.layout.organic.JGraphOrganicLayout;
 import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.DataMapEvent;
@@ -51,22 +34,24 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.CreateAttributeAction;
 import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.event.SaveFlagEvent;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.graph.action.EntityDisplayAction;
 import org.apache.cayenne.modeler.graph.action.RemoveEntityAction;
 import org.apache.cayenne.util.XMLEncoder;
 import org.jgraph.JGraph;
-import org.jgraph.graph.AttributeMap;
-import org.jgraph.graph.DefaultCellViewFactory;
-import org.jgraph.graph.DefaultEdge;
-import org.jgraph.graph.DefaultGraphCell;
-import org.jgraph.graph.DefaultGraphModel;
-import org.jgraph.graph.GraphConstants;
-import org.jgraph.graph.GraphLayoutCache;
-import org.jgraph.graph.GraphModel;
+import org.jgraph.graph.*;
 
-import com.jgraph.layout.JGraphFacade;
-import com.jgraph.layout.organic.JGraphOrganicLayout;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import javax.swing.event.UndoableEditEvent;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Base class for building graphs of entities
@@ -597,7 +582,7 @@ abstract class BaseGraphBuilder implements GraphBuilder, DataMapListener {
     public void undoableEditHappened(UndoableEditEvent e) {
         if (!undoEventsDisabled) {
             // graph has been modified
-            mediator.fireSaveFlagEvent(new SaveFlagEvent(this,true));
+            mediator.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
 
             Application.getInstance().getUndoManager().undoableEditHappened(e);
         }

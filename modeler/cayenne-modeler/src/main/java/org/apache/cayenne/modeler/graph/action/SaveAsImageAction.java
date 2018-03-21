@@ -18,27 +18,25 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.graph.action;
 
+import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.graph.DataDomainGraphTab;
+import org.apache.cayenne.modeler.pref.FSPath;
+import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
+import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
+import org.apache.cayenne.modeler.util.CayenneAction;
+import org.apache.cayenne.modeler.util.FileFilters;
+import org.jgraph.JGraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.adapters.JFileChooserAdapter;
-import org.apache.cayenne.modeler.graph.DataDomainGraphTab;
-import org.apache.cayenne.modeler.pref.FSPath;
-import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
-import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.modeler.util.FileFilters;
-import org.slf4j.Logger;
-import org.jgraph.JGraph;
-import org.slf4j.LoggerFactory;
 
 /**
  * Action for saving graph as image

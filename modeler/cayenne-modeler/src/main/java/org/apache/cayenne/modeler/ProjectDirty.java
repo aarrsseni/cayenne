@@ -12,14 +12,14 @@ import org.apache.cayenne.modeler.event.*;
  * @since 4.1
  * Class used to listen all changes need to enable save button.
  */
-public class SaveFlag implements DomainListener, DataNodeListener, DataMapListener, ObjEntityListener,
+public class ProjectDirty implements DomainListener, DataNodeListener, DataMapListener, ObjEntityListener,
         DbEntityListener, QueryListener, ProcedureListener, ProcedureParameterListener, DbAttributeListener,
         ObjAttributeListener, DbRelationshipListener, ObjRelationshipListener, CallbackMethodListener,
-        EntityListenerListener, EmbeddableListener, EmbeddableAttributeListener, SaveListener {
+        EntityListenerListener, EmbeddableListener, EmbeddableAttributeListener, ProjectDirtyEventListener {
 
     protected CayenneModelerController modelerController;
 
-    public SaveFlag(CayenneModelerController modelerController){
+    public ProjectDirty(CayenneModelerController modelerController){
         this.modelerController = modelerController;
     }
 
@@ -276,7 +276,7 @@ public class SaveFlag implements DomainListener, DataNodeListener, DataMapListen
     }
 
     @Override
-    public void saveFlagChange(SaveFlagEvent e) {
+    public void setProjectDirty(ProjectDirtyEvent e) {
         setDirty(e.getDirty());
     }
 

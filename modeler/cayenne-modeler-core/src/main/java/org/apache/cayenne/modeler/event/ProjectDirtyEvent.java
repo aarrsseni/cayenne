@@ -5,7 +5,7 @@ import java.util.EventObject;
 /*
  * @since 4.1
  */
-public class SaveFlagEvent extends EventObject {
+public class ProjectDirtyEvent extends EventObject {
 
     protected boolean dirty;
 
@@ -15,11 +15,11 @@ public class SaveFlagEvent extends EventObject {
      * @param source The object on which the Event initially occurred.
      * @throws IllegalArgumentException if source is null.
      */
-    public SaveFlagEvent(Object source) {
+    public ProjectDirtyEvent(Object source) {
         super(source);
     }
 
-    public SaveFlagEvent(Object source, boolean dirty){
+    public ProjectDirtyEvent(Object source, boolean dirty){
         super(source);
         this.dirty = dirty;
     }

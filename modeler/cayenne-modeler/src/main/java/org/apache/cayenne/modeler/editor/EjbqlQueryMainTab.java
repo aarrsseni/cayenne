@@ -18,22 +18,22 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.editor;
 
-import java.awt.BorderLayout;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import org.apache.cayenne.configuration.event.QueryEvent;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.util.ProjectUtil;
-import org.apache.cayenne.modeler.util.TextAdapter;
-import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.project.extension.info.ObjectInfo;
-import org.apache.cayenne.util.Util;
-import org.apache.cayenne.validation.ValidationException;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.cayenne.configuration.event.QueryEvent;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.util.ProjectUtil;
+import org.apache.cayenne.modeler.util.TextAdapter;
+import org.apache.cayenne.project.extension.info.ObjectInfo;
+import org.apache.cayenne.util.Util;
+import org.apache.cayenne.validation.ValidationException;
+
+import javax.swing.*;
+import java.awt.*;
 
 
 public class EjbqlQueryMainTab extends JPanel{
@@ -150,11 +150,11 @@ public class EjbqlQueryMainTab extends JPanel{
         if (query == null) {
             return;
         }
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), query, ObjectInfo.COMMENT, text);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), query, ObjectInfo.COMMENT, text);
         mediator.fireQueryEvent(new QueryEvent(this, query));
     }
 
     private String getQueryComment(QueryDescriptor queryDescriptor) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), queryDescriptor, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), queryDescriptor, ObjectInfo.COMMENT);
     }
 }

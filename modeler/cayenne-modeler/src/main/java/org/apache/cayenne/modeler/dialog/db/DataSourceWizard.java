@@ -19,9 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db;
 
-import com.google.inject.Inject;
 import org.apache.cayenne.dba.DbAdapter;
-import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
 import org.apache.cayenne.modeler.dialog.pref.PreferenceDialog;
@@ -68,10 +66,8 @@ public class DataSourceWizard extends CayenneController {
 	private DataSource dataSource;
 	protected ProjectController projectController;
 
-	@Inject
 	protected CoreDbAdapterFactory dbAdapterFactory;
 
-	@Inject
 	protected CoreDataSourceFactory dataSourceFactory;
 
 	public DataSourceWizard(ProjectController projectController, String title) {
@@ -81,6 +77,9 @@ public class DataSourceWizard extends CayenneController {
 		this.view = createView();
 		this.view.setTitle(title);
 		this.connectionInfo = new DBConnectionInfo();
+
+		dbAdapterFactory = projectController.getBootiqueInjector().getInstance(CoreDbAdapterFactory.class);
+		dataSourceFactory = projectController.getBootiqueInjector().getInstance(CoreDataSourceFactory.class);
 
 		initBindings();
 		initDataSourceListener();
@@ -182,7 +181,6 @@ public class DataSourceWizard extends CayenneController {
 	 */
 	public void okAction() {
 		DBConnectionInfo info = getConnectionInfo();
-		ClassLoadingService classLoader = getApplication().getClassLoadingService();
 		// doing connection testing...
 		try {
 			this.adapter = dbAdapterFactory.createAdapter(info);

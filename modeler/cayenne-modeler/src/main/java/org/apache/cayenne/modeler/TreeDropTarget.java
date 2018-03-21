@@ -77,7 +77,7 @@ public class TreeDropTarget implements DropTargetListener, Transferable {
                     DataNodeDescriptor currentDataNode = (DataNodeDescriptor) target.getUserObject();
                     DataMap currentDataMap = (DataMap) parent.getUserObject();
 
-                    LinkDataMapAction action = eventController.getApplication().getActionManager().getAction(LinkDataMapAction.class);
+                    LinkDataMapAction action = Application.getInstance().getActionManager().getAction(LinkDataMapAction.class);
                     action.linkDataMap(currentDataMap, currentDataNode);
 
                     targetTree.makeVisible(targetPath.pathByAddingChild(target));

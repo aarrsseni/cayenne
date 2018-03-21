@@ -18,19 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.graph;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
@@ -44,6 +31,11 @@ import org.apache.cayenne.modeler.graph.action.SaveAsImageAction;
 import org.apache.cayenne.modeler.graph.action.ZoomInAction;
 import org.apache.cayenne.modeler.graph.action.ZoomOutAction;
 import org.jgraph.JGraph;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * Tab for editing graphical representation of a dataDomain
@@ -192,10 +184,10 @@ public class DataDomainGraphTab extends JPanel implements DomainDisplayListener,
     }
 
     GraphRegistry getGraphRegistry() {
-        graphRegistry = mediator.getApplication().getMetaData().get(domain, GraphRegistry.class);
+        graphRegistry = Application.getInstance().getMetaData().get(domain, GraphRegistry.class);
         if (graphRegistry == null) {
             graphRegistry = new GraphRegistry();
-            mediator.getApplication().getMetaData().add(domain, graphRegistry);
+            Application.getInstance().getMetaData().add(domain, graphRegistry);
         }
 
         return graphRegistry;
