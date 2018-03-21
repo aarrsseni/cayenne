@@ -244,12 +244,12 @@ public class ProcedureQueryView extends JPanel {
         if (query == null) {
             return;
         }
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), query, ObjectInfo.COMMENT, text);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), query, ObjectInfo.COMMENT, text);
         mediator.fireQueryEvent(new QueryEvent(this, query));
     }
 
     private String getQueryComment(QueryDescriptor queryDescriptor) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), queryDescriptor, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), queryDescriptor, ObjectInfo.COMMENT);
     }
 
     final class LabelCapsRenderer extends DefaultListCellRenderer {

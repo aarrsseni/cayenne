@@ -5,11 +5,11 @@ import java.util.EventListener;
 /**
  * @since 4.1
  */
-public interface SaveListener extends EventListener {
+public interface ProjectDirtyEventListener extends EventListener {
 
     /**
      * @since 4.1
      */
-    void saveFlagChange(SaveFlagEvent e);
+    void setProjectDirty(ProjectDirtyEvent e);
 
 }

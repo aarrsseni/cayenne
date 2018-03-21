@@ -19,6 +19,10 @@
 
 package org.apache.cayenne.pref;
 
+import org.apache.cayenne.modeler.pref.DBConnectionInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,14 +30,9 @@ import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.pref.DBConnectionInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * An editor for modifying CayennePreferenceService.
- * 
+ *
  */
 public abstract class CayennePreferenceEditor implements PreferenceEditor {
 
@@ -123,8 +122,6 @@ public abstract class CayennePreferenceEditor implements PreferenceEditor {
                 logger.warn("Error removing preferences");
             }
         }
-
-        Application.getInstance().initClassLoader();
     }
 
     public void revert() {

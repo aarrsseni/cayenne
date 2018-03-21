@@ -148,18 +148,28 @@ import org.apache.cayenne.modeler.pref.DataNodeDefaults;
 import org.apache.cayenne.modeler.pref.ProjectStatePreferences;
 import org.apache.cayenne.modeler.util.CircularArray;
 import org.apache.cayenne.modeler.util.Comparators;
+import org.apache.cayenne.pref.CayenneProjectPreferences;
 import org.apache.cayenne.project.ConfigurationNodeParentGetter;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.util.IDUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EventListener;
+import java.util.EventObject;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.prefs.Preferences;
 
 /**
  * A controller that works with the project tree, tracking selection and
  * dispatching project events.
  */
-public class ProjectController{
+public class ProjectController {
 
     protected EventController eventController;
 
@@ -175,6 +185,15 @@ public class ProjectController{
     protected int maxHistorySize = 20;
 
     private EntityResolver entityResolver;
+
+    @com.google.inject.Inject
+    protected CayenneProjectPreferences cayenneProjectPreferences;
+
+    @com.google.inject.Inject
+    protected Injector injector;
+
+    @com.google.inject.Inject
+    protected com.google.inject.Injector bootiqueInjector;
 
     /**
      * Project files watcher. When project file is changed, user will be asked
@@ -285,7 +304,7 @@ public class ProjectController{
         } else {
             pref = getPreferenceForDataDomain().node("DataMap").node(map.getName()).node(nameSuffix);
         }
-        return (DataMapDefaults) getApplication().getCayenneProjectPreferences().getProjectDetailObject(
+        return (DataMapDefaults) cayenneProjectPreferences.getProjectDetailObject(
                 DataMapDefaults.class, pref);
     }
 
@@ -293,7 +312,7 @@ public class ProjectController{
         Preferences pref;
         pref = getPreferenceForDataDomain().node("DataMap").node(dataMap.getName());
 
-        return (DataMapDefaults) getApplication().getCayenneProjectPreferences().getProjectDetailObject(DataMapDefaults.class, pref);
+        return (DataMapDefaults) cayenneProjectPreferences.getProjectDetailObject(DataMapDefaults.class, pref);
     }
 
     public DataMapDefaults getDataMapPreferences(String nameSuffix, DataMap map) {
@@ -304,7 +323,7 @@ public class ProjectController{
         } else {
             pref = getPreferenceForDataDomain().node("DataMap").node(map.getName()).node(nameSuffix);
         }
-        return (DataMapDefaults) getApplication().getCayenneProjectPreferences().getProjectDetailObject(DataMapDefaults.class, pref);
+        return (DataMapDefaults) cayenneProjectPreferences.getProjectDetailObject(DataMapDefaults.class, pref);
     }
 
     /**
@@ -317,13 +336,13 @@ public class ProjectController{
             throw new CayenneRuntimeException("No DataNode selected");
         }
 
-        return (DataNodeDefaults) getApplication().getCayenneProjectPreferences().getProjectDetailObject(
+        return (DataNodeDefaults) cayenneProjectPreferences.getProjectDetailObject(
                 DataNodeDefaults.class, getPreferenceForDataDomain().node("DataNode").node(node.getName()));
 
     }
 
     public ProjectStatePreferences getProjectStatePreferences() {
-        return (ProjectStatePreferences) getApplication().getCayenneProjectPreferences().getProjectDetailObject(
+        return (ProjectStatePreferences) cayenneProjectPreferences.getProjectDetailObject(
                 ProjectStatePreferences.class, getPreferenceForDataDomain());
     }
 
@@ -439,10 +458,13 @@ public class ProjectController{
 
         // call different methods depending on whether domain was opened or
         // closed
-        if (e.getDomain() == null) {
-            getApplication().getActionManager().projectOpened();
-        } else {
-            getApplication().getActionManager().domainSelected();
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ActionManagerChangesListener.class)) {
+            ActionManagerChangesListener temp = (ActionManagerChangesListener) listener;
+            if (e.getDomain() == null) {
+                temp.projectOpenedChanges();
+            } else {
+                temp.domainSelectedChanges();
+            }
         }
     }
 
@@ -1307,8 +1329,7 @@ public class ProjectController{
         } else if (currentState.getPaths() != null) { // multiple objects
             ConfigurationNode[] paths = currentState.getPaths();
 
-            ConfigurationNodeParentGetter parentGetter = getApplication().getInjector()
-                    .getInstance(ConfigurationNodeParentGetter.class);
+            ConfigurationNodeParentGetter parentGetter = injector.getInstance(ConfigurationNodeParentGetter.class);
             Object parent = parentGetter.getParent(paths[0]);
 
             List<ConfigurationNode> result = new ArrayList<>();
@@ -1400,10 +1421,10 @@ public class ProjectController{
     /**
      * @since 4.1
      */
-    public void fireSaveFlagEvent(SaveFlagEvent e) {
-        for(EventListener listener : getEventController().getListenerMap().getListeners(SaveListener.class)) {
-            SaveListener temp = (SaveListener) listener;
-            temp.saveFlagChange(e);
+    public void fireProjectDirtyEvent(ProjectDirtyEvent e) {
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectDirtyEventListener.class)) {
+            ProjectDirtyEventListener temp = (ProjectDirtyEventListener) listener;
+            temp.setProjectDirty(e);
         }
     }
 
@@ -1413,7 +1434,7 @@ public class ProjectController{
     public void fireDoOnRemoveEvent(ProjectFileChangeTrackerEvent e){
         for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileChangeTrackerListener.class)){
             ProjectFileChangeTrackerListener temp = (ProjectFileChangeTrackerListener) listener;
-            temp.doOnRemove(e);
+            temp.onRemove(e);
         }
     }
 
@@ -1423,7 +1444,7 @@ public class ProjectController{
     public void fireDoOnChangeEvent(ProjectFileChangeTrackerEvent e){
         for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileChangeTrackerListener.class)){
             ProjectFileChangeTrackerListener temp = (ProjectFileChangeTrackerListener) listener;
-            temp.doOnChange(e);
+            temp.onChange(e);
         }
     }
 
@@ -1458,11 +1479,12 @@ public class ProjectController{
             if (key.contains(".xml")) {
                 projectControllerPreferences = projectControllerPreferences.node(projectControllerPreferences
                         .absolutePath() + key.replace(".xml", ""));
-            } else {
-                projectControllerPreferences = projectControllerPreferences.node(
-                        projectControllerPreferences.absolutePath())
-                        .node(getApplication().getNewProjectTemporaryName());
             }
+//            else {
+//                projectControllerPreferences = projectControllerPreferences.node(
+//                        projectControllerPreferences.absolutePath())
+//                        .node(getApplication().getNewProjectTemporaryName());
+//            }
         }
     }
 
@@ -1494,7 +1516,7 @@ public class ProjectController{
         this.entityTabSelection = entityTabSelection;
     }
 
-    public Application getApplication() {
-        return Application.getInstance();
+    public com.google.inject.Injector getBootiqueInjector() {
+        return bootiqueInjector;
     }
 }

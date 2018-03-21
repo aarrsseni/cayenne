@@ -18,6 +18,8 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.osx;
 
+import com.apple.eawt.Application;
+import org.apache.cayenne.di.Injector;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -42,15 +44,20 @@ import org.apache.cayenne.modeler.action.ConfigurePreferencesAction;
 import org.apache.cayenne.modeler.action.ExitAction;
 import org.apache.cayenne.modeler.init.platform.PlatformInitializer;
 
-import com.apple.eawt.Application;
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class OSXPlatformInitializer implements PlatformInitializer {
 
-    @Inject
+    @com.google.inject.Inject
+    protected Injector injector;
+
     protected ActionManager actionManager;
 
     public void initLookAndFeel() {
-
         // override some default styles and colors, assuming that Aqua theme will be used
         overrideUIDefaults();
 
@@ -111,6 +118,7 @@ public class OSXPlatformInitializer implements PlatformInitializer {
     }
 
     public void setupMenus(JFrame frame) {
+        actionManager = injector.getInstance(ActionManager.class);
         // set additional look and feel for the window
         frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
 

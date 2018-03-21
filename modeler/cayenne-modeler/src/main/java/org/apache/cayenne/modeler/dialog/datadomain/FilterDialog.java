@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.datadomain;
 
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.swing.BindingBuilder;
 
@@ -117,7 +118,7 @@ public class FilterDialog extends JPopupMenu {
 
 	private void initController() {
 		BindingBuilder builder = new BindingBuilder(
-			  eventController.getApplication().getBindingFactory(),
+				Application.getInstance().getBindingFactory(),
 			  this);
 
 		builder.bindToStateChange(dbEntity, "dbEntityFilter").updateView();

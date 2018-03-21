@@ -46,7 +46,7 @@ public class CayenneModelerPreferenceEditor extends CayennePreferenceEditor {
 
     public void save() {
         super.save();
-        
+
         if (isRefreshingClassLoader()) {
             application.initClassLoader();
             refreshingClassLoader = false;

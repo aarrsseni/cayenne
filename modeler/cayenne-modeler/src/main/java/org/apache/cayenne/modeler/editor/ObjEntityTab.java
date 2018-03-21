@@ -19,6 +19,8 @@
 
 package org.apache.cayenne.modeler.editor;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Insets;
@@ -42,20 +44,11 @@ import javax.swing.SwingConstants;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.exp.Expression;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CreateAttributeAction;
-import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.action.ObjEntityCounterpartAction;
-import org.apache.cayenne.modeler.action.ObjEntitySyncAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.dialog.objentity.ClassNameUpdater;
 import org.apache.cayenne.modeler.dialog.validator.DuplicatedAttributesDialog;
 import org.apache.cayenne.modeler.event.EntityDisplayEvent;
@@ -67,11 +60,21 @@ import org.apache.cayenne.modeler.util.ExpressionConvertor;
 import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.modeler.util.combo.AutoCompletion;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
+import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Arrays;
+import java.util.EventObject;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Detail view of the ObjEntity properties.
@@ -580,12 +583,12 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
             return;
         }
 
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), entity, ObjectInfo.COMMENT, value);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), entity, ObjectInfo.COMMENT, value);
         mediator.fireObjEntityEvent(new EntityEvent(this, entity));
     }
 
     private String getComment(ObjEntity entity) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), entity, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), entity, ObjectInfo.COMMENT);
     }
 
 }

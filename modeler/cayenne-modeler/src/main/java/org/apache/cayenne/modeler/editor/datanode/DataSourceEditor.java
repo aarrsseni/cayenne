@@ -20,6 +20,7 @@
 package org.apache.cayenne.modeler.editor.datanode;
 
 import org.apache.cayenne.configuration.DataNodeDescriptor;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
@@ -63,7 +64,7 @@ public abstract class DataSourceEditor extends CayenneController {
 
     protected void initBindings() {
         BindingBuilder builder = new BindingBuilder(
-                projectController.getApplication().getBindingFactory(),
+                Application.getInstance().getBindingFactory(),
                 this);
         builder.setDelegate(nodeChangeProcessor);
         prepareBindings(builder);

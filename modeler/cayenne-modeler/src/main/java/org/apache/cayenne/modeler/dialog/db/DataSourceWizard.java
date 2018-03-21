@@ -19,9 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db;
 
-import com.google.inject.Inject;
 import org.apache.cayenne.dba.DbAdapter;
-import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.GetDbConnectionAction;
@@ -80,10 +78,8 @@ public class DataSourceWizard extends CayenneController {
 	private DataSource dataSource;
 	protected ProjectController projectController;
 
-	@Inject
 	protected CoreDbAdapterFactory dbAdapterFactory;
 
-	@Inject
 	protected CoreDataSourceFactory dataSourceFactory;
 
 	public DataSourceWizard(ProjectController projectController, String title) {
@@ -94,6 +90,9 @@ public class DataSourceWizard extends CayenneController {
 		this.view.setTitle(title);
 		this.connectionInfo = new DBConnectionInfo();
 		this.projectController = (ProjectController) parent;
+
+		dbAdapterFactory = projectController.getBootiqueInjector().getInstance(CoreDbAdapterFactory.class);
+		dataSourceFactory = projectController.getBootiqueInjector().getInstance(CoreDataSourceFactory.class);
 
 		initBindings();
 		initDataSourceListener();
@@ -221,8 +220,7 @@ public class DataSourceWizard extends CayenneController {
 	 * conneciton. Does not store the open connection.
 	 */
 	public void okAction() {
-		final DBConnectionInfo info = getConnectionInfo();
-		final ClassLoadingService classLoader = getApplication().getClassLoadingService();
+		DBConnectionInfo info = getConnectionInfo();
 		// doing connection testing...
 		try {
 			try {

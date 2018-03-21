@@ -19,6 +19,37 @@
 
 package org.apache.cayenne.modeler;
 
+import org.apache.cayenne.modeler.action.*;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+
 import org.apache.cayenne.modeler.action.AboutAction;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.ConfigurePreferencesAction;
@@ -60,22 +91,7 @@ import org.apache.cayenne.modeler.action.dbimport.ReverseEngineeringToolMenuActi
 import org.apache.cayenne.modeler.dialog.LogConsole;
 import org.apache.cayenne.modeler.dialog.welcome.WelcomeScreen;
 import org.apache.cayenne.modeler.editor.EditorView;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.DataMapDisplayListener;
-import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
-import org.apache.cayenne.modeler.event.DataNodeDisplayListener;
-import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayListener;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureDisplayListener;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
-import org.apache.cayenne.modeler.event.QueryDisplayListener;
-import org.apache.cayenne.modeler.event.RecentFileListListener;
+import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.util.ModelerUtil;
 import org.apache.cayenne.modeler.util.RecentFileMenu;
@@ -119,7 +135,7 @@ import java.util.Vector;
 public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListener,
         DataMapDisplayListener, ObjEntityDisplayListener, DbEntityDisplayListener,
         QueryDisplayListener, ProcedureDisplayListener, MultipleObjectsDisplayListener,
-        EmbeddableDisplayListener {
+        EmbeddableDisplayListener, ActionManagerChangesListener {
 
     protected EditorView view;
     protected RecentFileMenu recentFileMenu;
@@ -525,6 +541,16 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
         for (RecentFileListListener recentFileListener : recentFileListeners) {
             recentFileListener.recentFileListChanged();
         }
+    }
+
+    @Override
+    public void projectOpenedChanges() {
+        actionManager.projectOpened();
+    }
+
+    @Override
+    public void domainSelectedChanges() {
+        actionManager.domainSelected();
     }
 
     public class SearchPanel extends JPanel {

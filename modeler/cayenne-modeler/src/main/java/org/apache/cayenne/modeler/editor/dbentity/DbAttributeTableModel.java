@@ -30,6 +30,9 @@ import org.apache.cayenne.modeler.util.CayenneTableModel;
 import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
 
+import javax.swing.*;
+import java.util.*;
+
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -231,7 +234,7 @@ public class DbAttributeTableModel extends CayenneTableModel<DbAttribute> {
     }
 
     public String getComment(DbAttribute attr) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), attr, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), attr, ObjectInfo.COMMENT);
     }
 
     public void setMaxLength(String newVal, DbAttribute attr) {
@@ -333,7 +336,7 @@ public class DbAttributeTableModel extends CayenneTableModel<DbAttribute> {
     }
 
     public void setComment(String newVal, DbAttribute attr) {
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), attr, ObjectInfo.COMMENT, newVal);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), attr, ObjectInfo.COMMENT, newVal);
     }
 
     public boolean isCellEditable(int row, int col) {

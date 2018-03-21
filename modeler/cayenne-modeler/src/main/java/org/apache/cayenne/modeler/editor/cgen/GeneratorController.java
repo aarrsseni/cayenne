@@ -20,6 +20,8 @@
 package org.apache.cayenne.modeler.editor.cgen;
 
 import org.apache.cayenne.gen.ArtifactsGenerationMode;
+import org.apache.cayenne.gen.ClassGenerationAction;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.gen.CgenConfiguration;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
@@ -28,10 +30,10 @@ import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.adapters.JFileChooserAdapter;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.FSPath;
+import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
 import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.CodeValidationUtil;

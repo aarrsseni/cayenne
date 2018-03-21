@@ -519,7 +519,7 @@ public class DataMapView extends JPanel {
     void setDataNode() {
         DataNodeDescriptor node = (DataNodeDescriptor) nodeSelector.getSelectedItem();
         DataMap map = eventController.getCurrentState().getDataMap();
-        LinkDataMapAction action = eventController.getApplication().getActionManager().getAction(LinkDataMapAction.class);
+        LinkDataMapAction action = Application.getInstance().getActionManager().getAction(LinkDataMapAction.class);
         action.linkDataMap(map, node);
     }
 
@@ -613,11 +613,11 @@ public class DataMapView extends JPanel {
             return;
         }
 
-        ObjectInfo.putToMetaData(eventController.getApplication().getMetaData(), dataMap, ObjectInfo.COMMENT, comment);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), dataMap, ObjectInfo.COMMENT, comment);
         eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
     }
 
     private String getComment(DataMap dataMap) {
-        return ObjectInfo.getFromMetaData(eventController.getApplication().getMetaData(), dataMap, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), dataMap, ObjectInfo.COMMENT);
     }
 }

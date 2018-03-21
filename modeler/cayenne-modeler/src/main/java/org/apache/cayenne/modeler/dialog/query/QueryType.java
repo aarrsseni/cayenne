@@ -28,6 +28,7 @@ import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.map.event.MapEvent;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.undo.CreateQueryUndoableEdit;
@@ -91,7 +92,7 @@ public class QueryType extends CayenneController{
         
         dataMap.addQueryDescriptor(query);
 
-        projectController.getApplication().getUndoManager().addEdit(
+        Application.getInstance().getUndoManager().addEdit(
                 new CreateQueryUndoableEdit(domain, dataMap, query));
 
         // notify listeners

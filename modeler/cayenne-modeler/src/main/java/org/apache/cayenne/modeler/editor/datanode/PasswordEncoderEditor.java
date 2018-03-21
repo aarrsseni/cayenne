@@ -18,15 +18,10 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.editor.datanode;
 
-import java.awt.Component;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
-import javax.swing.JOptionPane;
-
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.event.DataNodeEvent;
 import org.apache.cayenne.conn.DataSourceInfo;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
 import org.apache.cayenne.modeler.event.DataNodeDisplayListener;
@@ -34,6 +29,11 @@ import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.BindingDelegate;
 import org.apache.cayenne.swing.ObjectBinding;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class PasswordEncoderEditor extends CayenneController {
 
@@ -67,7 +67,7 @@ public class PasswordEncoderEditor extends CayenneController {
 
     protected void initController() {
         BindingBuilder builder = new BindingBuilder(
-                projectController.getApplication().getBindingFactory(),
+                Application.getInstance().getBindingFactory(),
                 this);
 
         builder.setDelegate(nodeChangeProcessor);

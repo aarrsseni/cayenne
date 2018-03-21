@@ -1,4 +1,4 @@
-package org.apache.cayenne.modeler.adapters;
+package org.apache.cayenne.modeler.pref.adapter;
 
 import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
 
@@ -7,7 +7,7 @@ import java.io.File;
 
 public class JFileChooserAdapter implements BaseFileChooser{
 
-    public JFileChooser jFileChooser;
+    protected JFileChooser jFileChooser;
 
     public JFileChooserAdapter(JFileChooser jFileChooser){
         this.jFileChooser = jFileChooser;

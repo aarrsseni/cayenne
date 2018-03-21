@@ -242,7 +242,7 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
         mediator.getEventController().addQueryListener(this);
         mediator.getEventController().addQueryDisplayListener(this);
         mediator.getEventController().addMultipleObjectsDisplayListener(this);
-        mediator.getApplication().getActionManager().setupCutCopyPaste(
+        Application.getInstance().getActionManager().setupCutCopyPaste(
                 this,
                 CutAction.class,
                 CopyAction.class);
@@ -1021,8 +1021,7 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
      * @param actionType action type
      */
     private JMenuItem buildMenu(Class<? extends Action> actionType) {
-        CayenneAction action = (CayenneAction) mediator
-                .getApplication()
+        CayenneAction action = (CayenneAction) Application.getInstance()
                 .getActionManager()
                 .getAction(actionType);
         return action.buildMenu();
@@ -1132,7 +1131,7 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
 
     // Filter all disabled actions in popupMenu, but skip Cut-Copy-Paste block. It should always exist.
     public void popupMenuFilter() {
-        Action cutAction = mediator.getApplication().getActionManager().getAction(CutAction.class);
+        Action cutAction = Application.getInstance().getActionManager().getAction(CutAction.class);
         for (MenuElement element : popup.getSubElements()) {
             JMenuItem item = (JMenuItem) element;
             if (!item.getAction().equals(cutAction)) {

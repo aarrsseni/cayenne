@@ -197,7 +197,7 @@ public class ObjEntityRelationshipPanel extends JPanel implements ObjEntityDispl
 
         table.getSelectionModel().addListSelectionListener(new ObjRelationshipListSelectionListener());
 
-        mediator.getApplication().getActionManager().setupCutCopyPaste(
+        Application.getInstance().getActionManager().setupCutCopyPaste(
                 table,
                 CutAttributeRelationshipAction.class,
                 CopyAttributeRelationshipAction.class);

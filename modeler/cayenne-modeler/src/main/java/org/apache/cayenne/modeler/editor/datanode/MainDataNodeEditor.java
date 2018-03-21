@@ -19,18 +19,6 @@
 
 package org.apache.cayenne.modeler.editor.datanode;
 
-import java.awt.Component;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.DefaultComboBoxModel;
-
 import org.apache.cayenne.access.dbsync.CreateIfNoSchemaStrategy;
 import org.apache.cayenne.access.dbsync.SkipSchemaUpdateStrategy;
 import org.apache.cayenne.access.dbsync.ThrowOnPartialOrCreateSchemaStrategy;
@@ -40,6 +28,7 @@ import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.event.DataNodeEvent;
 import org.apache.cayenne.configuration.server.JNDIDataSourceFactory;
 import org.apache.cayenne.configuration.server.XMLPoolingDataSourceFactory;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.pref.PreferenceDialog;
 import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
@@ -52,6 +41,13 @@ import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.BindingDelegate;
 import org.apache.cayenne.swing.ObjectBinding;
 import org.apache.cayenne.validation.ValidationException;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.*;
+import java.util.List;
 
 /**
  * A controller for the main tab of the DataNode editor panel.
@@ -152,7 +148,7 @@ public class MainDataNodeEditor extends CayenneController {
 		}
 
 		DataNodeDefaults oldPref = projectController.getDataNodePreferences();
-		DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor) projectController.getApplication().getProject()
+		DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor) Application.getInstance().getProject()
 				.getRootNode();
 
 		Collection<DataNodeDescriptor> matchingNode = dataChannelDescriptor.getNodeDescriptors();
@@ -202,7 +198,7 @@ public class MainDataNodeEditor extends CayenneController {
 			}
 		});
 
-		BindingBuilder builder = new BindingBuilder(projectController.getApplication().getBindingFactory(), this);
+		BindingBuilder builder = new BindingBuilder(Application.getInstance().getBindingFactory(), this);
 
 		localDataSourceBinding = builder.bindToComboSelection(view.getLocalDataSources(),
 				"projectController.dataNodePreferences.localDataSource", NO_LOCAL_DATA_SOURCE);
@@ -229,7 +225,7 @@ public class MainDataNodeEditor extends CayenneController {
 	protected void refreshLocalDataSources() {
 		localDataSources.clear();
 
-		Map sources = projectController.getApplication().getCayenneProjectPreferences().getDetailObject(DBConnectionInfo.class)
+		Map sources = Application.getInstance().getCayenneProjectPreferences().getDetailObject(DBConnectionInfo.class)
 				.getChildrenPreferences();
 
 		int len = sources.size();

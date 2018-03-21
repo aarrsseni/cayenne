@@ -491,11 +491,11 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
     }
 
     private String getComment(ObjAttribute attr) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), attr, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), attr, ObjectInfo.COMMENT);
     }
 
     private void setComment(String newVal, ObjAttribute attr) {
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), attr, ObjectInfo.COMMENT, newVal);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), attr, ObjectInfo.COMMENT, newVal);
     }
 
     @Override

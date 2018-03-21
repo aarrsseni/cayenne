@@ -19,6 +19,21 @@
 
 package org.apache.cayenne.modeler.dialog.pref;
 
+import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
+import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
+import org.apache.cayenne.modeler.util.CayenneController;
+import org.apache.cayenne.modeler.util.FileFilters;
+import org.apache.cayenne.pref.CayennePreferenceEditor;
+import org.apache.cayenne.pref.PreferenceEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.table.AbstractTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
@@ -27,19 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.table.AbstractTableModel;
-
-import org.apache.cayenne.modeler.adapters.JFileChooserAdapter;
-import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
-import org.apache.cayenne.modeler.util.CayenneController;
-import org.apache.cayenne.modeler.util.FileFilters;
-import org.apache.cayenne.pref.CayennePreferenceEditor;
-import org.apache.cayenne.pref.PreferenceEditor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ClasspathPreferences extends CayenneController {
 

@@ -33,12 +33,7 @@ import org.apache.cayenne.dbsync.merge.token.db.AbstractToDbToken;
 import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
 import org.apache.cayenne.dbsync.naming.NoStemStemmer;
 import org.apache.cayenne.dbsync.reverse.dbimport.DefaultDbImportAction;
-import org.apache.cayenne.dbsync.reverse.dbload.DbLoader;
-import org.apache.cayenne.dbsync.reverse.dbload.DbLoaderConfiguration;
-import org.apache.cayenne.dbsync.reverse.dbload.DefaultModelMergeDelegate;
-import org.apache.cayenne.dbsync.reverse.dbload.LoggingDbLoaderDelegate;
-import org.apache.cayenne.dbsync.reverse.dbload.ModelMergeDelegate;
-import org.apache.cayenne.dbsync.reverse.dbload.ProxyModelMergeDelegate;
+import org.apache.cayenne.dbsync.reverse.dbload.*;
 import org.apache.cayenne.dbsync.reverse.filters.FiltersConfig;
 import org.apache.cayenne.dbsync.reverse.filters.PatternFilter;
 import org.apache.cayenne.dbsync.reverse.filters.TableFilter;
@@ -48,7 +43,7 @@ import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ValidationResultBrowser;
-import org.apache.cayenne.modeler.event.SaveFlagEvent;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.pref.helpers.CoreDataSourceFactory;
 import org.apache.cayenne.modeler.pref.helpers.CoreDbAdapterFactory;
@@ -61,12 +56,10 @@ import org.apache.cayenne.validation.ValidationResult;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.Component;
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -110,6 +103,10 @@ public class MergerOptions extends CayenneController {
         super();
 
         this.projectController = projectController;
+
+        this.dbAdapterFactory = getProjectController().getBootiqueInjector().getInstance(CoreDbAdapterFactory.class);
+        this.dataSourceFactory = getProjectController().getBootiqueInjector().getInstance(CoreDataSourceFactory.class);
+
         this.mergerTokenFactoryProvider = mergerTokenFactoryProvider;
         this.dataMap = dataMap;
         this.tokens = new MergerTokenSelectorController(projectController);
@@ -360,7 +357,7 @@ public class MergerOptions extends CayenneController {
         project.setModified(true);
 
         ProjectController projectController = getProjectController();
-        projectController.fireSaveFlagEvent(new SaveFlagEvent(this,true));
+        projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
 
         projectController.fireDataMapEvent(new DataMapEvent(Application.getFrame(),
                 dataMap, MapEvent.REMOVE));

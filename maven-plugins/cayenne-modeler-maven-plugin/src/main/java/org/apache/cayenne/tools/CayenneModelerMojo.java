@@ -19,13 +19,13 @@
 
 package org.apache.cayenne.tools;
 
-import java.io.File;
-
 import org.apache.cayenne.modeler.generic.GenericMain;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+
+import java.io.File;
 
 /**
  * Maven mojo to start up the Cayenne modeler from the command-line.

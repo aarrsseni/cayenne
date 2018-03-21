@@ -19,6 +19,8 @@
 
 package org.apache.cayenne.modeler.editor;
 
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import java.awt.BorderLayout;
 import java.util.EventObject;
 
@@ -29,18 +31,22 @@ import javax.swing.JTextField;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.ProcedureEvent;
 import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.swing.components.JCayenneCheckBox;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
 import org.apache.cayenne.modeler.event.ProcedureDisplayListener;
 import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
+import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.EventObject;
 
 /**
  * A panel for editing stored procedure general settings, such as name, schema, etc.
@@ -205,11 +211,11 @@ public class ProcedureTab extends JPanel implements ProcedureDisplayListener, Ex
             return;
         }
 
-        ObjectInfo.putToMetaData(eventController.getApplication().getMetaData(), procedure, ObjectInfo.COMMENT, comment);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), procedure, ObjectInfo.COMMENT, comment);
         eventController.fireProcedureEvent(new ProcedureEvent(this, procedure));
     }
 
     String getComment(Procedure procedure) {
-        return ObjectInfo.getFromMetaData(eventController.getApplication().getMetaData(), procedure, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), procedure, ObjectInfo.COMMENT);
     }
 }

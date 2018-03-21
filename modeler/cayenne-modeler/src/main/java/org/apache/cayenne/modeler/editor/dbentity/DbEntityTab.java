@@ -39,6 +39,7 @@ import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.CreateAttributeAction;
 import org.apache.cayenne.modeler.action.CreateObjEntityFromDbAction;
@@ -54,6 +55,12 @@ import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.EventObject;
 
 /**
  * Detail view of the DbEntity properties.
@@ -334,7 +341,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
     }
 
     private String getComment(DbEntity entity) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), entity, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(Application.getInstance().getMetaData(), entity, ObjectInfo.COMMENT);
     }
 
     private void setComment(String value) {
@@ -344,7 +351,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
             return;
         }
 
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), entity, ObjectInfo.COMMENT, value);
+        ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), entity, ObjectInfo.COMMENT, value);
         mediator.fireDbEntityEvent(new EntityEvent(this, entity));
     }
 }

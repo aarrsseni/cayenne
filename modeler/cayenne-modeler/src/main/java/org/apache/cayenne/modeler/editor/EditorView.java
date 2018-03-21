@@ -23,9 +23,7 @@ import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.ProjectTreeView;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CollapseTreeAction;
-import org.apache.cayenne.modeler.action.FilterAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.dialog.datadomain.FilterController;
 import org.apache.cayenne.modeler.editor.datanode.DataNodeEditor;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityTabbedView;
@@ -161,7 +159,7 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
 
     public EditorView(ProjectController eventController) {
         this.eventController = eventController;
-        this.actionManager = eventController.getApplication().getActionManager();
+        this.actionManager= Application.getInstance().getActionManager();
         initView();
         initController();
        

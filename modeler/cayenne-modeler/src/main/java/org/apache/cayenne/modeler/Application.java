@@ -19,7 +19,6 @@
 
 package org.apache.cayenne.modeler;
 
-import com.google.inject.Inject;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.xml.DataChannelMetaData;
 import org.apache.cayenne.di.Injector;
@@ -64,7 +63,10 @@ public class Application {
     private static Application instance;
 
     @com.google.inject.Inject
-    protected FileClassLoadingService modelerClassLoader;
+    protected ClassLoadingService modelerClassLoader;
+
+    @com.google.inject.Inject
+    protected ProjectController projectController;
 
     protected CayenneModelerController frameController;
 
@@ -75,6 +77,7 @@ public class Application {
 
     protected CayenneUndoManager undoManager;
 
+    @com.google.inject.Inject
     protected CayenneProjectPreferences cayenneProjectPreferences;
 
     protected CayennePreference cayennePreference;
@@ -175,7 +178,7 @@ public class Application {
      */
     public void startup() {
         // init subsystems
-        initPreferences();
+
         initClassLoader();
 
         this.bindingFactory = new BindingFactory();
@@ -284,5 +287,9 @@ public class Application {
 
     public PlatformInitializer getPlatformInitializer() {
         return platformInitializer;
+    }
+
+    public ProjectController getProjectController() {
+        return projectController;
     }
 }
