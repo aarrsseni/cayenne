@@ -19,18 +19,11 @@
 
 package org.apache.cayenne.modeler.pref;
 
-import java.sql.Driver;
-import java.sql.SQLException;
-import java.util.prefs.Preferences;
-
-import javax.sql.DataSource;
-
 import org.apache.cayenne.conn.DataSourceInfo;
-import org.apache.cayenne.datasource.DriverDataSource;
-
-import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.pref.CayennePreference;
 import org.apache.cayenne.util.Util;
+
+import java.util.prefs.Preferences;
 
 public class DBConnectionInfo extends CayennePreference {
 

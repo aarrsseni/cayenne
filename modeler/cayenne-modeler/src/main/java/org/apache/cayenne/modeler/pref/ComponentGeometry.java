@@ -23,7 +23,8 @@ import org.apache.cayenne.pref.CayennePreference;
 import org.apache.cayenne.pref.PreferenceException;
 import org.apache.cayenne.reflect.PropertyUtils;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;

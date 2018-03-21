@@ -31,8 +31,9 @@ import org.apache.cayenne.pref.PreferenceEditor;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.util.Util;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import java.awt.Component;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.Driver;

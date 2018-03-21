@@ -26,7 +26,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.undo.ChangePKGeneratorUndoableEdit;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 
 public abstract class PKGeneratorPanel extends JPanel {
 

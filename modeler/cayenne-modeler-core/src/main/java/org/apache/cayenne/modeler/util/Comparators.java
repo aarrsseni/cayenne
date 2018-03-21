@@ -21,7 +21,14 @@ package org.apache.cayenne.modeler.util;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.Attribute;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.Embeddable;
+import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.Procedure;
+import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.query.Query;
 
 import java.util.Comparator;

@@ -17,30 +17,36 @@
  *  under the License.
  ****************************************************************/
 
-package org.apache.cayenne.modeler.util;
+package org.apache.cayenne.modeler.event;
 
-import org.apache.cayenne.reflect.PropertyUtils;
-import org.apache.cayenne.util.CayenneMapEntry;
+import org.apache.cayenne.modeler.ProjectFileChangeTracker;
+
+import java.util.EventObject;
 
 /**
  * @since 4.1
  */
-public final class CoreModelerUtil {
-    public static String getObjectName(Object object) {
-        if (object == null) {
-            return null;
-        } else if (object instanceof CayenneMapEntry) {
-            return ((CayenneMapEntry) object).getName();
-        } else if (object instanceof String) {
-            return (String) object;
-        } else {
-            try {
-                // use reflection
-                return (String) PropertyUtils.getProperty(object, "name");
-            }
-            catch (Exception ex) {
-                return null;
-            }
-        }
+public class ProjectFileOnChangeTrackerEvent extends EventObject {
+
+    protected ProjectFileChangeTracker projectFileChangeTracker;
+
+    protected String type;
+
+    public ProjectFileOnChangeTrackerEvent(Object source) {
+        super(source);
+    }
+
+    public ProjectFileOnChangeTrackerEvent(Object source, ProjectFileChangeTracker projectFileChangeTracker, String type){
+        super(source);
+        this.projectFileChangeTracker = projectFileChangeTracker;
+        this.type = type;
+    }
+
+    public ProjectFileChangeTracker getProjectFileChangeTracker() {
+        return projectFileChangeTracker;
+    }
+
+    public String getType() {
+        return type;
     }
 }

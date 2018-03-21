@@ -21,7 +21,13 @@ package org.apache.cayenne.modeler.editor.cgen;
 
 import org.apache.cayenne.gen.ArtifactsGenerationMode;
 import org.apache.cayenne.gen.ClassGenerationAction;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.Embeddable;
+import org.apache.cayenne.map.EmbeddableAttribute;
+import org.apache.cayenne.map.EmbeddedAttribute;
+import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.gen.CgenConfiguration;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
@@ -34,7 +40,7 @@ import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.FSPath;
 import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
-import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
+import org.apache.cayenne.modeler.pref.BaseFileChooser;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.CodeValidationUtil;
 import org.apache.cayenne.modeler.util.TextAdapter;
@@ -47,7 +53,16 @@ import org.apache.cayenne.validation.ValidationResult;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**

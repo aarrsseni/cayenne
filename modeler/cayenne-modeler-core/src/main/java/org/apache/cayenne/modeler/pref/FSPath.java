@@ -19,7 +19,6 @@
 
 package org.apache.cayenne.modeler.pref;
 
-import org.apache.cayenne.modeler.pref.helpers.BaseFileChooser;
 import org.apache.cayenne.pref.CayennePreference;
 
 import java.io.File;

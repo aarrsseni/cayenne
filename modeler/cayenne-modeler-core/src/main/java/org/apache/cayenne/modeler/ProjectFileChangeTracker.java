@@ -20,7 +20,7 @@ package org.apache.cayenne.modeler;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.modeler.event.ProjectFileChangeTrackerEvent;
+import org.apache.cayenne.modeler.event.ProjectFileOnChangeTrackerEvent;
 import org.apache.cayenne.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,9 +159,9 @@ public class ProjectFileChangeTracker extends Thread {
         }
 
         if (hasDeletions && !isShownRemoveDialog) {
-            mediator.fireDoOnRemoveEvent(new ProjectFileChangeTrackerEvent(this, this));
+            mediator.fireOnChangeEvent(new ProjectFileOnChangeTrackerEvent(this, this, "Remove"));
         } else if (hasChanges && !isShownChangeDialog) {
-            mediator.fireDoOnChangeEvent(new ProjectFileChangeTrackerEvent(this, this));
+            mediator.fireOnChangeEvent(new ProjectFileOnChangeTrackerEvent(this, this, "Change"));
         }
     }
 
