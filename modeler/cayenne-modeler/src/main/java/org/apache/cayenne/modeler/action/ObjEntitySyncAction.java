@@ -27,7 +27,7 @@ import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.objentity.EntitySyncController;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.*;
@@ -85,7 +85,7 @@ public class ObjEntitySyncAction extends CayenneAction {
             if (merger.synchronizeWithDbEntity(entity)) {
                 mediator
                         .fireObjEntityEvent(new EntityEvent(this, entity, MapEvent.CHANGE));
-                mediator.fireObjEntityDisplayEvent(new EntityDisplayEvent(
+                mediator.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(
                         this,
                         entity,
                         entity.getDataMap(),

@@ -230,10 +230,6 @@ public class EventController {
         listenerMap.remove(DataSourceModificationListener.class, listener);
     }
 
-    public void addActionManagerChangesListener(ActionManagerChangesListener listener) {
-        listenerMap.add(ActionManagerChangesListener.class, listener);
-    }
-
     public void addProjectFileOnChangeEventListener(ProjectFileOnChangeEventListener listener) {
         listenerMap.add(ProjectFileOnChangeEventListener.class, listener);
     }

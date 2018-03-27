@@ -19,18 +19,17 @@
 
 package org.apache.cayenne.modeler.dialog.validator;
 
-import javax.swing.JFrame;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
+
+import javax.swing.*;
 
 /**
  * Attribute validation message.
@@ -61,22 +60,39 @@ public class AttributeErrorMsg extends ValidationDisplayHandler {
     }
 
     public void displayField(ProjectController mediator, JFrame frame) {
-        AttributeDisplayEvent event = new AttributeDisplayEvent(
-                frame,
-                attribute,
-                entity,
-                map,
-                domain);
-
         // must first display entity, and then switch to relationship display .. so fire
         // twice
         if (entity instanceof ObjEntity) {
+            ObjEntityDisplayEvent event = new ObjEntityDisplayEvent(
+                    frame,
+                    entity,
+                    map,
+                    domain);
             mediator.fireObjEntityDisplayEvent(event);
-            mediator.fireObjAttributeDisplayEvent(event);
+
+            ObjAttributeDisplayEvent attrEvent = new ObjAttributeDisplayEvent(
+                    frame,
+                    attribute,
+                    entity,
+                    map,
+                    domain);
+            mediator.fireObjAttributeDisplayEvent(attrEvent);
         }
         else if (entity instanceof DbEntity) {
+            DbEntityDisplayEvent event = new DbEntityDisplayEvent(
+                    frame,
+                    entity,
+                    map,
+                    domain);
             mediator.fireDbEntityDisplayEvent(event);
-            mediator.fireDbAttributeDisplayEvent(event);
+
+            DbAttributeDisplayEvent attrEvent = new DbAttributeDisplayEvent(
+                    frame,
+                    attribute,
+                    entity,
+                    map,
+                    domain);
+            mediator.fireDbAttributeDisplayEvent(attrEvent);
         }
     }
 }

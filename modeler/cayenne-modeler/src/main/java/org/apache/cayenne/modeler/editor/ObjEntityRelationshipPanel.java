@@ -28,48 +28,25 @@ import org.apache.cayenne.map.event.ObjRelationshipListener;
 import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CopyAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.CutAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.PasteAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeRelationshipAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.dialog.objentity.ObjRelationshipInfo;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
 import org.apache.cayenne.modeler.event.TablePopupHandler;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
-import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.modeler.util.CayenneTable;
-import org.apache.cayenne.modeler.util.CellRenderers;
-import org.apache.cayenne.modeler.util.DbRelationshipPathComboBoxEditor;
-import org.apache.cayenne.modeler.util.ModelerUtil;
-import org.apache.cayenne.modeler.util.PanelFactory;
-import org.apache.cayenne.modeler.util.UIUtil;
+import org.apache.cayenne.modeler.util.*;
 import org.apache.cayenne.swing.components.image.FilteredIconFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
-import javax.swing.Icon;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
@@ -208,7 +185,7 @@ public class ObjEntityRelationshipPanel extends JPanel implements ObjEntityDispl
     /**
      * Loads obj relationships into table.
      */
-    public void currentObjEntityChanged(EntityDisplayEvent e) {
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
         if (e.getSource() == this) {
             return;
         }

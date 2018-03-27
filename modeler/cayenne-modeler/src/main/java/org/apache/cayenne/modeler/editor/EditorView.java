@@ -29,40 +29,12 @@ import org.apache.cayenne.modeler.action.FilterAction;
 import org.apache.cayenne.modeler.dialog.datadomain.FilterController;
 import org.apache.cayenne.modeler.editor.datanode.DataNodeEditor;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityTabbedView;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.DataMapDisplayListener;
-import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
-import org.apache.cayenne.modeler.event.DataNodeDisplayListener;
-import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayListener;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayListener;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureDisplayListener;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
-import org.apache.cayenne.modeler.event.QueryDisplayListener;
+import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Container;
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Main display area split into the project navigation tree on the left and selected
@@ -165,7 +137,6 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
         this.actionManager= Application.getInstance().getActionManager();
         initView();
         initController();
-       
     }
 
     public ProjectController getEventController() {
@@ -269,7 +240,7 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
 
 	private void initController() {
 		this.filterController = new FilterController(eventController,treePanel);
-		 
+
         eventController.getEventController().addDomainDisplayListener(this);
         eventController.getEventController().addDataNodeDisplayListener(this);
         eventController.getEventController().addDataMapDisplayListener(this);
@@ -280,6 +251,7 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
         eventController.getEventController().addMultipleObjectsDisplayListener(this);
         eventController.getEventController().addEmbeddableDisplayListener(this);
 
+        eventController.getCurrentState().initControllerStateListeners();
         // Moving this to try-catch block per CAY-940. Exception will be stack-traced
         try {
             ComponentGeometry geometry = new ComponentGeometry(this.getClass(), "splitPane/divider");
@@ -305,11 +277,11 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
         detailLayout.show(detailPanel, e.getDataMap() == null ? EMPTY_VIEW : DATA_MAP_VIEW);
     }
 
-    public void currentObjEntityChanged(EntityDisplayEvent e) {
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
 	    detailLayout.show(detailPanel, e.getEntity() == null ? EMPTY_VIEW : OBJ_VIEW);
     }
 
-    public void currentDbEntityChanged(EntityDisplayEvent e) {
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
         detailLayout.show(detailPanel, e.getEntity() == null ? EMPTY_VIEW : DB_VIEW);
     }
 

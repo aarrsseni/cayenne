@@ -22,34 +22,20 @@ package org.apache.cayenne.modeler.editor;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.dba.TypesMapping;
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.EmbeddedAttribute;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.AttributeEvent;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.wrapper.ObjAttributeWrapper;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.util.CayenneTable;
-import org.apache.cayenne.modeler.util.CayenneTableModel;
-import org.apache.cayenne.modeler.util.CellEditorForAttributeTable;
-import org.apache.cayenne.modeler.util.ModelerUtil;
-import org.apache.cayenne.modeler.util.ProjectUtil;
+import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+import org.apache.cayenne.modeler.util.*;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
 import org.apache.cayenne.util.Util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Model for the Object Entity attributes and for Obj to DB Attribute Mapping tables.
@@ -318,7 +304,7 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
 
         mediator.fireObjEntityEvent(new EntityEvent(this, entity, MapEvent.CHANGE));
 
-        mediator.fireObjEntityDisplayEvent(new EntityDisplayEvent(
+        mediator.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(
                 this,
                 mediator.getCurrentState().getObjEntity(),
                 mediator.getCurrentState().getDataMap(),
@@ -330,7 +316,7 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
                 entity,
                 MapEvent.CHANGE));
 
-        mediator.fireObjAttributeDisplayEvent(new AttributeDisplayEvent(
+        mediator.fireObjAttributeDisplayEvent(new ObjAttributeDisplayEvent(
                 this,
                 attributeNew,
                 mediator.getCurrentState().getObjEntity(),

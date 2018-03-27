@@ -22,35 +22,25 @@ package org.apache.cayenne.modeler;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.configuration.event.*;
+import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.event.*;
 import org.apache.cayenne.modeler.editor.CallbackType;
 import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
-import org.apache.cayenne.modeler.event.DisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
+import org.apache.cayenne.modeler.event.*;
+
+import java.util.Arrays;
 
 /*
  * @since 4.1
  * A snapshot of the current state of the project controller. This was added
  * so that we could support history of recent objects.
  */
-public class ControllerState {
+public class ControllerState implements DomainDisplayListener, DataNodeDisplayListener, DataMapDisplayListener, ObjEntityDisplayListener, EmbeddableDisplayListener, QueryDisplayListener,
+                                        ProcedureDisplayListener, ProcedureParameterDisplayListener, DbEntityDisplayListener, DbAttributeDisplayListener, ObjAttributeDisplayListener,
+                                        EmbeddableAttributeDisplayListener, DbRelationshipDisplayListener, MultipleObjectsDisplayListener, ObjRelationshipDisplayListener, DataMapListener,
+                                        ObjEntityListener, DbEntityListener, QueryListener, DataNodeListener, DomainListener, ProcedureListener, DbRelationshipListener{
+
     private boolean isRefiring;
     private DisplayEvent event;
     private DataChannelDescriptor domain;
@@ -94,9 +84,24 @@ public class ControllerState {
      */
     private ObjCallbackMethod[] callbackMethods;
 
-    public ControllerState() {
+    private ProjectController projectController;
+
+    public ControllerState(ProjectController projectController) {
 
         // life is much easier if these guys are never null
+        embAttrs = new EmbeddableAttribute[0];
+        dbAttrs = new DbAttribute[0];
+        dbRels = new DbRelationship[0];
+        procedureParameters = new ProcedureParameter[0];
+        objAttrs = new ObjAttribute[0];
+        objRels = new ObjRelationship[0];
+
+        callbackMethods = new ObjCallbackMethod[0];
+
+        this.projectController = projectController;
+    }
+
+    public void resetState(){
         embAttrs = new EmbeddableAttribute[0];
         dbAttrs = new DbAttribute[0];
         dbRels = new DbRelationship[0];
@@ -307,5 +312,424 @@ public class ControllerState {
 
     public void setCallbackMethods(ObjCallbackMethod[] callbackMethods){
         this.callbackMethods = callbackMethods;
+    }
+
+    @Override
+    public void currentDomainChanged(DomainDisplayEvent e) {
+        boolean changed = e.getDomain() != projectController.getCurrentState().getDomain();
+        if (!changed) {
+            changed = projectController.getCurrentState().getNode() != null || projectController.getCurrentState().getDataMap() != null || projectController.getCurrentState().getDbEntity() != null
+                    || projectController.getCurrentState().getObjEntity() != null || projectController.getCurrentState().getProcedure() != null || projectController.getCurrentState().getQuery() != null
+                    || projectController.getCurrentState().getEmbeddable() != null;
+        }
+
+        if (!e.isRefired()) {
+            e.setDomainChanged(changed);
+            if (changed) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+            }
+        }
+
+        if (changed) {
+            projectController.saveState(e);
+        }
+    }
+
+    @Override
+    public void currentDataNodeChanged(DataNodeDisplayEvent e) {
+        boolean changed = e.getDataNode() != projectController.getCurrentState().getNode();
+
+        if (!changed) {
+            changed = projectController.getCurrentState().getDataMap() != null || projectController.getCurrentState().getDbEntity() != null || projectController.getCurrentState().getObjEntity() != null
+                    || projectController.getCurrentState().getProcedure() != null || projectController.getCurrentState().getQuery() != null || projectController.getCurrentState().getEmbeddable() != null;
+        }
+
+        if (!e.isRefired()) {
+            e.setDataNodeChanged(changed);
+
+            if (changed) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setNode(e.getDataNode());
+            }
+        }
+
+        if (changed) {
+            projectController.saveState(e);
+        }
+    }
+
+    @Override
+    public void currentDataMapChanged(DataMapDisplayEvent e) {
+        boolean changed = e.getDataMap() != projectController.getCurrentState().getDataMap();
+        if (!changed) {
+            changed = projectController.getCurrentState().getDbEntity() != null || projectController.getCurrentState().getObjEntity() != null || projectController.getCurrentState().getProcedure() != null
+                    || projectController.getCurrentState().getQuery() != null || projectController.getCurrentState().getEmbeddable() != null;
+        }
+
+        if (!e.isRefired()) {
+            e.setDataMapChanged(changed);
+
+            if (changed) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setNode(e.getDataNode());
+                projectController.getCurrentState().setMap(e.getDataMap());
+            }
+        }
+
+        if (changed) {
+            projectController.saveState(e);
+        }
+    }
+
+    @Override
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
+        boolean changed = e.getEntity() != projectController.getCurrentState().getObjEntity();
+
+        if (!e.isRefired()) {
+            e.setEntityChanged(changed);
+
+            if (changed) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setNode(e.getDataNode());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setObjEntity((ObjEntity)e.getEntity());
+            }
+        }
+
+        if (changed) {
+            projectController.saveState(e);
+        }
+    }
+
+    @Override
+    public void currentEmbeddableChanged(EmbeddableDisplayEvent e) {
+        boolean changed = e.getEmbeddable() != projectController.getCurrentState().getEmbeddable();
+
+        if (!e.isRefired()) {
+            e.setEmbeddableChanged(changed);
+
+            if (changed) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setNode(e.getDataNode());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setEmbeddable(e.getEmbeddable());
+            }
+        }
+
+        if (changed) {
+            projectController.saveState(e);
+        }
+    }
+
+    @Override
+    public void currentQueryChanged(QueryDisplayEvent e) {
+        boolean changed = e.getQuery() != projectController.getCurrentState().getQuery();
+
+        if (!e.isRefired()) {
+            e.setQueryChanged(changed);
+
+            if (changed) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setQuery(e.getQuery());
+            }
+        }
+
+        if (changed) {
+            projectController.saveState(e);
+        }
+    }
+
+    @Override
+    public void currentProcedureChanged(ProcedureDisplayEvent e) {
+        boolean changed = e.getProcedure() != projectController.getCurrentState().getProcedure();
+
+        if (!e.isRefired()) {
+            e.setProcedureChanged(changed);
+
+            if (changed) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setProcedure(e.getProcedure());
+            }
+        }
+
+        if (changed) {
+            projectController.saveState(e);
+        }
+    }
+
+    @Override
+    public void currentProcedureParameterChanged(ProcedureParameterDisplayEvent e) {
+        boolean changed = !Arrays.equals(e.getProcedureParameters(), projectController.getCurrentState().getProcedureParameters());
+
+        if (changed) {
+            if (projectController.getCurrentState().getProcedure() != e.getProcedure()) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setProcedure(e.getProcedure());
+            }
+            projectController.getCurrentState().setProcedureParameters(e.getProcedureParameters());
+        }
+    }
+
+    @Override
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
+        boolean changed = e.getEntity() != projectController.getCurrentState().getDbEntity();
+        if (!e.isRefired()) {
+            e.setEntityChanged(changed);
+
+            if (changed) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setNode(e.getDataNode());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setDbEntity((DbEntity)e.getEntity());
+            }
+        }
+
+        if (changed) {
+            projectController.saveState(e);
+        }
+    }
+
+    @Override
+    public void currentDbAttributeChanged(DbAttributeDisplayEvent e) {
+        boolean changed = !Arrays.equals(e.getAttributes(), projectController.getCurrentState().getDbAttrs());
+
+        if (changed) {
+            if (e.getEntity() != projectController.getCurrentState().getDbEntity()) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setDbEntity((DbEntity)e.getEntity());
+            }
+            projectController.getCurrentState().setDbAttrs(new DbAttribute[e.getAttributes().length]);
+            System.arraycopy(e.getAttributes(), 0, projectController.getCurrentState().getDbAttrs(), 0, projectController.getCurrentState().getDbAttrs().length);
+        }
+    }
+
+    @Override
+    public void currentObjAttributeChanged(ObjAttributeDisplayEvent e) {
+        boolean changed = !Arrays.equals(e.getAttributes(), projectController.getCurrentState().getObjAttrs());
+
+        if (changed) {
+            if (e.getEntity() != projectController.getCurrentState().getObjEntity()) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setObjEntity((ObjEntity)e.getEntity());
+            }
+            projectController.getCurrentState().setObjAttrs(new ObjAttribute[e.getAttributes().length]);
+            System.arraycopy(e.getAttributes(), 0, projectController.getCurrentState().getObjAttrs(), 0, projectController.getCurrentState().getObjAttrs().length);
+        }
+    }
+
+    @Override
+    public void currentEmbeddableAttributeChanged(EmbeddableAttributeDisplayEvent e) {
+        boolean changed = !Arrays.equals(e.getEmbeddableAttributes(), projectController.getCurrentState().getEmbAttrs());
+
+        if (changed) {
+            if (e.getEmbeddable() != projectController.getCurrentState().getEmbeddable()) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setEmbeddable(e.getEmbeddable());
+            }
+            projectController.getCurrentState().setEmbAttrs(new EmbeddableAttribute[e.getEmbeddableAttributes().length]);
+            System.arraycopy(e.getEmbeddableAttributes(), 0, projectController.getCurrentState().getEmbAttrs(), 0, projectController.getCurrentState().getEmbAttrs().length);
+        }
+    }
+
+    @Override
+    public void currentDbRelationshipChanged(DbRelationshipDisplayEvent e) {
+        boolean changed = !Arrays.equals(e.getRelationships(), projectController.getCurrentState().getDbRels());
+
+        if (changed) {
+            if (e.getEntity() != projectController.getCurrentState().getDbEntity()) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setDbEntity((DbEntity)e.getEntity());
+            }
+            projectController.getCurrentState().setDbRels(new DbRelationship[e.getRelationships().length]);
+            System.arraycopy(e.getRelationships(), 0, projectController.getCurrentState().getDbRels(), 0, projectController.getCurrentState().getDbRels().length);
+        }
+    }
+
+    @Override
+    public void currentObjectsChanged(MultipleObjectsDisplayEvent e) {
+        projectController.clearState();
+        projectController.getCurrentState().setPaths(e.getNodes());
+        projectController.getCurrentState().setParentPath(e.getParentNode());
+    }
+
+    @Override
+    public void currentObjRelationshipChanged(ObjRelationshipDisplayEvent e) {
+        boolean changed = !Arrays.equals(e.getRelationships(), projectController.getCurrentState().getObjRels());
+        e.setRelationshipChanged(changed);
+
+        if (changed) {
+            if (e.getEntity() != projectController.getCurrentState().getObjEntity()) {
+                projectController.clearState();
+                projectController.getCurrentState().setDomain(e.getDomain());
+                projectController.getCurrentState().setMap(e.getDataMap());
+                projectController.getCurrentState().setObjEntity((ObjEntity) e.getEntity());
+            }
+            projectController.getCurrentState().setObjRels(new ObjRelationship[e.getRelationships().length]);
+            System.arraycopy(e.getRelationships(), 0, projectController.getCurrentState().getObjRels(), 0, projectController.getCurrentState().getObjRels().length);
+        }
+    }
+
+    public void initControllerStateListeners() {
+        projectController.getEventController().addDomainDisplayListener(this);
+        projectController.getEventController().addDataNodeDisplayListener(this);
+        projectController.getEventController().addDataMapDisplayListener(this);
+        projectController.getEventController().addObjEntityDisplayListener(this);
+        projectController.getEventController().addEmbeddableDisplayListener(this);
+        projectController.getEventController().addQueryDisplayListener(this);
+        projectController.getEventController().addProcedureDisplayListener(this);
+        projectController.getEventController().addProcedureParameterDisplayListener(this);
+        projectController.getEventController().addDbEntityDisplayListener(this);
+        projectController.getEventController().addDbAttributeDisplayListener(this);
+        projectController.getEventController().addObjAttributeDisplayListener(this);
+        projectController.getEventController().addEmbeddableAttributeDisplayListener(this);
+        projectController.getEventController().addDbRelationshipDisplayListener(this);
+        projectController.getEventController().addMultipleObjectsDisplayListener(this);
+        projectController.getEventController().addObjRelationshipDisplayListener(this);
+
+        projectController.getEventController().addDataMapListener(this);
+        projectController.getEventController().addObjEntityListener(this);
+        projectController.getEventController().addDbEntityListener(this);
+        projectController.getEventController().addQueryListener(this);
+        projectController.getEventController().addDataNodeListener(this);
+        projectController.getEventController().addDomainListener(this);
+        projectController.getEventController().addProcedureListener(this);
+        projectController.getEventController().addDbRelationshipListener(this);
+    }
+
+    @Override
+    public void dataMapChanged(DataMapEvent e) {
+
+    }
+
+    @Override
+    public void dataMapAdded(DataMapEvent e) {
+
+    }
+
+    @Override
+    public void dataMapRemoved(DataMapEvent e) {
+        projectController.removeFromHistory(e);
+    }
+
+
+    @Override
+    public void objEntityChanged(EntityEvent e) {
+        if (e.getEntity().getDataMap() != null) {
+            e.getEntity().getDataMap().objEntityChanged(e);
+        }
+    }
+
+    @Override
+    public void objEntityAdded(EntityEvent e) {
+
+    }
+
+    @Override
+    public void objEntityRemoved(EntityEvent e) {
+        projectController.removeFromHistory(e);
+    }
+
+    @Override
+    public void dbEntityChanged(EntityEvent e) {
+        if (e.getEntity().getDataMap() != null) {
+            e.getEntity().getDataMap().dbEntityChanged(e);
+        }
+    }
+
+    @Override
+    public void dbEntityAdded(EntityEvent e) {
+
+    }
+
+    @Override
+    public void dbEntityRemoved(EntityEvent e) {
+        projectController.removeFromHistory(e);
+    }
+
+    @Override
+    public void queryChanged(QueryEvent e) {
+
+    }
+
+    @Override
+    public void queryAdded(QueryEvent e) {
+
+    }
+
+    @Override
+    public void queryRemoved(QueryEvent e) {
+        projectController.removeFromHistory(e);
+    }
+
+    @Override
+    public void dataNodeChanged(DataNodeEvent e) {
+
+    }
+
+    @Override
+    public void dataNodeAdded(DataNodeEvent e) {
+
+    }
+
+    @Override
+    public void dataNodeRemoved(DataNodeEvent e) {
+        projectController.removeFromHistory(e);
+    }
+
+    @Override
+    public void domainChanged(DomainEvent e) {
+        projectController.removeFromHistory(e);
+    }
+
+    @Override
+    public void procedureChanged(ProcedureEvent e) {
+
+    }
+
+    @Override
+    public void procedureAdded(ProcedureEvent e) {
+
+    }
+
+    @Override
+    public void procedureRemoved(ProcedureEvent e) {
+        projectController.removeFromHistory(e);
+    }
+
+    @Override
+    public void dbRelationshipChanged(RelationshipEvent e) {
+        if (e.getEntity() instanceof DbEntity) {
+            ((DbEntity) e.getEntity()).dbRelationshipChanged(e);
+        }
+    }
+
+    @Override
+    public void dbRelationshipAdded(RelationshipEvent e) {
+
+    }
+
+    @Override
+    public void dbRelationshipRemoved(RelationshipEvent e) {
+
     }
 }

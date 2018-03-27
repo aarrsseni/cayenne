@@ -23,8 +23,7 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,15 +54,12 @@ class AttributeDisplayEventType extends EntityDisplayEventType {
 
         Attribute[] attributes = getLastEntityAttributes(entity);
 
-        EntityDisplayEvent entityDisplayEvent = new EntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel);
-        AttributeDisplayEvent attributeDisplayEvent = new AttributeDisplayEvent(this, attributes, entity, dataMap, dataChannel);
-
         if (entity instanceof ObjEntity) {
-            controller.fireObjEntityDisplayEvent(entityDisplayEvent);
-            controller.fireObjAttributeDisplayEvent(attributeDisplayEvent);
+            controller.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel));
+            controller.fireObjAttributeDisplayEvent(new ObjAttributeDisplayEvent(this, attributes, entity, dataMap, dataChannel));
         } else if (entity instanceof DbEntity) {
-            controller.fireDbEntityDisplayEvent(entityDisplayEvent);
-            controller.fireDbAttributeDisplayEvent(attributeDisplayEvent);
+            controller.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel));
+            controller.fireDbAttributeDisplayEvent(new DbAttributeDisplayEvent(this, attributes, entity, dataMap, dataChannel));
         }
     }
 

@@ -24,7 +24,8 @@ import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.tree.TreePath;
@@ -60,15 +61,18 @@ public abstract class BaseViewEntityAction extends CayenneAction {
         TreePath path = buildTreePath(entity);
         editor().getProjectTreeView().getSelectionModel().setSelectionPath(path);
 
-        EntityDisplayEvent event = new EntityDisplayEvent(
-                editor().getProjectTreeView(),
-                entity,
-                entity.getDataMap(),
-                (DataChannelDescriptor) getProjectController().getProject().getRootNode());
         if (entity instanceof DbEntity) {
-            getProjectController().fireDbEntityDisplayEvent(event);
+            getProjectController().fireDbEntityDisplayEvent(new DbEntityDisplayEvent(
+                    editor().getProjectTreeView(),
+                    entity,
+                    entity.getDataMap(),
+                    (DataChannelDescriptor) getProjectController().getProject().getRootNode()));
         } else if (entity instanceof ObjEntity){
-            getProjectController().fireObjEntityDisplayEvent(event);
+            getProjectController().fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(
+                    editor().getProjectTreeView(),
+                    entity,
+                    entity.getDataMap(),
+                    (DataChannelDescriptor) getProjectController().getProject().getRootNode()));
         }
     }
 }

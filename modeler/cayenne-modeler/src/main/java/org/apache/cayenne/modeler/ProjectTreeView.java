@@ -22,76 +22,22 @@ package org.apache.cayenne.modeler;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.configuration.event.DataMapEvent;
-import org.apache.cayenne.configuration.event.DataMapListener;
-import org.apache.cayenne.configuration.event.DataNodeEvent;
-import org.apache.cayenne.configuration.event.DataNodeListener;
-import org.apache.cayenne.configuration.event.DomainEvent;
-import org.apache.cayenne.configuration.event.DomainListener;
-import org.apache.cayenne.configuration.event.ProcedureEvent;
-import org.apache.cayenne.configuration.event.ProcedureListener;
-import org.apache.cayenne.configuration.event.QueryEvent;
-import org.apache.cayenne.configuration.event.QueryListener;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.event.DbEntityListener;
-import org.apache.cayenne.map.event.EmbeddableEvent;
-import org.apache.cayenne.map.event.EmbeddableListener;
-import org.apache.cayenne.map.event.EntityEvent;
-import org.apache.cayenne.map.event.ObjEntityListener;
-import org.apache.cayenne.modeler.action.CopyAction;
-import org.apache.cayenne.modeler.action.CreateDataMapAction;
-import org.apache.cayenne.modeler.action.CreateDbEntityAction;
-import org.apache.cayenne.modeler.action.CreateEmbeddableAction;
-import org.apache.cayenne.modeler.action.CreateNodeAction;
-import org.apache.cayenne.modeler.action.CreateObjEntityAction;
-import org.apache.cayenne.modeler.action.CreateProcedureAction;
-import org.apache.cayenne.modeler.action.CreateQueryAction;
-import org.apache.cayenne.modeler.action.CutAction;
-import org.apache.cayenne.modeler.action.DbEntitySyncAction;
-import org.apache.cayenne.modeler.action.LinkDataMapsAction;
-import org.apache.cayenne.modeler.action.ObjEntitySyncAction;
-import org.apache.cayenne.modeler.action.PasteAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.DataMapDisplayListener;
-import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
-import org.apache.cayenne.modeler.event.DataNodeDisplayListener;
-import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayListener;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayListener;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureDisplayListener;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
-import org.apache.cayenne.modeler.event.QueryDisplayListener;
+import org.apache.cayenne.configuration.event.*;
+import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.event.*;
+import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.CellRenderers;
 import org.apache.cayenne.modeler.util.Comparators;
 import org.apache.cayenne.project.Project;
-import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.reflect.PropertyUtils;
 import org.apache.cayenne.resource.Resource;
 import org.apache.cayenne.swing.components.TopBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.Action;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.MenuElement;
+import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -100,9 +46,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -336,12 +280,12 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
         });
     }
 
-    public void currentObjEntityChanged(EntityDisplayEvent e) {
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
         e.setEntityChanged(true);
         currentEntityChanged(e);
     }
 
-    public void currentDbEntityChanged(EntityDisplayEvent e) {
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
         e.setEntityChanged(true);
         currentEntityChanged(e);
     }
@@ -900,8 +844,8 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
                         (DataChannelDescriptor) mediator.getProject().getRootNode(),
                         (DataNodeDescriptor) obj));
             }
-        } else if (obj instanceof Entity) {
-            EntityDisplayEvent e = new EntityDisplayEvent(this, (Entity) obj);
+        } else if (obj instanceof DbEntity) {
+            DbEntityDisplayEvent e = new DbEntityDisplayEvent(this, (Entity) obj);
             e.setUnselectAttributes(true);
             if (data.length == 3) {
                 e.setDataMap((DataMap) data[data.length - 2]);
@@ -911,12 +855,19 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
                 e.setDataMap((DataMap) data[data.length - 2]);
                 e.setDomain((DataChannelDescriptor) mediator.getProject().getRootNode());
             }
-
-            if (obj instanceof ObjEntity) {
-                mediator.fireObjEntityDisplayEvent(e);
-            } else if (obj instanceof DbEntity) {
-                mediator.fireDbEntityDisplayEvent(e);
+            mediator.fireDbEntityDisplayEvent(e);
+        } else if (obj instanceof ObjEntity) {
+            ObjEntityDisplayEvent e = new ObjEntityDisplayEvent(this, (Entity) obj);
+            e.setUnselectAttributes(true);
+            if (data.length == 3) {
+                e.setDataMap((DataMap) data[data.length - 2]);
+                e.setDomain((DataChannelDescriptor) mediator.getProject().getRootNode());
+                e.setDataNode((DataNodeDescriptor) data[data.length - 3]);
+            } else if (data.length == 2) {
+                e.setDataMap((DataMap) data[data.length - 2]);
+                e.setDomain((DataChannelDescriptor) mediator.getProject().getRootNode());
             }
+            mediator.fireObjEntityDisplayEvent(e);
         } else if (obj instanceof Embeddable) {
             EmbeddableDisplayEvent e = new EmbeddableDisplayEvent(
                     this,

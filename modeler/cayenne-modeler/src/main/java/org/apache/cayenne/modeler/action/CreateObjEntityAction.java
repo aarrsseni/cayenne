@@ -32,7 +32,7 @@ import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.undo.CreateObjEntityUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.util.DeleteRuleUpdater;
@@ -59,7 +59,7 @@ public class CreateObjEntityAction extends CayenneAction {
             DataMap dataMap,
             ObjEntity entity) {
         mediator.fireObjEntityEvent(new EntityEvent(src, entity, MapEvent.ADD));
-        EntityDisplayEvent displayEvent = new EntityDisplayEvent(
+        ObjEntityDisplayEvent displayEvent = new ObjEntityDisplayEvent(
                 src,
                 entity,
                 dataMap,

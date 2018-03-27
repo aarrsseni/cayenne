@@ -27,6 +27,6 @@ import java.util.EventListener;
 public interface ObjRelationshipDisplayListener extends EventListener
 {
 	/** Current obj entity used as a model has changed.*/
-	public void currentObjRelationshipChanged(RelationshipDisplayEvent e);
+	public void currentObjRelationshipChanged(ObjRelationshipDisplayEvent e);
 }
 

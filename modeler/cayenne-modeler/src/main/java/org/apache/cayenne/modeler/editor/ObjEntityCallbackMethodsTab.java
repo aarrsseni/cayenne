@@ -18,14 +18,14 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.editor;
 
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
 import org.apache.cayenne.map.CallbackMap;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
+
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 
 /**
@@ -60,7 +60,7 @@ public class ObjEntityCallbackMethodsTab extends AbstractCallbackMethodsTab  {
         mediator.getEventController()
                 .addObjEntityDisplayListener(
                 new ObjEntityDisplayListener() {
-                    public void currentObjEntityChanged(EntityDisplayEvent e) {
+                    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
                         if (ObjEntityCallbackMethodsTab.this.isVisible()) {
                             rebuildTables();
                         }

@@ -19,8 +19,6 @@
 
 package org.apache.cayenne.modeler.dialog.validator;
 
-import javax.swing.JFrame;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
@@ -28,8 +26,11 @@ import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
+
+import javax.swing.*;
 
 /**
  * DataDomain validation message.
@@ -58,12 +59,11 @@ public class EntityErrorMsg extends ValidationDisplayHandler {
     }
 
     public void displayField(ProjectController mediator, JFrame frame) {
-        EntityDisplayEvent event = new EntityDisplayEvent(frame, entity, map, domain);
         if (entity instanceof ObjEntity) {
-            mediator.fireObjEntityDisplayEvent(event);
+            mediator.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(frame, entity, map, domain));
         }
         else if (entity instanceof DbEntity) {
-            mediator.fireDbEntityDisplayEvent(event);
+            mediator.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(frame, entity, map, domain));
         }
     }
 }

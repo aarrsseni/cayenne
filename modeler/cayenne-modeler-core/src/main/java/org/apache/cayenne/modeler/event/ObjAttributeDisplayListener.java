@@ -25,5 +25,5 @@ import java.util.EventListener;
 public interface ObjAttributeDisplayListener extends EventListener
 {
 	/** Display specified ObjAttribute.*/
-	public void currentObjAttributeChanged(AttributeDisplayEvent e);
+	public void currentObjAttributeChanged(ObjAttributeDisplayEvent e);
 }

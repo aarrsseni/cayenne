@@ -22,17 +22,13 @@ package org.apache.cayenne.modeler.action;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjRelationshipDisplayEvent;
 import org.apache.cayenne.modeler.undo.CreateRelationshipUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.util.DeleteRuleUpdater;
@@ -60,7 +56,7 @@ public class CreateRelationshipAction extends CayenneAction {
 
         mediator.fireObjRelationshipEvent(new RelationshipEvent(src, rel, objEntity, MapEvent.ADD));
 
-        RelationshipDisplayEvent rde = new RelationshipDisplayEvent(src, rel, objEntity, mediator.getCurrentState().getDataMap(),
+        ObjRelationshipDisplayEvent rde = new ObjRelationshipDisplayEvent(src, rel, objEntity, mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
         mediator.fireObjRelationshipDisplayEvent(rde);
@@ -73,7 +69,7 @@ public class CreateRelationshipAction extends CayenneAction {
 
         mediator.fireDbRelationshipEvent(new RelationshipEvent(src, rel, dbEntity, MapEvent.ADD));
 
-        RelationshipDisplayEvent rde = new RelationshipDisplayEvent(src, rel, dbEntity, mediator.getCurrentState().getDataMap(),
+        DbRelationshipDisplayEvent rde = new DbRelationshipDisplayEvent(src, rel, dbEntity, mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
         mediator.fireDbRelationshipDisplayEvent(rde);

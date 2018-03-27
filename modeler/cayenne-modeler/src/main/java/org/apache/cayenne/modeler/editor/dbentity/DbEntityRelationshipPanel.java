@@ -27,47 +27,25 @@ import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CopyAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.CutAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.PasteAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeRelationshipAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.dialog.ResolveDbRelationshipDialog;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
 import org.apache.cayenne.modeler.event.TablePopupHandler;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
-import org.apache.cayenne.modeler.util.BoardTableCellRenderer;
-import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.modeler.util.CayenneTable;
-import org.apache.cayenne.modeler.util.CellRenderers;
-import org.apache.cayenne.modeler.util.ModelerUtil;
-import org.apache.cayenne.modeler.util.PanelFactory;
-import org.apache.cayenne.modeler.util.UIUtil;
+import org.apache.cayenne.modeler.util.*;
 import org.apache.cayenne.modeler.util.combo.AutoCompletion;
 
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
-import javax.swing.JComboBox;
-import javax.swing.JCheckBox;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Component;
-import java.awt.Color;
 import java.util.List;
 
 /**
@@ -193,7 +171,7 @@ public class DbEntityRelationshipPanel extends JPanel implements DbEntityDisplay
     /**
      * Loads obj relationships into table.
      */
-    public void currentDbEntityChanged(EntityDisplayEvent e) {
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
         DbEntity entity = (DbEntity) e.getEntity();
         if (entity != null && e.isEntityChanged()) {
             // TODO: this line seems to slow down the Modeler significantly sometimes

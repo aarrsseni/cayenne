@@ -28,15 +28,10 @@ import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CreateAttributeAction;
-import org.apache.cayenne.modeler.action.CreateObjEntityAction;
-import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.action.DbEntityCounterpartAction;
-import org.apache.cayenne.modeler.action.DbEntitySyncAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.editor.ExistingSelectionProcessor;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
 import org.apache.cayenne.modeler.graph.action.ShowGraphEntityAction;
 import org.apache.cayenne.modeler.util.ExpressionConvertor;
 import org.apache.cayenne.modeler.util.TextAdapter;
@@ -44,15 +39,8 @@ import org.apache.cayenne.project.extension.info.ObjectInfo;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.EventObject;
@@ -204,12 +192,12 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
     }
 
     public void processExistingSelection(EventObject e) {
-        EntityDisplayEvent ede = new EntityDisplayEvent(this, mediator.getCurrentState().getDbEntity(),
+        DbEntityDisplayEvent ede = new DbEntityDisplayEvent(this, mediator.getCurrentState().getDbEntity(),
                 mediator.getCurrentState().getDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode());
         mediator.fireDbEntityDisplayEvent(ede);
     }
 
-    public void currentDbEntityChanged(EntityDisplayEvent e) {
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
         DbEntity entity = (DbEntity) e.getEntity();
 
         if (entity == null) {

@@ -47,7 +47,17 @@ public class EventListenerMap {
     public <T extends EventListener> T[] getListeners(Class<T> key){
         //Order of listeners is important!
         if(listenerMap.containsKey(key)) {
-            return listenerMap.get(key).toArray((T[]) Array.newInstance(key, listenerMap.get(key).size()));
+            Deque<Object> result = new LinkedList<>(listenerMap.get(key));
+
+            for(Object o : result){
+                if(o.getClass() == ControllerState.class){
+                    result.remove(o);
+                    result.addFirst(o);
+                    break;
+                }
+            }
+
+            return result.toArray((T[]) Array.newInstance(key, result.size()));
         }
         return (T[])Array.newInstance(key, 0);
     }
