@@ -19,18 +19,17 @@
 
 package org.apache.cayenne.modeler.dialog.validator;
 
-import javax.swing.JFrame;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjRelationshipDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
+
+import javax.swing.*;
 
 /**
  * Relationship validation message.
@@ -60,22 +59,41 @@ public class RelationshipErrorMsg extends ValidationDisplayHandler {
     }
 
     public void displayField(ProjectController mediator, JFrame frame) {
-        RelationshipDisplayEvent event = new RelationshipDisplayEvent(
-                frame,
-                rel,
-                entity,
-                map,
-                domain);
-
         // must first display entity, and then switch to relationship display .. so fire
         // twice
         if (entity instanceof ObjEntity) {
+            ObjEntityDisplayEvent event = new ObjEntityDisplayEvent(
+                    frame,
+                    entity,
+                    map,
+                    domain);
+
             mediator.fireObjEntityDisplayEvent(event);
-            mediator.fireObjRelationshipDisplayEvent(event);
+
+            ObjRelationshipDisplayEvent relEvent = new ObjRelationshipDisplayEvent(
+                    frame,
+                    rel,
+                    entity,
+                    map,
+                    domain);
+            mediator.fireObjRelationshipDisplayEvent(relEvent);
         }
         else if (entity instanceof DbEntity) {
+            DbEntityDisplayEvent event = new DbEntityDisplayEvent(
+                    frame,
+                    entity,
+                    map,
+                    domain);
+
             mediator.fireDbEntityDisplayEvent(event);
-            mediator.fireDbRelationshipDisplayEvent(event);
+
+            DbRelationshipDisplayEvent relEvent = new DbRelationshipDisplayEvent(
+                    frame,
+                    rel,
+                    entity,
+                    map,
+                    domain);
+            mediator.fireDbRelationshipDisplayEvent(relEvent);
         }
     }
 }

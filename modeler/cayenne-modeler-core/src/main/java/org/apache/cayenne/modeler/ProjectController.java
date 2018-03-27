@@ -103,6 +103,13 @@ import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.event.QueryDisplayListener;
 import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
 import org.apache.cayenne.modeler.event.SaveListener;
+import org.apache.cayenne.configuration.event.*;
+import org.apache.cayenne.di.Injector;
+import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.event.*;
+import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
+import org.apache.cayenne.modeler.event.ProjectDirtyEventListener;
 import org.apache.cayenne.modeler.action.NavigateBackwardAction;
 import org.apache.cayenne.modeler.action.NavigateForwardAction;
 import org.apache.cayenne.modeler.action.RevertAction;
@@ -157,16 +164,7 @@ import org.apache.cayenne.project.ConfigurationNodeParentGetter;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.util.IDUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EventListener;
-import java.util.EventObject;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.prefs.Preferences;
 
 /**
@@ -208,7 +206,8 @@ public class ProjectController {
     public ProjectController() {
         this.eventController = new EventController();
         controllerStateHistory = new CircularArray<>(maxHistorySize);
-        currentState = new ControllerState();
+
+        currentState = new ControllerState(this);
     }
 
     public void setCurrentDataMap(DataMap dataMap) {
@@ -371,23 +370,23 @@ public class ProjectController {
     }
 
     /** Resets all current models to null. */
-    private void clearState() {
+    protected void clearState() {
         // don't clear if we are refiring events for history navigation
         if (currentState.isRefiring()) {
             return;
         }
 
-        currentState = new ControllerState();
+        currentState = new ControllerState(this);
     }
 
-    private void saveState(DisplayEvent e) {
+    protected void saveState(DisplayEvent e) {
         if (!controllerStateHistory.contains(currentState)) {
             currentState.setEvent(e);
             controllerStateHistory.add(currentState);
         }
     }
 
-    private void removeFromHistory(EventObject e) {
+    protected void removeFromHistory(EventObject e) {
 
         int count = controllerStateHistory.size();
         List<ControllerState> removeList = new ArrayList<>();
@@ -436,146 +435,106 @@ public class ProjectController {
     }
 
     public void fireDomainDisplayEvent(DomainDisplayEvent e) {
-        boolean changed = e.getDomain() != currentState.getDomain();
-        if (!changed) {
-            changed = currentState.getNode() != null || currentState.getDataMap() != null || currentState.getDbEntity() != null
-                    || currentState.getObjEntity() != null || currentState.getProcedure() != null || currentState.getQuery() != null
-                    || currentState.getEmbeddable() != null;
-        }
-
-        if (!e.isRefired()) {
-            e.setDomainChanged(changed);
-            if (changed) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-            }
-        }
-
-        if (changed) {
-            saveState(e);
-        }
-
         for (EventListener listener : getEventController().getListenerMap().getListeners(DomainDisplayListener.class)) {
             DomainDisplayListener temp = (DomainDisplayListener) listener;
             temp.currentDomainChanged(e);
         }
-
-        // call different methods depending on whether domain was opened or
-        // closed
-        for(EventListener listener : getEventController().getListenerMap().getListeners(ActionManagerChangesListener.class)) {
-            ActionManagerChangesListener temp = (ActionManagerChangesListener) listener;
-            if (e.getDomain() == null) {
-                temp.projectOpenedChanges();
-            } else {
-                temp.domainSelectedChanges();
-            }
-        }
-    }
-
-    /**
-     * Informs all listeners of the DomainEvent. Does not send the event to its
-     * originator.
-     */
-    public void fireDomainEvent(DomainEvent e) {
-
-        if (e.getId() == MapEvent.REMOVE) {
-            removeFromHistory(e);
-        }
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(DomainListener.class)) {
-            DomainListener temp = (DomainListener) listener;
-            switch (e.getId()) {
-            case MapEvent.CHANGE:
-                temp.domainChanged(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid DomainEvent type: " + e.getId());
-            }
-        }
     }
 
     public void fireDataNodeDisplayEvent(DataNodeDisplayEvent e) {
-        boolean changed = e.getDataNode() != currentState.getNode();
-
-        if (!changed) {
-            changed = currentState.getDataMap() != null || currentState.getDbEntity() != null || currentState.getObjEntity() != null
-                    || currentState.getProcedure() != null || currentState.getQuery() != null || currentState.getEmbeddable() != null;
-        }
-
-        if (!e.isRefired()) {
-            e.setDataNodeChanged(changed);
-
-            if (changed) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setNode(e.getDataNode());
-            }
-        }
-
-        if (changed) {
-            saveState(e);
-        }
-
-        EventListener[] list = getEventController().getListenerMap().getListeners(DataNodeDisplayListener.class);
-        for (EventListener listener : list) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DataNodeDisplayListener.class)) {
             ((DataNodeDisplayListener) listener).currentDataNodeChanged(e);
         }
     }
 
-    /**
-     * Informs all listeners of the DataNodeEvent. Does not send the event to
-     * its originator.
-     */
-    public void fireDataNodeEvent(DataNodeEvent e) {
-
-        if (e.getId() == MapEvent.REMOVE) {
-            removeFromHistory(e);
-        }
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(DataNodeListener.class)) {
-            DataNodeListener temp = (DataNodeListener) listener;
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.dataNodeAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.dataNodeChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.dataNodeRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid DataNodeEvent type: " + e.getId());
-            }
+    public void fireDataMapDisplayEvent(DataMapDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DataMapDisplayListener.class)) {
+            DataMapDisplayListener temp = (DataMapDisplayListener) listener;
+            temp.currentDataMapChanged(e);
         }
     }
 
-    public void fireDataMapDisplayEvent(DataMapDisplayEvent e) {
-        boolean changed = e.getDataMap() != currentState.getDataMap();
-        if (!changed) {
-            changed = currentState.getDbEntity() != null || currentState.getObjEntity() != null || currentState.getProcedure() != null
-                    || currentState.getQuery() != null || currentState.getEmbeddable() != null;
+    public void fireObjEntityDisplayEvent(ObjEntityDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(ObjEntityDisplayListener.class)) {
+            ObjEntityDisplayListener temp = (ObjEntityDisplayListener) listener;
+            temp.currentObjEntityChanged(e);
         }
+    }
 
-        if (!e.isRefired()) {
-            e.setDataMapChanged(changed);
-
-            if (changed) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setNode(e.getDataNode());
-                currentState.setMap(e.getDataMap());
-            }
+    public void fireEmbeddableDisplayEvent(EmbeddableDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(EmbeddableDisplayListener.class)) {
+            EmbeddableDisplayListener temp = (EmbeddableDisplayListener) listener;
+            temp.currentEmbeddableChanged(e);
         }
+    }
 
-        if (changed) {
-            saveState(e);
+    public void fireQueryDisplayEvent(QueryDisplayEvent e) {
+        for (EventListener eventListener : getEventController().getListenerMap().getListeners(QueryDisplayListener.class)) {
+            QueryDisplayListener listener = (QueryDisplayListener) eventListener;
+            listener.currentQueryChanged(e);
         }
+    }
 
-        EventListener[] list = getEventController().getListenerMap().getListeners(DataMapDisplayListener.class);
-        for (EventListener listener : list) {
-            DataMapDisplayListener temp = (DataMapDisplayListener) listener;
-            temp.currentDataMapChanged(e);
+    public void fireProcedureDisplayEvent(ProcedureDisplayEvent e) {
+        for (EventListener eventListener : getEventController().getListenerMap().getListeners(ProcedureDisplayListener.class)) {
+            ProcedureDisplayListener listener = (ProcedureDisplayListener) eventListener;
+            listener.currentProcedureChanged(e);
+        }
+    }
+
+    public void fireProcedureParameterDisplayEvent(ProcedureParameterDisplayEvent e) {
+        for (EventListener eventListener : getEventController().getListenerMap().getListeners(ProcedureParameterDisplayListener.class)) {
+            ProcedureParameterDisplayListener listener = (ProcedureParameterDisplayListener) eventListener;
+            listener.currentProcedureParameterChanged(e);
+        }
+    }
+
+    public void fireDbEntityDisplayEvent(DbEntityDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DbEntityDisplayListener.class)) {
+            DbEntityDisplayListener temp = (DbEntityDisplayListener) listener;
+            temp.currentDbEntityChanged(e);
+        }
+    }
+
+    public void fireDbAttributeDisplayEvent(DbAttributeDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DbAttributeDisplayListener.class)) {
+            DbAttributeDisplayListener temp = (DbAttributeDisplayListener) listener;
+            temp.currentDbAttributeChanged(e);
+        }
+    }
+
+    public void fireObjAttributeDisplayEvent(ObjAttributeDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(ObjAttributeDisplayListener.class)) {
+            ObjAttributeDisplayListener temp = (ObjAttributeDisplayListener) listener;
+            temp.currentObjAttributeChanged(e);
+        }
+    }
+
+    public void fireEmbeddableAttributeDisplayEvent(EmbeddableAttributeDisplayEvent ev) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(EmbeddableAttributeDisplayListener.class)) {
+            EmbeddableAttributeDisplayListener temp = (EmbeddableAttributeDisplayListener) listener;
+            temp.currentEmbeddableAttributeChanged(ev);
+        }
+    }
+
+    public void fireDbRelationshipDisplayEvent(DbRelationshipDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DbRelationshipDisplayListener.class)) {
+            DbRelationshipDisplayListener temp = (DbRelationshipDisplayListener) listener;
+            temp.currentDbRelationshipChanged(e);
+        }
+    }
+
+    public void fireMultipleObjectsDisplayEvent(MultipleObjectsDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(MultipleObjectsDisplayListener.class)) {
+            MultipleObjectsDisplayListener temp = (MultipleObjectsDisplayListener) listener;
+            temp.currentObjectsChanged(e);
+        }
+    }
+
+    public void fireObjRelationshipDisplayEvent(ObjRelationshipDisplayEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(ObjRelationshipDisplayListener.class)) {
+            ObjRelationshipDisplayListener temp = (ObjRelationshipDisplayListener) listener;
+            temp.currentObjRelationshipChanged(e);
         }
     }
 
@@ -584,25 +543,20 @@ public class ProjectController {
      * originator.
      */
     public void fireDataMapEvent(DataMapEvent e) {
-
-        if (e.getId() == MapEvent.REMOVE) {
-            removeFromHistory(e);
-        }
-
         for (EventListener eventListener : getEventController().getListenerMap().getListeners(DataMapListener.class)) {
             DataMapListener listener = (DataMapListener) eventListener;
             switch (e.getId()) {
-            case MapEvent.ADD:
-                listener.dataMapAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                listener.dataMapChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                listener.dataMapRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid DataMapEvent type: " + e.getId());
+                case MapEvent.ADD:
+                    listener.dataMapAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    listener.dataMapChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    listener.dataMapRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid DataMapEvent type: " + e.getId());
             }
         }
     }
@@ -612,29 +566,20 @@ public class ProjectController {
      * originator.
      */
     public void fireObjEntityEvent(EntityEvent e) {
-
-        if (e.getEntity().getDataMap() != null && e.getId() == MapEvent.CHANGE) {
-            e.getEntity().getDataMap().objEntityChanged(e);
-        }
-
-        if (e.getId() == MapEvent.REMOVE) {
-            removeFromHistory(e);
-        }
-
         for (EventListener listener : getEventController().getListenerMap().getListeners(ObjEntityListener.class)) {
             ObjEntityListener temp = (ObjEntityListener) listener;
             switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.objEntityAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.objEntityChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.objEntityRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid EntityEvent type: " + e.getId());
+                case MapEvent.ADD:
+                    temp.objEntityAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.objEntityChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.objEntityRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid EntityEvent type: " + e.getId());
             }
         }
     }
@@ -644,29 +589,20 @@ public class ProjectController {
      * originator.
      */
     public void fireDbEntityEvent(EntityEvent e) {
-
-        if (e.getEntity().getDataMap() != null && e.getId() == MapEvent.CHANGE) {
-            e.getEntity().getDataMap().dbEntityChanged(e);
-        }
-
-        if (e.getId() == MapEvent.REMOVE) {
-            removeFromHistory(e);
-        }
-
         for (EventListener listener : getEventController().getListenerMap().getListeners(DbEntityListener.class)) {
             DbEntityListener temp = (DbEntityListener) listener;
             switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.dbEntityAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.dbEntityChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.dbEntityRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid EntityEvent type: " + e.getId());
+                case MapEvent.ADD:
+                    temp.dbEntityAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.dbEntityChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.dbEntityRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid EntityEvent type: " + e.getId());
             }
         }
     }
@@ -676,25 +612,60 @@ public class ProjectController {
      * its originator.
      */
     public void fireQueryEvent(QueryEvent e) {
-
-        if (e.getId() == MapEvent.REMOVE) {
-            removeFromHistory(e);
-        }
-
         for (EventListener eventListener : getEventController().getListenerMap().getListeners(QueryListener.class)) {
             QueryListener listener = (QueryListener) eventListener;
             switch (e.getId()) {
-            case MapEvent.ADD:
-                listener.queryAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                listener.queryChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                listener.queryRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid ProcedureEvent type: " + e.getId());
+                case MapEvent.ADD:
+                    listener.queryAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    listener.queryChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    listener.queryRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid ProcedureEvent type: " + e.getId());
+            }
+        }
+    }
+
+    /**
+     * Informs all listeners of the DataNodeEvent. Does not send the event to
+     * its originator.
+     */
+    public void fireDataNodeEvent(DataNodeEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DataNodeListener.class)) {
+            DataNodeListener temp = (DataNodeListener) listener;
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.dataNodeAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.dataNodeChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.dataNodeRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid DataNodeEvent type: " + e.getId());
+            }
+        }
+    }
+
+    /**
+     * Informs all listeners of the DomainEvent. Does not send the event to its
+     * originator.
+     */
+    public void fireDomainEvent(DomainEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DomainListener.class)) {
+            DomainListener temp = (DomainListener) listener;
+            switch (e.getId()) {
+                case MapEvent.CHANGE:
+                    temp.domainChanged(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid DomainEvent type: " + e.getId());
             }
         }
     }
@@ -704,25 +675,40 @@ public class ProjectController {
      * its originator.
      */
     public void fireProcedureEvent(ProcedureEvent e) {
-
-        if (e.getId() == MapEvent.REMOVE) {
-            removeFromHistory(e);
-        }
-
         for (EventListener eventListener : getEventController().getListenerMap().getListeners(ProcedureListener.class)) {
             ProcedureListener listener = (ProcedureListener) eventListener;
             switch (e.getId()) {
-            case MapEvent.ADD:
-                listener.procedureAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                listener.procedureChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                listener.procedureRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid ProcedureEvent type: " + e.getId());
+                case MapEvent.ADD:
+                    listener.procedureAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    listener.procedureChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    listener.procedureRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid ProcedureEvent type: " + e.getId());
+            }
+        }
+    }
+
+    /** Notifies all listeners of the change(add, remove) and does the change. */
+    public void fireDbRelationshipEvent(RelationshipEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DbRelationshipListener.class)) {
+            DbRelationshipListener temp = (DbRelationshipListener) listener;
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.dbRelationshipAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.dbRelationshipChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.dbRelationshipRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
             }
         }
     }
@@ -732,22 +718,192 @@ public class ProjectController {
      * its originator.
      */
     public void fireProcedureParameterEvent(ProcedureParameterEvent e) {
-
-        EventListener[] list = getEventController().getListenerMap().getListeners(ProcedureParameterListener.class);
-        for (EventListener eventListener : list) {
+        for (EventListener eventListener : getEventController().getListenerMap().getListeners(ProcedureParameterListener.class)) {
             ProcedureParameterListener listener = (ProcedureParameterListener) eventListener;
             switch (e.getId()) {
-            case MapEvent.ADD:
-                listener.procedureParameterAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                listener.procedureParameterChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                listener.procedureParameterRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid ProcedureParameterEvent type: " + e.getId());
+                case MapEvent.ADD:
+                    listener.procedureParameterAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    listener.procedureParameterChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    listener.procedureParameterRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid ProcedureParameterEvent type: " + e.getId());
+            }
+        }
+    }
+
+    /** Notifies all listeners of the change(add, remove) and does the change. */
+    public void fireDbAttributeEvent(AttributeEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(DbAttributeListener.class)) {
+            DbAttributeListener temp = (DbAttributeListener) listener;
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.dbAttributeAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.dbAttributeChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.dbAttributeRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid AttributeEvent type: " + e.getId());
+            }
+        }
+    }
+
+    /** Notifies all listeners of the change (add, remove) and does the change. */
+    public void fireObjAttributeEvent(AttributeEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(ObjAttributeListener.class)) {
+            ObjAttributeListener temp = (ObjAttributeListener) listener;
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.objAttributeAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.objAttributeChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.objAttributeRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid AttributeEvent type: " + e.getId());
+            }
+        }
+    }
+
+    /** Notifies all listeners of the change(add, remove) and does the change. */
+    public void fireObjRelationshipEvent(RelationshipEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(ObjRelationshipListener.class)) {
+            ObjRelationshipListener temp = (ObjRelationshipListener) listener;
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.objRelationshipAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.objRelationshipChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.objRelationshipRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
+            }
+        }
+    }
+
+    /**
+     * fires callback method manipulation event
+     *
+     * @param e
+     *            event
+     */
+    public void fireCallbackMethodEvent(CallbackMethodEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(CallbackMethodListener.class)) {
+            CallbackMethodListener temp = (CallbackMethodListener) listener;
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.callbackMethodAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.callbackMethodChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.callbackMethodRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid CallbackEvent type: " + e.getId());
+            }
+        }
+    }
+
+    /**
+     * fires entity listener manipulation event
+     *
+     * @param e
+     *            event
+     */
+    public void fireEntityListenerEvent(EntityListenerEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(EntityListenerListener.class)) {
+            EntityListenerListener temp = (EntityListenerListener) listener;
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.entityListenerAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.entityListenerChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.entityListenerRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid CallbackEvent type: " + e.getId());
+            }
+        }
+    }
+
+    public void fireEmbeddableEvent(EmbeddableEvent e, DataMap map) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(EmbeddableListener.class)) {
+            EmbeddableListener temp = (EmbeddableListener) listener;
+
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.embeddableAdded(e, map);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.embeddableChanged(e, map);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.embeddableRemoved(e, map);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
+            }
+        }
+    }
+
+    public void fireEmbeddableAttributeEvent(EmbeddableAttributeEvent e) {
+        for (EventListener listener : getEventController().getListenerMap().getListeners(EmbeddableAttributeListener.class)) {
+            EmbeddableAttributeListener temp = (EmbeddableAttributeListener) listener;
+
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    temp.embeddableAttributeAdded(e);
+                    break;
+                case MapEvent.CHANGE:
+                    temp.embeddableAttributeChanged(e);
+                    break;
+                case MapEvent.REMOVE:
+                    temp.embeddableAttributeRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
+            }
+        }
+    }
+
+
+
+    public void fireDataSourceModificationEvent(DataSourceModificationEvent e) {
+        for (DataSourceModificationListener listener : getEventController().getListenerMap().getListeners(DataSourceModificationListener.class)) {
+            switch (e.getId()) {
+                case MapEvent.ADD:
+                    listener.callbackDataSourceAdded(e);
+                    break;
+                // Change event not supported for now
+                // There is no good place to catch data source modification
+                /*case MapEvent.CHANGE:
+                    listener.callbackDataSourceChanged(e);
+                    break;*/
+                case MapEvent.REMOVE:
+                    listener.callbackDataSourceRemoved(e);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
             }
         }
     }
@@ -755,49 +911,37 @@ public class ProjectController {
     /**
      * @since 4.1
      */
-    public void fireForwardNavigationEvent() {
-        int size = controllerStateHistory.size();
-        if (size == 0)
-            return;
-
-        int i = controllerStateHistory.indexOf(currentState);
-        ControllerState cs;
-        if (size == 1) {
-            cs = controllerStateHistory.get(0);
+    public void fireProjectOnSaveEvent(ProjectOnSaveEvent e){
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectOnSaveListener.class)){
+            ProjectOnSaveListener temp = (ProjectOnSaveListener) listener;
+            temp.beforeSaveChanges(e);
         }
-        else {
-            int counter = 0;
-            while (true) {
-                if (i < 0) {
-                    // a new state got created without it being saved.
-                    // just move to the beginning of the list
-                    cs = controllerStateHistory.get(0);
-                } else if (i + 1 < size) {
-                    // move forward
-                    cs = controllerStateHistory.get(i + 1);
-                } else {
-                    // wrap around
-                    cs = controllerStateHistory.get(0);
-                }
-                if (!cs.isEquivalent(currentState)) {
-                    break;
-                }
-
-                // if it doesn't find it within 5 tries it is probably stuck in
-                // a loop
-                if (++counter > 5) {
-                    break;
-                }
-                i++;
-            }
-        }
-        runDisplayEvent(cs);
     }
 
     /**
      * @since 4.1
      */
-    public void fireBackwardNavigationEvent(){
+    public void fireProjectDirtyEvent(ProjectDirtyEvent e) {
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectDirtyEventListener.class)) {
+            ProjectDirtyEventListener temp = (ProjectDirtyEventListener) listener;
+            temp.setProjectDirty(e);
+        }
+    }
+
+    /**
+     * @since 4.1
+     */
+    public void fireOnChangeEvent(ProjectFileOnChangeTrackerEvent e){
+        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileOnChangeEventListener.class)){
+            ProjectFileOnChangeEventListener temp = (ProjectFileOnChangeEventListener) listener;
+            temp.onChange(e);
+        }
+    }
+
+    /**
+     * @since 4.1
+     */
+    public void moveBackward(){
         int size = controllerStateHistory.size();
         if (size == 0)
             return;
@@ -838,6 +982,48 @@ public class ProjectController {
 
     }
 
+    /**
+     * @since 4.1
+     */
+    public void moveForward() {
+        int size = controllerStateHistory.size();
+        if (size == 0)
+            return;
+
+        int i = controllerStateHistory.indexOf(currentState);
+        ControllerState cs;
+        if (size == 1) {
+            cs = controllerStateHistory.get(0);
+        }
+        else {
+            int counter = 0;
+            while (true) {
+                if (i < 0) {
+                    // a new state got created without it being saved.
+                    // just move to the beginning of the list
+                    cs = controllerStateHistory.get(0);
+                } else if (i + 1 < size) {
+                    // move forward
+                    cs = controllerStateHistory.get(i + 1);
+                } else {
+                    // wrap around
+                    cs = controllerStateHistory.get(0);
+                }
+                if (!cs.isEquivalent(currentState)) {
+                    break;
+                }
+
+                // if it doesn't find it within 5 tries it is probably stuck in
+                // a loop
+                if (++counter > 5) {
+                    break;
+                }
+                i++;
+            }
+        }
+        runDisplayEvent(cs);
+    }
+
     private void runDisplayEvent(ControllerState cs) {
         // reset the current state to the one we just navigated to
         currentState = cs;
@@ -855,12 +1041,14 @@ public class ProjectController {
         // because of the inheritance hierarchy
         de.setRefired(true);
         if (de instanceof EntityDisplayEvent) {
-            EntityDisplayEvent ede = (EntityDisplayEvent) de;
-            ede.setEntityChanged(true);
-            if (ede.getEntity() instanceof ObjEntity) {
-                fireObjEntityDisplayEvent(ede);
-            } else if (ede.getEntity() instanceof DbEntity) {
+            if(de instanceof DbEntityDisplayEvent) {
+                DbEntityDisplayEvent ede = (DbEntityDisplayEvent) de;
+                ede.setEntityChanged(true);
                 fireDbEntityDisplayEvent(ede);
+            } else if(de instanceof ObjEntityDisplayEvent) {
+                ObjEntityDisplayEvent ede = (ObjEntityDisplayEvent) de;
+                ede.setEntityChanged(true);
+                fireObjEntityDisplayEvent(ede);
             }
         } else if (de instanceof EmbeddableDisplayEvent) {
             EmbeddableDisplayEvent ede = (EmbeddableDisplayEvent) de;
@@ -892,352 +1080,6 @@ public class ProjectController {
         currentState.setRefiring(false);
     }
 
-    public void fireObjEntityDisplayEvent(EntityDisplayEvent e) {
-        boolean changed = e.getEntity() != currentState.getObjEntity();
-
-        if (!e.isRefired()) {
-            e.setEntityChanged(changed);
-
-            if (changed) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setNode(e.getDataNode());
-                currentState.setMap(e.getDataMap());
-                currentState.setObjEntity((ObjEntity)e.getEntity());
-            }
-        }
-
-        if (changed) {
-            saveState(e);
-        }
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(ObjEntityDisplayListener.class)) {
-            ObjEntityDisplayListener temp = (ObjEntityDisplayListener) listener;
-            temp.currentObjEntityChanged(e);
-        }
-    }
-
-    public void fireEmbeddableDisplayEvent(EmbeddableDisplayEvent e) {
-        boolean changed = e.getEmbeddable() != currentState.getEmbeddable();
-
-        if (!e.isRefired()) {
-            e.setEmbeddableChanged(changed);
-
-            if (changed) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setNode(e.getDataNode());
-                currentState.setMap(e.getDataMap());
-                currentState.setEmbeddable(e.getEmbeddable());
-            }
-        }
-
-        if (changed) {
-            saveState(e);
-        }
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(EmbeddableDisplayListener.class)) {
-            EmbeddableDisplayListener temp = (EmbeddableDisplayListener) listener;
-            temp.currentEmbeddableChanged(e);
-        }
-    }
-
-    public void fireQueryDisplayEvent(QueryDisplayEvent e) {
-        boolean changed = e.getQuery() != currentState.getQuery();
-
-        if (!e.isRefired()) {
-            e.setQueryChanged(changed);
-
-            if (changed) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setMap(e.getDataMap());
-                currentState.setQuery(e.getQuery());
-            }
-        }
-
-        if (changed) {
-            saveState(e);
-        }
-
-        for (EventListener eventListener : getEventController().getListenerMap().getListeners(QueryDisplayListener.class)) {
-            QueryDisplayListener listener = (QueryDisplayListener) eventListener;
-            listener.currentQueryChanged(e);
-        }
-    }
-
-    public void fireProcedureDisplayEvent(ProcedureDisplayEvent e) {
-        boolean changed = e.getProcedure() != currentState.getProcedure();
-
-        if (!e.isRefired()) {
-            e.setProcedureChanged(changed);
-
-            if (changed) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setMap(e.getDataMap());
-                currentState.setProcedure(e.getProcedure());
-            }
-        }
-
-        if (changed) {
-            saveState(e);
-        }
-
-        for (EventListener eventListener : getEventController().getListenerMap().getListeners(ProcedureDisplayListener.class)) {
-            ProcedureDisplayListener listener = (ProcedureDisplayListener) eventListener;
-            listener.currentProcedureChanged(e);
-        }
-    }
-
-    public void fireProcedureParameterDisplayEvent(ProcedureParameterDisplayEvent e) {
-        boolean changed = !Arrays.equals(e.getProcedureParameters(), currentState.getProcedureParameters());
-
-        if (changed) {
-            if (currentState.getProcedure() != e.getProcedure()) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setMap(e.getDataMap());
-                currentState.setProcedure(e.getProcedure());
-            }
-            currentState.setProcedureParameters(e.getProcedureParameters());
-        }
-
-        EventListener[] list = getEventController().getListenerMap().getListeners(ProcedureParameterDisplayListener.class);
-        for (EventListener eventListener : list) {
-            ProcedureParameterDisplayListener listener = (ProcedureParameterDisplayListener) eventListener;
-            listener.currentProcedureParameterChanged(e);
-        }
-    }
-
-    public void fireDbEntityDisplayEvent(EntityDisplayEvent e) {
-        boolean changed = e.getEntity() != currentState.getDbEntity();
-        if (!e.isRefired()) {
-            e.setEntityChanged(changed);
-
-            if (changed) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setNode(e.getDataNode());
-                currentState.setMap(e.getDataMap());
-                currentState.setDbEntity((DbEntity)e.getEntity());
-            }
-        }
-
-        if (changed) {
-            saveState(e);
-        }
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(DbEntityDisplayListener.class)) {
-            DbEntityDisplayListener temp = (DbEntityDisplayListener) listener;
-            temp.currentDbEntityChanged(e);
-        }
-    }
-
-    /** Notifies all listeners of the change(add, remove) and does the change. */
-    public void fireDbAttributeEvent(AttributeEvent e) {
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(DbAttributeListener.class)) {
-            DbAttributeListener temp = (DbAttributeListener) listener;
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.dbAttributeAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.dbAttributeChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.dbAttributeRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid AttributeEvent type: " + e.getId());
-            }
-        }
-    }
-
-    public void fireDbAttributeDisplayEvent(AttributeDisplayEvent e) {
-        boolean changed = !Arrays.equals(e.getAttributes(), currentState.getDbAttrs());
-
-        if (changed) {
-            if (e.getEntity() != currentState.getDbEntity()) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setMap(e.getDataMap());
-                currentState.setDbEntity((DbEntity)e.getEntity());
-            }
-            currentState.setDbAttrs(new DbAttribute[e.getAttributes().length]);
-            System.arraycopy(e.getAttributes(), 0, currentState.getDbAttrs(), 0, currentState.getDbAttrs().length);
-        }
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(DbAttributeDisplayListener.class)) {
-            DbAttributeDisplayListener temp = (DbAttributeDisplayListener) listener;
-            temp.currentDbAttributeChanged(e);
-        }
-    }
-
-    /** Notifies all listeners of the change (add, remove) and does the change. */
-    public void fireObjAttributeEvent(AttributeEvent e) {
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(ObjAttributeListener.class)) {
-            ObjAttributeListener temp = (ObjAttributeListener) listener;
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.objAttributeAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.objAttributeChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.objAttributeRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid AttributeEvent type: " + e.getId());
-            }
-        }
-    }
-
-    public void fireObjAttributeDisplayEvent(AttributeDisplayEvent e) {
-        boolean changed = !Arrays.equals(e.getAttributes(), currentState.getObjAttrs());
-
-        if (changed) {
-            if (e.getEntity() != currentState.getObjEntity()) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setMap(e.getDataMap());
-                currentState.setObjEntity((ObjEntity)e.getEntity());
-            }
-            currentState.setObjAttrs(new ObjAttribute[e.getAttributes().length]);
-            System.arraycopy(e.getAttributes(), 0, currentState.getObjAttrs(), 0, currentState.getObjAttrs().length);
-        }
-
-        EventListener[] list = getEventController().getListenerMap().getListeners(ObjAttributeDisplayListener.class);
-        for (EventListener listener : list) {
-            ObjAttributeDisplayListener temp = (ObjAttributeDisplayListener) listener;
-            temp.currentObjAttributeChanged(e);
-        }
-    }
-
-    public void fireEmbeddableAttributeDisplayEvent(EmbeddableAttributeDisplayEvent ev) {
-        boolean changed = !Arrays.equals(ev.getEmbeddableAttributes(), currentState.getEmbAttrs());
-
-        if (changed) {
-            if (ev.getEmbeddable() != currentState.getEmbeddable()) {
-                clearState();
-                currentState.setDomain(ev.getDomain());
-                currentState.setMap(ev.getDataMap());
-                currentState.setEmbeddable(ev.getEmbeddable());
-            }
-            currentState.setEmbAttrs(new EmbeddableAttribute[ev.getEmbeddableAttributes().length]);
-            System.arraycopy(ev.getEmbeddableAttributes(), 0, currentState.getEmbAttrs(), 0, currentState.getEmbAttrs().length);
-        }
-
-        EventListener[] list = getEventController().getListenerMap().getListeners(EmbeddableAttributeDisplayListener.class);
-        for (EventListener listener : list) {
-            EmbeddableAttributeDisplayListener temp = (EmbeddableAttributeDisplayListener) listener;
-            temp.currentEmbeddableAttributeChanged(ev);
-        }
-    }
-
-    /** Notifies all listeners of the change(add, remove) and does the change. */
-    public void fireDbRelationshipEvent(RelationshipEvent e) {
-
-        if (e.getId() == MapEvent.CHANGE && e.getEntity() instanceof DbEntity) {
-            ((DbEntity) e.getEntity()).dbRelationshipChanged(e);
-        }
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(DbRelationshipListener.class)) {
-            DbRelationshipListener temp = (DbRelationshipListener) listener;
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.dbRelationshipAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.dbRelationshipChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.dbRelationshipRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
-            }
-        }
-    }
-
-    public void fireDbRelationshipDisplayEvent(RelationshipDisplayEvent e) {
-        boolean changed = !Arrays.equals(e.getRelationships(), currentState.getDbRels());
-
-        if (changed) {
-            if (e.getEntity() != currentState.getDbEntity()) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setMap(e.getDataMap());
-                currentState.setDbEntity((DbEntity)e.getEntity());
-            }
-            currentState.setDbRels(new DbRelationship[e.getRelationships().length]);
-            System.arraycopy(e.getRelationships(), 0, currentState.getDbRels(), 0, currentState.getDbRels().length);
-        }
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(DbRelationshipDisplayListener.class)) {
-            DbRelationshipDisplayListener temp = (DbRelationshipDisplayListener) listener;
-            temp.currentDbRelationshipChanged(e);
-        }
-    }
-
-    /** Notifies all listeners of the change(add, remove) and does the change. */
-    public void fireObjRelationshipEvent(RelationshipEvent e) {
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(ObjRelationshipListener.class)) {
-            ObjRelationshipListener temp = (ObjRelationshipListener) listener;
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.objRelationshipAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.objRelationshipChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.objRelationshipRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
-            }
-        }
-    }
-
-    public void fireMultipleObjectsDisplayEvent(MultipleObjectsDisplayEvent e) {
-        clearState();
-        currentState.setPaths(e.getNodes());
-        currentState.setParentPath(e.getParentNode());
-
-        EventListener[] list = getEventController().getListenerMap().getListeners(MultipleObjectsDisplayListener.class);
-        for (EventListener listener : list) {
-            MultipleObjectsDisplayListener temp = (MultipleObjectsDisplayListener) listener;
-            temp.currentObjectsChanged(e);
-        }
-    }
-
-    public void fireObjRelationshipDisplayEvent(RelationshipDisplayEvent e) {
-        boolean changed = !Arrays.equals(e.getRelationships(), currentState.getObjRels());
-        e.setRelationshipChanged(changed);
-
-        if (changed) {
-            if (e.getEntity() != currentState.getObjEntity()) {
-                clearState();
-                currentState.setDomain(e.getDomain());
-                currentState.setMap(e.getDataMap());
-                currentState.setObjEntity((ObjEntity) e.getEntity());
-            }
-            currentState.setObjRels(new ObjRelationship[e.getRelationships().length]);
-            System.arraycopy(e.getRelationships(), 0, currentState.getObjRels(), 0, currentState.getObjRels().length);
-        }
-
-        EventListener[] list = getEventController().getListenerMap().getListeners(ObjRelationshipDisplayListener.class);
-        for (EventListener listener : list) {
-            ObjRelationshipDisplayListener temp = (ObjRelationshipDisplayListener) listener;
-            temp.currentObjRelationshipChanged(e);
-        }
-    }
-
     public void addDataMap(Object src, DataMap map) {
         addDataMap(src, map, true);
     }
@@ -1256,58 +1098,6 @@ public class ProjectController {
         fireDataMapEvent(new DataMapEvent(src, map, MapEvent.ADD));
         if (makeCurrent) {
             fireDataMapDisplayEvent(new DataMapDisplayEvent(src, map, currentState.getDomain(), currentState.getNode()));
-        }
-    }
-
-    /**
-     * fires callback method manipulation event
-     *
-     * @param e
-     *            event
-     */
-    public void fireCallbackMethodEvent(CallbackMethodEvent e) {
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(CallbackMethodListener.class)) {
-            CallbackMethodListener temp = (CallbackMethodListener) listener;
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.callbackMethodAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.callbackMethodChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.callbackMethodRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid CallbackEvent type: " + e.getId());
-            }
-        }
-    }
-
-    /**
-     * fires entity listener manipulation event
-     *
-     * @param e
-     *            event
-     */
-    public void fireEntityListenerEvent(EntityListenerEvent e) {
-
-        for (EventListener listener : getEventController().getListenerMap().getListeners(EntityListenerListener.class)) {
-            EntityListenerListener temp = (EntityListenerListener) listener;
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.entityListenerAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.entityListenerChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.entityListenerRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid CallbackEvent type: " + e.getId());
-            }
         }
     }
 
@@ -1361,92 +1151,7 @@ public class ProjectController {
         return null;
     }
 
-    public void fireEmbeddableEvent(EmbeddableEvent e, DataMap map) {
-        for (EventListener listener : getEventController().getListenerMap().getListeners(EmbeddableListener.class)) {
-            EmbeddableListener temp = (EmbeddableListener) listener;
 
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.embeddableAdded(e, map);
-                break;
-            case MapEvent.CHANGE:
-                temp.embeddableChanged(e, map);
-                break;
-            case MapEvent.REMOVE:
-                temp.embeddableRemoved(e, map);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
-            }
-        }
-    }
-
-    public void fireEmbeddableAttributeEvent(EmbeddableAttributeEvent e) {
-        for (EventListener listener : getEventController().getListenerMap().getListeners(EmbeddableAttributeListener.class)) {
-            EmbeddableAttributeListener temp = (EmbeddableAttributeListener) listener;
-
-            switch (e.getId()) {
-            case MapEvent.ADD:
-                temp.embeddableAttributeAdded(e);
-                break;
-            case MapEvent.CHANGE:
-                temp.embeddableAttributeChanged(e);
-                break;
-            case MapEvent.REMOVE:
-                temp.embeddableAttributeRemoved(e);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
-            }
-        }
-    }
-    
-    public void fireProjectOnSaveEvent(ProjectOnSaveEvent e){
-    	for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectOnSaveListener.class)){
-    		ProjectOnSaveListener temp = (ProjectOnSaveListener) listener;
-    		temp.beforeSaveChanges(e);
-    	}
-    }
-
-    public void fireDataSourceModificationEvent(DataSourceModificationEvent e) {
-        for (DataSourceModificationListener listener : getEventController().getListenerMap().getListeners(DataSourceModificationListener.class)) {
-            switch (e.getId()) {
-                case MapEvent.ADD:
-                    listener.callbackDataSourceAdded(e);
-                    break;
-                // Change event not supported for now
-                // There is no good place to catch data source modification
-                /*case MapEvent.CHANGE:
-                    listener.callbackDataSourceChanged(e);
-                    break;*/
-                case MapEvent.REMOVE:
-                    listener.callbackDataSourceRemoved(e);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid RelationshipEvent type: " + e.getId());
-            }
-        }
-    }
-
-    /**
-     * @since 4.1
-     */
-    public void fireProjectDirtyEvent(ProjectDirtyEvent e) {
-        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectDirtyEventListener.class)) {
-            ProjectDirtyEventListener temp = (ProjectDirtyEventListener) listener;
-            temp.setProjectDirty(e);
-        }
-    }
-
-    /**
-     * @since 4.1
-     */
-    public void fireOnChangeEvent(ProjectFileOnChangeTrackerEvent e){
-        for(EventListener listener : getEventController().getListenerMap().getListeners(ProjectFileOnChangeEventListener.class)){
-            ProjectFileOnChangeEventListener temp = (ProjectFileOnChangeEventListener) listener;
-            temp.onChange(e);
-        }
-    }
 
 
     public ArrayList<Embeddable> getEmbeddablesInCurrentDataDomain() {
@@ -1503,6 +1208,27 @@ public class ProjectController {
     }
 
     /**
+     * @since 4.1
+     */
+    public void setCurrentState(ControllerState cs) {
+        this.currentState = cs;
+    }
+
+    /**
+     * @since 4.1
+     */
+    public CircularArray<ControllerState> getControllerStateHistory() {
+        return controllerStateHistory;
+    }
+
+    /**
+     * @since 4.1
+     */
+    public void addControllerState(ControllerState controllerState) {
+        controllerStateHistory.add(controllerState);
+    }
+
+    /**
      * @since 4.0
      */
     public int getEntityTabSelection() {
@@ -1522,4 +1248,5 @@ public class ProjectController {
     public com.google.inject.Injector getBootiqueInjector() {
         return bootiqueInjector;
     }
+
 }

@@ -19,12 +19,12 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-import java.util.EventObject;
-
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneAction;
+
+import java.awt.event.ActionEvent;
+import java.util.EventObject;
 
 /**
  */
@@ -51,6 +51,6 @@ public class NavigateForwardAction extends CayenneAction {
     public void performAction(ActionEvent e) {
         ProjectController mediator = getProjectController();
         EventObject newEvent = new EventObject(this);
-        mediator.fireForwardNavigationEvent();
+        mediator.moveForward();
     }
 }

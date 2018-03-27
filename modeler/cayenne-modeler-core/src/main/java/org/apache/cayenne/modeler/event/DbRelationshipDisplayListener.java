@@ -25,6 +25,6 @@ import java.util.EventListener;
 public interface DbRelationshipDisplayListener extends EventListener
 {
 	/** Display specified DbRelationship. */
-	public void currentDbRelationshipChanged(RelationshipDisplayEvent e);
+	public void currentDbRelationshipChanged(DbRelationshipDisplayEvent e);
 }
 

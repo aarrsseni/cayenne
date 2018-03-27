@@ -23,22 +23,15 @@ import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.AttributeEvent;
 import org.apache.cayenne.map.event.EmbeddableAttributeEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
 import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
 import org.apache.cayenne.modeler.undo.CreateAttributeUndoableEdit;
 import org.apache.cayenne.modeler.undo.CreateEmbAttributeUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
@@ -81,9 +74,7 @@ public class CreateAttributeAction extends CayenneAction {
 
         DataChannelDescriptor domain = (DataChannelDescriptor) mediator.getProject().getRootNode();
 
-        AttributeDisplayEvent ade = new AttributeDisplayEvent(src, attr, objEntity, map, domain);
-
-        mediator.fireObjAttributeDisplayEvent(ade);
+        mediator.fireObjAttributeDisplayEvent(new ObjAttributeDisplayEvent(src, attr, objEntity, map, domain));
     }
 
     /**
@@ -93,10 +84,8 @@ public class CreateAttributeAction extends CayenneAction {
                                      DbAttribute attr) {
         mediator.fireDbAttributeEvent(new AttributeEvent(src, attr, dbEntity, MapEvent.ADD));
 
-        AttributeDisplayEvent ade = new AttributeDisplayEvent(src, attr, dbEntity, map,
-                (DataChannelDescriptor) mediator.getProject().getRootNode());
-
-        mediator.fireDbAttributeDisplayEvent(ade);
+        mediator.fireDbAttributeDisplayEvent(new DbAttributeDisplayEvent(src, attr, dbEntity, map,
+                (DataChannelDescriptor) mediator.getProject().getRootNode()));
     }
 
     @Override

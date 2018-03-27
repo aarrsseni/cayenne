@@ -28,5 +28,5 @@ import java.util.EventListener;
 public interface DbAttributeDisplayListener extends EventListener {
 
     /** Displays specified db attribute. */
-    public void currentDbAttributeChanged(AttributeDisplayEvent e);
+    public void currentDbAttributeChanged(DbAttributeDisplayEvent e);
 }

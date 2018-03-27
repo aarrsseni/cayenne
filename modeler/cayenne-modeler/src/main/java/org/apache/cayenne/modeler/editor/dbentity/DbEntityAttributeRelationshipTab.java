@@ -24,6 +24,8 @@ import org.apache.cayenne.map.event.DbEntityListener;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.CopyAttributeRelationshipAction;
 import org.apache.cayenne.modeler.action.CreateAttributeAction;
@@ -35,19 +37,14 @@ import org.apache.cayenne.modeler.action.DbEntitySyncAction;
 import org.apache.cayenne.modeler.action.PasteAction;
 import org.apache.cayenne.modeler.action.RemoveAttributeRelationshipAction;
 import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.ModelerUtil;
 import org.apache.cayenne.swing.components.image.FilteredIconFactory;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Combines DbEntityAttributeTab and DbEntityRelationshipTab in JSplitPane.
@@ -171,7 +168,7 @@ public class DbEntityAttributeRelationshipTab extends JPanel implements DbEntity
         relationshipPanel.dbEntityRemoved(e);
     }
 
-    public void currentDbEntityChanged(EntityDisplayEvent e) {
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
         DbEntity entity = (DbEntity) e.getEntity();
         if(entity.getDataMap().getMappedEntities(entity).isEmpty()) {
             toolBar.getComponentAtIndex(4).setEnabled(false);

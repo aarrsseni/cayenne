@@ -29,20 +29,12 @@ import org.apache.cayenne.map.event.ObjAttributeListener;
 import org.apache.cayenne.map.event.ObjEntityListener;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CopyAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.CutAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.ObjEntityToSuperEntityAction;
-import org.apache.cayenne.modeler.action.PasteAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeRelationshipAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.dialog.objentity.ObjAttributeInfoDialog;
 import org.apache.cayenne.modeler.editor.wrapper.ObjAttributeWrapper;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
-import org.apache.cayenne.modeler.event.ProjectOnSaveListener;
-import org.apache.cayenne.modeler.event.TablePopupHandler;
+import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
+import org.apache.cayenne.modeler.util.*;
 import org.apache.cayenne.modeler.util.*;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.CayenneTable;
@@ -64,6 +56,7 @@ import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.modeler.util.UIUtil;
 import org.apache.cayenne.modeler.util.combo.AutoCompletion;
 
+import javax.swing.*;
 import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -94,10 +87,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -377,7 +367,7 @@ public class ObjEntityAttributePanel extends JPanel implements ObjEntityDisplayL
         }
     }
 
-    public void currentObjEntityChanged(EntityDisplayEvent e) {
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
         if (e.getSource() == this) {
             return;
         }

@@ -28,5 +28,5 @@ import java.util.EventListener;
  */
 public interface DbEntityDisplayListener extends EventListener {
     /** Current entity used as a model has changed.*/
-    public void currentDbEntityChanged(EntityDisplayEvent e);
+    public void currentDbEntityChanged(DbEntityDisplayEvent e);
 }

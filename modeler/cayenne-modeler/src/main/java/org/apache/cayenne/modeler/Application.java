@@ -86,6 +86,9 @@ public class Application {
     protected Injector cayenneInjector;
 
     @com.google.inject.Inject
+    protected com.google.inject.Injector bootiqueInjector;
+
+    @com.google.inject.Inject
     protected PlatformInitializer platformInitializer;
 
     private String newProjectTemporaryName;
@@ -130,6 +133,10 @@ public class Application {
 
     public Injector getInjector() {
         return cayenneInjector;
+    }
+
+    public com.google.inject.Injector getBootiqueInjector() {
+        return bootiqueInjector;
     }
 
     public Project getProject() {

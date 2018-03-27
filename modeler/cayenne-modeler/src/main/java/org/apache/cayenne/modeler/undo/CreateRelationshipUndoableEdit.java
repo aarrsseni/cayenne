@@ -18,9 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbRelationship;
@@ -28,7 +25,11 @@ import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.modeler.action.CreateRelationshipAction;
 import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class CreateRelationshipUndoableEdit extends CayenneUndoableEdit {
 
@@ -78,7 +79,7 @@ public class CreateRelationshipUndoableEdit extends CayenneUndoableEdit {
 
         if (objEnt != null) {
             action.removeObjRelationships(objEnt, objectRel);
-            controller.fireObjEntityDisplayEvent(new EntityDisplayEvent(
+            controller.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(
                     this,
                     objEnt,
                     objEnt.getDataMap(),
@@ -87,7 +88,7 @@ public class CreateRelationshipUndoableEdit extends CayenneUndoableEdit {
 
         if (dbEnt != null) {
             action.removeDbRelationships(dbEnt, dbRel);
-            controller.fireDbEntityDisplayEvent(new EntityDisplayEvent(this, dbEnt, dbEnt
+            controller.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(this, dbEnt, dbEnt
                     .getDataMap(), (DataChannelDescriptor) controller
                     .getProject()
                     .getRootNode()));

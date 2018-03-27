@@ -72,6 +72,7 @@ public class CayenneModelerController extends CayenneController {
     private SaveFlag enableToSave;
     private ProjectDirty enableToSave;
     private ProjectFileChangeTrackerDisplay fileProjectChangeTracker;
+    private DomainSelectedChanges domainSelectedChanges;
 
     public CayenneModelerController(){}
 
@@ -377,8 +378,8 @@ public class CayenneModelerController extends CayenneController {
         projectController.getEventController().addProcedureDisplayListener(frame);
         projectController.getEventController().addMultipleObjectsDisplayListener(frame);
         projectController.getEventController().addEmbeddableDisplayListener(frame);
-        projectController.getEventController().addActionManagerChangesListener(frame);
 
+        initHelpers();
     }
 
     protected void initHelpers(){
@@ -387,5 +388,8 @@ public class CayenneModelerController extends CayenneController {
 
         fileProjectChangeTracker = new ProjectFileChangeTrackerDisplay(getProjectController());
         fileProjectChangeTracker.initAll();
+
+        domainSelectedChanges = new DomainSelectedChanges(frame.getActionManager(), this);
+        domainSelectedChanges.initAll();
     }
 }

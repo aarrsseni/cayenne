@@ -78,6 +78,42 @@ public enum DisplayEventTypes {
         }
     },
 
+    DbEntityDisplayEvent {
+        @Override
+        DisplayEventType createDisplayEventType(ProjectController controller) {
+            if (controller.getCurrentState().getObjAttrs().length != 0 || controller.getCurrentState().getDbAttrs().length != 0) {
+                return new AttributeDisplayEventType(controller);
+            } else if (controller.getCurrentState().getObjRels().length != 0 || controller.getCurrentState().getDbRels().length != 0) {
+                return new RelationshipDisplayEventType(controller);
+            } else {
+                return new EntityDisplayEventType(controller);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return DbEntityDisplayEvent.class.getSimpleName();
+        }
+    },
+
+    ObjEntityDisplayEvent {
+        @Override
+        DisplayEventType createDisplayEventType(ProjectController controller) {
+            if (controller.getCurrentState().getObjAttrs().length != 0 || controller.getCurrentState().getDbAttrs().length != 0) {
+                return new AttributeDisplayEventType(controller);
+            } else if (controller.getCurrentState().getObjRels().length != 0 || controller.getCurrentState().getDbRels().length != 0) {
+                return new RelationshipDisplayEventType(controller);
+            } else {
+                return new EntityDisplayEventType(controller);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return ObjEntityDisplayEvent.class.getSimpleName();
+        }
+    },
+
     AttributeDisplayEvent {
         @Override
         DisplayEventType createDisplayEventType(ProjectController controller) {

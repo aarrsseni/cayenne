@@ -19,29 +19,18 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.DbAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.DbRelationshipDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.*;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.Component;
+import java.awt.*;
 
 public class DbEntityTabbedView extends JTabbedPane implements ChangeListener,
         DbEntityDisplayListener, DbRelationshipDisplayListener,
@@ -98,7 +87,7 @@ public class DbEntityTabbedView extends JTabbedPane implements ChangeListener,
     }
 
     /** If entity is null hides it's contents, otherwise makes it visible. */
-    public void currentDbEntityChanged(EntityDisplayEvent e) {
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
         Entity entity = e.getEntity();
 
         if (e.isMainTabFocus() && entity instanceof DbEntity) {
@@ -116,7 +105,7 @@ public class DbEntityTabbedView extends JTabbedPane implements ChangeListener,
         }
     }
 
-    public void currentDbRelationshipChanged(RelationshipDisplayEvent e) {
+    public void currentDbRelationshipChanged(DbRelationshipDisplayEvent e) {
         if (e.getEntity() == null) {
             return;
         }
@@ -137,7 +126,7 @@ public class DbEntityTabbedView extends JTabbedPane implements ChangeListener,
         attributeRelationshipTab.updateActions(dbRels);
     }
 
-    public void currentDbAttributeChanged(AttributeDisplayEvent e) {
+    public void currentDbAttributeChanged(DbAttributeDisplayEvent e) {
         if (e.getEntity() == null)
             return;
 

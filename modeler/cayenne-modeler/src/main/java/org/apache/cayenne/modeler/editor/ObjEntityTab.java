@@ -44,22 +44,15 @@ import javax.swing.SwingConstants;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.exp.Expression;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CreateAttributeAction;
-import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.action.ObjEntityCounterpartAction;
-import org.apache.cayenne.modeler.action.ObjEntitySyncAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.dialog.objentity.ClassNameUpdater;
 import org.apache.cayenne.modeler.dialog.validator.DuplicatedAttributesDialog;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
 import org.apache.cayenne.modeler.graph.action.ShowGraphEntityAction;
 import org.apache.cayenne.modeler.util.CellRenderers;
@@ -72,20 +65,8 @@ import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -318,8 +299,9 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                     DataChannelDescriptor domain = (DataChannelDescriptor) mediator.getProject().getRootNode();
                     DataMap map = mediator.getCurrentState().getDataMap();
 
-                mediator.fireObjEntityEvent(new EntityEvent(this, entity));
-                mediator.fireObjEntityDisplayEvent(new EntityDisplayEvent(this, entity, map, domain));
+                    mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+                    mediator.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(this, entity, map, domain));
+                }
             }
         });
 
@@ -328,7 +310,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
             DbEntity entity = mediator.getCurrentState().getObjEntity().getDbEntity();
             if (entity != null) {
                 DataChannelDescriptor dom = (DataChannelDescriptor) mediator.getProject().getRootNode();
-                mediator.fireDbEntityDisplayEvent(new EntityDisplayEvent(this, entity, entity.getDataMap(), dom));
+                mediator.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(this, entity, entity.getDataMap(), dom));
             }
         });
 
@@ -566,7 +548,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
 
     public void processExistingSelection(EventObject e) {
 
-        EntityDisplayEvent ede = new EntityDisplayEvent(
+        ObjEntityDisplayEvent ede = new ObjEntityDisplayEvent(
                 this,
                 mediator.getCurrentState().getObjEntity(),
                 mediator.getCurrentState().getDataMap(),
@@ -574,7 +556,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
         mediator.fireObjEntityDisplayEvent(ede);
     }
 
-    public void currentObjEntityChanged(EntityDisplayEvent e) {
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
         ObjEntity entity = (ObjEntity) e.getEntity();
         if (entity == null || !e.isEntityChanged()) {
             return;

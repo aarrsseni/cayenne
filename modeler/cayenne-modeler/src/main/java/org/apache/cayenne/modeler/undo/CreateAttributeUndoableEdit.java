@@ -18,18 +18,15 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.action.CreateAttributeAction;
 import org.apache.cayenne.modeler.action.RemoveAttributeAction;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class CreateAttributeUndoableEdit extends CayenneUndoableEdit {
 
@@ -76,7 +73,7 @@ public class CreateAttributeUndoableEdit extends CayenneUndoableEdit {
                 objAttr
             });
 
-            controller.fireObjEntityDisplayEvent(new EntityDisplayEvent(
+            controller.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(
                     this,
                     objEntity,
                     dataMap,
@@ -88,7 +85,7 @@ public class CreateAttributeUndoableEdit extends CayenneUndoableEdit {
                 dbAttr
             });
 
-            controller.fireDbEntityDisplayEvent(new EntityDisplayEvent(
+            controller.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(
                     this,
                     dbEntity,
                     dataMap,

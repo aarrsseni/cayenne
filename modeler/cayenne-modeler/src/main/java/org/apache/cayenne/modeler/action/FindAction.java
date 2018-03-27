@@ -20,6 +20,7 @@ package org.apache.cayenne.modeler.action;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.dbsync.reverse.dbload.DbRelationshipDetected;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
@@ -45,6 +46,7 @@ import org.apache.cayenne.modeler.ProjectTreeModel;
 import org.apache.cayenne.modeler.ProjectTreeView;
 import org.apache.cayenne.modeler.dialog.FindDialog;
 import org.apache.cayenne.modeler.editor.EditorView;
+import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
 import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
 import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
@@ -54,20 +56,14 @@ import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
 import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.query.SQLTemplate;
 
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class FindAction extends CayenneAction {
@@ -274,24 +270,30 @@ public class FindAction extends CayenneAction {
         buildAndSelectTreePath(map, entity, editor);
 
         if (searchResultEntry.getObject() instanceof Attribute) {
-            AttributeDisplayEvent event = new AttributeDisplayEvent(editor.getProjectTreeView(),
-                    (Attribute) searchResultEntry.getObject(), entity, map, domain);
-            event.setMainTabFocus(true);
             if(searchResultEntry.getObject() instanceof DbAttribute) {
+                DbAttributeDisplayEvent event = new DbAttributeDisplayEvent(editor.getProjectTreeView(),
+                        (Attribute) searchResultEntry.getObject(), entity, map, domain);
+                event.setMainTabFocus(true);
                 editor.getDbDetailView().currentDbAttributeChanged(event);
                 editor.getDbDetailView().repaint();
             } else {
+                ObjAttributeDisplayEvent event = new ObjAttributeDisplayEvent(editor.getProjectTreeView(),
+                        (Attribute) searchResultEntry.getObject(), entity, map, domain);
+                event.setMainTabFocus(true);
                 editor.getObjDetailView().currentObjAttributeChanged(event);
                 editor.getObjDetailView().repaint();
             }
         } else if (searchResultEntry.getObject() instanceof Relationship) {
-            RelationshipDisplayEvent event = new RelationshipDisplayEvent(editor.getProjectTreeView(),
-                    (Relationship) searchResultEntry.getObject(), entity, map, domain);
-            event.setMainTabFocus(true);
             if(searchResultEntry.getObject() instanceof DbRelationship) {
+                DbRelationshipDisplayEvent event = new DbRelationshipDisplayEvent(editor.getProjectTreeView(),
+                        (Relationship) searchResultEntry.getObject(), entity, map, domain);
+                event.setMainTabFocus(true);
                 editor.getDbDetailView().currentDbRelationshipChanged(event);
                 editor.getDbDetailView().repaint();
             } else {
+                ObjRelationshipDisplayEvent event = new ObjRelationshipDisplayEvent(editor.getProjectTreeView(),
+                        (Relationship) searchResultEntry.getObject(), entity, map, domain);
+                event.setMainTabFocus(true);
                 editor.getObjDetailView().currentObjRelationshipChanged(event);
                 editor.getObjDetailView().repaint();
             }
@@ -327,12 +329,15 @@ public class FindAction extends CayenneAction {
     private static void jumpToEntityResult(Entity entity, EditorView editor, DataChannelDescriptor domain) {
         DataMap map = entity.getDataMap();
         buildAndSelectTreePath(map, entity, editor);
-        EntityDisplayEvent event = new EntityDisplayEvent(editor.getProjectTreeView(), entity, map, domain);
-        event.setMainTabFocus(true);
-
         if (entity instanceof ObjEntity) {
+            ObjEntityDisplayEvent event;
+            event = new ObjEntityDisplayEvent(editor.getProjectTreeView(), entity, map, domain);
+            event.setMainTabFocus(true);
             editor.getObjDetailView().currentObjEntityChanged(event);
         } else if (entity instanceof DbEntity) {
+            DbEntityDisplayEvent event;
+            event = new DbEntityDisplayEvent(editor.getProjectTreeView(), entity, map, domain);
+            event.setMainTabFocus(true);
             editor.getDbDetailView().currentDbEntityChanged(event);
         }
     }

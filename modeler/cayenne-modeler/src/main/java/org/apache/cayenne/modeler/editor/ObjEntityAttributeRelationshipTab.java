@@ -22,16 +22,8 @@ import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.ObjEntityListener;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CopyAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.CreateAttributeAction;
-import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.action.CutAttributeRelationshipAction;
-import org.apache.cayenne.modeler.action.ObjEntityCounterpartAction;
-import org.apache.cayenne.modeler.action.ObjEntitySyncAction;
-import org.apache.cayenne.modeler.action.PasteAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeRelationshipAction;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.util.CayenneAction;
@@ -39,12 +31,8 @@ import org.apache.cayenne.modeler.util.ModelerUtil;
 import org.apache.cayenne.swing.components.image.FilteredIconFactory;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Combines ObjEntityAttributeTab and ObjEntityRelationshipTab in JSplitPane.
@@ -168,7 +156,7 @@ public class ObjEntityAttributeRelationshipTab extends JPanel implements ObjEnti
         relationshipPanel.objEntityRemoved(e);
     }
 
-    public void currentObjEntityChanged(EntityDisplayEvent e) {
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
         attributePanel.currentObjEntityChanged(e);
         relationshipPanel.currentObjEntityChanged(e);
     }

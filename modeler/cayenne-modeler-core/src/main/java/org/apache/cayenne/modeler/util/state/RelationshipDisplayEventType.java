@@ -21,14 +21,9 @@ package org.apache.cayenne.modeler.util.state;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,15 +54,12 @@ class RelationshipDisplayEventType extends EntityDisplayEventType {
 
         Relationship[] relationships = getLastEntityRelationships(entity);
 
-        EntityDisplayEvent entityDisplayEvent = new EntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel);
-        RelationshipDisplayEvent displayEvent = new RelationshipDisplayEvent(this, relationships, entity, dataMap, dataChannel);
-
         if (entity instanceof ObjEntity) {
-            controller.fireObjEntityDisplayEvent(entityDisplayEvent);
-            controller.fireObjRelationshipDisplayEvent(displayEvent);
+            controller.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel));
+            controller.fireObjRelationshipDisplayEvent(new ObjRelationshipDisplayEvent(this, relationships, entity, dataMap, dataChannel));
         } else if (entity instanceof DbEntity) {
-            controller.fireDbEntityDisplayEvent(entityDisplayEvent);
-            controller.fireDbRelationshipDisplayEvent(displayEvent);
+            controller.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel));
+            controller.fireDbRelationshipDisplayEvent(new DbRelationshipDisplayEvent(this, relationships, entity, dataMap, dataChannel));
         }
     }
 

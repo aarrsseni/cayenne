@@ -19,30 +19,19 @@
 
 package org.apache.cayenne.modeler.editor;
 
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
 import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.ObjAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ObjRelationshipDisplayListener;
-import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.*;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Tabbed ObjEntity editor panel.
@@ -119,7 +108,7 @@ public class ObjEntityTabbedView extends JTabbedPane implements ObjEntityDisplay
         actionManager.getAction(RemoveCallbackMethodAction.class).setEnabled(false);
     }
 
-    public void currentObjEntityChanged(EntityDisplayEvent e) {
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
         Entity entity = e.getEntity();
 
         if (e.isMainTabFocus() && entity instanceof ObjEntity) {
@@ -139,7 +128,7 @@ public class ObjEntityTabbedView extends JTabbedPane implements ObjEntityDisplay
         }
     }
 
-    public void currentObjRelationshipChanged(RelationshipDisplayEvent e) {
+    public void currentObjRelationshipChanged(ObjRelationshipDisplayEvent e) {
         if (e.getEntity() == null) {
             return;
         }
@@ -159,7 +148,7 @@ public class ObjEntityTabbedView extends JTabbedPane implements ObjEntityDisplay
         attributeRelationshipTab.updateActions(objRels);
     }
 
-    public void currentObjAttributeChanged(AttributeDisplayEvent e) {
+    public void currentObjAttributeChanged(ObjAttributeDisplayEvent e) {
         if (e.getEntity() == null)
             return;
 

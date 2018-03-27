@@ -19,44 +19,7 @@
 
 package org.apache.cayenne.modeler;
 
-import org.apache.cayenne.modeler.action.AboutAction;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.ConfigurePreferencesAction;
-import org.apache.cayenne.modeler.action.CopyAction;
-import org.apache.cayenne.modeler.action.CreateDataMapAction;
-import org.apache.cayenne.modeler.action.CreateDbEntityAction;
-import org.apache.cayenne.modeler.action.CreateEmbeddableAction;
-import org.apache.cayenne.modeler.action.CreateNodeAction;
-import org.apache.cayenne.modeler.action.CreateObjEntityAction;
-import org.apache.cayenne.modeler.action.CreateProcedureAction;
-import org.apache.cayenne.modeler.action.CreateQueryAction;
-import org.apache.cayenne.modeler.action.CutAction;
-import org.apache.cayenne.modeler.action.DbEntitySyncAction;
-import org.apache.cayenne.modeler.action.DocumentationAction;
-import org.apache.cayenne.modeler.action.ExitAction;
-import org.apache.cayenne.modeler.action.FindAction;
-import org.apache.cayenne.modeler.action.GenerateCodeAction;
-import org.apache.cayenne.modeler.action.GenerateDBAction;
-import org.apache.cayenne.modeler.action.ImportDataMapAction;
-import org.apache.cayenne.modeler.action.ImportEOModelAction;
-import org.apache.cayenne.modeler.action.InferRelationshipsAction;
-import org.apache.cayenne.modeler.action.MigrateAction;
-import org.apache.cayenne.modeler.action.NavigateBackwardAction;
-import org.apache.cayenne.modeler.action.NavigateForwardAction;
-import org.apache.cayenne.modeler.action.NewProjectAction;
-import org.apache.cayenne.modeler.action.ObjEntitySyncAction;
-import org.apache.cayenne.modeler.action.OpenProjectAction;
-import org.apache.cayenne.modeler.action.PasteAction;
-import org.apache.cayenne.modeler.action.ProjectAction;
-import org.apache.cayenne.modeler.action.RedoAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
-import org.apache.cayenne.modeler.action.ReverseEngineeringAction;
-import org.apache.cayenne.modeler.action.RevertAction;
-import org.apache.cayenne.modeler.action.SaveAction;
-import org.apache.cayenne.modeler.action.SaveAsAction;
-import org.apache.cayenne.modeler.action.ShowLogConsoleAction;
-import org.apache.cayenne.modeler.action.UndoAction;
-import org.apache.cayenne.modeler.action.ValidateAction;
+import org.apache.cayenne.modeler.action.*;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -128,23 +91,7 @@ import org.apache.cayenne.modeler.action.dbimport.ReverseEngineeringToolMenuActi
 import org.apache.cayenne.modeler.dialog.LogConsole;
 import org.apache.cayenne.modeler.dialog.welcome.WelcomeScreen;
 import org.apache.cayenne.modeler.editor.EditorView;
-import org.apache.cayenne.modeler.event.ActionManagerChangesListener;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.DataMapDisplayListener;
-import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
-import org.apache.cayenne.modeler.event.DataNodeDisplayListener;
-import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayListener;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureDisplayListener;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
-import org.apache.cayenne.modeler.event.QueryDisplayListener;
-import org.apache.cayenne.modeler.event.RecentFileListListener;
+import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.util.ModelerUtil;
 import org.apache.cayenne.modeler.util.RecentFileMenu;
@@ -188,7 +135,7 @@ import java.util.Vector;
 public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListener,
         DataMapDisplayListener, ObjEntityDisplayListener, DbEntityDisplayListener,
         QueryDisplayListener, ProcedureDisplayListener, MultipleObjectsDisplayListener,
-        EmbeddableDisplayListener, ActionManagerChangesListener {
+        EmbeddableDisplayListener {
 
     protected EditorView view;
     protected RecentFileMenu recentFileMenu;
@@ -516,11 +463,11 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
         actionManager.dataMapSelected();
     }
 
-    public void currentObjEntityChanged(EntityDisplayEvent e) {
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
         actionManager.objEntitySelected();
     }
 
-    public void currentDbEntityChanged(EntityDisplayEvent e) {
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
         actionManager.dbEntitySelected();
     }
 
@@ -596,16 +543,6 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
         }
     }
 
-    @Override
-    public void projectOpenedChanges() {
-        actionManager.projectOpened();
-    }
-
-    @Override
-    public void domainSelectedChanges() {
-        actionManager.domainSelected();
-    }
-
     public class SearchPanel extends JPanel {
 
         private JLabel searchLabel = new JLabel("Search: ");
@@ -665,4 +602,7 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
         }
     }
 
+    public ActionManager getActionManager() {
+        return actionManager;
+    }
 }

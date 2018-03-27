@@ -19,22 +19,14 @@
 package org.apache.cayenne.modeler.dialog.objentity;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.EmbeddedAttribute;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.AttributeEvent;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.ObjAttributeTableModel;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.EntityTreeAttributeRelationshipFilter;
 import org.apache.cayenne.modeler.util.EntityTreeModel;
@@ -42,23 +34,16 @@ import org.apache.cayenne.modeler.util.ModelerUtil;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.util.CayenneMapEntry;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -487,14 +472,14 @@ public class ObjAttributeInfoDialog extends CayenneController implements TreeSel
 
 		projectController.fireObjEntityEvent(new EntityEvent(this, model.getEntity(), MapEvent.CHANGE));
 
-		EntityDisplayEvent event = new EntityDisplayEvent(this, projectController.getCurrentState().getObjEntity(),
+		ObjEntityDisplayEvent event = new ObjEntityDisplayEvent(this, projectController.getCurrentState().getObjEntity(),
 				projectController.getCurrentState().getDataMap(), (DataChannelDescriptor) projectController.getProject().getRootNode());
 
 		projectController.fireObjEntityDisplayEvent(event);
 
 		projectController.fireObjAttributeEvent(new AttributeEvent(this, attributeSaved, model.getEntity(), MapEvent.CHANGE));
 
-		AttributeDisplayEvent eventAttr = new AttributeDisplayEvent(this, attributeSaved,
+		ObjAttributeDisplayEvent eventAttr = new ObjAttributeDisplayEvent(this, attributeSaved,
 				projectController.getCurrentState().getObjEntity(), projectController.getCurrentState().getDataMap(),
 				(DataChannelDescriptor) projectController.getProject().getRootNode());
 
