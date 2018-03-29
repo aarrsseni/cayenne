@@ -161,7 +161,7 @@ public class DataDomainView extends JPanel implements DomainDisplayListener {
             properties.put(property, value);
 
             DomainEvent e = new DomainEvent(this, domain);
-            projectController.fireDomainEvent(e);
+            projectController.fireEvent(e);
         }
     }
 
@@ -229,6 +229,6 @@ public class DataDomainView extends JPanel implements DomainDisplayListener {
         dataChannelDescriptor.setName(newName);
 
         RenamedPreferences.copyPreferences(newName, prefs);
-        projectController.fireDomainEvent(e);
+        projectController.fireEvent(e);
     }
 }

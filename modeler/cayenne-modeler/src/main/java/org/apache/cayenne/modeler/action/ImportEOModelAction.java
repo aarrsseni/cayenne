@@ -23,6 +23,8 @@ import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.event.DataNodeEvent;
+import org.apache.cayenne.configuration.event.DbEntityEvent;
+import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.configuration.event.QueryEvent;
 import org.apache.cayenne.configuration.server.JNDIDataSourceFactory;
 import org.apache.cayenne.configuration.server.XMLPoolingDataSourceFactory;
@@ -33,16 +35,15 @@ import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ErrorDebugDialog;
 import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
 import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
+import org.apache.cayenne.modeler.pref.BaseFileChooser;
 import org.apache.cayenne.modeler.pref.FSPath;
 import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
-import org.apache.cayenne.modeler.pref.BaseFileChooser;
 import org.apache.cayenne.modeler.util.AdapterMapping;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.FileFilters;
@@ -186,9 +187,9 @@ public class ImportEOModelAction extends CayenneAction {
             domain.getNodeDescriptors().add(node);
 
             // send events after the node creation is complete
-            getProjectController().fireDataNodeEvent(
+            getProjectController().fireEvent(
                     new DataNodeEvent(this, node, MapEvent.ADD));
-            getProjectController().fireDataNodeDisplayEvent(
+            getProjectController().fireEvent(
                     new DataNodeDisplayEvent(
                             this,
                             (DataChannelDescriptor) getProjectController()
@@ -228,41 +229,43 @@ public class ImportEOModelAction extends CayenneAction {
             Collection<DbEntity> newDE = new ArrayList<>(currentMap.getDbEntities());
             Collection<QueryDescriptor> newQueries = new ArrayList<>(currentMap.getQueryDescriptors());
 
-            EntityEvent entityEvent = new EntityEvent(Application.getFrame(), null);
+            ObjEntityEvent objEntityEvent = new ObjEntityEvent(Application.getFrame(), null);
             QueryEvent queryEvent = new QueryEvent(Application.getFrame(), null);
 
             // 1. ObjEntities
             Collection<ObjEntity> addedOE = new ArrayList<>(newOE);
             addedOE.removeAll(originalOE);
             for (ObjEntity e : addedOE) {
-                entityEvent.setEntity(e);
-                entityEvent.setId(MapEvent.ADD);
-                mediator.fireObjEntityEvent(entityEvent);
+                objEntityEvent.setEntity(e);
+                objEntityEvent.setId(MapEvent.ADD);
+                mediator.fireEvent(objEntityEvent);
             }
 
             Collection<ObjEntity> removedOE = new ArrayList<>(originalOE);
             removedOE.removeAll(newOE);
             for (ObjEntity e : removedOE) {
-                entityEvent.setEntity(e);
-                entityEvent.setId(MapEvent.REMOVE);
-                mediator.fireObjEntityEvent(entityEvent);
+                objEntityEvent.setEntity(e);
+                objEntityEvent.setId(MapEvent.REMOVE);
+                mediator.fireEvent(objEntityEvent);
             }
+
+            DbEntityEvent dbEntityEvent = new DbEntityEvent(Application.getFrame(), null);
 
             // 2. DbEntities
             Collection<DbEntity> addedDE = new ArrayList<>(newDE);
             addedDE.removeAll(originalDE);
             for(DbEntity e: addedDE) {
-                entityEvent.setEntity(e);
-                entityEvent.setId(MapEvent.ADD);
-                mediator.fireDbEntityEvent(entityEvent);
+                dbEntityEvent.setEntity(e);
+                dbEntityEvent.setId(MapEvent.ADD);
+                mediator.fireEvent(dbEntityEvent);
             }
 
             Collection<DbEntity> removedDE = new ArrayList<>(originalDE);
             removedDE.removeAll(newDE);
             for(DbEntity e: removedDE) {
-                entityEvent.setEntity(e);
-                entityEvent.setId(MapEvent.REMOVE);
-                mediator.fireDbEntityEvent(entityEvent);
+                dbEntityEvent.setEntity(e);
+                dbEntityEvent.setId(MapEvent.REMOVE);
+                mediator.fireEvent(dbEntityEvent);
             }
 
             // 3. queries
@@ -271,7 +274,7 @@ public class ImportEOModelAction extends CayenneAction {
             for(QueryDescriptor q: addedQueries) {
                 queryEvent.setQuery(q);
                 queryEvent.setId(MapEvent.ADD);
-                mediator.fireQueryEvent(queryEvent);
+                mediator.fireEvent(queryEvent);
             }
 
             Collection<QueryDescriptor> removedQueries = new ArrayList<>(originalQueries);
@@ -279,10 +282,10 @@ public class ImportEOModelAction extends CayenneAction {
             for(QueryDescriptor q: removedQueries) {
                 queryEvent.setQuery(q);
                 queryEvent.setId(MapEvent.REMOVE);
-                mediator.fireQueryEvent(queryEvent);
+                mediator.fireEvent(queryEvent);
             }
 
-            mediator.fireDataMapDisplayEvent(new DataMapDisplayEvent(Application
+            mediator.fireEvent(new DataMapDisplayEvent(Application
                     .getFrame(), map, (DataChannelDescriptor) mediator
                     .getProject()
                     .getRootNode(), mediator.getCurrentState().getNode()));

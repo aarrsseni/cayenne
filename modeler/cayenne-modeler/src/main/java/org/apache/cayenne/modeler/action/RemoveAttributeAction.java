@@ -19,20 +19,10 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
-import java.util.Collection;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.AttributeEvent;
+import org.apache.cayenne.configuration.event.DbAttributeEvent;
+import org.apache.cayenne.configuration.event.ObjAttributeEvent;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.EmbeddableAttributeEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
@@ -40,6 +30,9 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.undo.RemoveAttributeUndoableEdit;
 import org.apache.cayenne.modeler.util.ProjectUtil;
+
+import java.awt.event.ActionEvent;
+import java.util.Collection;
 
 /**
  * Removes currently selected attribute from either the DbEntity or ObjEntity.
@@ -130,13 +123,13 @@ public class RemoveAttributeAction extends RemoveAction implements MultipleObjec
         for (DbAttribute attrib : attribs) {
             entity.removeAttribute(attrib.getName());
 
-            AttributeEvent e = new AttributeEvent(
+            DbAttributeEvent e = new DbAttributeEvent(
                     Application.getFrame(),
                     attrib,
                     entity,
                     MapEvent.REMOVE);
 
-            mediator.fireDbAttributeEvent(e);
+            mediator.fireEvent(e);
         }
 
         ProjectUtil.cleanObjMappings(dataMap);
@@ -147,12 +140,12 @@ public class RemoveAttributeAction extends RemoveAction implements MultipleObjec
 
         for (ObjAttribute attrib : attribs) {
             entity.removeAttribute(attrib.getName());
-            AttributeEvent e = new AttributeEvent(
+            ObjAttributeEvent e = new ObjAttributeEvent(
                     Application.getFrame(),
                     attrib,
                     entity,
                     MapEvent.REMOVE);
-            mediator.fireObjAttributeEvent(e);
+            mediator.fireEvent(e);
 
             Collection<ObjEntity> objEntities = ProjectUtil.getCollectionOfChildren((ObjEntity) e.getEntity());
             for (ObjEntity objEntity: objEntities) {
@@ -168,7 +161,7 @@ public class RemoveAttributeAction extends RemoveAction implements MultipleObjec
             embeddable.removeAttribute(attrib.getName());
             EmbeddableAttributeEvent e = new EmbeddableAttributeEvent(Application
                     .getFrame(), attrib, embeddable, MapEvent.REMOVE);
-            mediator.fireEmbeddableAttributeEvent(e);
+            mediator.fireEvent(e);
         }
     }
 }

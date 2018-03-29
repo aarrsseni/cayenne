@@ -136,7 +136,7 @@ public class SelectQueryPrefetchTab extends SelectQueryOrderingTab {
         // reset the model, since it is immutable
         table.setModel(createTableModel());
         
-        mediator.fireQueryEvent(new QueryEvent(this, selectQuery));
+        mediator.fireEvent(new QueryEvent(this, selectQuery));
     }
 
     public void removePrefetch(String prefetch) {
@@ -144,7 +144,7 @@ public class SelectQueryPrefetchTab extends SelectQueryOrderingTab {
 
         // reset the model, since it is immutable
         table.setModel(createTableModel());
-        mediator.fireQueryEvent(new QueryEvent(this, selectQuery));
+        mediator.fireEvent(new QueryEvent(this, selectQuery));
     }
 
     boolean isToMany(String prefetch) {

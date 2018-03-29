@@ -592,7 +592,7 @@ abstract class BaseGraphBuilder implements GraphBuilder, DataMapListener {
     public void undoableEditHappened(UndoableEditEvent e) {
         if (!undoEventsDisabled) {
             // graph has been modified
-            mediator.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
+            mediator.fireEvent(new ProjectDirtyEvent(this,true));
 
             Application.getInstance().getUndoManager().undoableEditHappened(e);
         }

@@ -24,6 +24,7 @@ import org.apache.cayenne.modeler.action.OpenProjectAction;
 import org.apache.cayenne.modeler.dialog.validator.ValidatorDialog;
 import org.apache.cayenne.modeler.editor.EditorView;
 import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
+import org.apache.cayenne.modeler.event.RecentFileListEvent;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.pref.FSPath;
 import org.apache.cayenne.modeler.util.CayenneController;
@@ -176,7 +177,7 @@ public class CayenneModelerController extends CayenneController {
     }
 
     public void projectSavedAction() {
-        projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this, false));
+        projectController.fireEvent(new ProjectDirtyEvent(this, false));
         projectController.updateProjectControllerPreferences();
         updateStatus("Project saved...");
         frame.setTitle(projectController.getProject().getConfigurationResource().getURL().getPath());
@@ -199,7 +200,7 @@ public class CayenneModelerController extends CayenneController {
         projectController.setProject(null);
 
         projectController.reset();
-        projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this, false));
+        projectController.fireEvent(new ProjectDirtyEvent(this, false));
 
         application.getActionManager().projectClosed();
 
@@ -232,7 +233,7 @@ public class CayenneModelerController extends CayenneController {
         // update preferences
         if (project.getConfigurationResource() != null) {
             getLastDirectory().setDirectory(new File(project.getConfigurationResource().getURL().getPath()));
-            frame.fireRecentFileListChanged();
+            frame.fireRecentFileListChanged(new RecentFileListEvent(this));
         }
 
         PROJECT_STATE_UTIL.fireLastState(projectController);
@@ -245,7 +246,7 @@ public class CayenneModelerController extends CayenneController {
         if (!loadFailures.isEmpty()) {
             // mark project as unsaved
             project.setModified(true);
-            projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
+            projectController.fireEvent(new ProjectDirtyEvent(this,true));
             allFailures.addAll(loadFailures);
         }
 
@@ -351,7 +352,7 @@ public class CayenneModelerController extends CayenneController {
         }
 
         getLastDirectory().setDirectory(newFile);
-        frame.fireRecentFileListChanged();
+        frame.fireRecentFileListChanged(new RecentFileListEvent(this));
     }
 
     public void projectOpened() {

@@ -18,26 +18,30 @@
  ****************************************************************/
 package org.apache.cayenne.map.event;
 
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
 
 
 public class EmbeddableEvent extends MapEvent {
 
     protected Embeddable embeddable;
+    protected DataMap dataMap;
     
     public EmbeddableEvent(Object source, Embeddable embeddable) {
         super(source);
         setEmbeddable(embeddable);
     }
 
-     public EmbeddableEvent(Object src, Embeddable embeddable2, int id) {
+     public EmbeddableEvent(Object src, Embeddable embeddable2, int id, DataMap dataMap) {
          this(src, embeddable2);
          setId(id);
+         this.dataMap = dataMap;
     }
 
-     public EmbeddableEvent(Object src, Embeddable embeddable2, String oldClassName) {
+     public EmbeddableEvent(Object src, Embeddable embeddable2, String oldClassName, DataMap dataMap) {
          this(src, embeddable2);
          setOldName(oldClassName);
+         this.dataMap = dataMap;
     }
 
      
@@ -53,5 +57,9 @@ public class EmbeddableEvent extends MapEvent {
     @Override
     public String getNewName() {
         return (embeddable != null) ? embeddable.getClassName() : null;
+    }
+
+    public DataMap getDataMap() {
+        return dataMap;
     }
 }

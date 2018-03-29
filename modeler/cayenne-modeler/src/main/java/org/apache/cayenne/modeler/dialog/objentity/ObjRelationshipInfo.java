@@ -19,25 +19,15 @@
 package org.apache.cayenne.modeler.dialog.objentity;
 
 import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.configuration.event.ObjRelationshipEvent;
 import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Relationship;
-import org.apache.cayenne.map.event.RelationshipEvent;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ResolveDbRelationshipDialog;
-import org.apache.cayenne.modeler.util.CayenneController;
+import org.apache.cayenne.modeler.util.*;
 import org.apache.cayenne.modeler.util.Comparators;
-import org.apache.cayenne.modeler.util.EntityTreeModel;
-import org.apache.cayenne.modeler.util.EntityTreeRelationshipFilter;
-import org.apache.cayenne.modeler.util.MultiColumnBrowser;
-import org.apache.cayenne.modeler.util.NameGeneratorPreferences;
 import org.apache.cayenne.util.DeleteRuleUpdater;
 import org.apache.cayenne.util.Util;
 
@@ -50,12 +40,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
 
 public class ObjRelationshipInfo extends CayenneController implements TreeSelectionListener {
 
@@ -305,7 +291,7 @@ public class ObjRelationshipInfo extends CayenneController implements TreeSelect
         }
 
         if (savePath()) {
-            projectController.fireObjRelationshipEvent(new RelationshipEvent(Application.getFrame(), getRelationship(),
+            projectController.fireEvent(new ObjRelationshipEvent(Application.getFrame(), getRelationship(),
                     getRelationship().getSourceEntity()));
         }
         view.sourceEntityLabel.setText(relationship.getSourceEntity().getName());

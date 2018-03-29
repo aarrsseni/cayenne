@@ -18,18 +18,13 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.autorelationship;
 
-import java.awt.Component;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
-
+import org.apache.cayenne.configuration.event.DbRelationshipEvent;
+import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.map.event.RelationshipEvent;
-import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
@@ -41,6 +36,9 @@ import org.apache.cayenne.modeler.util.NameGeneratorPreferences;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class InferRelationshipsController extends InferRelationshipsControllerBase {
 
@@ -186,9 +184,9 @@ public class InferRelationshipsController extends InferRelationshipsControllerBa
             DbRelationship rel = new DbRelationship(uniqueRelName(temp.getSource(), temp
                     .getName()));
 
-            RelationshipEvent e = new RelationshipEvent(Application.getFrame(), rel, temp
+            DbRelationshipEvent e = new DbRelationshipEvent(Application.getFrame(), rel, temp
                     .getSource(), MapEvent.ADD);
-            mediator.fireDbRelationshipEvent(e);
+            mediator.fireEvent(e);
 
             rel.setSourceEntity(temp.getSource());
             rel.setTargetEntityName(temp.getTarget());

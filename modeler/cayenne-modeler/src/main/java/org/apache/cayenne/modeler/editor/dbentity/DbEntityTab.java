@@ -22,10 +22,10 @@ package org.apache.cayenne.modeler.editor.dbentity;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.*;
@@ -194,7 +194,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
     public void processExistingSelection(EventObject e) {
         DbEntityDisplayEvent ede = new DbEntityDisplayEvent(this, mediator.getCurrentState().getDbEntity(),
                 mediator.getCurrentState().getDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode());
-        mediator.fireDbEntityDisplayEvent(ede);
+        mediator.fireEvent(ede);
     }
 
     public void currentDbEntityChanged(DbEntityDisplayEvent e) {
@@ -266,10 +266,10 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
             throw new ValidationException("Entity name is required.");
         } else if (entity.getDataMap().getDbEntity(newName) == null) {
             // completely new name, set new name for entity
-            EntityEvent e = new EntityEvent(this, entity, entity.getName());
+            DbEntityEvent e = new DbEntityEvent(this, entity, entity.getName());
             entity.setName(newName);
             // ProjectUtil.setDbEntityName(entity, newName);
-            mediator.fireDbEntityEvent(e);
+            mediator.fireEvent(e);
         } else {
             // there is an entity with the same name
             throw new ValidationException("There is another entity with name '" + newName + "'.");
@@ -286,7 +286,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
 
         if (ent != null && !Util.nullSafeEquals(ent.getCatalog(), text)) {
             ent.setCatalog(text);
-            mediator.fireDbEntityEvent(new EntityEvent(this, ent));
+            mediator.fireEvent(new DbEntityEvent(this, ent));
         }
     }
 
@@ -300,7 +300,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
 
         if (ent != null && !Util.nullSafeEquals(ent.getSchema(), text)) {
             ent.setSchema(text);
-            mediator.fireDbEntityEvent(new EntityEvent(this, ent));
+            mediator.fireEvent(new DbEntityEvent(this, ent));
         }
     }
 
@@ -319,7 +319,7 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
                 if (!Util.nullSafeEquals(oldQualifier, qualifier)) {
                     Expression exp = (Expression) convertor.stringAsValue(qualifier);
                     ent.setQualifier(exp);
-                    mediator.fireDbEntityEvent(new EntityEvent(this, ent));
+                    mediator.fireEvent(new DbEntityEvent(this, ent));
                 }
             } catch (IllegalArgumentException ex) {
                 // unparsable qualifier
@@ -341,6 +341,6 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
         }
 
         ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), entity, ObjectInfo.COMMENT, value);
-        mediator.fireDbEntityEvent(new EntityEvent(this, entity));
+        mediator.fireEvent(new DbEntityEvent(this, entity));
     }
 }

@@ -60,10 +60,10 @@ public class EntityErrorMsg extends ValidationDisplayHandler {
 
     public void displayField(ProjectController mediator, JFrame frame) {
         if (entity instanceof ObjEntity) {
-            mediator.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(frame, entity, map, domain));
+            mediator.fireEvent(new ObjEntityDisplayEvent(frame, entity, map, domain));
         }
         else if (entity instanceof DbEntity) {
-            mediator.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(frame, entity, map, domain));
+            mediator.fireEvent(new DbEntityDisplayEvent(frame, entity, map, domain));
         }
     }
 }

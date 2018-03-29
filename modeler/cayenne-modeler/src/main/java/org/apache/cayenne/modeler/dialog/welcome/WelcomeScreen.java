@@ -19,32 +19,20 @@
 
 package org.apache.cayenne.modeler.dialog.welcome;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagLayout;
-import java.awt.Paint;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ModelerPreferences;
 import org.apache.cayenne.modeler.action.NewProjectAction;
 import org.apache.cayenne.modeler.action.OpenProjectAction;
+import org.apache.cayenne.modeler.event.RecentFileListEvent;
 import org.apache.cayenne.modeler.event.RecentFileListListener;
 import org.apache.cayenne.modeler.util.BackgroundPanel;
 import org.apache.cayenne.modeler.util.ModelerUtil;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.List;
 
 /**
  * Welcome screen (CAY-894) is a panel shown when no project is open. User can quickly
@@ -170,7 +158,7 @@ public class WelcomeScreen extends JScrollPane implements RecentFileListListener
     }
 
     @Override
-    public void recentFileListChanged() {
+    public void recentFileListChanged(RecentFileListEvent e) {
         List<File> arr = ModelerPreferences.getLastProjFiles();
         recentProjectsList.setModel(new RecentFileListModel(arr));
     }

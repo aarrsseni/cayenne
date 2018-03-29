@@ -74,6 +74,6 @@ public class NewProjectAction extends ProjectAction {
         controller.projectOpenedAction(project);
 
         // select default domain
-        getProjectController().fireDomainDisplayEvent(new DomainDisplayEvent(this, dataChannelDescriptor));
+        getProjectController().fireEvent(new DomainDisplayEvent(this, dataChannelDescriptor));
     }
 }

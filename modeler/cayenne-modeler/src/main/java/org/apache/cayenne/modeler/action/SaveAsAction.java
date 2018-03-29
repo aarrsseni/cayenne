@@ -19,21 +19,12 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.util.prefs.Preferences;
-
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.event.EventListenerList;
-
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.validator.ValidatorDialog;
 import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
+import org.apache.cayenne.modeler.event.RecentFileListEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.pref.RenamedPreferences;
 import org.apache.cayenne.project.Project;
@@ -41,6 +32,13 @@ import org.apache.cayenne.project.ProjectSaver;
 import org.apache.cayenne.project.validation.ProjectValidator;
 import org.apache.cayenne.resource.URLResource;
 import org.apache.cayenne.validation.ValidationResult;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.util.prefs.Preferences;
 
 /**
  * A "Save As" action that allows user to pick save location.
@@ -138,7 +136,7 @@ public class SaveAsAction extends CayenneAction {
 
         File file = new File(p.getConfigurationResource().getURL().toURI());
         getApplication().getFrameController().addToLastProjListAction(file);
-        Application.getFrame().fireRecentFileListChanged();
+        Application.getFrame().fireRecentFileListChanged(new RecentFileListEvent(this));
 
         // Reset the watcher now
         getProjectController().getFileChangeTracker().reconfigure();
@@ -160,7 +158,7 @@ public class SaveAsAction extends CayenneAction {
         ProjectValidator projectValidator = getApplication().getInjector().getInstance(ProjectValidator.class);
         ValidationResult validationResult = projectValidator.validate(getCurrentProject().getRootNode());
         
-        getProjectController().fireProjectOnSaveEvent(new ProjectOnSaveEvent(SaveAsAction.class));
+        getProjectController().fireEvent(new ProjectOnSaveEvent(SaveAsAction.class));
         try {
             if (!saveAll()) {
                 return;

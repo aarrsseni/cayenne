@@ -178,7 +178,7 @@ public class DataSourcePreferences extends CayenneController {
 
 	private void fireEvent(String dataSourceKey, int eventId) {
 		DataSourceModificationEvent event = new DataSourceModificationEvent(this, dataSourceKey, eventId);
-		getApplication().getFrameController().getProjectController().fireDataSourceModificationEvent(event);
+		getApplication().getFrameController().getProjectController().fireEvent(event);
 	}
 
 	/**

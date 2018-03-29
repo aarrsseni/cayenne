@@ -302,7 +302,7 @@ public class RemoveUndoableEdit extends CayenneUndoableEdit {
                                 .getProject()
                                 .getRootNode());
 
-                controller.fireDataNodeEvent(e);
+                controller.fireEvent(e);
 
                 break;
             }

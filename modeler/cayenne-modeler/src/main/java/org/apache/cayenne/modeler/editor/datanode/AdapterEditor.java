@@ -109,6 +109,6 @@ public class AdapterEditor extends CayenneController {
         node.setAdapterType(name);
         
         DataNodeEvent e = new DataNodeEvent(AdapterEditor.this, node);
-        projectController.fireDataNodeEvent(e);
+        projectController.fireEvent(e);
     }
 }

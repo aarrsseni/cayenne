@@ -43,7 +43,7 @@ class DataNodeDisplayEventType extends DisplayEventType {
         }
 
         DataNodeDisplayEvent dataNodeDisplayEvent = new DataNodeDisplayEvent(this, dataChannel, dataNode);
-        controller.fireDataNodeDisplayEvent(dataNodeDisplayEvent);
+        controller.fireEvent(dataNodeDisplayEvent);
     }
 
     @Override

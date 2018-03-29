@@ -19,7 +19,6 @@
 package org.apache.cayenne.modeler.editor;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.map.event.EmbeddableAttributeEvent;
@@ -28,12 +27,7 @@ import org.apache.cayenne.map.event.EmbeddableEvent;
 import org.apache.cayenne.map.event.EmbeddableListener;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.ActionManager;
-import org.apache.cayenne.modeler.action.CopyAttributeAction;
-import org.apache.cayenne.modeler.action.CreateAttributeAction;
-import org.apache.cayenne.modeler.action.CutAttributeAction;
-import org.apache.cayenne.modeler.action.PasteAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeAction;
+import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
 import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
 import org.apache.cayenne.modeler.event.EmbeddableDisplayListener;
@@ -45,16 +39,12 @@ import org.apache.cayenne.modeler.util.PanelFactory;
 import org.apache.cayenne.modeler.util.UIUtil;
 import org.apache.cayenne.modeler.util.combo.AutoCompletion;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JToolBar;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.util.EventObject;
 import java.util.List;
 
@@ -161,7 +151,7 @@ public class EmbeddableAttributeTab extends JPanel implements
                 mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
-        mediator.fireEmbeddableAttributeDisplayEvent(ev);
+        mediator.fireEvent(ev);
     }
 
     private void rebuildTable(Embeddable emb) {
@@ -248,20 +238,20 @@ public class EmbeddableAttributeTab extends JPanel implements
         }
     }
 
-    public void embeddableAdded(EmbeddableEvent e, DataMap map) {
+    public void embeddableAdded(EmbeddableEvent e) {
     }
 
-    public void embeddableRemoved(EmbeddableEvent e, DataMap map) {
+    public void embeddableRemoved(EmbeddableEvent e) {
     }
 
-    public void embeddableChanged(EmbeddableEvent e, DataMap map) {
+    public void embeddableChanged(EmbeddableEvent e) {
         if (e.getOldName() != null) {
-            ((Embeddable) map.getEmbeddable(e.getOldName())).setClassName(e
+            ((Embeddable) e.getDataMap().getEmbeddable(e.getOldName())).setClassName(e
                     .getEmbeddable()
                     .getClassName());
-            if (map.getEmbeddableMap().containsKey(e.getOldName())) {
-                map.removeEmbeddable(e.getOldName());
-                map.addEmbeddable(e.getEmbeddable());
+            if (e.getDataMap().getEmbeddableMap().containsKey(e.getOldName())) {
+                e.getDataMap().removeEmbeddable(e.getOldName());
+                e.getDataMap().addEmbeddable(e.getEmbeddable());
             }
         }
     }

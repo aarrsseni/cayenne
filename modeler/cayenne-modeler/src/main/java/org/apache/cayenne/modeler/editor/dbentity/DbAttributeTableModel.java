@@ -19,24 +19,19 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
+import org.apache.cayenne.configuration.event.DbAttributeEvent;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.event.AttributeEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneTableModel;
 import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
 
-import javax.swing.JOptionPane;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import javax.swing.*;
+import java.util.*;
 
 /**
  * Model for DbEntity attributes. Allows adding/removing attributes, modifying types and names.
@@ -163,7 +158,7 @@ public class DbAttributeTableModel extends CayenneTableModel<DbAttribute> {
             return;
         }
 
-        AttributeEvent e = new AttributeEvent(eventSource, attr, entity);
+        DbAttributeEvent e = new DbAttributeEvent(eventSource, attr, entity);
 
         switch (col) {
             case DB_ATTRIBUTE_NAME:
@@ -195,7 +190,7 @@ public class DbAttributeTableModel extends CayenneTableModel<DbAttribute> {
                 break;
         }
 
-        mediator.fireDbAttributeEvent(e);
+        mediator.fireEvent(e);
     }
 
     public String getMaxLength(DbAttribute attr) {

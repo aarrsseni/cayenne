@@ -45,7 +45,7 @@ class DataMapDisplayEventType extends DisplayEventType {
         }
 
         DataMapDisplayEvent dataMapDisplayEvent = new DataMapDisplayEvent(this, dataMap, dataChannel, dataNode);
-        controller.fireDataMapDisplayEvent(dataMapDisplayEvent);
+        controller.fireEvent(dataMapDisplayEvent);
     }
 
     @Override

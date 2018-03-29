@@ -112,6 +112,10 @@ public class DataSourceWizard extends CayenneController {
 				setDataSourceKey(e.getDataSourceName());
 				refreshDataSources();
 			}
+
+			@Override
+			public void callbackDataSourceChanged(DataSourceModificationEvent e) {
+			}
 		};
 		getApplication().getFrameController().getProjectController()
 				.getEventController()

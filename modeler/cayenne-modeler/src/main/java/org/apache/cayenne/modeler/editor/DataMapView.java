@@ -385,7 +385,7 @@ public class DataMapView extends JPanel {
         }
 
         dataMap.setDefaultLockType(lockType);
-        eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+        eventController.fireEvent(new DataMapEvent(this, dataMap));
     }
 
     void setClientSupport(boolean flag) {
@@ -399,7 +399,7 @@ public class DataMapView extends JPanel {
             dataMap.setClientSupported(flag);
 
             toggleClientProperties(flag);
-            eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+            eventController.fireEvent(new DataMapEvent(this, dataMap));
         }
     }
 
@@ -413,7 +413,7 @@ public class DataMapView extends JPanel {
         if (dataMap.isQuotingSQLIdentifiers() != flag) {
             dataMap.setQuotingSQLIdentifiers(flag);
 
-            eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+            eventController.fireEvent(new DataMapEvent(this, dataMap));
         }
     }
 
@@ -440,7 +440,7 @@ public class DataMapView extends JPanel {
                 newDefaultPackage,
                 DataMapDefaults.DEFAULT_SUPERCLASS_PACKAGE_SUFFIX);
 
-        eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+        eventController.fireEvent(new DataMapEvent(this, dataMap));
     }
 
     void setDefaultClientPackage(String newDefaultPackage) {
@@ -467,7 +467,7 @@ public class DataMapView extends JPanel {
         // newDefaultPackage,
         // DataMapDefaults.DEFAULT_SUPERCLASS_PACKAGE);
 
-        eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+        eventController.fireEvent(new DataMapEvent(this, dataMap));
     }
 
     void setDefaultClientSuperclass(String newSuperclass) {
@@ -487,7 +487,7 @@ public class DataMapView extends JPanel {
         }
 
         dataMap.setDefaultClientSuperclass(newSuperclass);
-        eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+        eventController.fireEvent(new DataMapEvent(this, dataMap));
     }
     
     void setDefaultCatalog(String newCatalog) {
@@ -507,7 +507,7 @@ public class DataMapView extends JPanel {
         }
 
         dataMap.setDefaultCatalog(newCatalog);
-        eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+        eventController.fireEvent(new DataMapEvent(this, dataMap));
     }
 
     void setDefaultSchema(String newSchema) {
@@ -527,7 +527,7 @@ public class DataMapView extends JPanel {
         }
 
         dataMap.setDefaultSchema(newSchema);
-        eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+        eventController.fireEvent(new DataMapEvent(this, dataMap));
     }
 
     void setDefaultSuperclass(String newSuperclass) {
@@ -547,7 +547,7 @@ public class DataMapView extends JPanel {
         }
 
         dataMap.setDefaultSuperclass(newSuperclass);
-        eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+        eventController.fireEvent(new DataMapEvent(this, dataMap));
     }
 
     void setDataMapName(String newName) {
@@ -584,7 +584,7 @@ public class DataMapView extends JPanel {
                 .getProject()
                 .getRootNode(), map, newName);
         pref.copyPreferences(newName);
-        eventController.fireDataMapEvent(e);
+        eventController.fireEvent(e);
     }
 
     void setDataNode() {
@@ -685,7 +685,7 @@ public class DataMapView extends JPanel {
         }
 
         ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), dataMap, ObjectInfo.COMMENT, comment);
-        eventController.fireDataMapEvent(new DataMapEvent(this, dataMap));
+        eventController.fireEvent(new DataMapEvent(this, dataMap));
     }
 
     private String getComment(DataMap dataMap) {

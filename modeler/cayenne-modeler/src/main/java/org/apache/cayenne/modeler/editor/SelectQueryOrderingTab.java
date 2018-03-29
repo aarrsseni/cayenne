@@ -283,7 +283,7 @@ public class SelectQueryOrderingTab extends JPanel implements PropertyChangeList
 
         OrderingModel model = (OrderingModel) table.getModel();
         model.fireTableRowsInserted(index, index);
-        mediator.fireQueryEvent(new QueryEvent(SelectQueryOrderingTab.this, selectQuery));
+        mediator.fireEvent(new QueryEvent(SelectQueryOrderingTab.this, selectQuery));
     }
 
     void removeOrdering() {
@@ -297,7 +297,7 @@ public class SelectQueryOrderingTab extends JPanel implements PropertyChangeList
         selectQuery.removeOrdering(ordering);
 
         model.fireTableRowsDeleted(selection, selection);
-        mediator.fireQueryEvent(new QueryEvent(SelectQueryOrderingTab.this, selectQuery));
+        mediator.fireEvent(new QueryEvent(SelectQueryOrderingTab.this, selectQuery));
     }
 
     /**
@@ -390,7 +390,7 @@ public class SelectQueryOrderingTab extends JPanel implements PropertyChangeList
                             + column);
             }
 
-            mediator.fireQueryEvent(new QueryEvent(
+            mediator.fireEvent(new QueryEvent(
                     SelectQueryOrderingTab.this,
                     selectQuery));
         }

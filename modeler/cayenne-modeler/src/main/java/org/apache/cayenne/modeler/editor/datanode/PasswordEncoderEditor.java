@@ -58,7 +58,7 @@ public class PasswordEncoderEditor extends CayenneController {
                     Object newValue) {
 
                 DataNodeEvent e = new DataNodeEvent(PasswordEncoderEditor.this, node);
-                projectController.fireDataNodeEvent(e);
+                projectController.fireEvent(e);
             }
         };
 

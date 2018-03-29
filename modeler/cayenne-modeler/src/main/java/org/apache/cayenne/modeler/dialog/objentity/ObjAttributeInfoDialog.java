@@ -19,9 +19,9 @@
 package org.apache.cayenne.modeler.dialog.objentity;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.ObjAttributeEvent;
+import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.AttributeEvent;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.ObjAttributeTableModel;
@@ -464,20 +464,20 @@ public class ObjAttributeInfoDialog extends CayenneController implements TreeSel
 		model.getEntity().removeAttribute(attribute.getName());
 		model.getEntity().addAttribute(attributeSaved);
 
-		projectController.fireObjEntityEvent(new EntityEvent(this, model.getEntity(), MapEvent.CHANGE));
+		projectController.fireEvent(new ObjEntityEvent(this, model.getEntity(), MapEvent.CHANGE));
 
 		ObjEntityDisplayEvent event = new ObjEntityDisplayEvent(this, projectController.getCurrentState().getObjEntity(),
 				projectController.getCurrentState().getDataMap(), (DataChannelDescriptor) projectController.getProject().getRootNode());
 
-		projectController.fireObjEntityDisplayEvent(event);
+		projectController.fireEvent(event);
 
-		projectController.fireObjAttributeEvent(new AttributeEvent(this, attributeSaved, model.getEntity(), MapEvent.CHANGE));
+		projectController.fireEvent(new ObjAttributeEvent(this, attributeSaved, model.getEntity(), MapEvent.CHANGE));
 
 		ObjAttributeDisplayEvent eventAttr = new ObjAttributeDisplayEvent(this, attributeSaved,
 				projectController.getCurrentState().getObjEntity(), projectController.getCurrentState().getDataMap(),
 				(DataChannelDescriptor) projectController.getProject().getRootNode());
 
-		projectController.fireObjAttributeDisplayEvent(eventAttr);
+		projectController.fireEvent(eventAttr);
 
 	}
 

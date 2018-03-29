@@ -84,7 +84,7 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileOnChangeEvent
                         .openProject(fileDirectory);
             }
         } else {
-            projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
+            projectController.fireEvent(new ProjectDirtyEvent(this,true));
         }
     }
 
@@ -97,7 +97,7 @@ public class ProjectFileChangeTrackerDisplay implements ProjectFileOnChangeEvent
         } else if (dialog.shouldClose()) {
             Application.getInstance().getFrameController().projectClosedAction();
         } else {
-            projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this, true));
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         }
     }
 

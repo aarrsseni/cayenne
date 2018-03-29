@@ -68,7 +68,7 @@ public class RelationshipErrorMsg extends ValidationDisplayHandler {
                     map,
                     domain);
 
-            mediator.fireObjEntityDisplayEvent(event);
+            mediator.fireEvent(event);
 
             ObjRelationshipDisplayEvent relEvent = new ObjRelationshipDisplayEvent(
                     frame,
@@ -76,7 +76,7 @@ public class RelationshipErrorMsg extends ValidationDisplayHandler {
                     entity,
                     map,
                     domain);
-            mediator.fireObjRelationshipDisplayEvent(relEvent);
+            mediator.fireEvent(relEvent);
         }
         else if (entity instanceof DbEntity) {
             DbEntityDisplayEvent event = new DbEntityDisplayEvent(
@@ -85,7 +85,7 @@ public class RelationshipErrorMsg extends ValidationDisplayHandler {
                     map,
                     domain);
 
-            mediator.fireDbEntityDisplayEvent(event);
+            mediator.fireEvent(event);
 
             DbRelationshipDisplayEvent relEvent = new DbRelationshipDisplayEvent(
                     frame,
@@ -93,7 +93,7 @@ public class RelationshipErrorMsg extends ValidationDisplayHandler {
                     entity,
                     map,
                     domain);
-            mediator.fireDbRelationshipDisplayEvent(relEvent);
+            mediator.fireEvent(relEvent);
         }
     }
 }

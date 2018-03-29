@@ -65,7 +65,7 @@ public class LinkDataMapsAction extends CayenneAction {
         for (DataMap dataMap : dataChannelDescriptor.getDataMaps()) {
             if (!linkedDataMaps.contains(dataMap.getName())) {
                 dataNodeDescriptor.getDataMapNames().add(dataMap.getName());
-                mediator.fireDataNodeEvent(new DataNodeEvent(this, dataNodeDescriptor));
+                mediator.fireEvent(new DataNodeEvent(this, dataNodeDescriptor));
             }
         }
 

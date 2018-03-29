@@ -18,19 +18,18 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.datamap;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.WindowConstants;
-
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.configuration.event.ProcedureEvent;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class CatalogUpdateController extends DefaultsPreferencesController {
 
@@ -91,7 +90,7 @@ public class CatalogUpdateController extends DefaultsPreferencesController {
 
                     // any way to batch events, a big change will flood the app
                     // with entity events..?
-                    mediator.fireDbEntityEvent(new EntityEvent(this, entity));
+                    mediator.fireEvent(new DbEntityEvent(this, entity));
                 }
             }
         }
@@ -104,7 +103,7 @@ public class CatalogUpdateController extends DefaultsPreferencesController {
 
                     // any way to batch events, a big change will flood the app
                     // with procedure events..?
-                    mediator.fireProcedureEvent(new ProcedureEvent(this, procedure));
+                    mediator.fireEvent(new ProcedureEvent(this, procedure));
                 }
             }
         }

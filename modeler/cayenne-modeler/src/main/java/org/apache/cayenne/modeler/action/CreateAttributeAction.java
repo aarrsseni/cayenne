@@ -21,10 +21,11 @@ package org.apache.cayenne.modeler.action;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DbAttributeEvent;
+import org.apache.cayenne.configuration.event.ObjAttributeEvent;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.AttributeEvent;
 import org.apache.cayenne.map.event.EmbeddableAttributeEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
@@ -56,12 +57,12 @@ public class CreateAttributeAction extends CayenneAction {
     static void fireEmbeddableAttributeEvent(Object src, ProjectController mediator, Embeddable embeddable,
                                              EmbeddableAttribute attr) {
 
-        mediator.fireEmbeddableAttributeEvent(new EmbeddableAttributeEvent(src, attr, embeddable, MapEvent.ADD));
+        mediator.fireEvent(new EmbeddableAttributeEvent(src, attr, embeddable, MapEvent.ADD));
 
         EmbeddableAttributeDisplayEvent e = new EmbeddableAttributeDisplayEvent(src, embeddable, attr,
                 mediator.getCurrentState().getDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode());
 
-        mediator.fireEmbeddableAttributeDisplayEvent(e);
+        mediator.fireEvent(e);
     }
 
     /**
@@ -70,11 +71,11 @@ public class CreateAttributeAction extends CayenneAction {
     static void fireObjAttributeEvent(Object src, ProjectController mediator, DataMap map, ObjEntity objEntity,
                                       ObjAttribute attr) {
 
-        mediator.fireObjAttributeEvent(new AttributeEvent(src, attr, objEntity, MapEvent.ADD));
+        mediator.fireEvent(new ObjAttributeEvent(src, attr, objEntity, MapEvent.ADD));
 
         DataChannelDescriptor domain = (DataChannelDescriptor) mediator.getProject().getRootNode();
 
-        mediator.fireObjAttributeDisplayEvent(new ObjAttributeDisplayEvent(src, attr, objEntity, map, domain));
+        mediator.fireEvent(new ObjAttributeDisplayEvent(src, attr, objEntity, map, domain));
     }
 
     /**
@@ -82,9 +83,9 @@ public class CreateAttributeAction extends CayenneAction {
      */
     static void fireDbAttributeEvent(Object src, ProjectController mediator, DataMap map, DbEntity dbEntity,
                                      DbAttribute attr) {
-        mediator.fireDbAttributeEvent(new AttributeEvent(src, attr, dbEntity, MapEvent.ADD));
+        mediator.fireEvent(new DbAttributeEvent(src, attr, dbEntity, MapEvent.ADD));
 
-        mediator.fireDbAttributeDisplayEvent(new DbAttributeDisplayEvent(src, attr, dbEntity, map,
+        mediator.fireEvent(new DbAttributeDisplayEvent(src, attr, dbEntity, map,
                 (DataChannelDescriptor) mediator.getProject().getRootNode()));
     }
 

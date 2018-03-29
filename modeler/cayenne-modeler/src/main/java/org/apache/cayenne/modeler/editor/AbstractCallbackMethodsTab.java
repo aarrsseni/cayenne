@@ -460,7 +460,7 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
 
                 CallbackDescriptor callbackDescriptor =
                         ((CallbackDescriptorTableModel)table.getCayenneModel()).getCallbackDescriptor();
-                mediator.fireProjectDirtyEvent(new ProjectDirtyEvent(this, callbackDescriptor.moveMethod(callbackMethod, rowIndex)));
+                mediator.fireEvent(new ProjectDirtyEvent(this, callbackDescriptor.moveMethod(callbackMethod, rowIndex)));
                 rebuildTables();
                 return true;
             }

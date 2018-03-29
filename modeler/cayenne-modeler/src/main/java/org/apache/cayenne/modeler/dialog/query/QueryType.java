@@ -137,9 +137,9 @@ public class QueryType extends CayenneController{
      */
     public static void fireQueryEvent(Object src, ProjectController mediator,
             DataMap dataMap, QueryDescriptor query) {
-        mediator.fireQueryEvent(new QueryEvent(src, query, MapEvent.ADD,
+        mediator.fireEvent(new QueryEvent(src, query, MapEvent.ADD,
                 dataMap));
-        mediator.fireQueryDisplayEvent(new QueryDisplayEvent(src, query,
+        mediator.fireEvent(new QueryDisplayEvent(src, query,
                 dataMap, (DataChannelDescriptor)mediator.getProject().getRootNode()));
     }
     

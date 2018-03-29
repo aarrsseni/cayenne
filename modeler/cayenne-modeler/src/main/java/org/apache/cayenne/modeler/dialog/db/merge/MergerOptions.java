@@ -364,11 +364,11 @@ public class MergerOptions extends CayenneController {
         project.setModified(true);
 
         ProjectController projectController = getProjectController();
-        projectController.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
+        projectController.fireEvent(new ProjectDirtyEvent(this,true));
 
-        projectController.fireDataMapEvent(new DataMapEvent(Application.getFrame(),
+        projectController.fireEvent(new DataMapEvent(Application.getFrame(),
                 dataMap, MapEvent.REMOVE));
-        projectController.fireDataMapEvent(new DataMapEvent(Application.getFrame(),
+        projectController.fireEvent(new DataMapEvent(Application.getFrame(),
                 dataMap, MapEvent.ADD));
     }
 

@@ -22,9 +22,9 @@ package org.apache.cayenne.modeler.editor;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.*;
@@ -222,7 +222,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
 
                 if (dbEntity != entity.getDbEntity()) {
                     entity.setDbEntity(dbEntity);
-                    mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+                    mediator.fireEvent(new ObjEntityEvent(this, entity));
                 }
             }
         });
@@ -283,8 +283,8 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                     DataChannelDescriptor domain = (DataChannelDescriptor) mediator.getProject().getRootNode();
                     DataMap map = mediator.getCurrentState().getDataMap();
 
-                    mediator.fireObjEntityEvent(new EntityEvent(this, entity));
-                    mediator.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(this, entity, map, domain));
+                    mediator.fireEvent(new ObjEntityEvent(this, entity));
+                    mediator.fireEvent(new ObjEntityDisplayEvent(this, entity, map, domain));
                 }
             }
         });
@@ -296,7 +296,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                 DbEntity entity = mediator.getCurrentState().getObjEntity().getDbEntity();
                 if (entity != null) {
                     DataChannelDescriptor dom = (DataChannelDescriptor) mediator.getProject().getRootNode();
-                    mediator.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(this, entity, entity.getDataMap(), dom));
+                    mediator.fireEvent(new DbEntityDisplayEvent(this, entity, entity.getDataMap(), dom));
                 }
             }
         });
@@ -310,7 +310,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                 ObjEntity entity = mediator.getCurrentState().getObjEntity();
                 if (entity != null) {
                     entity.setReadOnly(readOnly.isSelected());
-                    mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+                    mediator.fireEvent(new ObjEntityEvent(this, entity));
                 }
             }
         });
@@ -324,7 +324,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                     entity.setDeclaredLockType(optimisticLocking.isSelected()
                             ? ObjEntity.LOCK_TYPE_OPTIMISTIC
                             : ObjEntity.LOCK_TYPE_NONE);
-                    mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+                    mediator.fireEvent(new ObjEntityEvent(this, entity));
                 }
             }
         });
@@ -336,7 +336,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                 if (entity != null) {
                     entity.setServerOnly(serverOnly.isSelected());
                     toggleEnabled(dbEntityCombo.isEnabled(), !serverOnly.isSelected());
-                    mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+                    mediator.fireEvent(new ObjEntityEvent(this, entity));
                 }
             }
         });
@@ -348,7 +348,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                 ObjEntity entity = mediator.getCurrentState().getObjEntity();
                 if (entity != null) {
                     entity.setAbstract(isAbstract.isSelected());
-                    mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+                    mediator.fireEvent(new ObjEntityEvent(this, entity));
                 }
             }
         });
@@ -423,7 +423,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
         // "ent" may be null if we quit editing by changing tree selection
         if (entity != null && !Util.nullSafeEquals(entity.getClassName(), className)) {
             entity.setClassName(className);
-            mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+            mediator.fireEvent(new ObjEntityEvent(this, entity));
         }
     }
 
@@ -437,7 +437,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
 
         if (ent != null && !Util.nullSafeEquals(ent.getSuperClassName(), text)) {
             ent.setSuperClassName(text);
-            mediator.fireObjEntityEvent(new EntityEvent(this, ent));
+            mediator.fireEvent(new ObjEntityEvent(this, ent));
         }
     }
 
@@ -451,7 +451,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
         // "ent" may be null if we quit editing by changing tree selection
         if (entity != null && !Util.nullSafeEquals(entity.getClientClassName(), className)) {
             entity.setClientClassName(className);
-            mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+            mediator.fireEvent(new ObjEntityEvent(this, entity));
         }
     }
 
@@ -465,7 +465,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
 
         if (ent != null && !Util.nullSafeEquals(ent.getClientSuperClassName(), text)) {
             ent.setClientSuperClassName(text);
-            mediator.fireObjEntityEvent(new EntityEvent(this, ent));
+            mediator.fireEvent(new ObjEntityEvent(this, ent));
         }
     }
 
@@ -482,7 +482,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                 if (!Util.nullSafeEquals(oldQualifier, text)) {
                     Expression exp = (Expression) convertor.stringAsValue(text);
                     entity.setDeclaredQualifier(exp);
-                    mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+                    mediator.fireEvent(new ObjEntityEvent(this, entity));
                 }
             } catch (IllegalArgumentException ex) {
                 // unparsable qualifier
@@ -509,10 +509,10 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
             throw new ValidationException("Entity name is required.");
         } else if (entity.getDataMap().getObjEntity(newName) == null) {
             // completely new name, set new name for entity
-            EntityEvent e = new EntityEvent(this, entity, entity.getName());
+            ObjEntityEvent e = new ObjEntityEvent(this, entity, entity.getName());
             entity.setName(newName);
 
-            mediator.fireObjEntityEvent(e);
+            mediator.fireEvent(e);
 
             // suggest to update class name
             ClassNameUpdater nameUpdater = new ClassNameUpdater(Application.getInstance().getFrameController(), entity);
@@ -557,7 +557,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                 mediator.getCurrentState().getObjEntity(),
                 mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
-        mediator.fireObjEntityDisplayEvent(ede);
+        mediator.fireEvent(ede);
     }
 
     public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
@@ -590,7 +590,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
         }
 
         ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), entity, ObjectInfo.COMMENT, value);
-        mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+        mediator.fireEvent(new ObjEntityEvent(this, entity));
     }
 
     private String getComment(ObjEntity entity) {

@@ -159,9 +159,9 @@ public class ProjectFileChangeTracker extends Thread {
         }
 
         if (hasDeletions && !isShownRemoveDialog) {
-            mediator.fireOnChangeEvent(new ProjectFileOnChangeTrackerEvent(this, this, "Remove"));
+            mediator.fireEvent(new ProjectFileOnChangeTrackerEvent(this, this, "Remove"));
         } else if (hasChanges && !isShownChangeDialog) {
-            mediator.fireOnChangeEvent(new ProjectFileOnChangeTrackerEvent(this, this, "Change"));
+            mediator.fireEvent(new ProjectFileOnChangeTrackerEvent(this, this, "Change"));
         }
     }
 

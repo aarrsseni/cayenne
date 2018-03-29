@@ -19,18 +19,18 @@
 
 package org.apache.cayenne.modeler.dialog.datamap;
 
-import java.awt.Component;
-
+import org.apache.cayenne.configuration.event.ObjAttributeEvent;
+import org.apache.cayenne.configuration.event.ObjEntityEvent;
+import org.apache.cayenne.configuration.event.ObjRelationshipEvent;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.event.AttributeEvent;
-import org.apache.cayenne.map.event.EntityEvent;
-import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
+
+import java.awt.*;
 
 public class LockingUpdateController extends CayenneController {
 
@@ -90,14 +90,14 @@ public class LockingUpdateController extends CayenneController {
         for (ObjEntity entity : dataMap.getObjEntities()) {
             if (updateEntities && defaultLockType != entity.getDeclaredLockType()) {
                 entity.setDeclaredLockType(defaultLockType);
-                projectController.fireObjEntityEvent(new EntityEvent(this, entity));
+                projectController.fireEvent(new ObjEntityEvent(this, entity));
             }
 
             if (updateAttributes) {
                 for (ObjAttribute a : entity.getAttributes()) {
                     if (a.isUsedForLocking() != on) {
                         a.setUsedForLocking(on);
-                        projectController.fireObjAttributeEvent(new AttributeEvent(this, a, entity));
+                        projectController.fireEvent(new ObjAttributeEvent(this, a, entity));
                     }
                 }
             }
@@ -106,7 +106,7 @@ public class LockingUpdateController extends CayenneController {
                 for (ObjRelationship r : entity.getRelationships()) {
                     if (r.isUsedForLocking() != on) {
                         r.setUsedForLocking(on);
-                        projectController.fireObjRelationshipEvent(new RelationshipEvent(
+                        projectController.fireEvent(new ObjRelationshipEvent(
                                 this,
                                 r,
                                 entity));

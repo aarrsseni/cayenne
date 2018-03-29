@@ -32,6 +32,8 @@ public interface DataSourceModificationListener extends EventListener {
 
     void callbackDataSourceAdded(DataSourceModificationEvent e);
 
+    void callbackDataSourceChanged(DataSourceModificationEvent e);
+
     void callbackDataSourceRemoved(DataSourceModificationEvent e);
 
 }

@@ -244,12 +244,12 @@ public class SQLTemplateScriptsTab extends JPanel {
         if (key.equals(DEFAULT_LABEL)) {
             if (!Util.nullSafeEquals(text, query.getSql())) {
                 query.setSql(text);
-                mediator.fireQueryEvent(new QueryEvent(this, query));
+                mediator.fireEvent(new QueryEvent(this, query));
             }
         } else {
             if (!Util.nullSafeEquals(text, query.getAdapterSql().get(key))) {
                 query.getAdapterSql().put(key, text);
-                mediator.fireQueryEvent(new QueryEvent(this, query));
+                mediator.fireEvent(new QueryEvent(this, query));
             }
         }
     }
