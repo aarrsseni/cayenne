@@ -57,7 +57,7 @@ class MultipleObjectsDisplayEventType extends DisplayEventType {
         }
 
         MultipleObjectsDisplayEvent multipleDisplayEvent = new MultipleObjectsDisplayEvent(this, multipleObjects, parentObject);
-        controller.fireMultipleObjectsDisplayEvent(multipleDisplayEvent);
+        controller.fireEvent(multipleDisplayEvent);
     }
 
     @Override

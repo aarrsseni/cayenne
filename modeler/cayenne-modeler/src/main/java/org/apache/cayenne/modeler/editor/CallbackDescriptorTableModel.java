@@ -146,7 +146,7 @@ public class CallbackDescriptorTableModel extends CayenneTableModel<String> {
 
                 fireTableRowsUpdated(row, row);
 
-                mediator.fireCallbackMethodEvent(new CallbackMethodEvent(
+                mediator.fireEvent(new CallbackMethodEvent(
                         eventSource,
                         prevMethod,
                         method,

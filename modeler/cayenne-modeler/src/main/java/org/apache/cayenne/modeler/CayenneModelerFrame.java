@@ -179,7 +179,7 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
         initStatusBar();
         initWelcome();
 
-        fireRecentFileListChanged(); // start filling list in welcome screen and in menu
+        fireRecentFileListChanged(new RecentFileListEvent(this)); // start filling list in welcome screen and in menu
 
         setView(null);
     }
@@ -537,9 +537,9 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
     /**
      * Notifies all listeners that recent file list has changed
      */
-    public void fireRecentFileListChanged() {
+    public void fireRecentFileListChanged(RecentFileListEvent e) {
         for (RecentFileListListener recentFileListener : recentFileListeners) {
-            recentFileListener.recentFileListChanged();
+            recentFileListener.recentFileListChanged(e);
         }
     }
 

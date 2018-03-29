@@ -20,10 +20,10 @@
 package org.apache.cayenne.modeler.dialog.db.load;
 
 import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.dbsync.reverse.dbload.DefaultDbLoaderDelegate;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 
@@ -45,7 +45,7 @@ final class LoaderDelegate extends DefaultDbLoaderDelegate {
     public void dbEntityRemoved(DbEntity entity) {
         checkCanceled();
         if (context.isExistingDataMap()) {
-            context.getProjectController().fireDbEntityEvent(new EntityEvent(Application.getFrame(), entity, MapEvent.REMOVE));
+            context.getProjectController().fireEvent(new DbEntityEvent(Application.getFrame(), entity, MapEvent.REMOVE));
         }
     }
 

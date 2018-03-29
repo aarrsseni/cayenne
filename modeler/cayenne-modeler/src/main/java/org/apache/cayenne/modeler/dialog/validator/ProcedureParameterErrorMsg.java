@@ -19,8 +19,6 @@
 
 package org.apache.cayenne.modeler.dialog.validator;
 
-import javax.swing.JFrame;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Procedure;
@@ -29,6 +27,8 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
 import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
+
+import javax.swing.*;
 
 /**
  */
@@ -60,7 +60,7 @@ public class ProcedureParameterErrorMsg extends ValidationDisplayHandler {
                 map,
                 domain);
         procedureEvent.setTabReset(true);
-        mediator.fireProcedureDisplayEvent(procedureEvent);
+        mediator.fireEvent(procedureEvent);
 
         // now show the failed parameter
         ProcedureParameterDisplayEvent event = new ProcedureParameterDisplayEvent(
@@ -71,7 +71,7 @@ public class ProcedureParameterErrorMsg extends ValidationDisplayHandler {
                 domain);
 
         event.setTabReset(true);
-        mediator.fireProcedureParameterDisplayEvent(event);
+        mediator.fireEvent(event);
     }
 
 }

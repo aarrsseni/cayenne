@@ -160,8 +160,8 @@ public class SelectQueryPrefetchTab extends SelectQueryOrderingTab {
         // reset the model, since it is immutable
         table.setModel(createTableModel());
         setUpPrefetchBox(table.getColumnModel().getColumn(2));
-        
-        mediator.fireQueryEvent(new QueryEvent(this, selectQuery));
+
+        mediator.fireEvent(new QueryEvent(this, selectQuery));
     }
 
     public void removePrefetch(String prefetch) {
@@ -171,7 +171,7 @@ public class SelectQueryPrefetchTab extends SelectQueryOrderingTab {
         table.setModel(createTableModel());
         setUpPrefetchBox(table.getColumnModel().getColumn(2));
 
-        mediator.fireQueryEvent(new QueryEvent(this, selectQuery));
+        mediator.fireEvent(new QueryEvent(this, selectQuery));
     }
 
 }

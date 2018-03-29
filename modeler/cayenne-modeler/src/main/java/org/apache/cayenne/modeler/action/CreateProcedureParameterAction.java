@@ -52,9 +52,9 @@ public class CreateProcedureParameterAction extends CayenneAction {
      */
     static void fireProcedureParameterEvent(Object src, ProjectController mediator, Procedure procedure,
                                             ProcedureParameter parameter) {
-        mediator.fireProcedureParameterEvent(new ProcedureParameterEvent(src, parameter, MapEvent.ADD));
+        mediator.fireEvent(new ProcedureParameterEvent(src, parameter, MapEvent.ADD));
 
-        mediator.fireProcedureParameterDisplayEvent(new ProcedureParameterDisplayEvent(src, parameter, procedure,
+        mediator.fireEvent(new ProcedureParameterDisplayEvent(src, parameter, procedure,
                 mediator.getCurrentState().getDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode()));
     }
 

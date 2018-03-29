@@ -21,10 +21,11 @@ package org.apache.cayenne.modeler.action;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DbRelationshipEvent;
+import org.apache.cayenne.configuration.event.ObjRelationshipEvent;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
@@ -54,12 +55,12 @@ public class CreateRelationshipAction extends CayenneAction {
     static void fireObjRelationshipEvent(Object src, ProjectController mediator, ObjEntity objEntity,
                                          ObjRelationship rel) {
 
-        mediator.fireObjRelationshipEvent(new RelationshipEvent(src, rel, objEntity, MapEvent.ADD));
+        mediator.fireEvent(new ObjRelationshipEvent(src, rel, objEntity, MapEvent.ADD));
 
         ObjRelationshipDisplayEvent rde = new ObjRelationshipDisplayEvent(src, rel, objEntity, mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
-        mediator.fireObjRelationshipDisplayEvent(rde);
+        mediator.fireEvent(rde);
     }
 
     /**
@@ -67,12 +68,12 @@ public class CreateRelationshipAction extends CayenneAction {
      */
     static void fireDbRelationshipEvent(Object src, ProjectController mediator, DbEntity dbEntity, DbRelationship rel) {
 
-        mediator.fireDbRelationshipEvent(new RelationshipEvent(src, rel, dbEntity, MapEvent.ADD));
+        mediator.fireEvent(new DbRelationshipEvent(src, rel, dbEntity, MapEvent.ADD));
 
         DbRelationshipDisplayEvent rde = new DbRelationshipDisplayEvent(src, rel, dbEntity, mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
-        mediator.fireDbRelationshipDisplayEvent(rde);
+        mediator.fireEvent(rde);
     }
 
     @Override

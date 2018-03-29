@@ -23,11 +23,11 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.configuration.event.DbRelationshipEvent;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
 import org.apache.cayenne.modeler.undo.RelationshipUndoableEdit;
@@ -319,8 +319,8 @@ public class ResolveDbRelationshipDialog extends CayenneDialog {
                 // fire only if the relationship is to the same entity...
                 // this is needed to update entity view...
                 if (relationship.getSourceEntity() == relationship.getTargetEntity()) {
-                    getMediator().fireDbRelationshipEvent(
-                            new RelationshipEvent(
+                    getMediator().fireEvent(
+                            new DbRelationshipEvent(
                                     this,
                                     reverseRelationship,
                                     reverseRelationship.getSourceEntity(),
@@ -341,8 +341,8 @@ public class ResolveDbRelationshipDialog extends CayenneDialog {
 
         Application.getInstance().getUndoManager().addEdit(undo);
 
-        getMediator().fireDbRelationshipEvent(
-                new RelationshipEvent(this, relationship, relationship.getSourceEntity()));
+        getMediator().fireEvent(
+                new DbRelationshipEvent(this, relationship, relationship.getSourceEntity()));
     }
 
     private void handleNameUpdate(DbRelationship relationship, String userInputName) {
@@ -362,8 +362,8 @@ public class ResolveDbRelationshipDialog extends CayenneDialog {
         relationship.setName(sourceEntityName);
         undo.addNameUndo(relationship, oldName, sourceEntityName);
 
-        getMediator().fireDbRelationshipEvent(
-                new RelationshipEvent(this, relationship, relationship.getSourceEntity(), oldName));
+        getMediator().fireEvent(
+                new DbRelationshipEvent(this, relationship, relationship.getSourceEntity(), oldName));
     }
 
     private Collection<DbJoin> getReverseJoins() {

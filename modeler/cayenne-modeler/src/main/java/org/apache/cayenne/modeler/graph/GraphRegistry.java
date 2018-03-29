@@ -59,7 +59,7 @@ public class GraphRegistry implements DomainListener {
         if (builder == null) {
             builder = graphMap.createGraphBuilder(type, true);
             
-            mediator.fireProjectDirtyEvent(new ProjectDirtyEvent(this,true));
+            mediator.fireEvent(new ProjectDirtyEvent(this,true));
         }
         
         //marking this builder as default

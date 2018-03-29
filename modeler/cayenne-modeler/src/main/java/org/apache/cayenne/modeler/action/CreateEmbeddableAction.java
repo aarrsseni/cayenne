@@ -75,16 +75,15 @@ public class CreateEmbeddableAction extends CayenneAction {
             DataMap dataMap,
             Embeddable embeddable) {
 
-        mediator.fireEmbeddableEvent(
-                new EmbeddableEvent(src, embeddable, MapEvent.ADD),
-                dataMap);
+        mediator.fireEvent(
+                new EmbeddableEvent(src, embeddable, MapEvent.ADD, dataMap));
         EmbeddableDisplayEvent displayEvent = new EmbeddableDisplayEvent(
                 src,
                 embeddable,
                 dataMap,
                 (DataChannelDescriptor)mediator.getProject().getRootNode());
         displayEvent.setMainTabFocus(true);
-        mediator.fireEmbeddableDisplayEvent(displayEvent);
+        mediator.fireEvent(displayEvent);
 
     }
 

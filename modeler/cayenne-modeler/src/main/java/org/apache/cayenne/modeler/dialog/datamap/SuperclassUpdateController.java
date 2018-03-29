@@ -19,15 +19,20 @@
 
 package org.apache.cayenne.modeler.dialog.datamap;
 
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import java.awt.Component;
 import javax.swing.WindowConstants;
 
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.Comparators;
 import org.apache.cayenne.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  */
@@ -82,7 +87,7 @@ public class SuperclassUpdateController extends DefaultsPreferencesController {
 
                             // any way to batch events, a big change will flood the app with
                             // entity events..?
-                            mediator.fireDbEntityEvent(new EntityEvent(this, entity));
+                            mediator.fireEvent(new DbEntityEvent(this, entity));
                         }
                     }
                 });

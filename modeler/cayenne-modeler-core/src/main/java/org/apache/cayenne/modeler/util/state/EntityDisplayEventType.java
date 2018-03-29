@@ -55,9 +55,9 @@ class EntityDisplayEventType extends DisplayEventType {
         }
 
         if (entity instanceof ObjEntity) {
-            controller.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel));
+            controller.fireEvent(new ObjEntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel));
         } else if (entity instanceof DbEntity) {
-            controller.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel));
+            controller.fireEvent(new DbEntityDisplayEvent(this, entity, dataMap, dataNode, dataChannel));
         }
     }
 

@@ -232,7 +232,7 @@ public abstract class SelectPropertiesPanel extends JPanel {
                     return;
                 }
                 query.setProperty(property, value);
-                mediator.fireQueryEvent(new QueryEvent(this, query));
+                mediator.fireEvent(new QueryEvent(this, query));
             }
             catch (Exception ex) {
                 logObj.warn("Error setting property: " + property, ex);

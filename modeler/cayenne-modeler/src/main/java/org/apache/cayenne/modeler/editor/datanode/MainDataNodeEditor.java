@@ -97,7 +97,7 @@ public class MainDataNodeEditor extends CayenneController {
 					e.setOldName(oldValue != null ? oldValue.toString() : null);
 				}
 
-				getProjectController().fireDataNodeEvent(e);
+				getProjectController().fireEvent(e);
 			}
 		};
 

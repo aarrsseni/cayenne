@@ -68,7 +68,7 @@ public class AttributeErrorMsg extends ValidationDisplayHandler {
                     entity,
                     map,
                     domain);
-            mediator.fireObjEntityDisplayEvent(event);
+            mediator.fireEvent(event);
 
             ObjAttributeDisplayEvent attrEvent = new ObjAttributeDisplayEvent(
                     frame,
@@ -76,7 +76,7 @@ public class AttributeErrorMsg extends ValidationDisplayHandler {
                     entity,
                     map,
                     domain);
-            mediator.fireObjAttributeDisplayEvent(attrEvent);
+            mediator.fireEvent(attrEvent);
         }
         else if (entity instanceof DbEntity) {
             DbEntityDisplayEvent event = new DbEntityDisplayEvent(
@@ -84,7 +84,7 @@ public class AttributeErrorMsg extends ValidationDisplayHandler {
                     entity,
                     map,
                     domain);
-            mediator.fireDbEntityDisplayEvent(event);
+            mediator.fireEvent(event);
 
             DbAttributeDisplayEvent attrEvent = new DbAttributeDisplayEvent(
                     frame,
@@ -92,7 +92,7 @@ public class AttributeErrorMsg extends ValidationDisplayHandler {
                     entity,
                     map,
                     domain);
-            mediator.fireDbAttributeDisplayEvent(attrEvent);
+            mediator.fireEvent(attrEvent);
         }
     }
 }

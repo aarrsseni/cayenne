@@ -19,14 +19,14 @@
 
 package org.apache.cayenne.modeler.dialog.validator;
 
-import javax.swing.JFrame;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.QueryDisplayEvent;
-import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.validation.ValidationFailure;
+
+import javax.swing.*;
 
 /**
  * @since 1.1
@@ -46,6 +46,6 @@ public class QueryErrorMsg extends ValidationDisplayHandler {
         DataMap map = query.getDataMap();
 
         QueryDisplayEvent event = new QueryDisplayEvent(frame, query, map, domain);
-        mediator.fireQueryDisplayEvent(event);
+        mediator.fireEvent(event);
     }
 }

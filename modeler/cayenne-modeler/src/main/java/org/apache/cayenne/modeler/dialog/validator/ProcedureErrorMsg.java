@@ -52,6 +52,6 @@ public class ProcedureErrorMsg extends ValidationDisplayHandler {
                 map,
                 domain);
         event.setTabReset(true);
-        mediator.fireProcedureDisplayEvent(event);
+        mediator.fireEvent(event);
     }
 }

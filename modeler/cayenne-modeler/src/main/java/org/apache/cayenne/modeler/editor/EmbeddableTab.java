@@ -30,12 +30,13 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.ObjAttributeEvent;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.AttributeEvent;
 import org.apache.cayenne.map.event.EmbeddableEvent;
+import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.ActionManager;
@@ -48,11 +49,8 @@ import org.apache.cayenne.project.extension.info.ObjectInfo;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import java.awt.BorderLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -148,11 +146,11 @@ public class EmbeddableTab extends JPanel implements EmbeddableDisplayListener {
             
             // completely new name, set new name for embeddable
             EmbeddableEvent e = new EmbeddableEvent(this, embeddable, embeddable
-                    .getClassName());
+                    .getClassName(), mediator.getCurrentState().getDataMap());
             String oldName = embeddable.getClassName();
             embeddable.setClassName(newClassName);
 
-            mediator.fireEmbeddableEvent(e, mediator.getCurrentState().getDataMap());
+            mediator.fireEvent(e);
 
             Iterator it = ((DataChannelDescriptor) mediator.getProject().getRootNode()).getDataMaps().iterator();
             while (it.hasNext()) {
@@ -170,9 +168,9 @@ public class EmbeddableTab extends JPanel implements EmbeddableDisplayListener {
                         ObjAttribute atribute = attrIt.next();
                         if (atribute.getType()==null || atribute.getType().equals(oldName)) {
                             atribute.setType(newClassName);
-                            AttributeEvent ev = new AttributeEvent(this, atribute, atribute
+                            ObjAttributeEvent ev = new ObjAttributeEvent(this, atribute, atribute
                                     .getEntity());
-                            mediator.fireObjAttributeEvent(ev);
+                            mediator.fireEvent(ev);
                         }
                     }
                     
@@ -210,7 +208,7 @@ public class EmbeddableTab extends JPanel implements EmbeddableDisplayListener {
         }
 
         ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), embeddable, ObjectInfo.COMMENT, comment);
-        mediator.fireEmbeddableEvent(new EmbeddableEvent(this, embeddable), mediator.getCurrentState().getDataMap());
+        mediator.fireEvent(new EmbeddableEvent(this, embeddable, MapEvent.CHANGE, mediator.getCurrentState().getDataMap()));
     }
 
     String getComment(Embeddable embeddable) {

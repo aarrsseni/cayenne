@@ -19,22 +19,18 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbKeyGenerator;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
 
 public class PKCustomSequenceGeneratorPanel extends PKGeneratorPanel {
 
@@ -128,7 +124,7 @@ public class PKCustomSequenceGeneratorPanel extends PKGeneratorPanel {
         DbKeyGenerator generator = mediator.getCurrentState().getDbEntity().getPrimaryKeyGenerator();
         if (!Util.nullSafeEquals(generator.getKeyCacheSize(), new Integer(cacheSize))) {
             generator.setKeyCacheSize(new Integer(cacheSize));
-            mediator.fireDbEntityEvent(new EntityEvent(this, generator.getDbEntity()));
+            mediator.fireEvent(new DbEntityEvent(this, generator.getDbEntity()));
         }
     }
 
@@ -146,7 +142,7 @@ public class PKCustomSequenceGeneratorPanel extends PKGeneratorPanel {
         DbKeyGenerator generator = mediator.getCurrentState().getDbEntity().getPrimaryKeyGenerator();
         if (!Util.nullSafeEquals(text, generator.getName())) {
             generator.setGeneratorName(text);
-            mediator.fireDbEntityEvent(new EntityEvent(this, generator.getDbEntity()));
+            mediator.fireEvent(new DbEntityEvent(this, generator.getDbEntity()));
         }
     }
 }

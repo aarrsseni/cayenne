@@ -21,11 +21,11 @@ package org.apache.cayenne.modeler.action;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
@@ -52,11 +52,11 @@ public class CreateDbEntityAction extends CayenneAction {
      * Fires events when a db entity was added
      */
     static void fireDbEntityEvent(Object src, ProjectController mediator, DbEntity entity) {
-        mediator.fireDbEntityEvent(new EntityEvent(src, entity, MapEvent.ADD));
+        mediator.fireEvent(new DbEntityEvent(src, entity, MapEvent.ADD));
         DbEntityDisplayEvent displayEvent = new DbEntityDisplayEvent(src, entity, mediator.getCurrentState().getDataMap(),
                 mediator.getCurrentState().getNode(), (DataChannelDescriptor) mediator.getProject().getRootNode());
         displayEvent.setMainTabFocus(true);
-        mediator.fireDbEntityDisplayEvent(displayEvent);
+        mediator.fireEvent(displayEvent);
     }
 
     public String getIconName() {

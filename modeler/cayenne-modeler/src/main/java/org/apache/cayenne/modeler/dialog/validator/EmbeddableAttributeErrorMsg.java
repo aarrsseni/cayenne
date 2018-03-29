@@ -18,8 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.validator;
 
-import javax.swing.JFrame;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
@@ -28,6 +26,8 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
+
+import javax.swing.*;
 
 public class EmbeddableAttributeErrorMsg extends ValidationDisplayHandler {
 
@@ -57,8 +57,8 @@ public class EmbeddableAttributeErrorMsg extends ValidationDisplayHandler {
                 map,
                 domain);
 
-        mediator.fireEmbeddableDisplayEvent(event);
-        mediator.fireEmbeddableAttributeDisplayEvent(event);
+        mediator.fireEvent(event);
+        mediator.fireEvent(event);
     }
 
 }

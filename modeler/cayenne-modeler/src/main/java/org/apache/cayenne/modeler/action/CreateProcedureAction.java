@@ -51,8 +51,8 @@ public class CreateProcedureAction extends CayenneAction {
      * Fires events when a procedure was added
      */
     static void fireProcedureEvent(Object src, ProjectController mediator, DataMap dataMap, Procedure procedure) {
-        mediator.fireProcedureEvent(new ProcedureEvent(src, procedure, MapEvent.ADD));
-        mediator.fireProcedureDisplayEvent(new ProcedureDisplayEvent(src, procedure, mediator.getCurrentState().getDataMap(),
+        mediator.fireEvent(new ProcedureEvent(src, procedure, MapEvent.ADD));
+        mediator.fireEvent(new ProcedureDisplayEvent(src, procedure, mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode()));
     }
 

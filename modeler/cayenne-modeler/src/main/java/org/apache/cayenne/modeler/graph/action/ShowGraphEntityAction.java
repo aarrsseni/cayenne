@@ -90,6 +90,6 @@ public class ShowGraphEntityAction extends CayenneAction {
                 entity,
                 entity.getDataMap(),
                 (DataChannelDescriptor) getProjectController().getProject().getRootNode());
-        getProjectController().fireDomainDisplayEvent(event);
+        getProjectController().fireEvent(event);
     }
 }

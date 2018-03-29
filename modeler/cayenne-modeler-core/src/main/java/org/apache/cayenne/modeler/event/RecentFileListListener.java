@@ -19,13 +19,15 @@
 
 package org.apache.cayenne.modeler.event;
 
+import java.util.EventListener;
+
 /**
  * Listens to changes in recent file list 
  */
-public interface RecentFileListListener {
+public interface RecentFileListListener extends EventListener{
     /**
      * Invoked when recent files list changed (for instance, a new project was opened
      * and so must be added to recent files menu
      */
-    public void recentFileListChanged();
+    public void recentFileListChanged(RecentFileListEvent e);
 }

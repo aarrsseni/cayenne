@@ -66,7 +66,7 @@ public class LinkDataMapAction extends CayenneAction {
         for (DataNodeDescriptor nextNode : dataChannelDescriptor.getNodeDescriptors()) {
             if (nextNode.getDataMapNames().contains(map.getName())) {
                 nextNode.getDataMapNames().remove(map.getName());
-                mediator.fireDataNodeEvent(new DataNodeEvent(this, nextNode));
+                mediator.fireEvent(new DataNodeEvent(this, nextNode));
                 unlinkedNodes.add(nextNode);
             }
         }
@@ -76,7 +76,7 @@ public class LinkDataMapAction extends CayenneAction {
             node.getDataMapNames().add(map.getName());
 
             // announce DataNode change
-            mediator.fireDataNodeEvent(new DataNodeEvent(this, node));
+            mediator.fireEvent(new DataNodeEvent(this, node));
         }
 
         application.getUndoManager().addEdit(

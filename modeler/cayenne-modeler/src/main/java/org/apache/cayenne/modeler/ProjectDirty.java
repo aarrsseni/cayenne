@@ -19,41 +19,12 @@
 
 package org.apache.cayenne.modeler;
 
-import org.apache.cayenne.configuration.event.DataMapEvent;
-import org.apache.cayenne.configuration.event.DataMapListener;
-import org.apache.cayenne.configuration.event.DataNodeEvent;
-import org.apache.cayenne.configuration.event.DataNodeListener;
-import org.apache.cayenne.configuration.event.DomainEvent;
-import org.apache.cayenne.configuration.event.DomainListener;
-import org.apache.cayenne.configuration.event.ProcedureEvent;
-import org.apache.cayenne.configuration.event.ProcedureListener;
-import org.apache.cayenne.configuration.event.ProcedureParameterEvent;
-import org.apache.cayenne.configuration.event.ProcedureParameterListener;
-import org.apache.cayenne.configuration.event.QueryEvent;
-import org.apache.cayenne.configuration.event.QueryListener;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.event.AttributeEvent;
-import org.apache.cayenne.map.event.DbAttributeListener;
-import org.apache.cayenne.map.event.DbEntityListener;
-import org.apache.cayenne.map.event.DbRelationshipListener;
-import org.apache.cayenne.map.event.EmbeddableAttributeEvent;
-import org.apache.cayenne.map.event.EmbeddableAttributeListener;
-import org.apache.cayenne.map.event.EmbeddableEvent;
-import org.apache.cayenne.map.event.EmbeddableListener;
-import org.apache.cayenne.map.event.EntityEvent;
-import org.apache.cayenne.map.event.ObjAttributeListener;
-import org.apache.cayenne.map.event.ObjEntityListener;
-import org.apache.cayenne.map.event.ObjRelationshipListener;
-import org.apache.cayenne.map.event.RelationshipEvent;
+import org.apache.cayenne.configuration.event.*;
+import org.apache.cayenne.map.event.*;
 import org.apache.cayenne.modeler.action.RevertAction;
 import org.apache.cayenne.modeler.action.SaveAction;
 import org.apache.cayenne.modeler.action.SaveAsAction;
-import org.apache.cayenne.modeler.event.CallbackMethodEvent;
-import org.apache.cayenne.modeler.event.CallbackMethodListener;
-import org.apache.cayenne.modeler.event.EntityListenerEvent;
-import org.apache.cayenne.modeler.event.EntityListenerListener;
-import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
-import org.apache.cayenne.modeler.event.ProjectDirtyEventListener;
+import org.apache.cayenne.modeler.event.*;
 
 /**
  * @since 4.1
@@ -293,17 +264,17 @@ public class ProjectDirty implements DomainListener, DataNodeListener, DataMapLi
     }
 
     @Override
-    public void embeddableChanged(EmbeddableEvent e, DataMap map) {
+    public void embeddableChanged(EmbeddableEvent e) {
         setDirty(true);
     }
 
     @Override
-    public void embeddableAdded(EmbeddableEvent e, DataMap map) {
+    public void embeddableAdded(EmbeddableEvent e) {
         setDirty(true);
     }
 
     @Override
-    public void embeddableRemoved(EmbeddableEvent e, DataMap map) {
+    public void embeddableRemoved(EmbeddableEvent e) {
         setDirty(true);
     }
 

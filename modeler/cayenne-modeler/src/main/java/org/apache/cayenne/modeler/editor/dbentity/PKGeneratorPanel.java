@@ -19,14 +19,14 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.undo.ChangePKGeneratorUndoableEdit;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 
 public abstract class PKGeneratorPanel extends JPanel {
 
@@ -82,7 +82,7 @@ public abstract class PKGeneratorPanel extends JPanel {
         }
 
         if (hasChanges) {
-            mediator.fireDbEntityEvent(new EntityEvent(this, entity));
+            mediator.fireEvent(new DbEntityEvent(this, entity));
         }
     }
 }

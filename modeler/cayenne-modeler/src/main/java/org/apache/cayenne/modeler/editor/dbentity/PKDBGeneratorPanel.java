@@ -19,26 +19,20 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.Collection;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JList;
-import javax.swing.MutableComboBoxModel;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
-
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.ProjectController;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Collection;
 
 public class PKDBGeneratorPanel extends PKGeneratorPanel {
 
@@ -82,7 +76,7 @@ public class PKDBGeneratorPanel extends PKGeneratorPanel {
             DbAttribute pk = (DbAttribute) pkAttributes.iterator().next();
             if (TypesMapping.isNumeric(pk.getType()) && !pk.isGenerated()) {
                 pk.setGenerated(true);
-                mediator.fireDbEntityEvent(new EntityEvent(this, entity));
+                mediator.fireEvent(new DbEntityEvent(this, entity));
             }
         }
 
@@ -125,9 +119,10 @@ public class PKDBGeneratorPanel extends PKGeneratorPanel {
                     boolean generated = e.getStateChange() == ItemEvent.SELECTED;
                     DbAttribute a = (DbAttribute) item;
 
-                    if (a.isGenerated() != generated) {
-                        a.setGenerated(generated);
-                        mediator.fireDbEntityEvent(new EntityEvent(this, entity));
+                        if (a.isGenerated() != generated) {
+                            a.setGenerated(generated);
+                            mediator.fireEvent(new DbEntityEvent(this, entity));
+                        }
                     }
                 }
             });

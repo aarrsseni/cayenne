@@ -20,6 +20,7 @@ package org.apache.cayenne.modeler.action;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.dbsync.filter.NamePatternMatcher;
 import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
 import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
@@ -28,7 +29,6 @@ import org.apache.cayenne.dbsync.naming.NoStemStemmer;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
@@ -57,7 +57,7 @@ public class CreateObjEntityAction extends CayenneAction {
             ProjectController mediator,
             DataMap dataMap,
             ObjEntity entity) {
-        mediator.fireObjEntityEvent(new EntityEvent(src, entity, MapEvent.ADD));
+        mediator.fireEvent(new ObjEntityEvent(src, entity, MapEvent.ADD));
         ObjEntityDisplayEvent displayEvent = new ObjEntityDisplayEvent(
                 src,
                 entity,
@@ -65,7 +65,7 @@ public class CreateObjEntityAction extends CayenneAction {
                 mediator.getCurrentState().getNode(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
         displayEvent.setMainTabFocus(true);
-        mediator.fireObjEntityDisplayEvent(displayEvent);
+        mediator.fireEvent(displayEvent);
     }
 
     @Override

@@ -62,13 +62,13 @@ public abstract class BaseViewEntityAction extends CayenneAction {
         editor().getProjectTreeView().getSelectionModel().setSelectionPath(path);
 
         if (entity instanceof DbEntity) {
-            getProjectController().fireDbEntityDisplayEvent(new DbEntityDisplayEvent(
+            getProjectController().fireEvent(new DbEntityDisplayEvent(
                     editor().getProjectTreeView(),
                     entity,
                     entity.getDataMap(),
                     (DataChannelDescriptor) getProjectController().getProject().getRootNode()));
         } else if (entity instanceof ObjEntity){
-            getProjectController().fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(
+            getProjectController().fireEvent(new ObjEntityDisplayEvent(
                     editor().getProjectTreeView(),
                     entity,
                     entity.getDataMap(),

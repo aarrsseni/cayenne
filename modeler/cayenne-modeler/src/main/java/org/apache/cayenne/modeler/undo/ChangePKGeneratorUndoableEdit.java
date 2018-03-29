@@ -19,10 +19,10 @@
 
 package org.apache.cayenne.modeler.undo;
 
+import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbKeyGenerator;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 
 import javax.swing.undo.CannotRedoException;
@@ -74,8 +74,8 @@ public class ChangePKGeneratorUndoableEdit extends CayenneUndoableEdit {
     }
 
     private void fireEvents() {
-        controller.fireDbEntityEvent(new EntityEvent(this, dbEntity));
-        controller.fireDbEntityDisplayEvent(new DbEntityDisplayEvent(this, dbEntity));
+        controller.fireEvent(new DbEntityEvent(this, dbEntity));
+        controller.fireEvent(new DbEntityDisplayEvent(this, dbEntity));
     }
 
     public boolean hasRealChange() {

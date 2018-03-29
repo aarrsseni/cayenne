@@ -423,7 +423,7 @@ public class PasteAction extends CayenneAction implements FlavorListener {
                         method.getName(),
                         MapEvent.ADD);
 
-                getProjectController().fireCallbackMethodEvent(ce);
+                getProjectController().fireEvent(ce);
             }
         } else if (where instanceof Embeddable) {
             final Embeddable embeddable = (Embeddable) where;

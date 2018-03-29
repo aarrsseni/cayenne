@@ -19,12 +19,8 @@
 
 package org.apache.cayenne.modeler.editor;
 
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.DeleteRule;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.configuration.event.ObjRelationshipEvent;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
@@ -164,7 +160,7 @@ public class ObjRelationshipTableModel extends CayenneTableModel<ObjRelationship
     @Override
     public void setUpdatedValueAt(Object value, int row, int column) {
         ObjRelationship relationship = getRelationship(row);
-        RelationshipEvent event = new RelationshipEvent(eventSource, relationship, entity);
+        ObjRelationshipEvent event = new ObjRelationshipEvent(eventSource, relationship, entity);
 
         switch (column) {
             case REL_NAME:
@@ -212,7 +208,7 @@ public class ObjRelationshipTableModel extends CayenneTableModel<ObjRelationship
                 break;
         }
 
-        mediator.fireObjRelationshipEvent(event);
+        mediator.fireEvent(event);
     }
 
     public void removeRow(int row) {
@@ -220,9 +216,8 @@ public class ObjRelationshipTableModel extends CayenneTableModel<ObjRelationship
             return;
         }
         Relationship rel = getRelationship(row);
-        RelationshipEvent e;
-        e = new RelationshipEvent(eventSource, rel, entity, RelationshipEvent.REMOVE);
-        mediator.fireObjRelationshipEvent(e);
+        ObjRelationshipEvent e = new ObjRelationshipEvent(eventSource, rel, entity, RelationshipEvent.REMOVE);
+        mediator.fireEvent(e);
         objectList.remove(row);
         entity.removeRelationship(rel.getName());
         fireTableRowsDeleted(row, row);

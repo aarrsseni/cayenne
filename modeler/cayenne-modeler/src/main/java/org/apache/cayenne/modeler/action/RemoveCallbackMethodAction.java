@@ -108,7 +108,7 @@ public class RemoveCallbackMethodAction extends RemoveAction {
                 method,
                 MapEvent.REMOVE);
         
-        mediator.fireCallbackMethodEvent(e);
+        mediator.fireEvent(e);
     }
 
     /**

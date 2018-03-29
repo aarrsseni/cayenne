@@ -19,7 +19,15 @@
 
 package org.apache.cayenne.modeler.dialog.datamap;
 
-import java.awt.Component;
+import org.apache.cayenne.configuration.event.ObjAttributeEvent;
+import org.apache.cayenne.configuration.event.ObjEntityEvent;
+import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.event.EmbeddableEvent;
+import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -27,19 +35,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import javax.swing.WindowConstants;
-
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddedAttribute;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.AttributeEvent;
-import org.apache.cayenne.map.event.EmbeddableEvent;
-import org.apache.cayenne.map.event.EntityEvent;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.util.Util;
 
 /**
  */
@@ -98,11 +93,11 @@ public class PackageUpdateController extends DefaultsPreferencesController {
             String className = tokens[tokens.length-1];
 
             if (doAll || Util.isEmptyString(oldName) || oldName.indexOf('.') < 0) {
-                EmbeddableEvent e = new EmbeddableEvent(this, embeddable, embeddable.getClassName());
+                EmbeddableEvent e = new EmbeddableEvent(this, embeddable, embeddable.getClassName(), mediator.getCurrentState().getDataMap());
                 String newClassName = getNameWithDefaultPackage(className);
                 oldNameEmbeddableToNewName.put(oldName, newClassName);
                 embeddable.setClassName(newClassName);
-                mediator.fireEmbeddableEvent(e, mediator.getCurrentState().getDataMap());
+                mediator.fireEvent(e);
             }
         }
 
@@ -118,8 +113,8 @@ public class PackageUpdateController extends DefaultsPreferencesController {
                 if(attribute instanceof EmbeddedAttribute){
                     if(oldNameEmbeddableToNewName.size()>0 && oldNameEmbeddableToNewName.containsKey(attribute.getType())){
                         attribute.setType(oldNameEmbeddableToNewName.get(attribute.getType()));
-                        AttributeEvent ev = new AttributeEvent(this, attribute, entity);
-                        mediator.fireObjAttributeEvent(ev);
+                        ObjAttributeEvent ev = new ObjAttributeEvent(this, attribute, entity);
+                        mediator.fireEvent(ev);
                     }
                 }
             }
@@ -161,7 +156,7 @@ public class PackageUpdateController extends DefaultsPreferencesController {
                 entity.setClassName(newName);
             }
 
-            mediator.fireObjEntityEvent(new EntityEvent(this, entity));
+            mediator.fireEvent(new ObjEntityEvent(this, entity));
         }
     }
 }

@@ -19,18 +19,18 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.QueryEvent;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.query.QueryType;
 import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.map.QueryDescriptor;
+
+import java.awt.event.ActionEvent;
 
 /**
  * @since 1.1
@@ -73,7 +73,7 @@ public class CreateQueryAction extends CayenneAction {
      */
     public static void fireQueryEvent(Object src, ProjectController mediator, DataChannelDescriptor domain,
             DataMap dataMap, QueryDescriptor query) {
-        mediator.fireQueryEvent(new QueryEvent(src, query, MapEvent.ADD, dataMap));
-        mediator.fireQueryDisplayEvent(new QueryDisplayEvent(src, query, dataMap, domain));
+        mediator.fireEvent(new QueryEvent(src, query, MapEvent.ADD, dataMap));
+        mediator.fireEvent(new QueryDisplayEvent(src, query, dataMap, domain));
     }
 }

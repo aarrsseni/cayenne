@@ -109,7 +109,7 @@ public class CreateCallbackMethodAction extends CayenneAction {
                 methodName,
                 MapEvent.ADD);
 
-        getProjectController().fireCallbackMethodEvent(ce);
+        getProjectController().fireEvent(ce);
     }
 
     private String toMethodName(LifecycleEvent event) {

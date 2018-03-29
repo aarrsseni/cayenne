@@ -21,10 +21,10 @@ package org.apache.cayenne.modeler.editor;
 
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.ObjAttributeEvent;
+import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.AttributeEvent;
-import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
@@ -297,21 +297,21 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
 
         entity.updateAttribute(attributeNew);
 
-        mediator.fireObjEntityEvent(new EntityEvent(this, entity, MapEvent.CHANGE));
+        mediator.fireEvent(new ObjEntityEvent(this, entity, MapEvent.CHANGE));
 
-        mediator.fireObjEntityDisplayEvent(new ObjEntityDisplayEvent(
+        mediator.fireEvent(new ObjEntityDisplayEvent(
                 this,
                 mediator.getCurrentState().getObjEntity(),
                 mediator.getCurrentState().getDataMap(),
                 (DataChannelDescriptor) mediator.getProject().getRootNode()));
 
-        mediator.fireObjAttributeEvent(new AttributeEvent(
+        mediator.fireEvent(new ObjAttributeEvent(
                 this,
                 attributeNew,
                 entity,
                 MapEvent.CHANGE));
 
-        mediator.fireObjAttributeDisplayEvent(new ObjAttributeDisplayEvent(
+        mediator.fireEvent(new ObjAttributeDisplayEvent(
                 this,
                 attributeNew,
                 mediator.getCurrentState().getObjEntity(),
@@ -344,7 +344,7 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
     public void setUpdatedValueAt(Object value, int row, int column) {
         ObjAttributeWrapper attribute = getAttribute(row);
         attribute.resetEdits();
-        AttributeEvent event = new AttributeEvent(eventSource, attribute.getValue(), entity);
+        ObjAttributeEvent event = new ObjAttributeEvent(eventSource, attribute.getValue(), entity);
 
         switch (column) {
             case OBJ_ATTRIBUTE:
@@ -370,7 +370,7 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
                 fireTableRowsUpdated(row, row);
                 break;
         }
-        mediator.fireObjAttributeEvent(event);
+        mediator.fireEvent(event);
     }
 
     public boolean isCellEditable(int row, int col) {

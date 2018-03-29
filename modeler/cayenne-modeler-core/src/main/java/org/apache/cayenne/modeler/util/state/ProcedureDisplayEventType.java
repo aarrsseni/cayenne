@@ -49,7 +49,7 @@ class ProcedureDisplayEventType extends DisplayEventType {
         }
 
         ProcedureDisplayEvent procedureDisplayEvent = new ProcedureDisplayEvent(this, procedure, dataMap, dataChannel);
-        controller.fireProcedureDisplayEvent(procedureDisplayEvent);
+        controller.fireEvent(procedureDisplayEvent);
     }
 
     @Override

@@ -19,21 +19,18 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.configuration.event.DbRelationshipEvent;
+import org.apache.cayenne.configuration.event.ObjRelationshipEvent;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.undo.RemoveRelationshipUndoableEdit;
 import org.apache.cayenne.modeler.util.ProjectUtil;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Removes currently selected relationship from either the DbEntity or
@@ -118,9 +115,9 @@ public class RemoveRelationshipAction extends RemoveAction implements
 
 		for (ObjRelationship rel : rels) {
 			entity.removeRelationship(rel.getName());
-			RelationshipEvent e = new RelationshipEvent(Application.getFrame(),
+			ObjRelationshipEvent e = new ObjRelationshipEvent(Application.getFrame(),
 					rel, entity, MapEvent.REMOVE);
-			mediator.fireObjRelationshipEvent(e);
+			mediator.fireEvent(e);
 		}
 	}
 
@@ -130,9 +127,9 @@ public class RemoveRelationshipAction extends RemoveAction implements
 		for (DbRelationship rel : rels) {
 			entity.removeRelationship(rel.getName());
 
-			RelationshipEvent e = new RelationshipEvent(Application.getFrame(),
+			DbRelationshipEvent e = new DbRelationshipEvent(Application.getFrame(),
 					rel, entity, MapEvent.REMOVE);
-			mediator.fireDbRelationshipEvent(e);
+			mediator.fireEvent(e);
 		}
 
 		ProjectUtil.cleanObjMappings(mediator.getCurrentState().getDataMap());

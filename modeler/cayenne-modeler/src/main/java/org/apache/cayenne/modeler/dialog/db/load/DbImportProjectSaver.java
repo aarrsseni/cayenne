@@ -53,8 +53,8 @@ public class DbImportProjectSaver implements ProjectSaver {
         DataMap dataMap = (DataMap) project.getRootNode();
 
         if (projectController.getCurrentState().getDataMap() != null) {
-            projectController.fireDataMapEvent(new DataMapEvent(Application.getFrame(), dataMap, MapEvent.REMOVE));
-            projectController.fireDataMapEvent(new DataMapEvent(Application.getFrame(), dataMap, MapEvent.ADD));
+            projectController.fireEvent(new DataMapEvent(Application.getFrame(), dataMap, MapEvent.REMOVE));
+            projectController.fireEvent(new DataMapEvent(Application.getFrame(), dataMap, MapEvent.ADD));
         } else {
             DataChannelDescriptor currentDomain = (DataChannelDescriptor) projectController.getProject().getRootNode();
             Resource baseResource = currentDomain.getConfigurationSource();

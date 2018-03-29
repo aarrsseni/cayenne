@@ -181,7 +181,7 @@ public class SQLTemplateMainTab extends BaseQueryMainTab {
             // completely new name, set new name for entity
             QueryEvent e = new QueryEvent(this, query, query.getName());
             ProjectUtil.setQueryName(map, query, newName);
-            mediator.fireQueryEvent(e);
+            mediator.fireEvent(e);
         }
         else {
             // there is a query with the same name
@@ -206,7 +206,7 @@ public class SQLTemplateMainTab extends BaseQueryMainTab {
             Object root = entity != null ? entity : mediator.getCurrentState().getDataMap();
             template.setRoot(root);
 
-            mediator.fireQueryEvent(new QueryEvent(this, template));
+            mediator.fireEvent(new QueryEvent(this, template));
         }
     }
 
@@ -216,7 +216,7 @@ public class SQLTemplateMainTab extends BaseQueryMainTab {
             return;
         }
         ObjectInfo.putToMetaData(Application.getInstance().getMetaData(), query, ObjectInfo.COMMENT, text);
-        mediator.fireQueryEvent(new QueryEvent(this, query));
+        mediator.fireEvent(new QueryEvent(this, query));
     }
 
     private String getQueryComment(QueryDescriptor queryDescriptor) {
