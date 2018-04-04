@@ -20,10 +20,9 @@ package org.apache.cayenne.modeler.undo;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.*;
-import org.apache.cayenne.modeler.action.CreateAttributeAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+import org.apache.cayenne.modeler.services.AttributeService;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -51,25 +50,23 @@ public class CreateAttributeUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateAttributeAction action = actionManager
-                .getAction(CreateAttributeAction.class);
+        AttributeService attributeService = controller.getBootiqueInjector().getInstance(AttributeService.class);
 
         if (objEntity != null) {
-            action.createObjAttribute(dataMap, objEntity, objAttr);
+            attributeService.createObjAttribute(dataMap, objEntity, objAttr);
         }
 
         if (dbEntity != null) {
-            action.createDbAttribute(dataMap, dbEntity, dbAttr);
+            attributeService.createDbAttribute(dataMap, dbEntity, dbAttr);
         }
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveAttributeAction action = actionManager
-                .getAction(RemoveAttributeAction.class);
+        AttributeService attributeService = controller.getBootiqueInjector().getInstance(AttributeService.class);
 
         if (objEntity != null) {
-            action.removeObjAttributes(objEntity, new ObjAttribute[] {
+            attributeService.removeObjAttributes(objEntity, new ObjAttribute[] {
                 objAttr
             });
 
@@ -81,7 +78,7 @@ public class CreateAttributeUndoableEdit extends CayenneUndoableEdit {
         }
 
         if (dbEntity != null) {
-            action.removeDbAttributes(dataMap, dbEntity, new DbAttribute[] {
+            attributeService.removeDbAttributes(dataMap, dbEntity, new DbAttribute[] {
                 dbAttr
             });
 

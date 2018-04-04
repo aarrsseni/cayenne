@@ -19,18 +19,7 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.CayenneModelerController;
 import org.apache.cayenne.modeler.dialog.ErrorDebugDialog;
@@ -44,7 +33,20 @@ import org.apache.cayenne.swing.control.FileMenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class OpenProjectAction extends ProjectAction {
+
+    @Inject
+    public Application application;
 
     private static Logger logObj = LoggerFactory.getLogger(OpenProjectAction.class);
 
@@ -67,9 +69,10 @@ public class OpenProjectAction extends ProjectAction {
         return "Open Project";
     }
 
-    public OpenProjectAction(Application application) {
-        super(getActionName(), application);
+    public OpenProjectAction() {
+        super(getActionName());
         this.fileChooser = new ProjectOpener();
+        setAlwaysOn(true);
     }
 
     @Override
@@ -137,7 +140,7 @@ public class OpenProjectAction extends ProjectAction {
             URL url = file.toURI().toURL();
             Resource rootSource = new URLResource(url);
 
-            UpgradeService upgradeService = getApplication().getInjector().getInstance(UpgradeService.class);
+            UpgradeService upgradeService = application.getInjector().getInstance(UpgradeService.class);
             UpgradeMetaData metaData = upgradeService.getUpgradeType(rootSource);
             switch (metaData.getUpgradeType()) {
                 case INTERMEDIATE_UPGRADE_NEEDED:
@@ -177,7 +180,7 @@ public class OpenProjectAction extends ProjectAction {
     }
 
     private Project openProjectResourse(Resource resource, CayenneModelerController controller) {
-        Project project = getApplication().getInjector().getInstance(ProjectLoader.class).loadProject(resource);
+        Project project = application.getInjector().getInstance(ProjectLoader.class).loadProject(resource);
         controller.projectOpenedAction(project);
         return project;
     }

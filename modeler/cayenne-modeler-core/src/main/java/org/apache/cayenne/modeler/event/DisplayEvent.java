@@ -86,4 +86,5 @@ public class DisplayEvent extends EventObject {
         Object last = getPathObject();
         return (last != null) ? last.getClass() == nodeClass : false;
     }
+
 }

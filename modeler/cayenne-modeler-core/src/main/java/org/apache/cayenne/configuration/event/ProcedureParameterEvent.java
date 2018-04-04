@@ -22,6 +22,8 @@ package org.apache.cayenne.configuration.event;
 import org.apache.cayenne.map.ProcedureParameter;
 import org.apache.cayenne.map.event.MapEvent;
 
+import java.util.EventListener;
+
 /**
  */
 public class ProcedureParameterEvent extends MapEvent {
@@ -59,5 +61,9 @@ public class ProcedureParameterEvent extends MapEvent {
 
     public void setParameter(ProcedureParameter parameter) {
         this.parameter = parameter;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return ProcedureParameterListener.class;
     }
 }

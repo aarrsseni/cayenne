@@ -18,15 +18,14 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
+import org.apache.cayenne.modeler.services.RelationshipService;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class RemoveRelationshipUndoableEdit extends BaseRemovePropertyUndoableEdit {
 
@@ -56,27 +55,28 @@ public class RemoveRelationshipUndoableEdit extends BaseRemovePropertyUndoableEd
 
     @Override
     public void redo() throws CannotRedoException {
-        RemoveRelationshipAction action = actionManager.getAction(RemoveRelationshipAction.class);
+        RelationshipService relationshipService = controller.getBootiqueInjector().getInstance(RelationshipService.class);
         if (objEntity != null) {
-            action.removeObjRelationships(objEntity, rels);
+            relationshipService.removeObjRelationships(objEntity, rels);
             focusObjEntity();
         } else {
-            action.removeDbRelationships(dbEntity, dbRels);
+            relationshipService.removeDbRelationships(dbEntity, dbRels);
             focusDBEntity();
         }
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        CreateRelationshipAction action = actionManager.getAction(CreateRelationshipAction.class);
+        RelationshipService relationshipService = controller.getBootiqueInjector().getInstance(RelationshipService.class);
+
         if (objEntity != null) {
             for (ObjRelationship r : rels) {
-                action.createObjRelationship(objEntity, r);
+                relationshipService.createObjRelationship(objEntity, r);
             }
             focusObjEntity();
         } else {
             for (DbRelationship dr : dbRels) {
-                action.createDbRelationship(dbEntity, dr);
+                relationshipService.createDbRelationship(dbEntity, dr);
             }
             focusDBEntity();
         }

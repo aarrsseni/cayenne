@@ -18,30 +18,15 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.modeler.action.PasteAction;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.action.RemoveAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeAction;
-import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
-import org.apache.cayenne.modeler.action.RemoveProcedureParameterAction;
-import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
 import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
-import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.modeler.services.*;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class PasteUndoableEdit extends CayenneUndoableEdit {
 
@@ -70,59 +55,66 @@ public class PasteUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        PasteAction action = actionManager.getAction(PasteAction.class);
-
-        action.paste(where, content, domain, map);
+        PasteService pasteService = controller.getBootiqueInjector().getInstance(PasteService.class);
+        pasteService.paste(where, content, domain, map);
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveAttributeAction rAttributeAction = actionManager
-                .getAction(RemoveAttributeAction.class);
+        AttributeService attributeService = controller.getBootiqueInjector().getInstance(AttributeService.class);
 
         RemoveAction rAction = actionManager.getAction(RemoveAction.class);
 
-        RemoveRelationshipAction rRelationShipAction = actionManager
-                .getAction(RemoveRelationshipAction.class);
+        DbEntityService dbEntityService = controller.getBootiqueInjector().getInstance(DbEntityService.class);
 
-        RemoveCallbackMethodAction rCallbackMethodAction = actionManager
-                .getAction(RemoveCallbackMethodAction.class);
+        ObjEntityService objEntityService = controller.getBootiqueInjector().getInstance(ObjEntityService.class);
 
-        RemoveProcedureParameterAction rProcedureParamAction = actionManager
-                .getAction(RemoveProcedureParameterAction.class);
+        ProcedureService procedureService = controller.getBootiqueInjector().getInstance(ProcedureService.class);
+
+        DataMapService dataMapService = controller.getBootiqueInjector().getInstance(DataMapService.class);
+
+        EmbeddableService embeddableService = controller.getBootiqueInjector().getInstance(EmbeddableService.class);
+
+        RelationshipService relationshipService = controller.getBootiqueInjector().getInstance(RelationshipService.class);
+
+        CallbackMethodService callbackMethodService = controller.getBootiqueInjector().getInstance(CallbackMethodService.class);
+
+        QueryService queryService = controller.getBootiqueInjector().getInstance(QueryService.class);
+
+        ProcedureParameterService procedureParameterService = controller.getBootiqueInjector().getInstance(ProcedureParameterService.class);
 
         if (content instanceof DataMap) {
             if (where instanceof DataChannelDescriptor) {
-                rAction.removeDataMap((DataMap) content);
+                dataMapService.removeDataMap((DataMap) content);
             } else if (where instanceof DataNodeDescriptor) {
-                rAction.removeDataMapFromDataNode(
+                dataMapService.removeDataMapFromDataNode(
                         (DataNodeDescriptor) where,
                         (DataMap) content);
             }
         } else if (where instanceof DataMap) {
             if (content instanceof DbEntity) {
-                rAction.removeDbEntity(map, (DbEntity) content);
+                dbEntityService.removeDbEntity(map, (DbEntity) content);
             } else if (content instanceof ObjEntity) {
-                rAction.removeObjEntity(map, (ObjEntity) content);
+                objEntityService.removeObjEntity(map, (ObjEntity) content);
             } else if (content instanceof Embeddable) {
-                rAction.removeEmbeddable(map, (Embeddable) content);
+                embeddableService.removeEmbeddable(map, (Embeddable) content);
             } else if (content instanceof QueryDescriptor) {
-                rAction.removeQuery(map, (QueryDescriptor) content);
+                queryService.removeQuery(map, (QueryDescriptor) content);
             } else if (content instanceof Procedure) {
-                rAction.removeProcedure(map, (Procedure) content);
+                procedureService.removeProcedure(map, (Procedure) content);
             }
         } else if (where instanceof DbEntity) {
             if (content instanceof DbEntity) {
-                rAction.removeDbEntity(map, (DbEntity) content);
+                dbEntityService.removeDbEntity(map, (DbEntity) content);
             } else if (content instanceof DbAttribute) {
-                rAttributeAction.removeDbAttributes(
+                attributeService.removeDbAttributes(
                         map,
                         (DbEntity) where,
                         new DbAttribute[] {
                             (DbAttribute) content
                         });
             } else if (content instanceof DbRelationship) {
-                rRelationShipAction.removeDbRelationships(
+                relationshipService.removeDbRelationships(
                         (DbEntity) where,
                         new DbRelationship[] {
                             (DbRelationship) content
@@ -130,15 +122,15 @@ public class PasteUndoableEdit extends CayenneUndoableEdit {
             }
         } else if (where instanceof ObjEntity) {
             if (content instanceof ObjEntity) {
-                rAction.removeObjEntity(map, (ObjEntity) content);
+                objEntityService.removeObjEntity(map, (ObjEntity) content);
             } else if (content instanceof ObjAttribute) {
-                rAttributeAction.removeObjAttributes(
+                attributeService.removeObjAttributes(
                         (ObjEntity) where,
                         new ObjAttribute[] {
                             (ObjAttribute) content
                         });
             } else if (content instanceof ObjRelationship) {
-                rRelationShipAction.removeObjRelationships(
+                relationshipService.removeObjRelationships(
                         (ObjEntity) where,
                         new ObjRelationship[] {
                             (ObjRelationship) content
@@ -147,7 +139,7 @@ public class PasteUndoableEdit extends CayenneUndoableEdit {
             		ObjCallbackMethod[] methods = new ObjCallbackMethod[] {
                             (ObjCallbackMethod) content };
             		for(ObjCallbackMethod callbackMethod : methods) {
-	            		rCallbackMethodAction.removeCallbackMethod(
+                        callbackMethodService.removeCallbackMethod(
 	                			methods[0].getCallbackType(), 
 	                			callbackMethod.getName());
             		}
@@ -155,7 +147,7 @@ public class PasteUndoableEdit extends CayenneUndoableEdit {
         } else if (where instanceof Procedure) {
             final Procedure procedure = (Procedure) where;
             if (content instanceof ProcedureParameter) {
-                rProcedureParamAction.removeProcedureParameters(
+                procedureParameterService.removeProcedureParameters(
                         procedure,
                         new ProcedureParameter[] {
                             (ProcedureParameter) content
@@ -163,9 +155,9 @@ public class PasteUndoableEdit extends CayenneUndoableEdit {
             }
         } else if (where instanceof Embeddable) {
             if (content instanceof Embeddable) {
-                rAction.removeEmbeddable(map, (Embeddable) content);
+                embeddableService.removeEmbeddable(map, (Embeddable) content);
             } else if (content instanceof EmbeddableAttribute) {
-                rAttributeAction.removeEmbeddableAttributes((Embeddable) where,
+                attributeService.removeEmbeddableAttributes((Embeddable) where,
                         new EmbeddableAttribute[]{(EmbeddableAttribute) content});
             }
         }

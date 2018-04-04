@@ -83,7 +83,7 @@ public class GenericLauncher implements Launcher {
                 }
 
                 if (project != null) {
-                    new OpenProjectAction(application).openProject(project);
+                    new OpenProjectAction().openProject(project);
                 }
             }
         });

@@ -22,7 +22,7 @@ import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.event.DataNodeEvent;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.LinkDataMapAction;
+import org.apache.cayenne.modeler.services.DataMapService;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -49,8 +49,8 @@ public class LinkDataMapUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        LinkDataMapAction action = actionManager.getAction(LinkDataMapAction.class);
-        action.linkDataMap(map, node);
+        DataMapService dataMapService = mediator.getBootiqueInjector().getInstance(DataMapService.class);
+        dataMapService.linkDataMap(map, node);
     }
 
     @Override

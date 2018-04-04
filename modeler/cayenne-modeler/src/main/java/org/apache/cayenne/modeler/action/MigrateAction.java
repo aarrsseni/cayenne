@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactoryProvider;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.Application;
@@ -34,10 +35,13 @@ import java.util.Collection;
  */
 public class MigrateAction extends DBWizardAction<DbActionOptionsDialog> {
 
+    @Inject
+    public Application application;
+
     private boolean dialogShown;
 
-    public MigrateAction(Application application) {
-        super(getActionName(), application);
+    public MigrateAction() {
+        super(getActionName());
     }
 
     public static String getActionName() {
@@ -66,7 +70,7 @@ public class MigrateAction extends DBWizardAction<DbActionOptionsDialog> {
         String selectedSchema = optionsDialog == null ? null : optionsDialog.getSelectedSchema();
 
         MergerTokenFactoryProvider mergerTokenFactoryProvider =
-                getApplication().getInjector().getInstance(MergerTokenFactoryProvider.class);
+                application.getInjector().getInstance(MergerTokenFactoryProvider.class);
 
         // ... show dialog...
         new MergerOptions(

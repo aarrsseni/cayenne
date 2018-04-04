@@ -18,17 +18,21 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.util.Arrays;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 
+import java.util.Arrays;
+
 /**
  * Action for copying relationship(s)
  */
 public class CopyRelationshipAction extends CopyAction implements MultipleObjectsAction {
+
+    @Inject
+    public Application application;
 
     private final static String ACTION_NAME = "Copy Relationship";
 
@@ -45,8 +49,8 @@ public class CopyRelationshipAction extends CopyAction implements MultipleObject
         return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 
-    public CopyRelationshipAction(Application application) {
-        super(ACTION_NAME, application);
+    public CopyRelationshipAction() {
+        super(ACTION_NAME);
     }
 
     /**

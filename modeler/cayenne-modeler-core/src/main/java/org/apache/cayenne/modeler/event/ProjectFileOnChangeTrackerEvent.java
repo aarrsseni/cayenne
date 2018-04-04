@@ -19,8 +19,10 @@
 
 package org.apache.cayenne.modeler.event;
 
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.modeler.ProjectFileChangeTracker;
 
+import java.util.EventListener;
 import java.util.EventObject;
 
 /**
@@ -48,5 +50,9 @@ public class ProjectFileOnChangeTrackerEvent extends EventObject {
 
     public String getType() {
         return type;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return ProjectFileOnChangeEventListener.class;
     }
 }

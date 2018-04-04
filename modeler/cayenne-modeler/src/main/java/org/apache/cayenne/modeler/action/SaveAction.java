@@ -19,11 +19,12 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.RecentFileListEvent;
-import org.apache.cayenne.pref.RenamedPreferences;
+import org.apache.cayenne.modeler.services.SaveService;
 import org.apache.cayenne.project.Project;
-import org.apache.cayenne.project.ProjectSaver;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,12 +36,21 @@ import java.io.File;
  */
 public class SaveAction extends SaveAsAction {
 
+    @Inject
+    public Application application;
+
+    @Inject
+    public ProjectController projectController;
+
+    @Inject
+    public SaveService saveService;
+
     public static String getActionName() {
         return "Save";
     }
 
-    public SaveAction(Application application) {
-        super(getActionName(), application);
+    public SaveAction() {
+        super(getActionName());
     }
 
     @Override
@@ -59,33 +69,16 @@ public class SaveAction extends SaveAsAction {
         if (p == null || p.getConfigurationResource() == null) {
             return super.saveAll();
         }
-
-        String oldPath = p.getConfigurationResource().getURL().getPath();
         File oldProjectFile = new File(p.getConfigurationResource().getURL().toURI());
 
-        getProjectController().getFileChangeTracker().pauseWatching();
-        ProjectSaver saver = getApplication().getInjector().getInstance(ProjectSaver.class);
-        saver.save(p);
-
-        RenamedPreferences.removeOldPreferences();
-
-        // if change DataChanelDescriptor name - as result change name of xml file
-        // we will need change preferences path
-        String[] path = oldPath.split("/");
-        String[] newPath = p.getConfigurationResource().getURL().getPath().split("/");
-
-        if (!path[path.length - 1].equals(newPath[newPath.length - 1])) {
-            String newName = newPath[newPath.length - 1].replace(".xml", "");
-            RenamedPreferences.copyPreferences(newName, getProjectController().getPreferenceForProject());
-            RenamedPreferences.removeOldPreferences();
-        }
+        saveService.saveAll(p);
 
         File newProjectFile = new File(p.getConfigurationResource().getURL().toURI());
-        getApplication().getFrameController().changePathInLastProjListAction(oldProjectFile, newProjectFile);
-        Application.getFrame().fireRecentFileListChanged(new RecentFileListEvent(this));
+        application.getFrameController().changePathInLastProjListAction(oldProjectFile, newProjectFile);
+        application.getFrame().fireRecentFileListChanged(new RecentFileListEvent(this));
 
         // Reset the watcher now
-        getProjectController().getFileChangeTracker().reconfigure();
+        projectController.getFileChangeTracker().reconfigure();
 
         return true;
     }

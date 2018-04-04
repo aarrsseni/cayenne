@@ -19,20 +19,16 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.event.DbAttributeEvent;
-import org.apache.cayenne.configuration.event.ObjAttributeEvent;
 import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.EmbeddableAttributeEvent;
-import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
+import org.apache.cayenne.modeler.services.AttributeService;
 import org.apache.cayenne.modeler.undo.RemoveAttributeUndoableEdit;
-import org.apache.cayenne.modeler.util.ProjectUtil;
 
 import java.awt.event.ActionEvent;
-import java.util.Collection;
 
 /**
  * Removes currently selected attribute from either the DbEntity or ObjEntity.
@@ -40,6 +36,12 @@ import java.util.Collection;
 public class RemoveAttributeAction extends RemoveAction implements MultipleObjectsAction {
 
     private final static String ACTION_NAME = "Remove Attribute";
+
+    @Inject
+    public Application application;
+
+    @Inject
+    public AttributeService attributeService;
 
     /**
      * Name of action if multiple rels are selected
@@ -54,8 +56,8 @@ public class RemoveAttributeAction extends RemoveAction implements MultipleObjec
         return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 
-    public RemoveAttributeAction(Application application) {
-        super(ACTION_NAME, application);
+    public RemoveAttributeAction() {
+        super(ACTION_NAME);
     }
 
     /**
@@ -89,7 +91,7 @@ public class RemoveAttributeAction extends RemoveAction implements MultipleObjec
                 application.getUndoManager().addEdit(
                         new RemoveAttributeUndoableEdit(embeddable, embAttrs));
 
-                removeEmbeddableAttributes(embeddable, embAttrs);
+                attributeService.removeEmbeddableAttributes(embeddable, embAttrs);
 
             }
         } else if (objAttrs != null && objAttrs.length > 0) {
@@ -101,7 +103,7 @@ public class RemoveAttributeAction extends RemoveAction implements MultipleObjec
 
                 application.getUndoManager().addEdit(new RemoveAttributeUndoableEdit(entity, objAttrs));
 
-                removeObjAttributes(entity, objAttrs);
+                attributeService.removeObjAttributes(entity, objAttrs);
             }
         } else if (dbAttrs != null && dbAttrs.length > 0) {
         	if ((dbAttrs.length == 1 && dialog.shouldDelete("DbAttribute", dbAttrs[0]
@@ -112,56 +114,8 @@ public class RemoveAttributeAction extends RemoveAction implements MultipleObjec
 
                 application.getUndoManager().addEdit(new RemoveAttributeUndoableEdit(entity, dbAttrs));
 
-                removeDbAttributes(mediator.getCurrentState().getDataMap(), entity, dbAttrs);
+                attributeService.removeDbAttributes(mediator.getCurrentState().getDataMap(), entity, dbAttrs);
         	}
-        }
-    }
-
-    public void removeDbAttributes(DataMap dataMap, DbEntity entity, DbAttribute[] attribs) {
-        ProjectController mediator = getProjectController();
-
-        for (DbAttribute attrib : attribs) {
-            entity.removeAttribute(attrib.getName());
-
-            DbAttributeEvent e = new DbAttributeEvent(
-                    Application.getFrame(),
-                    attrib,
-                    entity,
-                    MapEvent.REMOVE);
-
-            mediator.fireEvent(e);
-        }
-
-        ProjectUtil.cleanObjMappings(dataMap);
-    }
-
-    public void removeObjAttributes(ObjEntity entity, ObjAttribute[] attribs) {
-        ProjectController mediator = getProjectController();
-
-        for (ObjAttribute attrib : attribs) {
-            entity.removeAttribute(attrib.getName());
-            ObjAttributeEvent e = new ObjAttributeEvent(
-                    Application.getFrame(),
-                    attrib,
-                    entity,
-                    MapEvent.REMOVE);
-            mediator.fireEvent(e);
-
-            Collection<ObjEntity> objEntities = ProjectUtil.getCollectionOfChildren((ObjEntity) e.getEntity());
-            for (ObjEntity objEntity: objEntities) {
-                objEntity.removeAttributeOverride(e.getAttribute().getName());
-            }
-        }
-    }
-
-    public void removeEmbeddableAttributes(Embeddable embeddable, EmbeddableAttribute[] attrs) {
-        ProjectController mediator = getProjectController();
-
-        for (EmbeddableAttribute attrib : attrs) {
-            embeddable.removeAttribute(attrib.getName());
-            EmbeddableAttributeEvent e = new EmbeddableAttributeEvent(Application
-                    .getFrame(), attrib, embeddable, MapEvent.REMOVE);
-            mediator.fireEvent(e);
         }
     }
 }

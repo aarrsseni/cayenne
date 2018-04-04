@@ -35,6 +35,11 @@
             <artifactId>cayenne-dbsync</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cayenne.modeler</groupId>
+            <artifactId>cayenne-wocompat</artifactId>
+            <version>4.1.M2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

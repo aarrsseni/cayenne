@@ -19,18 +19,22 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 
 public class ObjEntityCounterpartAction extends BaseViewEntityAction {
+
+    @Inject
+    public ProjectController projectController;
 
     public static String getActionName() {
         return "View related DbEntity";
     }
 
-    public ObjEntityCounterpartAction(Application application) {
-        super(getActionName(), application);
+    public ObjEntityCounterpartAction() {
+        super(getActionName());
     }
 
     public String getIconName() {
@@ -39,7 +43,7 @@ public class ObjEntityCounterpartAction extends BaseViewEntityAction {
 
     @Override
     protected Entity getEntity() {
-        ObjEntity objEntity = getProjectController().getCurrentState().getObjEntity();
+        ObjEntity objEntity = projectController.getCurrentState().getObjEntity();
         if (objEntity == null) {
             return null;
         }

@@ -3,6 +3,9 @@ package org.apache.cayenne.configuration.event;
 import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.event.AttributeEvent;
+import org.apache.cayenne.map.event.ObjAttributeListener;
+
+import java.util.EventListener;
 
 public class ObjAttributeEvent extends AttributeEvent{
 
@@ -18,4 +21,7 @@ public class ObjAttributeEvent extends AttributeEvent{
         super(src, attr, entity, oldName);
     }
 
+    public Class<? extends EventListener> getEventListener() {
+        return ObjAttributeListener.class;
+    }
 }

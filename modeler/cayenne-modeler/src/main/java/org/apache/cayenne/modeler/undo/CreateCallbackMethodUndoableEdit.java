@@ -18,12 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
+import org.apache.cayenne.modeler.editor.CallbackType;
+import org.apache.cayenne.modeler.services.CallbackMethodService;
+
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-
-import org.apache.cayenne.modeler.action.CreateCallbackMethodAction;
-import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
-import org.apache.cayenne.modeler.editor.CallbackType;
 
 public class CreateCallbackMethodUndoableEdit extends CayenneUndoableEdit {
 
@@ -37,16 +36,14 @@ public class CreateCallbackMethodUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateCallbackMethodAction action = actionManager
-                .getAction(CreateCallbackMethodAction.class);
-        action.createCallbackMethod(callbackType, methodName);
+        CallbackMethodService callbackMethodService = controller.getBootiqueInjector().getInstance(CallbackMethodService.class);
+        callbackMethodService.createCallbackMethod(callbackType, methodName);
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveCallbackMethodAction action = actionManager
-                .getAction(RemoveCallbackMethodAction.class);
-        action.removeCallbackMethod(callbackType, methodName);
+        CallbackMethodService callbackMethodService = controller.getBootiqueInjector().getInstance(CallbackMethodService.class);
+        callbackMethodService.removeCallbackMethod(callbackType, methodName);
     }
 
     public CreateCallbackMethodUndoableEdit(CallbackType callbackType,

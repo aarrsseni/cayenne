@@ -22,6 +22,8 @@ package org.apache.cayenne.configuration.event;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.event.MapEvent;
 
+import java.util.EventListener;
+
 /** 
  * Represents events resulted from DataDomain changes 
  * in CayenneModeler.
@@ -49,5 +51,9 @@ public class DomainEvent extends MapEvent {
 	@Override
     public String getNewName() {
 		return (domain != null) ? domain.getName() : null;
+	}
+
+	public Class<? extends EventListener> getEventListener() {
+		return DomainListener.class;
 	}
 }

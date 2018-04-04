@@ -18,20 +18,20 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.configuration.event.DataNodeEvent;
-import org.apache.cayenne.map.DataMap;
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.undo.LinkDataMapsUndoableEdit;
+import org.apache.cayenne.modeler.services.DataMapService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class LinkDataMapsAction extends CayenneAction {
+
+    @Inject
+    public Application application;
+
+    @Inject
+    public DataMapService dataMapsService;
 
     public static String getActionName() {
         return "Link unlinked DataMaps";
@@ -39,11 +39,9 @@ public class LinkDataMapsAction extends CayenneAction {
 
     /**
      * Constructor for LinkDataMapsAction.
-     *
-     * @param application
      */
-    public LinkDataMapsAction(Application application) {
-        super(getActionName(), application);
+    public LinkDataMapsAction() {
+        super(getActionName());
     }
 
     @Override
@@ -53,24 +51,6 @@ public class LinkDataMapsAction extends CayenneAction {
 
     @Override
     public void performAction(ActionEvent e) {
-        ProjectController mediator = getProjectController();
-        DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor) mediator.getProject().getRootNode();
-
-        Collection<String> linkedDataMaps = new ArrayList<>();
-        DataNodeDescriptor dataNodeDescriptor = mediator.getCurrentState().getNode();
-        for (DataNodeDescriptor dataNodeDesc : dataChannelDescriptor.getNodeDescriptors()) {
-            linkedDataMaps.addAll(dataNodeDesc.getDataMapNames());
-        }
-
-        for (DataMap dataMap : dataChannelDescriptor.getDataMaps()) {
-            if (!linkedDataMaps.contains(dataMap.getName())) {
-                dataNodeDescriptor.getDataMapNames().add(dataMap.getName());
-                mediator.fireEvent(new DataNodeEvent(this, dataNodeDescriptor));
-            }
-        }
-
-        application.getUndoManager().addEdit(
-                new LinkDataMapsUndoableEdit(dataNodeDescriptor, linkedDataMaps, mediator));
+        dataMapsService.linkDataMaps();
     }
-
 }

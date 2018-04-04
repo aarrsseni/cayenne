@@ -22,6 +22,8 @@ package org.apache.cayenne.configuration.event;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.event.MapEvent;
 
+import java.util.EventListener;
+
 /** 
  * Represents events resulted from DataNode changes 
  * in CayenneModeler.
@@ -64,5 +66,9 @@ public class DataNodeEvent extends MapEvent {
 	@Override
     public String getNewName() {
 		return (dataNode != null) ? dataNode.getName() : null;
+	}
+
+	public Class<? extends EventListener> getEventListener() {
+		return DataNodeListener.class;
 	}
 }

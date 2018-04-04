@@ -20,8 +20,11 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Procedure;
+
+import java.util.EventListener;
 
 /**
  * Display event for Stored Procedures.
@@ -63,5 +66,9 @@ public class ProcedureDisplayEvent extends DataMapDisplayEvent {
 
     public void setTabReset(boolean b) {
         tabReset = b;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return ProcedureDisplayListener.class;
     }
 }

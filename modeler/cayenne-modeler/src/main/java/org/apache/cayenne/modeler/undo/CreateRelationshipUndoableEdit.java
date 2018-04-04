@@ -23,10 +23,9 @@ import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+import org.apache.cayenne.modeler.services.RelationshipService;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -56,29 +55,27 @@ public class CreateRelationshipUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateRelationshipAction action = actionManager
-                .getAction(CreateRelationshipAction.class);
+        RelationshipService relationshipService = controller.getBootiqueInjector().getInstance(RelationshipService.class);
 
         if (objEnt != null) {
             for (ObjRelationship rel : objectRel) {
-                action.createObjRelationship(objEnt, rel);
+                relationshipService.createObjRelationship(objEnt, rel);
             }
         }
 
         if (dbEnt != null) {
             for (DbRelationship rel : dbRel) {
-                action.createDbRelationship(dbEnt, rel);
+                relationshipService.createDbRelationship(dbEnt, rel);
             }
         }
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveRelationshipAction action = actionManager
-                .getAction(RemoveRelationshipAction.class);
 
+        RelationshipService relationshipService = controller.getBootiqueInjector().getInstance(RelationshipService.class);
         if (objEnt != null) {
-            action.removeObjRelationships(objEnt, objectRel);
+            relationshipService.removeObjRelationships(objEnt, objectRel);
             controller.fireEvent(new ObjEntityDisplayEvent(
                     this,
                     objEnt,
@@ -87,7 +84,7 @@ public class CreateRelationshipUndoableEdit extends CayenneUndoableEdit {
         }
 
         if (dbEnt != null) {
-            action.removeDbRelationships(dbEnt, dbRel);
+            relationshipService.removeDbRelationships(dbEnt, dbRel);
             controller.fireEvent(new DbEntityDisplayEvent(this, dbEnt, dbEnt
                     .getDataMap(), (DataChannelDescriptor) controller
                     .getProject()

@@ -19,8 +19,11 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
+
+import java.util.EventListener;
 
 public class EmbeddableDisplayEvent extends DataMapDisplayEvent {
 
@@ -54,5 +57,9 @@ public class EmbeddableDisplayEvent extends DataMapDisplayEvent {
 
     public void setEmbeddableChanged(boolean temp) {
         this.embeddableChanged = temp;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return EmbeddableDisplayListener.class;
     }
 }

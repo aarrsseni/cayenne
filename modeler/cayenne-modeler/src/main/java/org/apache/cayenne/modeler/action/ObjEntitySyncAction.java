@@ -19,15 +19,13 @@
 
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.event.ObjEntityEvent;
+import com.google.inject.Inject;
 import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.objentity.EntitySyncController;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+import org.apache.cayenne.modeler.services.ObjEntityService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.*;
@@ -42,12 +40,18 @@ import java.awt.event.KeyEvent;
  */
 public class ObjEntitySyncAction extends CayenneAction {
 
+    @Inject
+    public Application application;
+
+    @Inject
+    public ObjEntityService objEntityService;
+
     public static String getActionName() {
         return "Sync ObjEntity with DbEntity";
     }
 
-    public ObjEntitySyncAction(Application application) {
-        super(getActionName(), application);
+    public ObjEntitySyncAction() {
+        super(getActionName());
     }
 
     public String getIconName() {
@@ -83,13 +87,7 @@ public class ObjEntitySyncAction extends CayenneAction {
             merger.setNameGenerator(new DbEntitySyncAction.PreserveRelationshipNameGenerator());
 
             if (merger.synchronizeWithDbEntity(entity)) {
-                mediator
-                        .fireEvent(new ObjEntityEvent(this, entity, MapEvent.CHANGE));
-                mediator.fireEvent(new ObjEntityDisplayEvent(
-                        this,
-                        entity,
-                        entity.getDataMap(),
-                        (DataChannelDescriptor)mediator.getProject().getRootNode()));
+                objEntityService.syncObjEntity(entity);
             }
         }
     }

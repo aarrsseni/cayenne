@@ -19,16 +19,14 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.event.DbRelationshipEvent;
-import org.apache.cayenne.configuration.event.ObjRelationshipEvent;
 import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
+import org.apache.cayenne.modeler.services.RelationshipService;
 import org.apache.cayenne.modeler.undo.RemoveRelationshipUndoableEdit;
-import org.apache.cayenne.modeler.util.ProjectUtil;
 
 import java.awt.event.ActionEvent;
 
@@ -40,7 +38,14 @@ import java.awt.event.ActionEvent;
 public class RemoveRelationshipAction extends RemoveAction implements
 		MultipleObjectsAction {
 
-	
+	@Inject
+	public ProjectController projectController;
+
+	@Inject
+	public Application application;
+
+	@Inject
+	public RelationshipService relationshipService;
 
 	private final static String ACTION_NAME = "Remove Relationship";
 
@@ -57,8 +62,8 @@ public class RemoveRelationshipAction extends RemoveAction implements
 		return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
 	}
 
-	public RemoveRelationshipAction(Application application) {
-		super(ACTION_NAME, application);
+	public RemoveRelationshipAction() {
+		super(ACTION_NAME);
 	}
 
 	/**
@@ -77,9 +82,8 @@ public class RemoveRelationshipAction extends RemoveAction implements
 	@Override
 	public void performAction(ActionEvent e, boolean allowAsking) {
 		ConfirmRemoveDialog dialog = getConfirmDeleteDialog(allowAsking);
-		ProjectController mediator = getProjectController();
 
-		ObjRelationship[] rels = getProjectController()
+		ObjRelationship[] rels = projectController
 				.getCurrentState()
 				.getObjRels();
 		if (rels != null && rels.length > 0) {
@@ -87,13 +91,13 @@ public class RemoveRelationshipAction extends RemoveAction implements
 					rels[0].getName()))
 					|| (rels.length > 1 && dialog
 							.shouldDelete("selected ObjRelationships"))) {
-				ObjEntity entity = mediator.getCurrentState().getObjEntity();
-				removeObjRelationships(entity, rels);
-				Application.getInstance().getUndoManager().addEdit(
+				ObjEntity entity = projectController.getCurrentState().getObjEntity();
+				relationshipService.removeObjRelationships(entity, rels);
+				application.getUndoManager().addEdit(
 						new RemoveRelationshipUndoableEdit(entity, rels));
 			}
 		} else {
-			DbRelationship[] dbRels = getProjectController()
+			DbRelationship[] dbRels = projectController
 					.getCurrentState()
 					.getDbRels();
 			if (dbRels != null && dbRels.length > 0) {
@@ -101,37 +105,12 @@ public class RemoveRelationshipAction extends RemoveAction implements
 						"DbRelationship", dbRels[0].getName()))
 						|| (dbRels.length > 1 && dialog
 								.shouldDelete("selected DbRelationships"))) {
-					DbEntity entity = mediator.getCurrentState().getDbEntity();
-					removeDbRelationships(entity, dbRels);
-					Application.getInstance().getUndoManager().addEdit(
+					DbEntity entity = projectController.getCurrentState().getDbEntity();
+					relationshipService.removeDbRelationships(entity, dbRels);
+					application.getUndoManager().addEdit(
 							new RemoveRelationshipUndoableEdit(entity, dbRels));
 				}
 			}
 		}
-	}
-
-	public void removeObjRelationships(ObjEntity entity, ObjRelationship[] rels) {
-		ProjectController mediator = getProjectController();
-
-		for (ObjRelationship rel : rels) {
-			entity.removeRelationship(rel.getName());
-			ObjRelationshipEvent e = new ObjRelationshipEvent(Application.getFrame(),
-					rel, entity, MapEvent.REMOVE);
-			mediator.fireEvent(e);
-		}
-	}
-
-	public void removeDbRelationships(DbEntity entity, DbRelationship[] rels) {
-		ProjectController mediator = getProjectController();
-
-		for (DbRelationship rel : rels) {
-			entity.removeRelationship(rel.getName());
-
-			DbRelationshipEvent e = new DbRelationshipEvent(Application.getFrame(),
-					rel, entity, MapEvent.REMOVE);
-			mediator.fireEvent(e);
-		}
-
-		ProjectUtil.cleanObjMappings(mediator.getCurrentState().getDataMap());
 	}
 }

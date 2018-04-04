@@ -18,12 +18,17 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
+import org.apache.cayenne.configuration.ConfigurationNode;
+
 import java.awt.event.ActionEvent;
 
-import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.modeler.Application;
-
 public class CutCallbackMethodAction extends CutAction implements MultipleObjectsAction {
+
+    @Inject
+    public CopyCallbackMethodAction copyCallbackMethodAction;
+    @Inject
+    public RemoveCallbackMethodAction removeCallbackMethodAction;
 
     private final static String ACTION_NAME = "Cut Callback method";
 
@@ -40,8 +45,8 @@ public class CutCallbackMethodAction extends CutAction implements MultipleObject
         return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 
-    public CutCallbackMethodAction(Application application) {
-        super(ACTION_NAME, application);
+    public CutCallbackMethodAction() {
+        super(ACTION_NAME);
     }
 
     /**
@@ -58,13 +63,7 @@ public class CutCallbackMethodAction extends CutAction implements MultipleObject
      */
     @Override
     public void performAction(ActionEvent e) {
-        application
-                .getActionManager()
-                .getAction(CopyCallbackMethodAction.class)
-                .performAction(e);
-        application
-                .getActionManager()
-                .getAction(RemoveCallbackMethodAction.class)
-                .performAction(e, false);
+        copyCallbackMethodAction.performAction(e);
+        removeCallbackMethodAction.performAction(e, false);
     }
 }

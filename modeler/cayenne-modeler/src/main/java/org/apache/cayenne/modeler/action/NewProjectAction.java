@@ -19,13 +19,8 @@
 
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.configuration.ConfigurationTree;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.CayenneModelerController;
-import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.project.Project;
+import com.google.inject.Inject;
+import org.apache.cayenne.modeler.services.ProjectService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,12 +29,16 @@ import java.awt.event.KeyEvent;
 
 public class NewProjectAction extends ProjectAction {
 
+    @Inject
+    public ProjectService newProjectService;
+
     public static String getActionName() {
         return "New Project";
     }
 
-    public NewProjectAction(Application application) {
-        super(getActionName(), application);
+    public NewProjectAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
 
     public String getIconName() {
@@ -53,27 +52,10 @@ public class NewProjectAction extends ProjectAction {
     }
 
     public void performAction(ActionEvent e) {
-
-        CayenneModelerController controller = Application
-                .getInstance()
-                .getFrameController();
         // Save and close (if needed) currently open project.
         if (getCurrentProject() != null && !closeProject(true)) {
             return;
         }
-
-        DataChannelDescriptor dataChannelDescriptor = new DataChannelDescriptor();
-
-        dataChannelDescriptor.setName(NameBuilder
-                .builder(dataChannelDescriptor)
-                .name());
-
-        Project project = new Project(
-                new ConfigurationTree<DataChannelDescriptor>(dataChannelDescriptor));
-
-        controller.projectOpenedAction(project);
-
-        // select default domain
-        getProjectController().fireEvent(new DomainDisplayEvent(this, dataChannelDescriptor));
+        newProjectService.newProject();
     }
 }

@@ -19,20 +19,14 @@
 
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.configuration.ConfigurationNameMapper;
-import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.DataMapLoader;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.map.DataMap;
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.pref.BaseFileChooser;
 import org.apache.cayenne.modeler.pref.FSPath;
 import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
-import org.apache.cayenne.modeler.pref.BaseFileChooser;
+import org.apache.cayenne.modeler.services.DataMapService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.FileFilters;
-import org.apache.cayenne.resource.Resource;
-import org.apache.cayenne.resource.URLResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +34,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.net.URL;
 
 /**
  * Modeler action that imports a DataMap into a project from an arbitrary
@@ -52,11 +45,14 @@ public class ImportDataMapAction extends CayenneAction {
 
     private static Logger logObj = LoggerFactory.getLogger(ImportDataMapAction.class);
 
-    private ConfigurationNameMapper nameMapper;
+    @Inject
+    public Application application;
 
-    public ImportDataMapAction(Application application, ConfigurationNameMapper nameMapper) {
-        super(getActionName(), application);
-        this.nameMapper = nameMapper;
+    @Inject
+    public DataMapService dataMapService;
+
+    public ImportDataMapAction() {
+        super(getActionName());
     }
 
     public static String getActionName() {
@@ -72,28 +68,8 @@ public class ImportDataMapAction extends CayenneAction {
         if (dataMapFile == null) {
             return;
         }
-
-        DataMap newMap;
-
         try {
-            URL url = dataMapFile.toURI().toURL();
-            DataMapLoader loader = application.getInjector().getInstance(DataMapLoader.class);
-            newMap = loader.load(new URLResource(url));
-
-            ConfigurationNode root = getProjectController().getProject().getRootNode();
-            newMap.setName(NameBuilder
-                    .builder(newMap, root)
-                    .baseName(newMap.getName())
-                    .name());
-
-            Resource baseResource = ((DataChannelDescriptor) root).getConfigurationSource();
-
-            if (baseResource != null) {
-                Resource dataMapResource = baseResource.getRelativeResource(nameMapper.configurationLocation(newMap));
-                newMap.setConfigurationSource(dataMapResource);
-            }
-
-            getProjectController().addDataMap(this, newMap);
+            dataMapService.importDataMap(dataMapFile);
         } catch (Exception ex) {
             logObj.info("Error importing DataMap.", ex);
             JOptionPane.showMessageDialog(Application.getFrame(), "Error reading DataMap: " + ex.getMessage(),
@@ -104,7 +80,7 @@ public class ImportDataMapAction extends CayenneAction {
     protected File selectDataMap(Frame f) {
 
         // find start directory in preferences
-        FSPath lastDir = getApplication().getFrameController().getLastDirectory();
+        FSPath lastDir = application.getFrameController().getLastDirectory();
 
         // configure dialog
         JFileChooser chooser = new JFileChooser();

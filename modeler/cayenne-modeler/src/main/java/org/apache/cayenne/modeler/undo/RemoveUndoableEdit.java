@@ -21,34 +21,15 @@ package org.apache.cayenne.modeler.undo;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.event.DataNodeEvent;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.CreateDataMapAction;
-import org.apache.cayenne.modeler.action.CreateDbEntityAction;
-import org.apache.cayenne.modeler.action.CreateEmbeddableAction;
-import org.apache.cayenne.modeler.action.CreateNodeAction;
-import org.apache.cayenne.modeler.action.CreateObjEntityAction;
-import org.apache.cayenne.modeler.action.CreateProcedureAction;
-import org.apache.cayenne.modeler.action.CreateQueryAction;
-import org.apache.cayenne.modeler.action.CreateRelationshipAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
+import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.services.*;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class RemoveUndoableEdit extends CayenneUndoableEdit {
@@ -199,37 +180,50 @@ public class RemoveUndoableEdit extends CayenneUndoableEdit {
     public void redo() throws CannotRedoException {
         RemoveAction action = actionManager.getAction(RemoveAction.class);
 
+        NodeService nodeService = controller.getBootiqueInjector().getInstance(NodeService.class);
+
+        DbEntityService dbEntityService = controller.getBootiqueInjector().getInstance(DbEntityService.class);
+
+        ObjEntityService objEntityService = controller.getBootiqueInjector().getInstance(ObjEntityService.class);
+
+        DataMapService dataMapService = controller.getBootiqueInjector().getInstance(DataMapService.class);
+
+        EmbeddableService embeddableService = controller.getBootiqueInjector().getInstance(EmbeddableService.class);
+
+        QueryService queryService = controller.getBootiqueInjector().getInstance(QueryService.class);
+
+        ProcedureService procedureService = controller.getBootiqueInjector().getInstance(ProcedureService.class);
+
         switch (this.mode) {
             case OBJECT_ENTITY:
-                action.removeObjEntity(map, objEntity);
+                objEntityService.removeObjEntity(map, objEntity);
                 break;
             case DB_ENTITY:
-                action.removeDbEntity(map, dbEntity);
+                dbEntityService.removeDbEntity(map, dbEntity);
                 break;
             case QUERY:
-                action.removeQuery(map, query);
+                queryService.removeQuery(map, query);
                 break;
             case PROCEDURE:
-                action.removeProcedure(map, procedure);
+                procedureService.removeProcedure(map, procedure);
             case MAP_FROM_NODE:
-                action.removeDataMapFromDataNode(dataNode, map);
+                dataMapService.removeDataMapFromDataNode(dataNode, map);
                 break;
             case MAP_FROM_DOMAIN:
-                action.removeDataMap(map);
+                dataMapService.removeDataMap(map);
                 break;
             case NODE:
-                action.removeDataNode(dataNode);
+                nodeService.removeDataNode(dataNode);
                 break;
             case EMBEDDABLE:
-                action.removeEmbeddable(map, embeddable);
+                embeddableService.removeEmbeddable(map, embeddable);
         }
     }
 
     @Override
     public void undo() throws CannotUndoException {
 
-        CreateRelationshipAction relationshipAction = actionManager
-                .getAction(CreateRelationshipAction.class);
+        RelationshipService relationshipService = controller.getBootiqueInjector().getInstance(RelationshipService.class);
 
         switch (this.mode) {
             case OBJECT_ENTITY: {
@@ -238,13 +232,12 @@ public class RemoveUndoableEdit extends CayenneUndoableEdit {
 
                     ObjEntity objEntity = entry.getKey();
                     for (ObjRelationship rel : entry.getValue()) {
-                        relationshipAction.createObjRelationship(objEntity, rel);
+                        relationshipService.createObjRelationship(objEntity, rel);
                     }
                 }
 
-                CreateObjEntityAction action = actionManager
-                        .getAction(CreateObjEntityAction.class);
-                action.createObjEntity(map, objEntity);
+                ObjEntityService objEntityService = controller.getBootiqueInjector().getInstance(ObjEntityService.class);
+                objEntityService.createObjEntity(map, objEntity);
 
                 break;
             }
@@ -254,14 +247,12 @@ public class RemoveUndoableEdit extends CayenneUndoableEdit {
                         .entrySet()) {
                     DbEntity dbEntity = entry.getKey();
                     for (DbRelationship rel : entry.getValue()) {
-                        relationshipAction.createDbRelationship(dbEntity, rel);
+                        relationshipService.createDbRelationship(dbEntity, rel);
                     }
                 }
 
-                CreateDbEntityAction action = actionManager
-                        .getAction(CreateDbEntityAction.class);
-
-                action.createEntity(map, dbEntity);
+                DbEntityService dbEntityService = controller.getBootiqueInjector().getInstance(DbEntityService.class);
+                dbEntityService.createEntity(map, dbEntity);
 
                 break;
             }
@@ -274,17 +265,14 @@ public class RemoveUndoableEdit extends CayenneUndoableEdit {
                         .getProject()
                         .getRootNode();
 
-                CreateQueryAction action = actionManager
-                        .getAction(CreateQueryAction.class);
-
-                action.createQuery(domain, map, query);
+                QueryService queryService = controller.getBootiqueInjector().getInstance(QueryService.class);
+                queryService.createQuery(domain, map, query);
 
                 break;
             }
             case PROCEDURE: {
-                CreateProcedureAction action = actionManager
-                        .getAction(CreateProcedureAction.class);
-                action.createProcedure(map, procedure);
+                ProcedureService procedureService = controller.getBootiqueInjector().getInstance(ProcedureService.class);
+                procedureService.createProcedure(map, procedure);
                 break;
             }
             case MAP_FROM_NODE: {
@@ -307,23 +295,20 @@ public class RemoveUndoableEdit extends CayenneUndoableEdit {
                 break;
             }
             case MAP_FROM_DOMAIN: {
-                CreateDataMapAction action = actionManager
-                        .getAction(CreateDataMapAction.class);
-                action.createDataMap(map);
-
+                DataMapService dataMapService = controller.getBootiqueInjector().getInstance(DataMapService.class);
+                dataMapService.createDataMap(map);
                 break;
             }
             case NODE: {
-                CreateNodeAction action = actionManager.getAction(CreateNodeAction.class);
-                action.createDataNode(dataNode);
+                NodeService nodeService = controller.getBootiqueInjector().getInstance(NodeService.class);
+                nodeService.createDataNode(dataNode);
 
                 break;
             }
 
             case EMBEDDABLE: {
-                CreateEmbeddableAction action = actionManager
-                        .getAction(CreateEmbeddableAction.class);
-                action.createEmbeddable(map, embeddable);
+                EmbeddableService embeddableService = controller.getBootiqueInjector().getInstance(EmbeddableService.class);
+                embeddableService.createEmbeddable(map, embeddable);
 
                 break;
             }

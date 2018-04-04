@@ -28,11 +28,14 @@ import org.apache.cayenne.di.Injector;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.map.event.*;
+import org.apache.cayenne.map.event.EmbeddableEvent;
+import org.apache.cayenne.map.event.EntityEvent;
+import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.DataNodeDefaults;
 import org.apache.cayenne.modeler.pref.ProjectStatePreferences;
+import org.apache.cayenne.modeler.util.AdapterMapping;
 import org.apache.cayenne.modeler.util.CircularArray;
 import org.apache.cayenne.modeler.util.Comparators;
 import org.apache.cayenne.pref.CayenneProjectPreferences;
@@ -64,16 +67,24 @@ public class ProjectController {
 
     private EntityResolver entityResolver;
 
+    protected AdapterMapping adapterMapping;
+
     @com.google.inject.Inject
     protected CayenneProjectPreferences cayenneProjectPreferences;
 
     @com.google.inject.Inject
     protected Injector injector;
 
+    public Injector getInjector() {
+        return injector;
+    }
+
     @com.google.inject.Inject
     protected com.google.inject.Injector bootiqueInjector;
 
     protected ListenerDescriptorCreator listenerDescriptorCreator;
+
+    protected ActionEventListener actionEventListener;
 
     /**
      * Project files watcher. When project file is changed, user will be asked
@@ -87,6 +98,10 @@ public class ProjectController {
 
         currentState = new ControllerState(this);
         listenerDescriptorCreator = new ListenerDescriptorCreator();
+
+        adapterMapping = new AdapterMapping();
+
+        actionEventListener = new ActionEventListener(this);
     }
 
     public Project getProject() {
@@ -319,7 +334,7 @@ public class ProjectController {
             return;
         }
 
-        ListenerDescriptor listenerDescriptor = getEventController().getListenerDescriptor(event.getClass());
+        ListenerDescriptor listenerDescriptor = getEventController().getListenerDescriptor(event);
         EventListener[] list = getEventController()
                 .getListenerMap()
                 .getListeners(listenerDescriptor.getListenerClass());
@@ -639,4 +654,11 @@ public class ProjectController {
         return bootiqueInjector;
     }
 
+    public void updateActionEventListeners() {
+        actionEventListener.initListeners();
+    }
+
+    public AdapterMapping getAdapterMapping() {
+        return adapterMapping;
+    }
 }

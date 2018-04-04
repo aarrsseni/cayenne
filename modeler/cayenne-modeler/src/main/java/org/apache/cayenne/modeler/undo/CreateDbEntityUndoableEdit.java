@@ -18,13 +18,12 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.modeler.action.CreateDbEntityAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
+import org.apache.cayenne.modeler.services.DbEntityService;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class CreateDbEntityUndoableEdit extends CayenneUndoableEdit {
 
@@ -48,13 +47,13 @@ public class CreateDbEntityUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateDbEntityAction action = actionManager.getAction(CreateDbEntityAction.class);
-        action.createEntity(map, entity);
+        DbEntityService dbEntityService = controller.getBootiqueInjector().getInstance(DbEntityService.class);
+        dbEntityService.createEntity(map, entity);
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveAction action = actionManager.getAction(RemoveAction.class);
-        action.removeDbEntity(map, entity);
+        DbEntityService dbEntityService = controller.getBootiqueInjector().getInstance(DbEntityService.class);
+        dbEntityService.removeDbEntity(map, entity);
     }
 }

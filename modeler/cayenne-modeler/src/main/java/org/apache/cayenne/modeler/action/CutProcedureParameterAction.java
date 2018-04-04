@@ -18,17 +18,22 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.modeler.Application;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action for cutting procedure parameter(s)
  */
 public class CutProcedureParameterAction extends CutAction implements
         MultipleObjectsAction {
+
+    @Inject
+    public CopyProcedureParameterAction copyProcedureParameterAction;
+    @Inject
+    public RemoveProcedureParameterAction removeProcedureParameterAction;
 
     private final static String ACTION_NAME = "Cut Procedure Parameter";
 
@@ -45,8 +50,8 @@ public class CutProcedureParameterAction extends CutAction implements
         return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 
-    public CutProcedureParameterAction(Application application) {
-        super(ACTION_NAME, application);
+    public CutProcedureParameterAction() {
+        super(ACTION_NAME);
     }
 
     /**
@@ -67,13 +72,7 @@ public class CutProcedureParameterAction extends CutAction implements
      */
     @Override
     public void performAction(ActionEvent e) {
-        application
-                .getActionManager()
-                .getAction(CopyProcedureParameterAction.class)
-                .performAction(e);
-        application
-                .getActionManager()
-                .getAction(RemoveProcedureParameterAction.class)
-                .performAction(e, false);
+        copyProcedureParameterAction.performAction(e);
+        removeProcedureParameterAction.performAction(e, false);
     }
 }

@@ -19,17 +19,17 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.validator.ValidatorDialog;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.project.validation.ProjectValidator;
 import org.apache.cayenne.validation.ValidationResult;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * UI action that performs full project validation.
@@ -37,12 +37,15 @@ import org.apache.cayenne.validation.ValidationResult;
  */
 public class ValidateAction extends CayenneAction {
 
+    @Inject
+    public Application application;
+
     public static String getActionName() {
         return "Validate Project";
     }
 
-    public ValidateAction(Application application) {
-        super(getActionName(), application);
+    public ValidateAction() {
+        super(getActionName());
     }
 
     public KeyStroke getAcceleratorKey() {
@@ -57,7 +60,7 @@ public class ValidateAction extends CayenneAction {
      */
     public void performAction(ActionEvent e) {
 
-        ProjectValidator projectValidator = getApplication().getInjector().getInstance(
+        ProjectValidator projectValidator = application.getInjector().getInstance(
                 ProjectValidator.class);
         ValidationResult validationResult = projectValidator.validate(getCurrentProject()
                 .getRootNode());

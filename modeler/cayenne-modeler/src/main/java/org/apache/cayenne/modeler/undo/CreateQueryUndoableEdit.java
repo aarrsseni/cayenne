@@ -18,14 +18,13 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.modeler.action.CreateQueryAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
 import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.modeler.services.QueryService;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class CreateQueryUndoableEdit extends CayenneUndoableEdit {
 
@@ -41,8 +40,8 @@ public class CreateQueryUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateQueryAction action = actionManager.getAction(CreateQueryAction.class);
-        action.createQuery(domain, map, query);
+        QueryService queryService = controller.getBootiqueInjector().getInstance(QueryService.class);
+        queryService.createQuery(domain, map, query);
     }
 
     @Override
@@ -52,8 +51,7 @@ public class CreateQueryUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveAction action = actionManager.getAction(RemoveAction.class);
-        action.removeQuery(map, query);
+        QueryService queryService = controller.getBootiqueInjector().getInstance(QueryService.class);
+        queryService.removeQuery(map, query);
     }
-
 }

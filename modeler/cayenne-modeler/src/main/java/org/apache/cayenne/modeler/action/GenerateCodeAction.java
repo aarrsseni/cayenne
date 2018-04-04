@@ -19,25 +19,23 @@
 
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.dialog.codegen.CodeGeneratorController;
+import com.google.inject.Inject;
+import org.apache.cayenne.modeler.services.GenerateCodeService;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.project.Project;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class GenerateCodeAction extends CayenneAction {
+
+    @Inject
+    public GenerateCodeService generateCodeService;
 
     public static String getActionName() {
         return "Generate Classes";
     }
 
-    public GenerateCodeAction(Application application) {
-        super(getActionName(), application);
+    public GenerateCodeAction() {
+        super(getActionName());
     }
 
     public String getIconName() {
@@ -45,32 +43,6 @@ public class GenerateCodeAction extends CayenneAction {
     }
 
     public void performAction(ActionEvent e) {
-        Collection<DataMap> dataMaps;
-        DataMap dataMap = getProjectController().getCurrentState().getDataMap();
-
-        if (dataMap != null) {
-            dataMaps = new ArrayList<>();
-            dataMaps.add(dataMap);
-
-            new CodeGeneratorController(getApplication().getFrameController(), dataMaps).startup();
-        } else if (getProjectController().getCurrentState().getNode() != null) {
-            Collection<String> nodeMaps = getProjectController().getCurrentState().getNode().getDataMapNames();
-            Project project = getProjectController().getProject();
-            dataMaps = ((DataChannelDescriptor) project.getRootNode()).getDataMaps();
-
-            Collection<DataMap> resultMaps = new ArrayList<>();
-            for (DataMap map : dataMaps) {
-                if (nodeMaps.contains(map.getName())) {
-                    resultMaps.add(map);
-                }
-            }
-
-            new CodeGeneratorController(getApplication().getFrameController(), resultMaps).startup();
-        } else {
-            Project project = getProjectController().getProject();
-            dataMaps = ((DataChannelDescriptor) project.getRootNode()).getDataMaps();
-
-            new CodeGeneratorController(getApplication().getFrameController(), dataMaps).startup();
-        }
+        generateCodeService.generateCode();
     }
 }

@@ -18,12 +18,16 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
+import java.awt.event.ActionEvent;
+
 public class CollapseTreeAction extends CayenneAction {
+	@Inject
+	public Application application;
+
 	private final static String COLLAPSE = "collapse";
 	
 	public static String getActionName() {
@@ -34,12 +38,12 @@ public class CollapseTreeAction extends CayenneAction {
 		return "icon-tree-collapse.png";
 	}
 
-	public CollapseTreeAction(Application application) {
-		super(getActionName(), application);
+	public CollapseTreeAction() {
+		super(getActionName());
 	}
 
 	@Override
 	public void performAction(ActionEvent e) {	
-		getApplication().getFrameController().getEditorView().getFilterController().treeExpOrCollPath(COLLAPSE);		
+		application.getFrameController().getEditorView().getFilterController().treeExpOrCollPath(COLLAPSE);
 	}
 }

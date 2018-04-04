@@ -19,7 +19,10 @@
 
 package org.apache.cayenne.modeler.event;
 
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.event.MapEvent;
+
+import java.util.EventListener;
 
 public class DataSourceModificationEvent extends MapEvent {
 
@@ -38,5 +41,9 @@ public class DataSourceModificationEvent extends MapEvent {
     @Override
     public String getNewName() {
         return dataSourceName;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return DataSourceModificationListener.class;
     }
 }

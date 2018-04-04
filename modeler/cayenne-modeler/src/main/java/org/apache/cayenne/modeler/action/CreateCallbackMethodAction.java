@@ -18,16 +18,9 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.map.CallbackMap;
-import org.apache.cayenne.map.LifecycleEvent;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.editor.CallbackType;
-import org.apache.cayenne.modeler.event.CallbackMethodEvent;
-import org.apache.cayenne.modeler.undo.CreateCallbackMethodUndoableEdit;
+import com.google.inject.Inject;
+import org.apache.cayenne.modeler.services.CallbackMethodService;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.util.Util;
 
 import java.awt.event.ActionEvent;
 
@@ -36,6 +29,9 @@ import java.awt.event.ActionEvent;
  */
 public class CreateCallbackMethodAction extends CayenneAction {
 
+    @Inject
+    public CallbackMethodService callbackMethodService;
+
     /**
      * unique action name
      */
@@ -43,32 +39,15 @@ public class CreateCallbackMethodAction extends CayenneAction {
 
     /**
      * Constructor.
-     *
-     * @param actionName  unique action name
-     * @param application Application instance
      */
-    public CreateCallbackMethodAction(String actionName, Application application) {
-        super(actionName, application);
+    public CreateCallbackMethodAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
 
-    /**
-     * Constructor.
-     *
-     * @param application Application instance
-     */
-    public CreateCallbackMethodAction(Application application) {
-        super(ACTION_NAME, application);
-    }
 
     public static String getActionName() {
         return ACTION_NAME;
-    }
-
-    /**
-     * @return CallbackMap instance where to create a method
-     */
-    public CallbackMap getCallbackMap() {
-        return getProjectController().getCurrentState().getObjEntity().getCallbackMap();
     }
 
     /**
@@ -84,36 +63,7 @@ public class CreateCallbackMethodAction extends CayenneAction {
      * @param e event
      */
     public final void performAction(ActionEvent e) {
-        CallbackType callbackType = getProjectController().getCurrentState().getCallbackType();
-
-        String methodName = NameBuilder
-                .builderForCallbackMethod(getProjectController().getCurrentState().getObjEntity())
-                .baseName(toMethodName(callbackType.getType()))
-                .name();
-
-        createCallbackMethod(callbackType, methodName);
-        application.getUndoManager().addEdit(
-                new CreateCallbackMethodUndoableEdit(
-                        callbackType,
-                        methodName));
-    }
-
-    public void createCallbackMethod(
-            CallbackType callbackType,
-            String methodName) {
-        getCallbackMap().getCallbackDescriptor(callbackType.getType()).addCallbackMethod(methodName);
-
-        CallbackMethodEvent ce = new CallbackMethodEvent(
-                this,
-                null,
-                methodName,
-                MapEvent.ADD);
-
-        getProjectController().fireEvent(ce);
-    }
-
-    private String toMethodName(LifecycleEvent event) {
-        return "on" + Util.underscoredToJava(event.name(), true);
+        callbackMethodService.createCallbackMethod();
     }
 }
 

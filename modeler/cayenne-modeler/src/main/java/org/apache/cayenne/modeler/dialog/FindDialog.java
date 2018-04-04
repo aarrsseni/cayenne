@@ -19,6 +19,7 @@
 package org.apache.cayenne.modeler.dialog;
 
 import org.apache.cayenne.modeler.action.FindAction;
+import org.apache.cayenne.modeler.services.DefaultFindService;
 import org.apache.cayenne.modeler.util.CayenneController;
 
 import javax.swing.JDialog;
@@ -40,9 +41,9 @@ import java.util.List;
 public class FindDialog extends CayenneController {
 
     private FindDialogView view;
-    private List<FindAction.SearchResultEntry> searchResults;
+    private List<DefaultFindService.SearchResultEntry> searchResults;
 
-    public FindDialog(CayenneController parent, List<FindAction.SearchResultEntry> searchResults) {
+    public FindDialog(CayenneController parent, List<DefaultFindService.SearchResultEntry> searchResults) {
         super(parent);
 
         this.searchResults = searchResults;

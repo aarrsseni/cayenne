@@ -18,55 +18,29 @@
  */
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.event.ObjEntityEvent;
-import org.apache.cayenne.dbsync.filter.NamePatternMatcher;
-import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
-import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.dbsync.naming.NoStemStemmer;
 import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
-import org.apache.cayenne.modeler.undo.CreateObjEntityUndoableEdit;
+import org.apache.cayenne.modeler.services.ObjEntityService;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.util.DeleteRuleUpdater;
 
 import java.awt.event.ActionEvent;
 
 public class CreateObjEntityAction extends CayenneAction {
 
+    @Inject
+    public ObjEntityService objEntityService;
+
     /**
      * Constructor for CreateObjEntityAction.
      */
-    public CreateObjEntityAction(Application application) {
-        super(getActionName(), application);
+    public CreateObjEntityAction() {
+        super(getActionName());
     }
 
     public static String getActionName() {
         return "Create ObjEntity";
-    }
-
-
-    static void fireObjEntityEvent(
-            Object src,
-            ProjectController mediator,
-            DataMap dataMap,
-            ObjEntity entity) {
-        mediator.fireEvent(new ObjEntityEvent(src, entity, MapEvent.ADD));
-        ObjEntityDisplayEvent displayEvent = new ObjEntityDisplayEvent(
-                src,
-                entity,
-                dataMap,
-                mediator.getCurrentState().getNode(),
-                (DataChannelDescriptor) mediator.getProject().getRootNode());
-        displayEvent.setMainTabFocus(true);
-        mediator.fireEvent(displayEvent);
     }
 
     @Override
@@ -76,57 +50,7 @@ public class CreateObjEntityAction extends CayenneAction {
 
     @Override
     public void performAction(ActionEvent e) {
-        createObjEntity();
-    }
-
-    protected void createObjEntity() {
-        ProjectController mediator = getProjectController();
-
-        DataMap dataMap = mediator.getCurrentState().getDataMap();
-        ObjEntity entity = new ObjEntity();
-        entity.setName(NameBuilder.builder(entity, dataMap).name());
-
-        // init defaults
-        entity.setSuperClassName(dataMap.getDefaultSuperclass());
-        entity.setDeclaredLockType(dataMap.getDefaultLockType());
-
-        DbEntity dbEntity = mediator.getCurrentState().getDbEntity();
-        if (dbEntity != null) {
-            entity.setDbEntity(dbEntity);
-
-            // TODO: use injectable name generator
-            String baseName = new DefaultObjectNameGenerator(NoStemStemmer.getInstance()).objEntityName(dbEntity);
-            entity.setName(NameBuilder
-                    .builder(entity, dbEntity.getDataMap())
-                    .baseName(baseName)
-                    .name());
-        }
-
-        entity.setClassName(dataMap.getNameWithDefaultPackage(entity.getName()));
-
-        if (dataMap.isClientSupported()) {
-            entity.setClientClassName(dataMap.getNameWithDefaultClientPackage(entity.getName()));
-            entity.setClientSuperClassName(dataMap.getDefaultClientSuperclass());
-        }
-
-        dataMap.addObjEntity(entity);
-
-        // TODO: Modeler-controlled defaults for all the hardcoded boolean flags here.
-        EntityMergeSupport merger = new EntityMergeSupport(new DefaultObjectNameGenerator(NoStemStemmer.getInstance()),
-                NamePatternMatcher.EXCLUDE_ALL, true, true, false);
-        merger.setNameGenerator(new DbEntitySyncAction.PreserveRelationshipNameGenerator());
-        merger.addEntityMergeListener(DeleteRuleUpdater.getEntityMergeListener());
-        merger.synchronizeWithDbEntity(entity);
-
-        fireObjEntityEvent(this, mediator, dataMap, entity);
-
-        application.getUndoManager().addEdit(new CreateObjEntityUndoableEdit(dataMap, entity));
-    }
-
-    public void createObjEntity(DataMap dataMap, ObjEntity entity) {
-        ProjectController mediator = getProjectController();
-        dataMap.addObjEntity(entity);
-        fireObjEntityEvent(this, mediator, dataMap, entity);
+        objEntityService.createObjEntity();
     }
 
     /**

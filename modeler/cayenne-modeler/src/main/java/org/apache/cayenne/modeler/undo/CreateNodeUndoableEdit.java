@@ -18,14 +18,13 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.action.CreateNodeAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
+import org.apache.cayenne.modeler.services.NodeService;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class CreateNodeUndoableEdit extends CayenneUndoableEdit {
 
@@ -47,13 +46,14 @@ public class CreateNodeUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveAction action = actionManager.getAction(RemoveAction.class);
-        action.removeDataNode(node);
+        NodeService nodeService = controller.getBootiqueInjector().getInstance(NodeService.class);
+        nodeService.removeDataNode(node);
     }
 
     public void redo() throws CannotRedoException {
         domain.getNodeDescriptors().add(node);
-        CreateNodeAction action = actionManager.getAction(CreateNodeAction.class);
-        action.createDataNode(node);
+
+        NodeService nodeService = controller.getBootiqueInjector().getInstance(NodeService.class);
+        nodeService.createDataNode(node);
     }
 }

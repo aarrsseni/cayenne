@@ -29,10 +29,9 @@ import org.apache.cayenne.dbsync.DbSyncModule;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.FileClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.services.*;
 import org.apache.cayenne.pref.CayenneProjectPreferences;
-import org.apache.cayenne.project.ConfigurationNodeParentGetter;
-import org.apache.cayenne.project.DefaultConfigurationNodeParentGetter;
-import org.apache.cayenne.project.ProjectModule;
+import org.apache.cayenne.project.*;
 
 /**
  * @since 4.1
@@ -55,6 +54,28 @@ public class CayenneModelerCore implements Module{
         binder.bind(CayenneProjectPreferences.class).in(Singleton.class);
         binder.bind(ConfigurationNodeParentGetter.class).to(DefaultConfigurationNodeParentGetter.class);
         binder.bind(ProjectController.class).in(Singleton.class);
+
+        binder.bind(ProjectService.class).to(DefaultProjectService.class);
+        binder.bind(ExitService.class).to(DefaultExitService.class);
+        binder.bind(AttributeService.class).to(DefaultAttributeService.class);
+        binder.bind(DataMapService.class).to(DefaultDataMapService.class);
+        binder.bind(DbEntityService.class).to(DefaultDbEntityService.class);
+        binder.bind(EmbeddableService.class).to(DefaultEmbeddableService.class);
+        binder.bind(NodeService.class).to(DefaultNodeService.class);
+        binder.bind(ObjEntityService.class).to(DefaultObjEntityService.class);
+        binder.bind(ProcedureService.class).to(DefaultProcedureService.class);
+        binder.bind(ProcedureParameterService.class).to(DefaultProcedureParameterService.class);
+        binder.bind(RelationshipService.class).to(DefaultRelationshipService.class);
+        binder.bind(DocumentationService.class).to(DefaultDocumentationService.class);
+        binder.bind(FindService.class).to(DefaultFindService.class);
+        binder.bind(PasteService.class).to(DefaultPasteService.class);
+        binder.bind(CallbackMethodService.class).to(DefaultCallbackMethodService.class);
+        binder.bind(QueryService.class).to(DefaultQueryService.class);
+        binder.bind(GenerateDbService.class).to(DefaultGenerateDbService.class);
+        binder.bind(GenerateCodeService.class).to(DefaultGenerateCodeService.class);
+        binder.bind(SaveService.class).to(DefaultSaveService.class);
+        binder.bind(EOModelService.class).to(DefaultEOModelService.class);
+        binder.bind(DbService.class).to(DefaultDbService.class);
 
         contributeModuleClass(binder).addBinding().to(ProjectModule.class);
         addModuleClass(binder, new ProjectModule());

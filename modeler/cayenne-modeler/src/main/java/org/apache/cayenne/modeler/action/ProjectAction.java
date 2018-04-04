@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.CayenneModelerController;
 import org.apache.cayenne.modeler.ProjectController;
@@ -31,12 +32,18 @@ import java.awt.event.ActionEvent;
  */
 public class ProjectAction extends CayenneAction {
 
+    @Inject
+    Application application;
+
+    @Inject
+    public SaveAction saveAction;
+
     public static String getActionName() {
         return "Close Project";
     }
 
-    public ProjectAction(Application application) {
-        super(getActionName(), application);
+    public ProjectAction() {
+        super(getActionName());
     }
 
     /**
@@ -44,8 +51,8 @@ public class ProjectAction extends CayenneAction {
      * 
      * @param name
      */
-    public ProjectAction(String name, Application application) {
-        super(name, application);
+    public ProjectAction(String name) {
+        super(name);
     }
 
     /**
@@ -96,11 +103,7 @@ public class ProjectAction extends CayenneAction {
                         this,
                         ActionEvent.ACTION_PERFORMED,
                         "SaveAll");
-                Application
-                        .getInstance()
-                        .getActionManager()
-                        .getAction(SaveAction.class)
-                        .actionPerformed(e);
+                saveAction.actionPerformed(e);
                 if (projectController.isDirty()) {
                     // save was canceled... do not close
                     return false;

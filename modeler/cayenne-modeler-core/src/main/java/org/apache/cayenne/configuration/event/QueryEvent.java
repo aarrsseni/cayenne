@@ -23,6 +23,8 @@ import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.map.event.MapEvent;
 
+import java.util.EventListener;
+
 /**
  * An event generated when a Query object is added to a DataMap, 
  * removed from a DataMap, or changed within a DataMap.
@@ -101,5 +103,9 @@ public class QueryEvent extends MapEvent {
      */
     public void setDataMap(DataMap map) {
         this.map = map;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return QueryListener.class;
     }
 }

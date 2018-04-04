@@ -18,16 +18,22 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.map.Relationship;
-import org.apache.cayenne.modeler.Application;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action for cutting attribute(s)
  */
 public class CutRelationshipAction extends CutAction implements MultipleObjectsAction {
+
+    @Inject
+    public CopyRelationshipAction copyRelationshipAction;
+
+    @Inject
+    public RemoveRelationshipAction removeRelationshipAction;
 
     private final static String ACTION_NAME = "Cut Relationship";
 
@@ -44,8 +50,8 @@ public class CutRelationshipAction extends CutAction implements MultipleObjectsA
         return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 
-    public CutRelationshipAction(Application application) {
-        super(ACTION_NAME, application);
+    public CutRelationshipAction() {
+        super();
     }
 
     /**
@@ -66,13 +72,7 @@ public class CutRelationshipAction extends CutAction implements MultipleObjectsA
      */
     @Override
     public void performAction(ActionEvent e) {
-        application
-                .getActionManager()
-                .getAction(CopyRelationshipAction.class)
-                .performAction(e);
-        application
-                .getActionManager()
-                .getAction(RemoveRelationshipAction.class)
-                .performAction(e, false);
+        copyRelationshipAction.performAction(e);
+        removeRelationshipAction.performAction(e, false);
     }
 }

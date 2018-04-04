@@ -18,17 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
+import org.apache.cayenne.map.*;
+import org.apache.cayenne.modeler.services.AttributeService;
+
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.modeler.action.CreateAttributeAction;
-import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 
 public class RemoveAttributeUndoableEdit extends BaseRemovePropertyUndoableEdit {
 
@@ -54,45 +48,45 @@ public class RemoveAttributeUndoableEdit extends BaseRemovePropertyUndoableEdit 
 
     @Override
     public void redo() throws CannotRedoException {
-        RemoveAttributeAction action = actionManager.getAction(RemoveAttributeAction.class);
+        AttributeService attributeService = controller.getBootiqueInjector().getInstance(AttributeService.class);
 
         if (objEntity != null) {
-            action.removeObjAttributes(objEntity, objAttributes);
+            attributeService.removeObjAttributes(objEntity, objAttributes);
             focusObjEntity();
         }
 
         if (dbEntity != null) {
-            action.removeDbAttributes(dbEntity.getDataMap(), dbEntity, dbAttributes);
+            attributeService.removeDbAttributes(dbEntity.getDataMap(), dbEntity, dbAttributes);
             focusDBEntity();
         }
 
         if (embeddable != null) {
-            action.removeEmbeddableAttributes(embeddable, embeddableAttrs);
+            attributeService.removeEmbeddableAttributes(embeddable, embeddableAttrs);
             focusEmbeddable();
         }
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        CreateAttributeAction action = actionManager.getAction(CreateAttributeAction.class);
+        AttributeService attributeService = controller.getBootiqueInjector().getInstance(AttributeService.class);
 
         if (objEntity != null) {
             for (ObjAttribute attr : objAttributes) {
-                action.createObjAttribute(objEntity.getDataMap(), objEntity, attr);
+                attributeService.createObjAttribute(objEntity.getDataMap(), objEntity, attr);
             }
             focusObjEntity();
         }
 
         if (dbEntity != null) {
             for (DbAttribute attr : dbAttributes) {
-                action.createDbAttribute(dbEntity.getDataMap(), dbEntity, attr);
+                attributeService.createDbAttribute(dbEntity.getDataMap(), dbEntity, attr);
             }
             focusDBEntity();
         }
 
         if (embeddable != null) {
             for (EmbeddableAttribute attr : embeddableAttrs) {
-                action.createEmbAttribute(embeddable, attr);
+                attributeService.createEmbAttribute(embeddable, attr);
             }
             focusEmbeddable();
         }

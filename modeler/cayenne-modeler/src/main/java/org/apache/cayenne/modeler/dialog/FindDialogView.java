@@ -18,17 +18,14 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog;
 
-import org.apache.cayenne.modeler.action.FindAction;
+import org.apache.cayenne.modeler.services.DefaultFindService;
 import org.apache.cayenne.modeler.util.CellRenderers;
 import org.apache.cayenne.swing.ImageRendererColumn;
 import org.apache.cayenne.swing.components.TopBorder;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -46,7 +43,7 @@ public class FindDialogView extends JDialog {
         return table;
     }
 
-    public FindDialogView(List<FindAction.SearchResultEntry> searchResults) {
+    public FindDialogView(List<DefaultFindService.SearchResultEntry> searchResults) {
         super((Frame) null, "Search results", true);
 
         JPanel panel = new JPanel();
@@ -88,9 +85,9 @@ public class FindDialogView extends JDialog {
         contentPane.setPreferredSize(new Dimension(400, 325));
     }
 
-    private JLabel[][] convertToDataVector(List<FindAction.SearchResultEntry> resultEntries) {
+    private JLabel[][] convertToDataVector(List<DefaultFindService.SearchResultEntry> resultEntries) {
         JLabel[][] dataVector = new JLabel[resultEntries.size()][1];
-        for (FindAction.SearchResultEntry entry : resultEntries) {
+        for (DefaultFindService.SearchResultEntry entry : resultEntries) {
             JLabel labelIcon = new JLabel();
             labelIcon.setIcon(CellRenderers.iconForObject(entry.getObject()));
             labelIcon.setText(entry.getName());

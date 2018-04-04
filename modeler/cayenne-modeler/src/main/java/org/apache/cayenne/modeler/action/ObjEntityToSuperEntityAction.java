@@ -19,26 +19,30 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 
 /**
  * @since 4.0
  */
 public class ObjEntityToSuperEntityAction extends BaseViewEntityAction {
 
+    @Inject
+    public ProjectController projectController;
+
     public static String getActionName() {
         return "View related SuperEntity";
     }
 
-    public ObjEntityToSuperEntityAction(Application application) {
-        super(getActionName(), application);
+    public ObjEntityToSuperEntityAction() {
+        super(getActionName());
     }
 
     @Override
     protected Entity getEntity() {
-        ObjEntity objEntity = getProjectController().getCurrentState().getObjEntity();
+        ObjEntity objEntity = projectController.getCurrentState().getObjEntity();
         if (objEntity == null) {
             return null;
         }

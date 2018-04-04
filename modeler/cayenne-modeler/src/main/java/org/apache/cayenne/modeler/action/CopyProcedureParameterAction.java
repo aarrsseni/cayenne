@@ -18,19 +18,18 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.util.Arrays;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+
+import java.util.Arrays;
 
 /**
  * Action for copying procedure parameter(s)
  */
 public class CopyProcedureParameterAction extends CopyAction implements MultipleObjectsAction {
     private final static String ACTION_NAME = "Copy Procedure Parameter";
-    
+
     /**
      * Name of action if multiple attrs are selected
      */
@@ -44,8 +43,8 @@ public class CopyProcedureParameterAction extends CopyAction implements Multiple
         return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 
-    public CopyProcedureParameterAction(Application application) {
-        super(ACTION_NAME, application);
+    public CopyProcedureParameterAction() {
+        super(ACTION_NAME);
     }
 
     /**

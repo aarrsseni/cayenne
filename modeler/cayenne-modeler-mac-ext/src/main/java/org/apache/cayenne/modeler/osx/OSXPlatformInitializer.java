@@ -37,6 +37,7 @@ public class OSXPlatformInitializer implements PlatformInitializer {
     @com.google.inject.Inject
     protected Injector injector;
 
+    @com.google.inject.Inject
     protected ActionManager actionManager;
 
     public void initLookAndFeel() {
@@ -80,7 +81,6 @@ public class OSXPlatformInitializer implements PlatformInitializer {
     }
 
     public void setupMenus(JFrame frame) {
-        actionManager = injector.getInstance(ActionManager.class);
         // set additional look and feel for the window
         frame.getRootPane().putClientProperty("apple.awt.brushMetalLook", Boolean.TRUE);
 

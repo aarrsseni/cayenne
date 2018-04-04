@@ -21,6 +21,8 @@ package org.apache.cayenne.map.event;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
 
+import java.util.EventListener;
+
 
 public class EmbeddableEvent extends MapEvent {
 
@@ -61,5 +63,9 @@ public class EmbeddableEvent extends MapEvent {
 
     public DataMap getDataMap() {
         return dataMap;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return EmbeddableListener.class;
     }
 }

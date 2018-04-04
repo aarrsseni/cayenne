@@ -18,17 +18,20 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.Toolkit;
+import com.google.inject.Inject;
+import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.util.CayenneAction;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.KeyStroke;
-
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.util.CayenneAction;
-
 public class RedoAction extends CayenneAction {
+
+    @Inject
+    public Application application;
 
     @Override
     public void setEnabled(boolean b) {
@@ -46,8 +49,9 @@ public class RedoAction extends CayenneAction {
         return "Redo";
     }
     
-    public RedoAction(Application application) {
-        super(getActionName(), application);
+    public RedoAction() {
+        super(getActionName());
+        setEnabled(true);
     }
     
     @Override

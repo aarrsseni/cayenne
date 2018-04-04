@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
@@ -30,6 +31,7 @@ import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.objentity.EntitySyncController;
+import org.apache.cayenne.modeler.services.DbEntityService;
 import org.apache.cayenne.modeler.undo.DbEntitySyncUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
@@ -46,12 +48,21 @@ import java.util.Iterator;
  */
 public class DbEntitySyncAction extends CayenneAction {
 
+	@Inject
+	public Application application;
+
+	@Inject
+	public DbEntityService dbEntityService;
+
+	@Inject
+	public ProjectController projectController;
+
 	public static String getActionName() {
 		return "Sync Dependent ObjEntities with DbEntity";
 	}
 
-	public DbEntitySyncAction(Application application) {
-		super(getActionName(), application);
+	public DbEntitySyncAction() {
+		super(getActionName());
 	}
 
 	@Override
@@ -73,9 +84,8 @@ public class DbEntitySyncAction extends CayenneAction {
 	}
 
 	protected void syncDbEntity() {
-		ProjectController mediator = getProjectController();
 
-		DbEntity dbEntity = mediator.getCurrentState().getDbEntity();
+		DbEntity dbEntity = projectController.getCurrentState().getDbEntity();
 
 		if (dbEntity != null) {
 
@@ -93,8 +103,8 @@ public class DbEntitySyncAction extends CayenneAction {
 
 			merger.setNameGenerator(new PreserveRelationshipNameGenerator());
 
-			DbEntitySyncUndoableEdit undoableEdit = new DbEntitySyncUndoableEdit((DataChannelDescriptor) mediator
-					.getProject().getRootNode(), mediator.getCurrentState().getDataMap());
+			DbEntitySyncUndoableEdit undoableEdit = new DbEntitySyncUndoableEdit((DataChannelDescriptor) projectController
+					.getProject().getRootNode(), projectController.getCurrentState().getDataMap());
 
 			// filter out inherited entities, as we need to add attributes only to the roots
 			filterInheritedEntities(entities);
@@ -114,7 +124,7 @@ public class DbEntitySyncAction extends CayenneAction {
 				}
 
 				if (merger.synchronizeWithDbEntity(entity)) {
-					mediator.fireEvent(new ObjEntityEvent(this, entity, MapEvent.CHANGE));
+					projectController.fireEvent(new ObjEntityEvent(this, entity, MapEvent.CHANGE));
 				}
 
 				merger.removeEntityMergeListener(listener);

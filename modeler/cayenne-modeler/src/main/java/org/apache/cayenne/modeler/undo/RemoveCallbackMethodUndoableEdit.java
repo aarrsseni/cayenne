@@ -18,13 +18,12 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
-import org.apache.cayenne.modeler.action.CreateCallbackMethodAction;
-import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
 import org.apache.cayenne.modeler.editor.CallbackType;
 import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
+import org.apache.cayenne.modeler.services.CallbackMethodService;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class RemoveCallbackMethodUndoableEdit extends CayenneUndoableEdit {
 
@@ -44,19 +43,17 @@ public class RemoveCallbackMethodUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-    	RemoveCallbackMethodAction action = actionManager
-                .getAction(RemoveCallbackMethodAction.class);
+    	CallbackMethodService callbackMethodService = controller.getBootiqueInjector().getInstance(CallbackMethodService.class);
         for (ObjCallbackMethod method : methods) {
-            action.removeCallbackMethod(callbackType, method.getName());
+            callbackMethodService.removeCallbackMethod(callbackType, method.getName());
         }
     }
 
     @Override
     public void undo() throws CannotUndoException {
-    	CreateCallbackMethodAction action = actionManager
-                .getAction(CreateCallbackMethodAction.class);
+        CallbackMethodService callbackMethodService = controller.getBootiqueInjector().getInstance(CallbackMethodService.class);
         for (ObjCallbackMethod method : methods) {
-            action.createCallbackMethod(callbackType, method.getName());
+            callbackMethodService.createCallbackMethod(callbackType, method.getName());
         }
     }
 }

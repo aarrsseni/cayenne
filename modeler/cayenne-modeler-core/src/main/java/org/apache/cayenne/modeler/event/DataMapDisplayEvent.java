@@ -23,11 +23,13 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 
+import java.util.EventListener;
+
 /**
  * Represents a display event of a DataMap.
  * 
  */
-public class DataMapDisplayEvent extends DataNodeDisplayEvent {
+public class DataMapDisplayEvent extends DataNodeDisplayEvent{
 	protected DataMap dataMap;
 
 	/** True if different from current data map. */
@@ -69,5 +71,9 @@ public class DataMapDisplayEvent extends DataNodeDisplayEvent {
 	
 	public void setDataMapChanged(boolean temp) {
 		dataMapChanged = temp;
+	}
+
+	public Class<? extends EventListener> getEventListener() {
+		return DataMapDisplayListener.class;
 	}
 }

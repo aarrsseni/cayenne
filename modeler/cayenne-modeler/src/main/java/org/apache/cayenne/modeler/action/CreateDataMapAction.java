@@ -19,14 +19,10 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.undo.CreateDataMapUndoableEdit;
+import org.apache.cayenne.modeler.services.DataMapService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
@@ -36,36 +32,23 @@ import java.awt.event.ActionEvent;
  */
 public class CreateDataMapAction extends CayenneAction {
 
+    @Inject
+    public DataMapService dataMapService;
+
     public static String getActionName() {
         return "Create DataMap";
     }
 
-    public CreateDataMapAction(Application application) {
-        super(getActionName(), application);
+    public CreateDataMapAction() {
+        super(getActionName());
     }
 
     public String getIconName() {
         return "icon-datamap.png";
     }
 
-    /** Calls addDataMap() or creates new data map if no data node selected. */
-    public void createDataMap(DataMap map) {
-        ProjectController mediator = getProjectController();
-        mediator.addDataMap(this, map);
-    }
-
     public void performAction(ActionEvent e) {
-        ProjectController mediator = getProjectController();
-
-        DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor) mediator
-                .getProject()
-                .getRootNode();
-
-        DataMap map = new DataMap();
-        map.setName(NameBuilder.builder(map, dataChannelDescriptor).name());
-        createDataMap(map);
-
-        application.getUndoManager().addEdit(new CreateDataMapUndoableEdit(dataChannelDescriptor, map));
+        dataMapService.createDataMap();
     }
 
     /**

@@ -20,6 +20,8 @@ package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.map.event.MapEvent;
 
+import java.util.EventListener;
+
 
 /**
  * Event for creating/removing/modifying callback methods
@@ -55,6 +57,10 @@ public class CallbackMethodEvent extends MapEvent {
      */
     public String getNewName() {
         return callbackMethod;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return CallbackMethodListener.class;
     }
 }
 

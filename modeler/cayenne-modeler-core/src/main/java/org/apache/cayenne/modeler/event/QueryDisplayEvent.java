@@ -21,8 +21,11 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.QueryDescriptor;
+
+import java.util.EventListener;
 
 /**
  * @since 1.1
@@ -50,5 +53,9 @@ public class QueryDisplayEvent extends DataMapDisplayEvent {
 
     public void setQueryChanged(boolean queryChanged) {
         this.queryChanged = queryChanged;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return QueryDisplayListener.class;
     }
 }

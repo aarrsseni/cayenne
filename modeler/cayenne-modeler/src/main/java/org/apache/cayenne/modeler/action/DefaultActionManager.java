@@ -20,22 +20,13 @@ package org.apache.cayenne.modeler.action;
 
 import org.apache.cayenne.configuration.ConfigurationNameMapper;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.graph.action.ShowGraphEntityAction;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.project.ConfigurationNodeParentGetter;
 
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import javax.swing.*;
+import java.util.*;
 
 /**
  * Stores a map of modeler actions, and deals with activating/deactivating those actions
@@ -54,90 +45,102 @@ public class DefaultActionManager implements ActionManager {
     private Collection<String> PROCEDURE_ACTIONS;
     private Collection<String> MULTIPLE_OBJECTS_ACTIONS;
 
-    protected Map<String, Action> actionMap;
+    @com.google.inject.Inject
+    Map<String, Action> actionMap;
 
-    public DefaultActionManager(@Inject Application application, @Inject ConfigurationNameMapper nameMapper) {
+    @com.google.inject.Inject
+    Application application;
+
+    @com.google.inject.Inject
+    ConfigurationNameMapper nameMapper;
+
+
+
+    public DefaultActionManager() {
+//        this.actionMap = new HashMap<>(40);
+//
+//        registerAction(new ProjectAction(application));
+//        registerAction(new NewProjectAction()).setAlwaysOn(true);
+//        registerAction(new OpenProjectAction(application)).setAlwaysOn(true);
+//        registerAction(new ImportDataMapAction(application, nameMapper));
+//        registerAction(new SaveAction(application));
+//        registerAction(new SaveAsAction(application));
+//        registerAction(new RevertAction(application));
+//        registerAction(new ValidateAction(application));
+//        registerAction(new RemoveAction(application));
+//        registerAction(new CreateNodeAction(application));
+//        registerAction(new CreateDataMapAction(application));
+//        registerAction(new GenerateCodeAction(application));
+//        registerAction(new CreateObjEntityAction(application));
+//        registerAction(new CreateDbEntityAction(application));
+//        registerAction(new CreateProcedureAction(application));
+//        registerAction(new CreateProcedureParameterAction(application));
+//        registerAction(new RemoveProcedureParameterAction(application));
+//        registerAction(new CreateQueryAction(application));
+//        registerAction(new CreateAttributeAction(application));
+//        registerAction(new RemoveAttributeAction(application));
+//        registerAction(new CreateRelationshipAction(application));
+//        registerAction(new RemoveRelationshipAction(application));
+//        registerAction(new RemoveAttributeRelationshipAction(application));
+//        // start callback-related actions
+//        registerAction(new CreateCallbackMethodAction(application)).setAlwaysOn(true);
+//        registerAction(new RemoveCallbackMethodAction(application));
+//        // end callback-related actions
+//        registerAction(new DbEntitySyncAction(application));
+//        registerAction(new ObjEntitySyncAction(application));
+//        registerAction(new DbEntityCounterpartAction(application));
+//        registerAction(new ObjEntityCounterpartAction(application));
+//        registerAction(new ObjEntityToSuperEntityAction(application));
+//        registerAction(new ReverseEngineeringAction(application));
+//        registerAction(new InferRelationshipsAction(application));
+//        registerAction(new ImportEOModelAction(application));
+//        registerAction(new GenerateDBAction(application));
+//        registerAction(new MigrateAction(application));
+//        registerAction(new AboutAction(application)).setAlwaysOn(true);
+//        registerAction(new DocumentationAction(application)).setAlwaysOn(true);
+//        registerAction(new ConfigurePreferencesAction(application)).setAlwaysOn(true);
+//        registerAction(cayenneActionSet.iterator().next());
+//        registerAction(new NavigateBackwardAction(application)).setAlwaysOn(true);
+//        registerAction(new NavigateForwardAction(application)).setAlwaysOn(true);
+//        // search action registered
+//        registerAction(new FindAction(application));
+//
+//        registerAction(new ShowLogConsoleAction(application)).setAlwaysOn(true);
+//
+//        registerAction(new CutAction(application));
+//        registerAction(new CutAttributeAction(application));
+//        registerAction(new CutRelationshipAction(application));
+//        registerAction(new CutAttributeRelationshipAction(application));
+//        registerAction(new CutProcedureParameterAction(application));
+//        registerAction(new CutCallbackMethodAction(application));
+//        registerAction(new CopyAction(application));
+//        registerAction(new CopyAttributeAction(application));
+//        registerAction(new CopyRelationshipAction(application));
+//        registerAction(new CopyAttributeRelationshipAction(application));
+//        registerAction(new CopyCallbackMethodAction(application));
+//        registerAction(new CopyProcedureParameterAction(application));
+//        registerAction(new PasteAction(application));
+//
+//        UndoAction undoAction = new UndoAction(application);
+//        undoAction.setEnabled(false);
+//        registerAction(undoAction);
+//
+//        RedoAction redoAction = new RedoAction(application);
+//        redoAction.setEnabled(false);
+//        registerAction(redoAction);
+//
+//        registerAction(new CreateEmbeddableAction(application));
+//        registerAction(new ShowGraphEntityAction(application));
+//
+//        registerAction(new CollapseTreeAction(application));
+//        registerAction(new FilterAction(application));
+//
+//        registerAction(new LinkDataMapAction(application));
+//        registerAction(new LinkDataMapsAction(application));
+    }
+
+    public void initAllActions(){
         initActions();
-        this.actionMap = new HashMap<>(40);
-
-        registerAction(new ProjectAction(application));
-        registerAction(new NewProjectAction(application)).setAlwaysOn(true);
-        registerAction(new OpenProjectAction(application)).setAlwaysOn(true);
-        registerAction(new ImportDataMapAction(application, nameMapper));
-        registerAction(new SaveAction(application));
-        registerAction(new SaveAsAction(application));
-        registerAction(new RevertAction(application));
-        registerAction(new ValidateAction(application));
-        registerAction(new RemoveAction(application));
-        registerAction(new CreateNodeAction(application));
-        registerAction(new CreateDataMapAction(application));
-        registerAction(new GenerateCodeAction(application));
-        registerAction(new CreateObjEntityAction(application));
-        registerAction(new CreateDbEntityAction(application));
-        registerAction(new CreateProcedureAction(application));
-        registerAction(new CreateProcedureParameterAction(application));
-        registerAction(new RemoveProcedureParameterAction(application));
-        registerAction(new CreateQueryAction(application));
-        registerAction(new CreateAttributeAction(application));
-        registerAction(new RemoveAttributeAction(application));
-        registerAction(new CreateRelationshipAction(application));
-        registerAction(new RemoveRelationshipAction(application));
-        registerAction(new RemoveAttributeRelationshipAction(application));
-        // start callback-related actions
-        registerAction(new CreateCallbackMethodAction(application)).setAlwaysOn(true);
-        registerAction(new RemoveCallbackMethodAction(application));
-        // end callback-related actions
-        registerAction(new DbEntitySyncAction(application));
-        registerAction(new ObjEntitySyncAction(application));
-        registerAction(new DbEntityCounterpartAction(application));
-        registerAction(new ObjEntityCounterpartAction(application));
-        registerAction(new ObjEntityToSuperEntityAction(application));
-        registerAction(new ReverseEngineeringAction(application));
-        registerAction(new InferRelationshipsAction(application));
-        registerAction(new ImportEOModelAction(application));
-        registerAction(new GenerateDBAction(application));
-        registerAction(new MigrateAction(application));
-        registerAction(new AboutAction(application)).setAlwaysOn(true);
-        registerAction(new DocumentationAction(application)).setAlwaysOn(true);
-        registerAction(new ConfigurePreferencesAction(application)).setAlwaysOn(true);
-        registerAction(new ExitAction(application)).setAlwaysOn(true);
-        registerAction(new NavigateBackwardAction(application)).setAlwaysOn(true);
-        registerAction(new NavigateForwardAction(application)).setAlwaysOn(true);
-        // search action registered
-        registerAction(new FindAction(application));
-
-        registerAction(new ShowLogConsoleAction(application)).setAlwaysOn(true);
-
-        registerAction(new CutAction(application));
-        registerAction(new CutAttributeAction(application));
-        registerAction(new CutRelationshipAction(application));
-        registerAction(new CutAttributeRelationshipAction(application));
-        registerAction(new CutProcedureParameterAction(application));
-        registerAction(new CutCallbackMethodAction(application));
-        registerAction(new CopyAction(application));
-        registerAction(new CopyAttributeAction(application));
-        registerAction(new CopyRelationshipAction(application));
-        registerAction(new CopyAttributeRelationshipAction(application));
-        registerAction(new CopyCallbackMethodAction(application));
-        registerAction(new CopyProcedureParameterAction(application));
-        registerAction(new PasteAction(application));
-
-        UndoAction undoAction = new UndoAction(application);
-        undoAction.setEnabled(false);
-        registerAction(undoAction);
-
-        RedoAction redoAction = new RedoAction(application);
-        redoAction.setEnabled(false);
-        registerAction(redoAction);
-
-        registerAction(new CreateEmbeddableAction(application));
-        registerAction(new ShowGraphEntityAction(application));
-
-        registerAction(new CollapseTreeAction(application));
-        registerAction(new FilterAction(application));
-
-        registerAction(new LinkDataMapAction(application));
-        registerAction(new LinkDataMapsAction(application));
     }
 
     private void initActions() {

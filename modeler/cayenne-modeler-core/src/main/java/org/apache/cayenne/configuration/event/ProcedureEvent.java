@@ -22,6 +22,8 @@ package org.apache.cayenne.configuration.event;
 import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.event.MapEvent;
 
+import java.util.EventListener;
+
 /** 
  * An event generated when a Procedure object is added to a DataMap, 
  * removed from a DataMap, or changed within a DataMap.
@@ -56,5 +58,9 @@ public class ProcedureEvent extends MapEvent {
     @Override
     public String getNewName() {
         return (procedure != null) ? procedure.getName() : null;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return ProcedureListener.class;
     }
 }

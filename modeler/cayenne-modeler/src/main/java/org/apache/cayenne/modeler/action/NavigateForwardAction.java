@@ -19,16 +19,18 @@
 
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.modeler.Application;
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
-import java.util.EventObject;
 
 /**
  */
 public class NavigateForwardAction extends CayenneAction {
+
+    @Inject
+    public ProjectController projectController;
 
     public static final String getActionName() {
         return "Move Forward";
@@ -37,8 +39,9 @@ public class NavigateForwardAction extends CayenneAction {
     /**
      * Constructor for Move Forward Action
      */
-    public NavigateForwardAction(Application application) {
-        super(getActionName(), application);
+    public NavigateForwardAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
 
     public String getIconName() {
@@ -49,8 +52,6 @@ public class NavigateForwardAction extends CayenneAction {
      * Moves to the previous element in the navigation history
      */
     public void performAction(ActionEvent e) {
-        ProjectController mediator = getProjectController();
-        EventObject newEvent = new EventObject(this);
-        mediator.moveForward();
+        projectController.moveForward();
     }
 }

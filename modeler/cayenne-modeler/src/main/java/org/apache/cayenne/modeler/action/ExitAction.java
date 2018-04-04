@@ -19,14 +19,21 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.dialog.LogConsole;
-import org.apache.cayenne.pref.RenamedPreferences;
+import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.ConsoleStopLoggingEvent;
+import org.apache.cayenne.modeler.services.ExitService;
 
 import java.awt.event.ActionEvent;
 
 public class ExitAction extends ProjectAction {
+
+    @Inject
+    public ExitService exitService;
+
+    @Inject
+    public ProjectController projectController;
 
     public static String getActionName() {
         return "Exit";
@@ -35,8 +42,9 @@ public class ExitAction extends ProjectAction {
     /**
      * Constructor for ExitAction.
      */
-    public ExitAction(Application application) {
-        super(getActionName(), application);
+    public ExitAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
 
     public void performAction(ActionEvent e) {
@@ -49,12 +57,9 @@ public class ExitAction extends ProjectAction {
         }
 
         // stop logging before JVM shutdown to prevent hanging
-        LogConsole.getInstance().stopLogging();
+        projectController.fireEvent(new ConsoleStopLoggingEvent(this));
 
-        RenamedPreferences.removeNewPreferences();
-
-        // goodbye
-        System.exit(0);
+        exitService.exit();
         return true;
     }
 

@@ -18,13 +18,12 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.modeler.action.CreateEmbeddableAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
+import org.apache.cayenne.modeler.services.EmbeddableService;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class CreateEmbeddableUndoableEdit extends CayenneUndoableEdit {
 
@@ -43,16 +42,14 @@ public class CreateEmbeddableUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateEmbeddableAction action = actionManager
-                .getAction(CreateEmbeddableAction.class);
-
-        action.createEmbeddable(dataMap, embeddable);
+        EmbeddableService embeddableService = controller.getBootiqueInjector().getInstance(EmbeddableService.class);
+        embeddableService.createEmbeddable(dataMap, embeddable);
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveAction action = actionManager.getAction(RemoveAction.class);
-        action.removeEmbeddable(dataMap, embeddable);
+        EmbeddableService embeddableService = controller.getBootiqueInjector().getInstance(EmbeddableService.class);
+        embeddableService.removeEmbeddable(dataMap, embeddable);
     }
 
 }

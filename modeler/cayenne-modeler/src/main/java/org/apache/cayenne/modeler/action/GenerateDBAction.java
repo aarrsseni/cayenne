@@ -19,43 +19,29 @@
 
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.dialog.db.gen.DBGeneratorOptions;
+import com.google.inject.Inject;
+import org.apache.cayenne.modeler.services.GenerateDbService;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.project.Project;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Action that generates database tables from a DataMap.
  */
 public class GenerateDBAction extends CayenneAction {
 
+    @Inject
+    public GenerateDbService dbService;
+
     public static String getActionName() {
         return "Generate Database Schema";
     }
 
-    public GenerateDBAction(Application application) {
-        super(getActionName(), application);
+    public GenerateDBAction() {
+        super(getActionName());
     }
 
     public void performAction(ActionEvent e) {
-
-        Collection<DataMap> dataMaps;
-        DataMap dataMap = getProjectController().getCurrentState().getDataMap();
-
-        if (dataMap != null) {
-            dataMaps = new ArrayList<>();
-            dataMaps.add(dataMap);
-        } else {
-            Project project = getProjectController().getProject();
-            dataMaps = ((DataChannelDescriptor) project.getRootNode()).getDataMaps();
-        }
-        new DBGeneratorOptions(getProjectController(), "Generate DB Schema: Options", dataMaps)
-                .startupAction();
+        dbService.generateDb();
     }
 }

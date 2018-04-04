@@ -19,25 +19,28 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoaderContext;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoaderOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.load.LoadDataMapTask;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 import java.util.Collection;
-import javax.swing.SwingUtilities;
-import javax.swing.JOptionPane;
 
 /**
  * Action that imports database structure into a DataMap.
  */
 public class ReverseEngineeringAction extends DBWizardAction<DbLoaderOptionsDialog> {
 
-    ReverseEngineeringAction(Application application) {
-        super(getActionName(), application);
+    @Inject
+    public Application application;
+
+    public ReverseEngineeringAction() {
+        super(getActionName());
     }
 
     public static String getActionName() {
