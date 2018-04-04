@@ -18,20 +18,25 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.Toolkit;
+import com.google.inject.Inject;
+import org.apache.cayenne.configuration.ConfigurationNode;
+import org.apache.cayenne.modeler.util.CayenneAction;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
-import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.util.CayenneAction;
 
 /**
  * Action for cutting entities, queries etc.
  */
 public class CutAction extends CayenneAction {
+
+    @Inject
+    public CopyAction copyAction;
+
+    @Inject
+    public RemoveAction removeAction;
 
     public static String getActionName() {
         return "Cut";
@@ -40,15 +45,15 @@ public class CutAction extends CayenneAction {
     /**
      * Constructor for CutAction
      */
-    public CutAction(Application application) {
-        this(getActionName(), application);
+    public CutAction() {
+        this(getActionName());
     }
 
     /**
      * Constructor for descendants
      */
-    protected CutAction(String name, Application application) {
-        super(name, application);
+    protected CutAction(String name) {
+        super(name);
     }
 
     @Override
@@ -68,10 +73,8 @@ public class CutAction extends CayenneAction {
      */
     @Override
     public void performAction(ActionEvent e) {
-        application.getActionManager().getAction(CopyAction.class).performAction(e);
-        application.getActionManager().getAction(RemoveAction.class).performAction(
-                e,
-                false);
+        copyAction.performAction(e);
+        removeAction.performAction(e, false);
     }
 
     /**
@@ -79,7 +82,6 @@ public class CutAction extends CayenneAction {
      */
     @Override
     public boolean enableForPath(ConfigurationNode object) {
-        return application.getActionManager().getAction(CopyAction.class).enableForPath(
-                object);
+        return copyAction.enableForPath(object);
     }
 }

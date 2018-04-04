@@ -19,43 +19,28 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.event.ProcedureParameterEvent;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
+import org.apache.cayenne.modeler.services.ProcedureParameterService;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.modeler.undo.CreateProcedureParameterUndoableEdit;
 
 import java.awt.event.ActionEvent;
 
 public class CreateProcedureParameterAction extends CayenneAction {
 
+    @Inject
+    public ProcedureParameterService procedureParameterService;
+
     /**
      * Constructor for CreateProcedureParameterAction.
      */
-    public CreateProcedureParameterAction(Application application) {
-        super(getActionName(), application);
+    public CreateProcedureParameterAction() {
+        super(getActionName());
     }
 
     public static String getActionName() {
         return "Create Parameter";
-    }
-
-    /**
-     * Fires events when an proc parameter was added
-     */
-    static void fireProcedureParameterEvent(Object src, ProjectController mediator, Procedure procedure,
-                                            ProcedureParameter parameter) {
-        mediator.fireEvent(new ProcedureParameterEvent(src, parameter, MapEvent.ADD));
-
-        mediator.fireEvent(new ProcedureParameterDisplayEvent(src, parameter, procedure,
-                mediator.getCurrentState().getDataMap(), (DataChannelDescriptor) mediator.getProject().getRootNode()));
     }
 
     @Override
@@ -68,28 +53,7 @@ public class CreateProcedureParameterAction extends CayenneAction {
      */
     @Override
     public void performAction(ActionEvent e) {
-        ProjectController mediator = getProjectController();
-
-        if (getProjectController().getCurrentState().getProcedure() != null) {
-            Procedure procedure = getProjectController().getCurrentState().getProcedure();
-            ProcedureParameter parameter = new ProcedureParameter();
-            parameter.setName(NameBuilder.builder(parameter, procedure).name());
-
-            createProcedureParameter(procedure, parameter);
-
-            application.getUndoManager().addEdit(
-                    new CreateProcedureParameterUndoableEdit(
-                            (DataChannelDescriptor) mediator.getProject().getRootNode(), mediator.getCurrentState().getDataMap(),
-                            procedure, parameter
-                    )
-            );
-        }
-    }
-
-    public void createProcedureParameter(Procedure procedure, ProcedureParameter parameter) {
-        procedure.addCallParameter(parameter);
-        ProjectController mediator = getProjectController();
-        fireProcedureParameterEvent(this, mediator, procedure, parameter);
+        procedureParameterService.createProcedureParameter();
     }
 
     /**

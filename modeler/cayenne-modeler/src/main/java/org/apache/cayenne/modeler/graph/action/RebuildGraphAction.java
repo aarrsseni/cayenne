@@ -18,11 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.graph.action;
 
-import java.awt.event.ActionEvent;
-
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.graph.DataDomainGraphTab;
 import org.apache.cayenne.modeler.util.CayenneAction;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action for refreshing the graph 
@@ -31,7 +31,7 @@ public class RebuildGraphAction extends CayenneAction {
     private final DataDomainGraphTab dataDomainGraphTab;
 
     public RebuildGraphAction(DataDomainGraphTab dataDomainGraphTab, Application application) {
-        super("Rebuild", application);
+        super("Rebuild");
         this.dataDomainGraphTab = dataDomainGraphTab;
         setEnabled(true);
     }

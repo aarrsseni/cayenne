@@ -22,10 +22,13 @@ package org.apache.cayenne.configuration.event;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.event.MapEvent;
 
+import java.util.EventListener;
+
 /** 
  * An events describing a DataMap change.
  */
 public class DataMapEvent extends MapEvent {
+
 	protected DataMap dataMap;
 
 	/** Creates a DataMap change event. */
@@ -66,4 +69,8 @@ public class DataMapEvent extends MapEvent {
     public String getNewName() {
         return (dataMap != null) ? dataMap.getName() : null;
     }
+
+    public Class<? extends EventListener> getEventListener() {
+		return DataMapListener.class;
+	}
 }

@@ -18,30 +18,26 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.EmbeddableEvent;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.undo.CreateEmbeddableUndoableEdit;
+import org.apache.cayenne.modeler.services.EmbeddableService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
 
 public class CreateEmbeddableAction extends CayenneAction {
 
+    @Inject
+    public EmbeddableService embeddableService;
+
     public static String getActionName() {
         return "Create Embeddable";
     }
 
-    public CreateEmbeddableAction(Application application) {
-        super(getActionName(), application);
+    public CreateEmbeddableAction() {
+        super(getActionName());
     }
 
     @Override
@@ -51,40 +47,7 @@ public class CreateEmbeddableAction extends CayenneAction {
 
     @Override
     public void performAction(ActionEvent e) {
-        ProjectController mediator = getProjectController();
-
-        DataMap dataMap = mediator.getCurrentState().getDataMap();
-
-        Embeddable embeddable = new Embeddable();
-        String baseName = NameBuilder.builder(embeddable, dataMap).name();
-        String nameWithPackage = dataMap.getNameWithDefaultPackage(baseName);
-        embeddable.setClassName(nameWithPackage);
-        createEmbeddable(dataMap, embeddable);
-
-        application.getUndoManager().addEdit(new CreateEmbeddableUndoableEdit(dataMap, embeddable));
-    }
-
-    public void createEmbeddable(DataMap dataMap, Embeddable embeddable) {
-        dataMap.addEmbeddable(embeddable);
-        fireEmbeddableEvent(this, getProjectController(), dataMap, embeddable);
-    }
-
-    static void fireEmbeddableEvent(
-            Object src,
-            ProjectController mediator,
-            DataMap dataMap,
-            Embeddable embeddable) {
-
-        mediator.fireEvent(
-                new EmbeddableEvent(src, embeddable, MapEvent.ADD, dataMap));
-        EmbeddableDisplayEvent displayEvent = new EmbeddableDisplayEvent(
-                src,
-                embeddable,
-                dataMap,
-                (DataChannelDescriptor)mediator.getProject().getRootNode());
-        displayEvent.setMainTabFocus(true);
-        mediator.fireEvent(displayEvent);
-
+        embeddableService.createEmbeddable();
     }
 
     /**

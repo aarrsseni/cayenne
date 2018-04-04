@@ -18,17 +18,16 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
-import org.apache.cayenne.map.CallbackMap;
-import org.apache.cayenne.map.event.MapEvent;
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.editor.CallbackType;
 import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
-import org.apache.cayenne.modeler.event.CallbackMethodEvent;
+import org.apache.cayenne.modeler.services.CallbackMethodService;
 import org.apache.cayenne.modeler.undo.RemoveCallbackMethodUndoableEdit;
+
+import java.awt.event.ActionEvent;
 
 
 /**
@@ -37,6 +36,15 @@ import org.apache.cayenne.modeler.undo.RemoveCallbackMethodUndoableEdit;
  * @version 1.0 Oct 30, 2007
  */
 public class RemoveCallbackMethodAction extends RemoveAction {
+
+    @Inject
+    public Application application;
+
+    @Inject
+    public ProjectController projectController;
+
+    @Inject
+    public CallbackMethodService callbackMethodService;
     
     /**
      * unique action name
@@ -50,11 +58,9 @@ public class RemoveCallbackMethodAction extends RemoveAction {
 
     /**
      * Constructor.
-     *
-     * @param application Application instance
      */
-    public RemoveCallbackMethodAction(Application application) {
-        super(getActionName(), application);
+    public RemoveCallbackMethodAction() {
+        super(getActionName());
     }
 
     /**
@@ -64,6 +70,17 @@ public class RemoveCallbackMethodAction extends RemoveAction {
     public String getIconName() {
         return "icon-trash.png";
     }
+
+    /**
+     * @return unique action name
+     */
+    public static String getActionName() {
+        return ACTION_NAME;
+    }
+
+    public String getActionName(boolean multiple) {
+        return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
+    }
     
     /**
      * performs callback method removing
@@ -72,7 +89,7 @@ public class RemoveCallbackMethodAction extends RemoveAction {
     public void performAction(ActionEvent e, boolean allowAsking) {
         ConfirmRemoveDialog dialog = getConfirmDeleteDialog(allowAsking);
         
-        ObjCallbackMethod[] methods = getProjectController().getCurrentState().getCallbackMethods();
+        ObjCallbackMethod[] methods = projectController.getCurrentState().getCallbackMethods();
 
         if ((methods.length == 1 && dialog.shouldDelete("callback method", methods[0].getName()))
         		|| (methods.length > 1 && dialog.shouldDelete("selected callback methods"))) {
@@ -85,48 +102,16 @@ public class RemoveCallbackMethodAction extends RemoveAction {
      * @param actionEvent event
      */
     private void removeCallbackMethods(ActionEvent actionEvent) {
-        ProjectController mediator = getProjectController();
-        CallbackType callbackType = mediator.getCurrentState().getCallbackType();
+        CallbackType callbackType = projectController.getCurrentState().getCallbackType();
 
-        ObjCallbackMethod[] callbackMethods = mediator.getCurrentState().getCallbackMethods();
+        ObjCallbackMethod[] callbackMethods = projectController.getCurrentState().getCallbackMethods();
 
         for (ObjCallbackMethod callbackMethod : callbackMethods) {
-            removeCallbackMethod(callbackType, callbackMethod.getName());
+            callbackMethodService.removeCallbackMethod(callbackType, callbackMethod.getName());
         }
         
-        Application.getInstance().getUndoManager().addEdit( 
+        application.getUndoManager().addEdit(
         		new RemoveCallbackMethodUndoableEdit(callbackType, callbackMethods));
-    }
-    
-    public void removeCallbackMethod(CallbackType callbackType, String method) {
-        ProjectController mediator = getProjectController();
-        getCallbackMap().getCallbackDescriptor(callbackType.getType()).removeCallbackMethod(method);
-        
-        CallbackMethodEvent e = new CallbackMethodEvent(
-                this,
-                null,
-                method,
-                MapEvent.REMOVE);
-        
-        mediator.fireEvent(e);
-    }
-
-    /**
-     * @return unique action name
-     */
-    public static String getActionName() {
-        return ACTION_NAME;
-    }
-
-    /**
-     * @return CallbackMap fom which remove callback method
-     */
-    public CallbackMap getCallbackMap() {
-        return getProjectController().getCurrentState().getObjEntity().getCallbackMap();
-    }
-
-    public String getActionName(boolean multiple) {
-        return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 }
 

@@ -19,25 +19,32 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.CayenneModelerController;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.project.Project;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+
 /**
  */
 public class RevertAction extends CayenneAction {
+
+    @Inject
+    public Application application;
+
+    @Inject
+    public NewProjectAction newProjectAction;
 
     public static String getActionName() {
         return "Revert";
     }
 
-    public RevertAction(Application application) {
-        super(getActionName(), application);
+    public RevertAction() {
+        super(getActionName());
     }
 
     public void performAction(ActionEvent e) {
@@ -49,7 +56,7 @@ public class RevertAction extends CayenneAction {
 
         boolean isNew = project.getConfigurationResource() == null;
 
-        CayenneModelerController controller = getApplication().getFrameController();
+        CayenneModelerController controller = application.getFrameController();
 
         // close ... don't use OpenProjectAction close method as it will ask for save, we
         // don't want that here
@@ -72,8 +79,7 @@ public class RevertAction extends CayenneAction {
             throw new CayenneRuntimeException("Only ApplicationProjects are supported.");
         }
         else {
-            controller.getApplication().getActionManager().getAction(
-                    NewProjectAction.class).performAction(e);
+            newProjectAction.performAction(e);
         }
 
         application.getUndoManager().discardAllEdits();

@@ -20,6 +20,8 @@ package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 
+import java.util.EventListener;
+
 /**
  * Represents a display event of a DataDomain.
  * 
@@ -61,5 +63,9 @@ public class DomainDisplayEvent extends DisplayEvent {
 	 */
 	public void setDomainChanged(boolean domainChanged) {
 		this.domainChanged = domainChanged;
+	}
+
+	public Class<? extends EventListener> getEventListener() {
+		return DomainDisplayListener.class;
 	}
 }

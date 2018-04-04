@@ -18,16 +18,19 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import javax.swing.KeyStroke;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
 public class UndoAction extends CayenneAction {
+
+    @Inject
+    public Application application;
 
     @Override
     public boolean isAlwaysOn() {
@@ -38,8 +41,9 @@ public class UndoAction extends CayenneAction {
         return "Undo";
     }
     
-    public UndoAction(Application application) {
-        super(getActionName(), application);
+    public UndoAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
     
     @Override

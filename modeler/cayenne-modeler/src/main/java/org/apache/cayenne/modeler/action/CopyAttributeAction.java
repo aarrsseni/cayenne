@@ -18,13 +18,12 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.util.Arrays;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+
+import java.util.Arrays;
 
 /**
  * Action for copying attribute(s)
@@ -46,8 +45,8 @@ public class CopyAttributeAction extends CopyAction implements MultipleObjectsAc
         return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 
-    public CopyAttributeAction(Application application) {
-        super(ACTION_NAME, application);
+    public CopyAttributeAction() {
+        super(ACTION_NAME);
     }
 
     /**

@@ -18,7 +18,10 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.event;
 
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.event.CayenneEvent;
+
+import java.util.EventListener;
 
 /**
  * Triggered while project is saved.
@@ -27,5 +30,9 @@ public class ProjectOnSaveEvent extends CayenneEvent{
 
 	public ProjectOnSaveEvent(Object source) {
 		super(source);
+	}
+
+	public Class<? extends EventListener> getEventListener() {
+		return ProjectOnSaveListener.class;
 	}
 }

@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.graph.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.graph.DataDomainGraphTab;
 import org.apache.cayenne.modeler.pref.FSPath;
@@ -43,12 +44,16 @@ import java.io.OutputStream;
  * Action for saving graph as image
  */
 public class SaveAsImageAction extends CayenneAction {
+
+	@Inject
+	public Application application;
+
 	private static final Logger logObj = LoggerFactory.getLogger(SaveAsImageAction.class);
 
 	private final DataDomainGraphTab dataDomainGraphTab;
 
 	public SaveAsImageAction(DataDomainGraphTab dataDomainGraphTab, Application application) {
-		super("Save As Image", application);
+		super("Save As Image");
 		this.dataDomainGraphTab = dataDomainGraphTab;
 		setEnabled(true);
 	}
@@ -61,7 +66,7 @@ public class SaveAsImageAction extends CayenneAction {
 	@Override
 	public void performAction(ActionEvent e) {
 		// find start directory in preferences
-		FSPath lastDir = getApplication().getFrameController().getLastDirectory();
+		FSPath lastDir = Application.getInstance().getFrameController().getLastDirectory();
 
 		// configure dialog
 		JFileChooser chooser = new JFileChooser();

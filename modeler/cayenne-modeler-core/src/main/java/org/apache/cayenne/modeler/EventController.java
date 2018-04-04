@@ -19,10 +19,12 @@
 
 package org.apache.cayenne.modeler;
 
+import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.event.*;
 import org.apache.cayenne.map.event.*;
 import org.apache.cayenne.modeler.event.*;
 
+import java.util.EventListener;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +44,6 @@ public class EventController {
         this.listenerMap = new EventListenerMap();
         this.listenerDescriptorMap = new HashMap<>();
         this.listenerDescriptorCreator = new ListenerDescriptorCreator();
-        initListenerDescriptorMap();
     }
 
     public void reset(){
@@ -245,49 +246,71 @@ public class EventController {
         listenerMap.add(ProjectFileOnChangeEventListener.class, listener);
     }
 
-    public ListenerDescriptor getListenerDescriptor(Class<? extends EventObject> key) {
-        return listenerDescriptorMap.get(key);
+
+
+    public void addConsoleStopLoggingListener(ConsoleStopLoggingListener listener) {
+        listenerMap.add(ConsoleStopLoggingListener.class, listener);
     }
 
-    //TODO: move declaration of eventListener to event class
+    public <T extends EventListener> void addListener(Class<T> listenerClass, T listener) {
+        listenerMap.add(listenerClass, listener);
+    }
+
+    public ListenerDescriptor getListenerDescriptor(EventObject key) {
+        try {
+            listenerDescriptorMap.putIfAbsent(key.getClass(), listenerDescriptorCreator.create((Class<? extends EventListener>) key.getClass().getMethod("getEventListener").invoke(key)));
+        } catch (Exception e) {
+            throw new CayenneRuntimeException("Can't create listener descriptor. Add getEventListener method to " + key.getClass());
+        }
+        return listenerDescriptorMap.get(key.getClass());
+    }
+
     private void initListenerDescriptorMap(){
-        listenerDescriptorMap.put(DataMapEvent.class, listenerDescriptorCreator.create(DataMapListener.class));
-        listenerDescriptorMap.put(ProcedureEvent.class, listenerDescriptorCreator.create(ProcedureListener.class));
-        listenerDescriptorMap.put(QueryEvent.class, listenerDescriptorCreator.create(QueryListener.class));
-        listenerDescriptorMap.put(DomainEvent.class, listenerDescriptorCreator.create(DomainListener.class));
-        listenerDescriptorMap.put(DataNodeEvent.class, listenerDescriptorCreator.create(DataNodeListener.class));
-        listenerDescriptorMap.put(ObjEntityEvent.class, listenerDescriptorCreator.create(ObjEntityListener.class));
-        listenerDescriptorMap.put(DbEntityEvent.class, listenerDescriptorCreator.create(DbEntityListener.class));
-        listenerDescriptorMap.put(ObjRelationshipEvent.class, listenerDescriptorCreator.create(ObjRelationshipListener.class));
-        listenerDescriptorMap.put(DbRelationshipEvent.class, listenerDescriptorCreator.create(DbRelationshipListener.class));
-        listenerDescriptorMap.put(DbAttributeEvent.class, listenerDescriptorCreator.create(DbAttributeListener.class));
-        listenerDescriptorMap.put(ObjAttributeEvent.class, listenerDescriptorCreator.create(ObjAttributeListener.class));
-        listenerDescriptorMap.put(CallbackMethodDisplayEvent.class, listenerDescriptorCreator.create(CallbackMethodDisplayListener.class));
-        listenerDescriptorMap.put(CallbackMethodEvent.class, listenerDescriptorCreator.create(CallbackMethodListener.class));
-        listenerDescriptorMap.put(CallbackTypeSelectionEvent.class, listenerDescriptorCreator.create(CallbackTypeSelectionListener.class));
-        listenerDescriptorMap.put(DataMapDisplayEvent.class, listenerDescriptorCreator.create(DataMapDisplayListener.class));
-        listenerDescriptorMap.put(DataNodeDisplayEvent.class, listenerDescriptorCreator.create(DataNodeDisplayListener.class));
-        listenerDescriptorMap.put(DataSourceModificationEvent.class, listenerDescriptorCreator.create(DataSourceModificationListener.class));
-        listenerDescriptorMap.put(DbAttributeDisplayEvent.class, listenerDescriptorCreator.create(DbAttributeDisplayListener.class));
-        listenerDescriptorMap.put(DbEntityDisplayEvent.class, listenerDescriptorCreator.create(DbEntityDisplayListener.class));
-        listenerDescriptorMap.put(DbRelationshipDisplayEvent.class, listenerDescriptorCreator.create(DbRelationshipDisplayListener.class));
-        listenerDescriptorMap.put(DomainDisplayEvent.class, listenerDescriptorCreator.create(DomainDisplayListener.class));
-        listenerDescriptorMap.put(EmbeddableAttributeDisplayEvent.class, listenerDescriptorCreator.create(EmbeddableAttributeDisplayListener.class));
-        listenerDescriptorMap.put(EmbeddableDisplayEvent.class, listenerDescriptorCreator.create(EmbeddableDisplayListener.class));
-        listenerDescriptorMap.put(EntityListenerEvent.class, listenerDescriptorCreator.create(EntityListenerListener.class));
-        listenerDescriptorMap.put(MultipleObjectsDisplayEvent.class, listenerDescriptorCreator.create(MultipleObjectsDisplayListener.class));
-        listenerDescriptorMap.put(ObjAttributeDisplayEvent.class, listenerDescriptorCreator.create(ObjAttributeDisplayListener.class));
-        listenerDescriptorMap.put(ObjEntityDisplayEvent.class, listenerDescriptorCreator.create(ObjEntityDisplayListener.class));
-        listenerDescriptorMap.put(ObjRelationshipDisplayEvent.class, listenerDescriptorCreator.create(ObjRelationshipDisplayListener.class));
-        listenerDescriptorMap.put(ProcedureDisplayEvent.class, listenerDescriptorCreator.create(ProcedureDisplayListener.class));
-        listenerDescriptorMap.put(ProcedureParameterDisplayEvent.class, listenerDescriptorCreator.create(ProcedureParameterDisplayListener.class));
-        listenerDescriptorMap.put(ProcedureParameterEvent.class, listenerDescriptorCreator.create(ProcedureParameterListener.class));
-        listenerDescriptorMap.put(ProjectDirtyEvent.class, listenerDescriptorCreator.create(ProjectDirtyEventListener.class));
-        listenerDescriptorMap.put(ProjectFileOnChangeTrackerEvent.class, listenerDescriptorCreator.create(ProjectFileOnChangeEventListener.class));
-        listenerDescriptorMap.put(ProjectOnSaveEvent.class, listenerDescriptorCreator.create(ProjectOnSaveListener.class));
-        listenerDescriptorMap.put(QueryDisplayEvent.class, listenerDescriptorCreator.create(QueryDisplayListener.class));
-        listenerDescriptorMap.put(RecentFileListEvent.class, listenerDescriptorCreator.create(RecentFileListListener.class));
-        listenerDescriptorMap.put(EmbeddableAttributeEvent.class, listenerDescriptorCreator.create(EmbeddableAttributeListener.class));
-        listenerDescriptorMap.put(EmbeddableEvent.class, listenerDescriptorCreator.create(EmbeddableListener.class));
+//        listenerDescriptorMap.put(DataMapEvent.class, listenerDescriptorCreator.create(DataMapListener.class));
+//        listenerDescriptorMap.put(ProcedureEvent.class, listenerDescriptorCreator.create(ProcedureListener.class));
+//        listenerDescriptorMap.put(QueryEvent.class, listenerDescriptorCreator.create(QueryListener.class));
+//        listenerDescriptorMap.put(DomainEvent.class, listenerDescriptorCreator.create(DomainListener.class));
+//        listenerDescriptorMap.put(DataNodeEvent.class, listenerDescriptorCreator.create(DataNodeListener.class));
+//        listenerDescriptorMap.put(ObjEntityEvent.class, listenerDescriptorCreator.create(ObjEntityListener.class));
+//        listenerDescriptorMap.put(DbEntityEvent.class, listenerDescriptorCreator.create(DbEntityListener.class));
+//        listenerDescriptorMap.put(ObjRelationshipEvent.class, listenerDescriptorCreator.create(ObjRelationshipListener.class));
+//        listenerDescriptorMap.put(DbRelationshipEvent.class, listenerDescriptorCreator.create(DbRelationshipListener.class));
+//        listenerDescriptorMap.put(DbAttributeEvent.class, listenerDescriptorCreator.create(DbAttributeListener.class));
+//        listenerDescriptorMap.put(ObjAttributeEvent.class, listenerDescriptorCreator.create(ObjAttributeListener.class));
+//        listenerDescriptorMap.put(CallbackMethodDisplayEvent.class, listenerDescriptorCreator.create(CallbackMethodDisplayListener.class));
+//        listenerDescriptorMap.put(CallbackMethodEvent.class, listenerDescriptorCreator.create(CallbackMethodListener.class));
+//        listenerDescriptorMap.put(CallbackTypeSelectionEvent.class, listenerDescriptorCreator.create(CallbackTypeSelectionListener.class));
+//        listenerDescriptorMap.put(DataMapDisplayEvent.class, listenerDescriptorCreator.create(DataMapDisplayListener.class));
+//        listenerDescriptorMap.put(DataNodeDisplayEvent.class, listenerDescriptorCreator.create(DataNodeDisplayListener.class));
+//        listenerDescriptorMap.put(DataSourceModificationEvent.class, listenerDescriptorCreator.create(DataSourceModificationListener.class));
+//        listenerDescriptorMap.put(DbAttributeDisplayEvent.class, listenerDescriptorCreator.create(DbAttributeDisplayListener.class));
+//        listenerDescriptorMap.put(DbEntityDisplayEvent.class, listenerDescriptorCreator.create(DbEntityDisplayListener.class));
+//        listenerDescriptorMap.put(DbRelationshipDisplayEvent.class, listenerDescriptorCreator.create(DbRelationshipDisplayListener.class));
+//        listenerDescriptorMap.put(DomainDisplayEvent.class, listenerDescriptorCreator.create(DomainDisplayListener.class));
+//        listenerDescriptorMap.put(EmbeddableAttributeDisplayEvent.class, listenerDescriptorCreator.create(EmbeddableAttributeDisplayListener.class));
+//        listenerDescriptorMap.put(EmbeddableDisplayEvent.class, listenerDescriptorCreator.create(EmbeddableDisplayListener.class));
+//        listenerDescriptorMap.put(EntityListenerEvent.class, listenerDescriptorCreator.create(EntityListenerListener.class));
+//        listenerDescriptorMap.put(MultipleObjectsDisplayEvent.class, listenerDescriptorCreator.create(MultipleObjectsDisplayListener.class));
+//        listenerDescriptorMap.put(ObjAttributeDisplayEvent.class, listenerDescriptorCreator.create(ObjAttributeDisplayListener.class));
+//        listenerDescriptorMap.put(ObjEntityDisplayEvent.class, listenerDescriptorCreator.create(ObjEntityDisplayListener.class));
+//        listenerDescriptorMap.put(ObjRelationshipDisplayEvent.class, listenerDescriptorCreator.create(ObjRelationshipDisplayListener.class));
+//        listenerDescriptorMap.put(ProcedureDisplayEvent.class, listenerDescriptorCreator.create(ProcedureDisplayListener.class));
+//        listenerDescriptorMap.put(ProcedureParameterDisplayEvent.class, listenerDescriptorCreator.create(ProcedureParameterDisplayListener.class));
+//        listenerDescriptorMap.put(ProcedureParameterEvent.class, listenerDescriptorCreator.create(ProcedureParameterListener.class));
+//        listenerDescriptorMap.put(ProjectDirtyEvent.class, listenerDescriptorCreator.create(ProjectDirtyEventListener.class));
+//        listenerDescriptorMap.put(ProjectFileOnChangeTrackerEvent.class, listenerDescriptorCreator.create(ProjectFileOnChangeEventListener.class));
+//        listenerDescriptorMap.put(ProjectOnSaveEvent.class, listenerDescriptorCreator.create(ProjectOnSaveListener.class));
+//        listenerDescriptorMap.put(QueryDisplayEvent.class, listenerDescriptorCreator.create(QueryDisplayListener.class));
+//        listenerDescriptorMap.put(RecentFileListEvent.class, listenerDescriptorCreator.create(RecentFileListListener.class));
+//        listenerDescriptorMap.put(EmbeddableAttributeEvent.class, listenerDescriptorCreator.create(EmbeddableAttributeListener.class));
+//        listenerDescriptorMap.put(EmbeddableEvent.class, listenerDescriptorCreator.create(EmbeddableListener.class));
+
+//        listenerDescriptorMap.put(ConsoleStopLoggingEvent.class, listenerDescriptorCreator.create(ConsoleStopLoggingListener.class));
+//        listenerDescriptorMap.put(ShowLogConsoleEvent.class, listenerDescriptorCreator.create(ShowLogConsoleListener.class));
+//        listenerDescriptorMap.put(ProjectOpenEvent.class, listenerDescriptorCreator.create(ProjectOpenListener.class));
+//        listenerDescriptorMap.put(CreateAttributeEvent.class, listenerDescriptorCreator.create(CreateAttributeListener.class));
+//        listenerDescriptorMap.put(CreateDataMapEvent.class, listenerDescriptorCreator.create(CreateDataMapListener.class));
+//        listenerDescriptorMap.put(CreateDbEntityEvent.class, listenerDescriptorCreator.create(CreateDbEntityListener.class));
+//        listenerDescriptorMap.put(CreateEmbeddableEvent.class, listenerDescriptorCreator.create(CreateEmbeddableListener.class));
     }
 }

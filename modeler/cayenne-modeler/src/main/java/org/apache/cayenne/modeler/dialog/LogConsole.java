@@ -19,6 +19,10 @@
 package org.apache.cayenne.modeler.dialog;
 
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.event.ConsoleStopLoggingEvent;
+import org.apache.cayenne.modeler.event.ConsoleStopLoggingListener;
+import org.apache.cayenne.modeler.event.ShowLogConsoleEvent;
+import org.apache.cayenne.modeler.event.ShowLogConsoleListener;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.util.Util;
@@ -35,7 +39,7 @@ import java.util.Date;
 /**
  * Implementation for modeler log console functionality
  */
-public class LogConsole extends CayenneController {
+public class LogConsole extends CayenneController implements ConsoleStopLoggingListener, ShowLogConsoleListener {
     /**
      * How much characters are allowed in console
      */
@@ -97,6 +101,7 @@ public class LogConsole extends CayenneController {
         
         DEBUG_STYLE = new SimpleAttributeSet();
         StyleConstants.setForeground(DEBUG_STYLE, Color.GRAY);
+
     }
     
     /**
@@ -330,5 +335,20 @@ public class LogConsole extends CayenneController {
         }
         
         return instance;
+    }
+
+    @Override
+    public void stopLogging(ConsoleStopLoggingEvent e) {
+        getInstance().stopLogging();
+    }
+
+    public void initListeners() {
+        getApplication().getProjectController().getEventController().addListener(ConsoleStopLoggingListener.class, this);
+        getApplication().getProjectController().getEventController().addListener(ShowLogConsoleListener.class, this);
+    }
+
+    @Override
+    public void showLogConsole(ShowLogConsoleEvent e) {
+        LogConsole.getInstance().toggle();
     }
 }

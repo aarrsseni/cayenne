@@ -20,6 +20,8 @@ package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.event.CayenneEvent;
 
+import java.util.EventListener;
+
 
 /**
  * Display event for callback method
@@ -45,6 +47,10 @@ public class CallbackMethodDisplayEvent extends CayenneEvent {
      */
     public String getCallbackMethod() {
         return callbackMethod;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return CallbackMethodDisplayListener.class;
     }
 }
 

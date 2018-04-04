@@ -23,6 +23,8 @@ import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 
+import java.util.EventListener;
+
 public class EmbeddableAttributeDisplayEvent extends EmbeddableDisplayEvent {
 
     protected EmbeddableAttribute[] embeddableAttributes;
@@ -52,4 +54,7 @@ public class EmbeddableAttributeDisplayEvent extends EmbeddableDisplayEvent {
         return embeddableAttributes;
     }
 
+    public Class<? extends EventListener> getEventListener() {
+        return EmbeddableAttributeDisplayListener.class;
+    }
 }

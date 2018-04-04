@@ -20,19 +20,6 @@
 
 package org.apache.cayenne.modeler.util;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-import javax.swing.tree.TreePath;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.Entity;
@@ -46,6 +33,12 @@ import org.apache.cayenne.project.Project;
 import org.apache.cayenne.swing.components.image.FilteredIconFactory;
 import org.apache.cayenne.util.Util;
 
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 /**
  * Superclass of CayenneModeler actions that implements support for some common
  * functionality, exception handling, etc.
@@ -53,23 +46,20 @@ import org.apache.cayenne.util.Util;
 public abstract class CayenneAction extends AbstractAction {
 
     protected boolean alwaysOn;
-    protected Application application;
 
     /**
      * Creates a named CayenneAction.
      */
-    public CayenneAction(String name, Application application) {
-        this(name, application, name);
+    public CayenneAction(String name) {
+        this(name, name);
     }
 
     /**
      * Creates a named CayenneAction.
      */
-    public CayenneAction(String name, Application application, String shortDescription) {
+    public CayenneAction(String name, String shortDescription) {
         super(name);
         super.putValue(Action.DEFAULT, name);
-
-        this.application = application;
 
         Icon icon = createIcon();
         if (icon != null) {
@@ -88,12 +78,8 @@ public abstract class CayenneAction extends AbstractAction {
         setEnabled(false);
     }
 
-    public Application getApplication() {
-        return application;
-    }
-
     protected Project getCurrentProject() {
-        return application.getFrameController().getProjectController().getProject();
+        return Application.getInstance().getFrameController().getProjectController().getProject();
     }
 
     /**
@@ -159,7 +145,7 @@ public abstract class CayenneAction extends AbstractAction {
      * Returns current project controller.
      */
     public ProjectController getProjectController() {
-        return application.getFrameController().getProjectController();
+        return Application.getInstance().getFrameController().getProjectController();
     }
 
     /**

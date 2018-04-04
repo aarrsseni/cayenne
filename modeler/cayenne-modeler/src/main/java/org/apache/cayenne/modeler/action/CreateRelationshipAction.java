@@ -19,61 +19,29 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.event.DbRelationshipEvent;
-import org.apache.cayenne.configuration.event.ObjRelationshipEvent;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
-import org.apache.cayenne.modeler.event.ObjRelationshipDisplayEvent;
-import org.apache.cayenne.modeler.undo.CreateRelationshipUndoableEdit;
+import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.modeler.services.RelationshipService;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.util.DeleteRuleUpdater;
 
 import java.awt.event.ActionEvent;
 
 public class CreateRelationshipAction extends CayenneAction {
 
+    @Inject
+    public RelationshipService relationshipService;
+
     /**
      * Constructor for CreateRelationshipAction.
      */
-    public CreateRelationshipAction(Application application) {
-        super(getActionName(), application);
+    public CreateRelationshipAction() {
+        super(getActionName());
     }
 
     public static String getActionName() {
         return "Create Relationship";
-    }
-
-    /**
-     * Fires events when a obj rel was added
-     */
-    static void fireObjRelationshipEvent(Object src, ProjectController mediator, ObjEntity objEntity,
-                                         ObjRelationship rel) {
-
-        mediator.fireEvent(new ObjRelationshipEvent(src, rel, objEntity, MapEvent.ADD));
-
-        ObjRelationshipDisplayEvent rde = new ObjRelationshipDisplayEvent(src, rel, objEntity, mediator.getCurrentState().getDataMap(),
-                (DataChannelDescriptor) mediator.getProject().getRootNode());
-
-        mediator.fireEvent(rde);
-    }
-
-    /**
-     * Fires events when a db rel was added
-     */
-    static void fireDbRelationshipEvent(Object src, ProjectController mediator, DbEntity dbEntity, DbRelationship rel) {
-
-        mediator.fireEvent(new DbRelationshipEvent(src, rel, dbEntity, MapEvent.ADD));
-
-        DbRelationshipDisplayEvent rde = new DbRelationshipDisplayEvent(src, rel, dbEntity, mediator.getCurrentState().getDataMap(),
-                (DataChannelDescriptor) mediator.getProject().getRootNode());
-
-        mediator.fireEvent(rde);
     }
 
     @Override
@@ -86,46 +54,7 @@ public class CreateRelationshipAction extends CayenneAction {
      */
     @Override
     public void performAction(ActionEvent e) {
-        ObjEntity objEnt = getProjectController().getCurrentState().getObjEntity();
-        if (objEnt != null) {
-
-            ObjRelationship rel = new ObjRelationship();
-            rel.setName(NameBuilder.builder(rel, objEnt).name());
-            createObjRelationship(objEnt, rel);
-
-            application.getUndoManager().addEdit(
-                    new CreateRelationshipUndoableEdit(objEnt, new ObjRelationship[]{rel}));
-        } else {
-            DbEntity dbEnt = getProjectController().getCurrentState().getDbEntity();
-            if (dbEnt != null) {
-
-                DbRelationship rel = new DbRelationship();
-                rel.setName(NameBuilder.builder(rel, dbEnt).name());
-                createDbRelationship(dbEnt, rel);
-
-                application.getUndoManager().addEdit(
-                        new CreateRelationshipUndoableEdit(dbEnt, new DbRelationship[]{rel}));
-            }
-        }
-    }
-
-    public void createObjRelationship(ObjEntity objEntity, ObjRelationship rel) {
-        ProjectController mediator = getProjectController();
-
-        rel.setSourceEntity(objEntity);
-        DeleteRuleUpdater.updateObjRelationship(rel);
-
-        objEntity.addRelationship(rel);
-        fireObjRelationshipEvent(this, mediator, objEntity, rel);
-    }
-
-    public void createDbRelationship(DbEntity dbEntity, DbRelationship rel) {
-        ProjectController mediator = getProjectController();
-
-        rel.setSourceEntity(dbEntity);
-        dbEntity.addRelationship(rel);
-
-        fireDbRelationshipEvent(this, mediator, dbEntity, rel);
+        relationshipService.createRelationship();
     }
 
     /**

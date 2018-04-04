@@ -27,7 +27,6 @@ import org.apache.cayenne.modeler.dialog.LogConsole;
 import org.apache.cayenne.modeler.dialog.pref.ClasspathPreferences;
 import org.apache.cayenne.modeler.init.platform.PlatformInitializer;
 import org.apache.cayenne.modeler.undo.CayenneUndoManager;
-import org.apache.cayenne.modeler.util.AdapterMapping;
 import org.apache.cayenne.modeler.util.WidgetFactory;
 import org.apache.cayenne.pref.CayennePreference;
 import org.apache.cayenne.pref.CayenneProjectPreferences;
@@ -35,7 +34,7 @@ import org.apache.cayenne.project.Project;
 import org.apache.cayenne.swing.BindingFactory;
 import org.apache.cayenne.util.IDUtil;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,7 +72,6 @@ public class Application {
     protected String name;
 
     protected BindingFactory bindingFactory;
-    protected AdapterMapping adapterMapping;
 
     protected CayenneUndoManager undoManager;
 
@@ -90,6 +88,9 @@ public class Application {
 
     @com.google.inject.Inject
     protected PlatformInitializer platformInitializer;
+
+    @com.google.inject.Inject
+    protected ActionManager actionManager;
 
     private String newProjectTemporaryName;
 
@@ -155,15 +156,11 @@ public class Application {
         return modelerClassLoader;
     }
 
-    public AdapterMapping getAdapterMapping() {
-        return adapterMapping;
-    }
-
     /**
      * Returns action controller.
      */
     public ActionManager getActionManager() {
-        return cayenneInjector.getInstance(ActionManager.class);
+        return actionManager;
     }
 
     /**
@@ -188,8 +185,9 @@ public class Application {
 
         initClassLoader();
 
+        actionManager.initAllActions();
+
         this.bindingFactory = new BindingFactory();
-        this.adapterMapping = new AdapterMapping();
 
         this.undoManager = new CayenneUndoManager(this);
 
@@ -200,6 +198,8 @@ public class Application {
 
         // After prefs have been loaded, we can now show the console if needed
         LogConsole.getInstance().showConsoleIfNeeded();
+        LogConsole.getInstance().initListeners();
+
         getFrame().setVisible(true);
     }
 

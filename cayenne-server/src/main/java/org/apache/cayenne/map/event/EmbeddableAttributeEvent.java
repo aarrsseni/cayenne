@@ -21,6 +21,8 @@ package org.apache.cayenne.map.event;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 
+import java.util.EventListener;
+
 public class EmbeddableAttributeEvent extends EmbeddableEvent {
 
     protected EmbeddableAttribute embeddableAttribute;
@@ -49,6 +51,10 @@ public class EmbeddableAttributeEvent extends EmbeddableEvent {
 
     public void setEmbeddableAttribute(EmbeddableAttribute embeddableAttribute) {
         this.embeddableAttribute = embeddableAttribute;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return EmbeddableAttributeListener.class;
     }
 
 }

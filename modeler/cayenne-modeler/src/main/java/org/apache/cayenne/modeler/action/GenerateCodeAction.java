@@ -19,6 +19,8 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
+import org.apache.cayenne.modeler.services.GenerateCodeService;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.modeler.Application;
@@ -30,12 +32,15 @@ import java.awt.event.ActionEvent;
 
 public class GenerateCodeAction extends CayenneAction {
 
+    @Inject
+    public GenerateCodeService generateCodeService;
+
     public static String getActionName() {
         return "Generate Classes";
     }
 
-    public GenerateCodeAction(Application application) {
-        super(getActionName(), application);
+    public GenerateCodeAction() {
+        super(getActionName());
     }
 
     public String getIconName() {

@@ -18,8 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.graph.action;
 
-import java.awt.event.ActionEvent;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.Entity;
@@ -31,6 +29,8 @@ import org.apache.cayenne.modeler.event.DomainDisplayEvent;
 import org.apache.cayenne.modeler.event.EntityDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
+import java.awt.event.ActionEvent;
+
 /**
  * Action that shows entity on the graph
  */
@@ -40,8 +40,8 @@ public class ShowGraphEntityAction extends CayenneAction {
         return "ShowGraphEntity";
     }
 
-    public ShowGraphEntityAction(Application application) {
-        super(getActionName(), application, "Show on Graph");
+    public ShowGraphEntityAction() {
+        super(getActionName(),  "Show on Graph");
         setEnabled(true);
     }
 

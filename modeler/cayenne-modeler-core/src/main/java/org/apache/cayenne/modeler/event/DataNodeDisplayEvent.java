@@ -22,6 +22,8 @@ package org.apache.cayenne.modeler.event;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 
+import java.util.EventListener;
+
 /**
  * Represents a display event of a DataNode.
  * 
@@ -61,5 +63,7 @@ public class DataNodeDisplayEvent extends DomainDisplayEvent {
 		this.dataNode = dataNode;
 	}
 
-
+	public Class<? extends EventListener> getEventListener() {
+		return DataNodeDisplayListener.class;
+	}
 }

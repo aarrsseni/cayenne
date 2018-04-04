@@ -19,17 +19,10 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.event.ProcedureEvent;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
-import org.apache.cayenne.modeler.undo.CreateProcedureUndoableEdit;
+import org.apache.cayenne.modeler.services.ProcedureService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
@@ -39,40 +32,19 @@ import java.awt.event.ActionEvent;
  */
 public class CreateProcedureAction extends CayenneAction {
 
-    public CreateProcedureAction(Application application) {
-        super(getActionName(), application);
+    @Inject
+    public ProcedureService procedureService;
+
+    public CreateProcedureAction() {
+        super(getActionName());
     }
 
     public static String getActionName() {
         return "Create Stored Procedure";
     }
 
-    /**
-     * Fires events when a procedure was added
-     */
-    static void fireProcedureEvent(Object src, ProjectController mediator, DataMap dataMap, Procedure procedure) {
-        mediator.fireEvent(new ProcedureEvent(src, procedure, MapEvent.ADD));
-        mediator.fireEvent(new ProcedureDisplayEvent(src, procedure, mediator.getCurrentState().getDataMap(),
-                (DataChannelDescriptor) mediator.getProject().getRootNode()));
-    }
-
     public void performAction(ActionEvent e) {
-        ProjectController mediator = getProjectController();
-        DataMap map = mediator.getCurrentState().getDataMap();
-
-        Procedure procedure = new Procedure();
-        procedure.setName(NameBuilder.builder(procedure, map).name());
-        createProcedure(map, procedure);
-
-        application.getUndoManager().addEdit(new CreateProcedureUndoableEdit(map, procedure));
-    }
-
-    public void createProcedure(DataMap map, Procedure procedure) {
-        ProjectController mediator = getProjectController();
-        procedure.setSchema(map.getDefaultSchema());
-        procedure.setCatalog(map.getDefaultCatalog());
-        map.addProcedure(procedure);
-        fireProcedureEvent(this, mediator, map, procedure);
+        procedureService.createProcedure();
     }
 
     /**

@@ -18,7 +18,10 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.event;
 
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.event.MapEvent;
+
+import java.util.EventListener;
 
 /**
  * Event for creating/removing/modifying entity listeners
@@ -49,6 +52,10 @@ public class EntityListenerEvent extends MapEvent{
      */
     public String getNewName() {
         return newName;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return EntityListenerListener.class;
     }
 }
 

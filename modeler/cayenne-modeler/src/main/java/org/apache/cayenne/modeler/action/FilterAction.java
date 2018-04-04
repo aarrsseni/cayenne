@@ -18,15 +18,18 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JButton;
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
-
 import org.apache.cayenne.modeler.dialog.datadomain.FilterDialog;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
 public class FilterAction extends CayenneAction{
+
+    @Inject
+    public Application application;
     
 	private FilterDialog filterDialog = null;
 	
@@ -34,8 +37,8 @@ public class FilterAction extends CayenneAction{
         return "Filter tree";
     }
 
-	public FilterAction(Application application) {
-        super(getActionName(), application);
+	public FilterAction() {
+        super(getActionName());
     }
 	
     @Override
@@ -47,7 +50,7 @@ public class FilterAction extends CayenneAction{
 	public void performAction(ActionEvent e) {
 		JButton source = (JButton)e.getSource();
         if(filterDialog == null) {
-            filterDialog = new FilterDialog(getApplication().getFrameController().getEditorView().getFilterController());
+            filterDialog = new FilterDialog(application.getFrameController().getEditorView().getFilterController());
         }
 		filterDialog.pack();
 		filterDialog.show(source, 0, source.getHeight());

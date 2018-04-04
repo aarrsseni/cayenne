@@ -18,25 +18,27 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.editor.ObjEntityAttributePanel;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityAttributePanel;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 
 public class CutAttributeRelationshipAction extends CutAction implements MultipleObjectsAction {
 
+    @Inject
     private CutAttributeAction cutAttributeAction;
+
+    @Inject
     private CutRelationshipAction cutRelationshipAction;
+
     private JComponent currentSelectedPanel;
 
-    public CutAttributeRelationshipAction(Application application) {
-        super(application);
-        cutAttributeAction = new CutAttributeAction(application);
-        cutRelationshipAction = new CutRelationshipAction(application);
+    public CutAttributeRelationshipAction() {
+        super();
     }
 
     public JComponent getCurrentSelectedPanel() {

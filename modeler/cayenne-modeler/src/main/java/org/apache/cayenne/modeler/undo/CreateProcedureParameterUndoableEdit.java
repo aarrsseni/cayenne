@@ -23,9 +23,8 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.modeler.action.CreateProcedureParameterAction;
-import org.apache.cayenne.modeler.action.RemoveProcedureParameterAction;
 import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
+import org.apache.cayenne.modeler.services.ProcedureParameterService;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -48,10 +47,9 @@ public class CreateProcedureParameterUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveProcedureParameterAction action = actionManager.getAction(RemoveProcedureParameterAction.class);
-
+        ProcedureParameterService procedureParameterService = controller.getBootiqueInjector().getInstance(ProcedureParameterService.class);
         if (procedure != null) {
-            action.removeProcedureParameters(procedure, new ProcedureParameter[] {
+            procedureParameterService.removeProcedureParameters(procedure, new ProcedureParameter[] {
                     parameter
             });
 
@@ -61,9 +59,10 @@ public class CreateProcedureParameterUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateProcedureParameterAction action = actionManager.getAction(CreateProcedureParameterAction.class);
+        ProcedureParameterService procedureParameterService = controller.getBootiqueInjector().getInstance(ProcedureParameterService.class);
+
         if (procedure != null) {
-            action.createProcedureParameter(procedure, parameter);
+            procedureParameterService.createProcedureParameter(procedure, parameter);
         }
     }
 

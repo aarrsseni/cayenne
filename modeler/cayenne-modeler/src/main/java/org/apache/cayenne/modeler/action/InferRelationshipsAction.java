@@ -18,15 +18,19 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.autorelationship.InferRelationshipsController;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
+import java.awt.event.ActionEvent;
+
 
 public class InferRelationshipsAction extends CayenneAction {
+
+    @Inject
+    public Application application;
 
     public static final String getActionName() {
         return "Infer Relationships";
@@ -35,15 +39,15 @@ public class InferRelationshipsAction extends CayenneAction {
     /**
      * Constructor for ShowLogConsoleAction.
      */
-    public InferRelationshipsAction(Application application) {
-        super(getActionName(), application);
+    public InferRelationshipsAction() {
+        super(getActionName());
     }
     
     @Override
     public void performAction(ActionEvent e) {
         DataMap dataMap = getProjectController().getCurrentState().getDataMap();
         if (dataMap != null) {
-            new InferRelationshipsController(getApplication().getFrameController(), dataMap)
+            new InferRelationshipsController(application.getFrameController(), dataMap)
                     .startup();
         }
     }

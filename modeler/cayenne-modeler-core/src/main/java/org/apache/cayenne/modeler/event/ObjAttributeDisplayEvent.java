@@ -1,9 +1,12 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Entity;
+
+import java.util.EventListener;
 
 public class ObjAttributeDisplayEvent extends AttributeDisplayEvent{
 
@@ -15,4 +18,7 @@ public class ObjAttributeDisplayEvent extends AttributeDisplayEvent{
         super(src, attributes, entity, dataMap, domain);
     }
 
+    public Class<? extends EventListener> getEventListener() {
+        return ObjAttributeDisplayListener.class;
+    }
 }

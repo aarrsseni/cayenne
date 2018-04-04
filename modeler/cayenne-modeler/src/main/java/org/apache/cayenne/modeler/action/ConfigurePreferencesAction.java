@@ -19,22 +19,27 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.pref.PreferenceDialog;
 import org.apache.cayenne.modeler.util.CayenneAction;
+
+import java.awt.event.ActionEvent;
 
 /**
  */
 public class ConfigurePreferencesAction extends CayenneAction {
 
+    @Inject
+    public Application application;
+
     public static String getActionName() {
         return "Preferences";
     }
 
-    public ConfigurePreferencesAction(Application application) {
-        super(getActionName(), application);
+    public ConfigurePreferencesAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
 
     public void performAction(ActionEvent e) {
@@ -42,7 +47,7 @@ public class ConfigurePreferencesAction extends CayenneAction {
     }
 
     public void showPreferencesDialog() {
-        new PreferenceDialog(getApplication().getFrameController()).startupAction(null);
+        new PreferenceDialog(application.getFrameController()).startupAction(null);
         
     }
     

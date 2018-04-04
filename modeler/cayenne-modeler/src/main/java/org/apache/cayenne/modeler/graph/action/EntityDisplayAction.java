@@ -18,17 +18,15 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.graph.action;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.Action;
-import javax.swing.Icon;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.action.FindAction;
 import org.apache.cayenne.modeler.graph.GraphBuilder;
+import org.apache.cayenne.modeler.services.DefaultFindService;
 import org.apache.cayenne.modeler.util.CayenneAction;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Action that displays one of the objects in main tree, and then fires another action (if specified)
@@ -43,13 +41,13 @@ public class EntityDisplayAction extends CayenneAction {
     private GraphBuilder builder;
 
     public EntityDisplayAction(GraphBuilder builder) {
-        super("Show", Application.getInstance());
+        super("Show");
         this.builder = builder;
         init();
     }
 
     public EntityDisplayAction(GraphBuilder builder, CayenneAction delegate) {
-        super((String) delegate.getValue(Action.NAME), Application.getInstance());
+        super((String) delegate.getValue(Action.NAME));
         this.delegate = delegate;
         this.builder = builder;
         init();
@@ -81,7 +79,7 @@ public class EntityDisplayAction extends CayenneAction {
         }
 
         // reusing logic from FindAction
-        FindAction.jumpToResult(new FindAction.SearchResultEntry(entity, entity.getName()));
+        FindAction.jumpToResult(new DefaultFindService.SearchResultEntry(entity, entity.getName()));
         return true;
     }
 

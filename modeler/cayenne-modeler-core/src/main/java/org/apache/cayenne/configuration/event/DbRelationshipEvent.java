@@ -2,7 +2,10 @@ package org.apache.cayenne.configuration.event;
 
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.event.DbRelationshipListener;
 import org.apache.cayenne.map.event.RelationshipEvent;
+
+import java.util.EventListener;
 
 public class DbRelationshipEvent extends RelationshipEvent {
 
@@ -18,4 +21,7 @@ public class DbRelationshipEvent extends RelationshipEvent {
         super(src, rel, entity, oldName);
     }
 
+    public Class<? extends EventListener> getEventListener() {
+        return DbRelationshipListener.class;
+    }
 }

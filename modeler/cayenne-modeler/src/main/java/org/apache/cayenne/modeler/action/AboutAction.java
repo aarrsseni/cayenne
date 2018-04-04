@@ -19,11 +19,10 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.AboutDialog;
 import org.apache.cayenne.modeler.util.CayenneAction;
+
+import java.awt.event.ActionEvent;
 
 /**
  */
@@ -36,8 +35,9 @@ public class AboutAction extends CayenneAction {
     /**
      * Constructor for AboutMenuAction.
      */
-    public AboutAction(Application application) {
-        super(getActionName(), application);
+    public AboutAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
 
     /**

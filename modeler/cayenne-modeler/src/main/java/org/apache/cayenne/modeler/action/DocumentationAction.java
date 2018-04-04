@@ -19,23 +19,27 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.util.BrowserControl;
+import com.google.inject.Inject;
+import org.apache.cayenne.modeler.services.DocumentationService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
+import java.awt.event.ActionEvent;
+
 public class DocumentationAction extends CayenneAction {
+
+    @Inject
+    public DocumentationService documentationService;
 
     public final static String getActionName() {
         return "Documentation";
     }
 
-    public DocumentationAction(Application application) {
-        super(getActionName(), application);
+    public DocumentationAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
 
     public void performAction(ActionEvent e) {
-        BrowserControl.displayURL("http://cayenne.apache.org");
+        documentationService.showDocumentation();
     }
 }

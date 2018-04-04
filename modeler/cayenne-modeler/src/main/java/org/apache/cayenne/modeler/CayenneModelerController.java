@@ -38,9 +38,9 @@ import org.apache.cayenne.project.validation.ProjectValidator;
 import org.apache.cayenne.validation.ValidationFailure;
 import org.apache.cayenne.validation.ValidationResult;
 
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DropTarget;
@@ -75,6 +75,8 @@ public class CayenneModelerController extends CayenneController {
     private ProjectFileChangeTrackerDisplay fileProjectChangeTracker;
     private DomainSelectedChanges domainSelectedChanges;
 
+    private ModelerActionListener modelerActionListener;
+
     public CayenneModelerController(){}
 
     public CayenneModelerController(Application application) {
@@ -87,6 +89,8 @@ public class CayenneModelerController extends CayenneController {
         initHelpers();
         this.projectController = new ProjectController(this);
         this.dbImportController = new DbImportController();
+
+        this.modelerActionListener = new ModelerActionListener(this);
     }
 
     @Override
@@ -209,8 +213,12 @@ public class CayenneModelerController extends CayenneController {
 
         projectController.setProject(null);
 
-        projectController.reset();
         projectController.fireEvent(new ProjectDirtyEvent(this, false));
+
+        projectController.reset();
+
+        projectController.updateActionEventListeners();
+        this.updateModelerActionListener();
 
         application.getActionManager().projectClosed();
 
@@ -222,7 +230,6 @@ public class CayenneModelerController extends CayenneController {
      * child controllers.
      */
     public void projectOpenedAction(Project project) {
-
         projectController.setProject(project);
 
         editorView = new EditorView(projectController);
@@ -232,17 +239,17 @@ public class CayenneModelerController extends CayenneController {
         application.getActionManager().projectOpened();
 
         // do status update AFTER the project is actually opened...
-        if (project.getConfigurationResource() == null) {
+        if (projectController.getProject().getConfigurationResource() == null) {
             updateStatus("New project created...");
             frame.setTitle("[New Project]");
         } else {
             updateStatus("Project opened...");
-            frame.setTitle(project.getConfigurationResource().getURL().getPath());
+            frame.setTitle(projectController.getProject().getConfigurationResource().getURL().getPath());
         }
 
         // update preferences
-        if (project.getConfigurationResource() != null) {
-            getLastDirectory().setDirectory(new File(project.getConfigurationResource().getURL().getPath()));
+        if (projectController.getProject().getConfigurationResource() != null) {
+            getLastDirectory().setDirectory(new File(projectController.getProject().getConfigurationResource().getURL().getPath()));
             frame.fireRecentFileListChanged(new RecentFileListEvent(this));
         }
 
@@ -251,17 +258,17 @@ public class CayenneModelerController extends CayenneController {
         // for validation purposes combine load failures with post-load validation (not
         // sure if that'll cause duplicate messages?).
         List<ValidationFailure> allFailures = new ArrayList<>();
-        Collection<ValidationFailure> loadFailures = project.getConfigurationTree().getLoadFailures();
+        Collection<ValidationFailure> loadFailures = projectController.getProject().getConfigurationTree().getLoadFailures();
 
         if (!loadFailures.isEmpty()) {
             // mark project as unsaved
-            project.setModified(true);
+            projectController.getProject().setModified(true);
             projectController.fireEvent(new ProjectDirtyEvent(this,true));
             allFailures.addAll(loadFailures);
         }
 
         ProjectValidator projectValidator = getApplication().getInjector().getInstance(ProjectValidator.class);
-        ValidationResult validationResult = projectValidator.validate(project.getRootNode());
+        ValidationResult validationResult = projectValidator.validate(projectController.getProject().getRootNode());
         allFailures.addAll(validationResult.getFailures());
 
         if (!allFailures.isEmpty()) {
@@ -392,5 +399,9 @@ public class CayenneModelerController extends CayenneController {
 
         domainSelectedChanges = new DomainSelectedChanges(frame.getActionManager(), this);
         domainSelectedChanges.initAll();
+    }
+
+    public void updateModelerActionListener() {
+        modelerActionListener.initListeners();
     }
 }

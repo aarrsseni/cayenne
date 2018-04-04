@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.dbsync.reverse.dbload.DbLoader;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
@@ -35,9 +36,12 @@ import java.util.List;
 
 public abstract class DBWizardAction<T extends DbActionOptionsDialog> extends CayenneAction {
 	private static Logger LOGGER = LoggerFactory.getLogger(DBWizardAction.class);
-	
-    public DBWizardAction(String name, Application application) {
-        super(name, application);
+
+	@Inject
+    public Application application;
+
+    public DBWizardAction(String name) {
+        super(name);
     }
 
     protected DataSourceWizard dataSourceWizardDialog(String title) {

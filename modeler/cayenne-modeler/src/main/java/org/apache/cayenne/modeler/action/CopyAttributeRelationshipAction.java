@@ -19,11 +19,11 @@
 package org.apache.cayenne.modeler.action;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.ObjEntityAttributePanel;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityAttributePanel;
-import javax.swing.JComponent;
+
+import javax.swing.*;
 
 public class CopyAttributeRelationshipAction extends CopyAction implements MultipleObjectsAction {
 
@@ -31,10 +31,10 @@ public class CopyAttributeRelationshipAction extends CopyAction implements Multi
     private CopyRelationshipAction copyRelationshipAction;
     private JComponent currentSelectedPanel;
 
-    protected CopyAttributeRelationshipAction(Application application) {
-        super(application);
-        copyAttributeAction = new CopyAttributeAction(application);
-        copyRelationshipAction = new CopyRelationshipAction(application);
+    public CopyAttributeRelationshipAction() {
+        super(getActionName());
+        copyAttributeAction = new CopyAttributeAction();
+        copyRelationshipAction = new CopyRelationshipAction();
     }
 
     public JComponent getCurrentSelectedPanel() {

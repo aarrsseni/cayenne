@@ -18,17 +18,23 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
-import java.awt.event.ActionEvent;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.modeler.Application;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action for cutting attribute(s)
  */
 public class CutAttributeAction extends CutAction implements MultipleObjectsAction {
+
+    @Inject
+    public CopyAttributeAction copyAttributeAction;
+
+    @Inject
+    public RemoveAttributeAction removeAttributeAction;
 
     private final static String ACTION_NAME = "Cut Attribute";
 
@@ -45,8 +51,8 @@ public class CutAttributeAction extends CutAction implements MultipleObjectsActi
         return multiple ? ACTION_NAME_MULTIPLE : ACTION_NAME;
     }
 
-    public CutAttributeAction(Application application) {
-        super(ACTION_NAME, application);
+    public CutAttributeAction() {
+        super(ACTION_NAME);
     }
 
     /**
@@ -71,13 +77,7 @@ public class CutAttributeAction extends CutAction implements MultipleObjectsActi
      */
     @Override
     public void performAction(ActionEvent e) {
-        application
-                .getActionManager()
-                .getAction(CopyAttributeAction.class)
-                .performAction(e);
-        application
-                .getActionManager()
-                .getAction(RemoveAttributeAction.class)
-                .performAction(e, false);
+        copyAttributeAction.performAction(e);
+        removeAttributeAction.performAction(e, false);
     }
 }

@@ -26,6 +26,7 @@ import org.apache.cayenne.modeler.ProjectTreeView;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.CollapseTreeAction;
 import org.apache.cayenne.modeler.action.FilterAction;
+import org.apache.cayenne.modeler.dialog.LogConsole;
 import org.apache.cayenne.modeler.dialog.datadomain.FilterController;
 import org.apache.cayenne.modeler.editor.datanode.DataNodeEditor;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityTabbedView;
@@ -251,6 +252,9 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
         eventController.getEventController().addEmbeddableDisplayListener(this);
 
         eventController.getCurrentState().initControllerStateListeners();
+
+        LogConsole.getInstance().initListeners();
+
         // Moving this to try-catch block per CAY-940. Exception will be stack-traced
         try {
             ComponentGeometry geometry = new ComponentGeometry(this.getClass(), "splitPane/divider");

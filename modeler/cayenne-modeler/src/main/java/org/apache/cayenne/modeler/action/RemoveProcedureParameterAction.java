@@ -19,14 +19,11 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.event.ProcedureParameterEvent;
-import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
+import org.apache.cayenne.modeler.services.ProcedureParameterService;
 
 import java.awt.event.ActionEvent;
 
@@ -35,6 +32,9 @@ import java.awt.event.ActionEvent;
  * 
  */
 public class RemoveProcedureParameterAction extends RemoveAction {
+
+    @Inject
+    public ProcedureParameterService procedureParameterService;
 
     private final static String ACTION_NAME = "Remove Parameter";
 
@@ -51,8 +51,8 @@ public class RemoveProcedureParameterAction extends RemoveAction {
         return ACTION_NAME;
     }
 
-    public RemoveProcedureParameterAction(Application application) {
-        super(ACTION_NAME, application);
+    public RemoveProcedureParameterAction() {
+        super(ACTION_NAME);
     }
 
     /**
@@ -81,30 +81,8 @@ public class RemoveProcedureParameterAction extends RemoveAction {
                     params[0].getName()))
                     || (params.length > 1 && dialog
                             .shouldDelete("selected procedure parameters"))) {
-                removeProcedureParameters();
+                procedureParameterService.removeProcedureParameters();
             }
-        }
-    }
-
-    protected void removeProcedureParameters() {
-        ProjectController mediator = getProjectController();
-        ProcedureParameter[] parameters = mediator.getCurrentState().getProcedureParameters();
-        removeProcedureParameters(mediator.getCurrentState().getProcedure(), parameters);
-    }
-
-    public void removeProcedureParameters(
-            Procedure procedure,
-            ProcedureParameter[] parameters) {
-        ProjectController mediator = getProjectController();
-
-        for (ProcedureParameter parameter : parameters) {
-
-            procedure.removeCallParameter(parameter.getName());
-
-            ProcedureParameterEvent e = new ProcedureParameterEvent(Application
-                    .getFrame(), parameter, MapEvent.REMOVE);
-
-            mediator.fireEvent(e);
         }
     }
 }

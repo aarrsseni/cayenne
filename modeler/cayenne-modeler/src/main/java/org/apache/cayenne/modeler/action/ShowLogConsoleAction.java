@@ -18,8 +18,9 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.dialog.LogConsole;
+import org.apache.cayenne.modeler.event.ShowLogConsoleEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
@@ -28,6 +29,10 @@ import java.awt.event.ActionEvent;
  * Action for opening log console window (See CAY-366)
  */
 public class ShowLogConsoleAction extends CayenneAction {
+
+    @Inject
+    public Application application;
+
     /**
      * Readable name for this action
      */
@@ -38,13 +43,14 @@ public class ShowLogConsoleAction extends CayenneAction {
     /**
      * Constructor for ShowLogConsoleAction.
      */
-    public ShowLogConsoleAction(Application application) {
-        super(getActionName(), application);
+    public ShowLogConsoleAction() {
+        super(getActionName());
+        setAlwaysOn(true);
     }
     
     @Override
     public void performAction(ActionEvent e) {
-        LogConsole.getInstance().toggle();
+        application.getProjectController().fireEvent(new ShowLogConsoleEvent(this));
     }
 
 }

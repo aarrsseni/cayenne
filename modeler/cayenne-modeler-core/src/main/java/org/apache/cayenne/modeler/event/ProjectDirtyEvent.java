@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.event;
 
+import java.util.EventListener;
 import java.util.EventObject;
 
 /*
@@ -45,5 +46,9 @@ public class ProjectDirtyEvent extends EventObject {
 
     public boolean getDirty(){
         return dirty;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return ProjectDirtyEventListener.class;
     }
 }

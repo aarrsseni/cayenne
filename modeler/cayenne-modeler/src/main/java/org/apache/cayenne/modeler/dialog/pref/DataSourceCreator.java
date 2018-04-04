@@ -19,19 +19,15 @@
 
 package org.apache.cayenne.modeler.dialog.pref;
 
-import java.awt.Component;
-import java.util.Map;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.util.AdapterMapping;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.DbAdapterInfo;
 import org.apache.cayenne.swing.BindingBuilder;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Map;
 
 /**
  */
@@ -147,7 +143,7 @@ public class DataSourceCreator extends CayenneController {
             dataSource.setDbAdapter(adapterString);
 
             // guess adapter defaults...
-            AdapterMapping defaultMap = getApplication().getAdapterMapping();
+            AdapterMapping defaultMap = getApplication().getProjectController().getAdapterMapping();
             dataSource.setJdbcDriver(defaultMap.jdbcDriverForAdapter(adapterString));
             dataSource.setUrl(defaultMap.jdbcURLForAdapter(adapterString));
         }

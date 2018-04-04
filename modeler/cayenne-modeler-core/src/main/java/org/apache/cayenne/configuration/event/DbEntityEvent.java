@@ -1,7 +1,10 @@
 package org.apache.cayenne.configuration.event;
 
 import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.map.event.DbEntityListener;
 import org.apache.cayenne.map.event.EntityEvent;
+
+import java.util.EventListener;
 
 public class DbEntityEvent extends EntityEvent{
 
@@ -17,4 +20,7 @@ public class DbEntityEvent extends EntityEvent{
         super(src, entity, oldName);
     }
 
+    public Class<? extends EventListener> getEventListener() {
+        return DbEntityListener.class;
+    }
 }

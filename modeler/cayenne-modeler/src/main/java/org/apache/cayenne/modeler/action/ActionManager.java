@@ -19,11 +19,9 @@
 
 package org.apache.cayenne.modeler.action;
 
-import javax.swing.Action;
-import javax.swing.JComponent;
-
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.modeler.Application;
+
+import javax.swing.*;
 
 /**
  * Stores a map of modeler actions, and deals with activating/deactivating those actions
@@ -75,4 +73,6 @@ public interface ActionManager {
             JComponent comp,
             Class<? extends Action> cutActionType,
             Class<? extends Action> copyActionType);
+
+    void initAllActions();
 }

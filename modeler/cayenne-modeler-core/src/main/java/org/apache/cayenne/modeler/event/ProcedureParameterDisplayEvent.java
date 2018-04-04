@@ -20,9 +20,12 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
+
+import java.util.EventListener;
 
 /**
  */
@@ -58,5 +61,9 @@ public class ProcedureParameterDisplayEvent extends ProcedureDisplayEvent {
 
     public void setProcedureParameters(ProcedureParameter[] parameters) {
         procedureParameters = parameters;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return ProcedureParameterDisplayListener.class;
     }
 }

@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.Entity;
@@ -36,10 +37,13 @@ import java.awt.event.ActionEvent;
  */
 public abstract class BaseViewEntityAction extends CayenneAction {
 
+    @Inject
+    public Application application;
+
     abstract protected Entity getEntity();
 
-    public BaseViewEntityAction(String name, Application application) {
-        super(name, application);
+    public BaseViewEntityAction(String name) {
+        super(name);
     }
 
     /**

@@ -18,8 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.event;
 
+import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.event.CayenneEvent;
 import org.apache.cayenne.modeler.editor.CallbackType;
+
+import java.util.EventListener;
 
 
 /**
@@ -49,6 +52,10 @@ public class CallbackTypeSelectionEvent extends CayenneEvent {
      */
     public CallbackType getCallbackType() {
         return callbackType;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return CallbackTypeSelectionListener.class;
     }
 }
 

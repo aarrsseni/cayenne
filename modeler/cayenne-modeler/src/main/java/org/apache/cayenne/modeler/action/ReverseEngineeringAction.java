@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
@@ -32,6 +33,7 @@ import org.apache.cayenne.modeler.pref.DataMapDefaults;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -53,8 +55,11 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
         return ICON_NAME;
     }
 
-    ReverseEngineeringAction(Application application) {
-        super(getActionName(), application);
+    @Inject
+    public Application application;
+
+    public ReverseEngineeringAction() {
+        super(getActionName());
     }
 
     public static String getActionName() {

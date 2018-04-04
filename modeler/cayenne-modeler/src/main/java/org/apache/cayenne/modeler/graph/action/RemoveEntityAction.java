@@ -18,25 +18,33 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.graph.action;
 
-import java.awt.event.ActionEvent;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.action.RemoveAction;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.graph.GraphBuilder;
+import org.apache.cayenne.modeler.services.DbEntityService;
+import org.apache.cayenne.modeler.services.ObjEntityService;
 import org.apache.cayenne.modeler.undo.RemoveUndoableEdit;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action for removing entities from the graph
  */
 public class RemoveEntityAction extends RemoveAction {
     GraphBuilder builder;
+
+    @Inject
+    public ObjEntityService objEntityService;
+
+    @Inject
+    public DbEntityService dbEntityService;
     
     public RemoveEntityAction(GraphBuilder builder) {
-        super(Application.getInstance());
+        super();
         this.builder = builder;
         setEnabled(true);
     }
@@ -54,14 +62,14 @@ public class RemoveEntityAction extends RemoveAction {
             if (dialog.shouldDelete("ObjEntity", entity.getName())) {
                 application.getUndoManager().addEdit(
                         new RemoveUndoableEdit(entity.getDataMap(), (ObjEntity) entity));
-                removeObjEntity(entity.getDataMap(), (ObjEntity) entity);
+                objEntityService.removeObjEntity(entity.getDataMap(), (ObjEntity) entity);
             }
         }
         else {
             if (dialog.shouldDelete("DbEntity", entity.getName())) {
                 application.getUndoManager().addEdit(
                         new RemoveUndoableEdit(entity.getDataMap(), (DbEntity) entity));
-                removeDbEntity(entity.getDataMap(), (DbEntity) entity);
+                dbEntityService.removeDbEntity(entity.getDataMap(), (DbEntity) entity);
             }
         }
     }

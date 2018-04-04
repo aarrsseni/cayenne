@@ -19,15 +19,9 @@
 
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.event.QueryEvent;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.query.QueryType;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
@@ -37,7 +31,8 @@ import java.awt.event.ActionEvent;
  */
 public class CreateQueryAction extends CayenneAction {
 
-    
+    @Inject
+    public ProjectController projectController;
 
     public static String getActionName() {
         return "Create Query";
@@ -46,8 +41,8 @@ public class CreateQueryAction extends CayenneAction {
     /**
      * Constructor for CreateQueryAction.
      */
-    public CreateQueryAction(Application application) {
-        super(getActionName(), application);
+    public CreateQueryAction() {
+        super(getActionName());
     }
 
     public String getIconName() {
@@ -59,21 +54,6 @@ public class CreateQueryAction extends CayenneAction {
     }
 
     protected void createQuery() {
-        new QueryType(getProjectController(),getProjectController().getCurrentState().getDataMap()).startupAction();
-    }
-    
-    public void createQuery(DataChannelDescriptor domain, DataMap dataMap, QueryDescriptor query) {
-        dataMap.addQueryDescriptor(query);
-        // notify listeners
-        fireQueryEvent(this, getProjectController(), domain, dataMap, query);
-    }
-     
-    /**
-     * Fires events when a query was added
-     */
-    public static void fireQueryEvent(Object src, ProjectController mediator, DataChannelDescriptor domain,
-            DataMap dataMap, QueryDescriptor query) {
-        mediator.fireEvent(new QueryEvent(src, query, MapEvent.ADD, dataMap));
-        mediator.fireEvent(new QueryDisplayEvent(src, query, dataMap, domain));
+        new QueryType(projectController, projectController.getCurrentState().getDataMap()).startupAction();
     }
 }

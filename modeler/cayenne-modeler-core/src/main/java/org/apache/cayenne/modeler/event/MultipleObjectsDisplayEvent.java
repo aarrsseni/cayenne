@@ -19,7 +19,9 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
+import org.apache.cayenne.configuration.event.DataMapListener;
 
+import java.util.EventListener;
 import java.util.EventObject;
 
 /**
@@ -44,5 +46,9 @@ public class MultipleObjectsDisplayEvent extends EventObject {
 
     public ConfigurationNode getParentNode() {
         return parentNode;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return MultipleObjectsDisplayListener.class;
     }
 }

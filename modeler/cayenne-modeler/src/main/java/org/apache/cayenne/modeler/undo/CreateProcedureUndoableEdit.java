@@ -18,13 +18,12 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.modeler.action.CreateProcedureAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
+import org.apache.cayenne.modeler.services.ProcedureService;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class CreateProcedureUndoableEdit extends CayenneUndoableEdit {
 
@@ -43,14 +42,13 @@ public class CreateProcedureUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateProcedureAction action = actionManager
-                .getAction(CreateProcedureAction.class);
-        action.createProcedure(map, procedure);
+        ProcedureService procedureService = controller.getBootiqueInjector().getInstance(ProcedureService.class);
+        procedureService.createProcedure(map, procedure);
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveAction action = actionManager.getAction(RemoveAction.class);
-        action.removeProcedure(map, procedure);
+        ProcedureService procedureService = controller.getBootiqueInjector().getInstance(ProcedureService.class);
+        procedureService.removeProcedure(map, procedure);
     }
 }

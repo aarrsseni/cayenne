@@ -18,13 +18,12 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.modeler.action.CreateObjEntityAction;
-import org.apache.cayenne.modeler.action.RemoveAction;
+import org.apache.cayenne.modeler.services.ObjEntityService;
+
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 
 public class CreateObjEntityUndoableEdit extends CayenneUndoableEdit {
 
@@ -48,15 +47,13 @@ public class CreateObjEntityUndoableEdit extends CayenneUndoableEdit {
 
     @Override
     public void redo() throws CannotRedoException {
-        CreateObjEntityAction action = actionManager
-                .getAction(CreateObjEntityAction.class);
-
-        action.createObjEntity(map, objEntity);
+        ObjEntityService objEntityService = controller.getBootiqueInjector().getInstance(ObjEntityService.class);
+        objEntityService.createObjEntity(map, objEntity);
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        RemoveAction action = actionManager.getAction(RemoveAction.class);
-        action.removeObjEntity(map, objEntity);
+        ObjEntityService objEntityService = controller.getBootiqueInjector().getInstance(ObjEntityService.class);
+        objEntityService.removeObjEntity(map, objEntity);
     }
 }
