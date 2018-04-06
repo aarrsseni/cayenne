@@ -207,7 +207,6 @@ public class CayenneModelerController extends CayenneController {
 
         projectController.reset();
 
-        projectController.updateActionEventListeners();
         this.updateModelerActionListener();
 
         application.getActionManager().projectClosed();

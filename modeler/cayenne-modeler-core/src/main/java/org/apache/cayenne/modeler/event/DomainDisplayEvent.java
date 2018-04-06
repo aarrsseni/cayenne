@@ -19,6 +19,7 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
 
 import java.util.EventListener;
 

@@ -2,6 +2,7 @@ package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.listener.GenerateDbListener;
 
 import java.util.Collection;
 import java.util.EventListener;

@@ -2,7 +2,7 @@ package org.apache.cayenne.modeler.action.listener;
 
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.CreateCallbackMethodEvent;
-import org.apache.cayenne.modeler.event.CreateCallbackMethodListener;
+import org.apache.cayenne.modeler.event.listener.CreateCallbackMethodListener;
 import org.apache.cayenne.modeler.undo.CreateCallbackMethodUndoableEdit;
 
 public class CreateCallbackMethodActionListener implements CreateCallbackMethodListener{

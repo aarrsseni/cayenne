@@ -40,7 +40,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Action that synchronizes all ObjEntities with the current state of the
@@ -107,7 +106,7 @@ public class DbEntitySyncAction extends CayenneAction {
 					.getProject().getRootNode(), projectController.getCurrentState().getDataMap());
 
 			// filter out inherited entities, as we need to add attributes only to the roots
-			filterInheritedEntities(entities);
+			dbEntityService.filterInheritedEntities(entities);
 
 			for(ObjEntity entity : entities) {
 
@@ -131,20 +130,6 @@ public class DbEntitySyncAction extends CayenneAction {
 			}
 
 			application.getUndoManager().addEdit(undoableEdit);
-		}
-	}
-
-	/**
-	 * This method works only for case when all inherited entities bound to same DbEntity
-	 * if this will ever change some additional checks should be performed.
-	 */
-	private void filterInheritedEntities(Collection<ObjEntity> entities) {
-		// entities.removeIf(c -> c.getSuperEntity() != null);
-		Iterator<ObjEntity> it = entities.iterator();
-		while(it.hasNext()) {
-			if(it.next().getSuperEntity() != null) {
-				it.remove();
-			}
 		}
 	}
 

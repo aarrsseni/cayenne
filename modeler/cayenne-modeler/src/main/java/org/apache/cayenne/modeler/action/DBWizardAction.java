@@ -20,10 +20,10 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
-import org.apache.cayenne.dbsync.reverse.dbload.DbLoader;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
+import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +31,13 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.sql.Connection;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class DBWizardAction<T extends DbActionOptionsDialog> extends CayenneAction {
 	private static Logger LOGGER = LoggerFactory.getLogger(DBWizardAction.class);
 
 	@Inject
-    public Application application;
+    public DbService dbService;
 
     public DBWizardAction(String name) {
         super(name);
@@ -56,21 +55,21 @@ public abstract class DBWizardAction<T extends DbActionOptionsDialog> extends Ca
 
     protected abstract T createDialog(Collection<String> catalogs, Collection<String> schemas, String currentCatalog, String currentSchema);
 
-    protected T loaderOptionDialog(DataSourceWizard connectWizard) {
+    protected T loaderOptionDialog() {
 
         // use this catalog as the default...
         List<String> catalogs;
         List<String> schemas;
         String currentCatalog;
         String currentSchema = null;
-        try(Connection connection = connectWizard.getDataSource().getConnection()) {
-            catalogs = getCatalogs(connectWizard, connection);
-            schemas = getSchemas(connection);
+        try(Connection connection = dbService.createConnection()) {
+            catalogs = dbService.getCatalogs(connection);
+            schemas = dbService.getSchemas(connection);
             if (catalogs.isEmpty() && schemas.isEmpty()) {
                 return null;
             }
             currentCatalog = connection.getCatalog();
-			
+
 			try {
 	            currentSchema = connection.getSchema();
 			} catch (Throwable th) {
@@ -92,18 +91,5 @@ public abstract class DBWizardAction<T extends DbActionOptionsDialog> extends Ca
         }
 
         return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<String> getCatalogs(DataSourceWizard connectWizard, Connection connection) throws Exception {
-        if(!connectWizard.getAdapter().supportsCatalogsOnReverseEngineering()) {
-            return (List<String>) Collections.EMPTY_LIST;
-        }
-
-        return DbLoader.loadCatalogs(connection);
-    }
-
-    private List<String> getSchemas(Connection connection) throws Exception {
-        return DbLoader.loadSchemas(connection);
     }
 }

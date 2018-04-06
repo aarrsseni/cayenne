@@ -2,7 +2,7 @@ package org.apache.cayenne.modeler.action.listener;
 
 import org.apache.cayenne.modeler.dialog.db.gen.DBGeneratorOptions;
 import org.apache.cayenne.modeler.event.GenerateDbEvent;
-import org.apache.cayenne.modeler.event.GenerateDbListener;
+import org.apache.cayenne.modeler.event.listener.GenerateDbListener;
 
 public class GenerateDbActionListener implements GenerateDbListener{
     @Override

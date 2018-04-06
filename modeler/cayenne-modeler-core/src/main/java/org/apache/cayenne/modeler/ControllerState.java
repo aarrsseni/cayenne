@@ -28,6 +28,7 @@ import org.apache.cayenne.map.event.*;
 import org.apache.cayenne.modeler.editor.CallbackType;
 import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
 import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.*;
 
 import java.util.Arrays;
 

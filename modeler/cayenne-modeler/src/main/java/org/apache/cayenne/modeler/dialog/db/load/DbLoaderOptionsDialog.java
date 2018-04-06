@@ -24,12 +24,9 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
 import org.apache.cayenne.modeler.util.NameGeneratorPreferences;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.Vector;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
 
 /**
  * Dialog for selecting database reverse-engineering parameters.
@@ -103,37 +100,37 @@ public class DbLoaderOptionsDialog extends DbActionOptionsDialog {
         strategyCombo.setModel(new DefaultComboBoxModel<>(arr));
     }
 
-    String getTableIncludePattern() {
+    public String getTableIncludePattern() {
         return "".equals(tableIncludePatternField.getText()) ?
                 null :
                 tableIncludePatternField.getText();
     }
 
-    String getTableExcludePattern() {
+    public String getTableExcludePattern() {
         return "".equals(tableExcludePatternField.getText()) ?
                 null :
                 tableExcludePatternField.getText();
     }
 
-    String getMeaningfulPk() {
+    public String getMeaningfulPk() {
         return "".equals(meaningfulPk.getText()) ? null : meaningfulPk
                 .getText();
     }
 
-    String getProcedureNamePattern() {
+    public String getProcedureNamePattern() {
         return "".equals(procNamePatternField.getText()) ? null : procNamePatternField
                 .getText();
     }
 
-    boolean isUsePrimitives() {
+    public boolean isUsePrimitives() {
         return usePrimitives.isSelected();
     }
 
-    boolean isUseJava7Typed() {
+    public boolean isUseJava7Typed() {
         return useJava7Types.isSelected();
     }
 
-    String getNamingStrategy() {
+    public String getNamingStrategy() {
         return (String) strategyCombo.getSelectedItem();
     }
 }

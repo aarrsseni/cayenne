@@ -19,20 +19,17 @@
 
 package org.apache.cayenne.modeler.dialog.db;
 
-import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
 import org.apache.cayenne.modeler.dialog.pref.PreferenceDialog;
 import org.apache.cayenne.modeler.event.DataSourceModificationEvent;
-import org.apache.cayenne.modeler.event.DataSourceModificationListener;
+import org.apache.cayenne.modeler.event.listener.DataSourceModificationListener;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
-import org.apache.cayenne.modeler.pref.CoreDataSourceFactory;
-import org.apache.cayenne.modeler.pref.CoreDbAdapterFactory;
+import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
 
-import javax.sql.DataSource;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
@@ -56,19 +53,15 @@ public class DataSourceWizard extends CayenneController {
 	// this object is a clone of an object selected from the dropdown, as we
 	// need to allow
 	// local temporary modifications
-	private DBConnectionInfo connectionInfo;
+//	private DBConnectionInfo connectionInfo;
 
 	private boolean canceled;
 
 	private DataSourceModificationListener dataSourceListener;
 
-	private DbAdapter adapter;
-	private DataSource dataSource;
 	protected ProjectController projectController;
 
-	protected CoreDbAdapterFactory dbAdapterFactory;
-
-	protected CoreDataSourceFactory dataSourceFactory;
+	DbService dbService;
 
 	public DataSourceWizard(ProjectController projectController, String title) {
 		super();
@@ -76,10 +69,10 @@ public class DataSourceWizard extends CayenneController {
 		this.projectController = projectController;
 		this.view = createView();
 		this.view.setTitle(title);
-		this.connectionInfo = new DBConnectionInfo();
+//		this.connectionInfo = new DBConnectionInfo();
 
-		dbAdapterFactory = projectController.getBootiqueInjector().getInstance(CoreDbAdapterFactory.class);
-		dataSourceFactory = projectController.getBootiqueInjector().getInstance(CoreDataSourceFactory.class);
+		dbService = projectController.getBootiqueInjector().getInstance(DbService.class);
+		dbService.createDbConnectionInfo();
 
 		initBindings();
 		initDataSourceListener();
@@ -147,12 +140,12 @@ public class DataSourceWizard extends CayenneController {
 		// update a clone object that will be used to obtain connection...
 		DBConnectionInfo currentInfo = dataSources.get(dataSourceKey);
 		if (currentInfo != null) {
-			currentInfo.copyTo(connectionInfo);
+			currentInfo.copyTo(dbService.getDbConnectionInfo());
 		} else {
-			connectionInfo = new DBConnectionInfo();
+			dbService.createDbConnectionInfo();
 		}
 
-		view.getConnectionInfo().setConnectionInfo(connectionInfo);
+		view.getConnectionInfo().setConnectionInfo(dbService.getDbConnectionInfo());
 	}
 
 	/**
@@ -175,21 +168,21 @@ public class DataSourceWizard extends CayenneController {
 		return !canceled;
 	}
 
-	public DBConnectionInfo getConnectionInfo() {
-		return connectionInfo;
-	}
+//	public DBConnectionInfo getConnectionInfo() {
+//		return connectionInfo;
+//	}
 
 	/**
 	 * Tests that the entered information is valid and can be used to open a
 	 * conneciton. Does not store the open connection.
 	 */
 	public void okAction() {
-		DBConnectionInfo info = getConnectionInfo();
+		DBConnectionInfo info = dbService.getDbConnectionInfo();
 		// doing connection testing...
 		try {
-			this.adapter = dbAdapterFactory.createAdapter(info);
-			this.dataSource = dataSourceFactory.createDataSource(info);
-			try (Connection connection = dataSource.getConnection()) {
+			dbService.createDbAdapter(info);
+			dbService.createDataSource(info);
+			try (Connection connection = dbService.createConnection()) {
 			} catch (SQLException ignore) {
 			}
 		} catch (Throwable th) {
@@ -256,16 +249,5 @@ public class DataSourceWizard extends CayenneController {
 
 		setDataSourceKey(key != null ? key : getDataSourceKey());
 		dataSourceBinding.updateView();
-	}
-
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	/**
-	 * Returns configured DbAdapter.
-	 */
-	public DbAdapter getAdapter() {
-		return adapter;
 	}
 }

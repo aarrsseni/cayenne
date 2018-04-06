@@ -3,6 +3,7 @@ package org.apache.cayenne.modeler.event;
 import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.listener.CreateProcedureParameterListener;
 
 import java.util.EventListener;
 import java.util.EventObject;

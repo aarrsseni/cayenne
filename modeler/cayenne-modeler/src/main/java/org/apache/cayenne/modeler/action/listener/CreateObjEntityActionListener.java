@@ -2,7 +2,7 @@ package org.apache.cayenne.modeler.action.listener;
 
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.CreateObjEntityEvent;
-import org.apache.cayenne.modeler.event.CreateObjEntityListener;
+import org.apache.cayenne.modeler.event.listener.CreateObjEntityListener;
 import org.apache.cayenne.modeler.undo.CreateObjEntityUndoableEdit;
 
 public class CreateObjEntityActionListener implements CreateObjEntityListener{

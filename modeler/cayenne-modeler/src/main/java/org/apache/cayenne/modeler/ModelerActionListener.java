@@ -1,7 +1,7 @@
 package org.apache.cayenne.modeler;
 
 import org.apache.cayenne.modeler.action.listener.*;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.*;
 
 public class ModelerActionListener {
 
@@ -28,5 +28,6 @@ public class ModelerActionListener {
         cayenneModelerController.getProjectController().getEventController().addListener(GenerateDbListener.class, new GenerateDbActionListener());
         cayenneModelerController.getProjectController().getEventController().addListener(LinkDataMapListener.class, new LinkDataMapActionListener());
         cayenneModelerController.getProjectController().getEventController().addListener(GenerateCodeListener.class, new GenerateCodeActionListener());
+        cayenneModelerController.getProjectController().getEventController().addListener(DbLoaderExceptionListener.class, new DbLoaderExceptionProcessListener());
     }
 }

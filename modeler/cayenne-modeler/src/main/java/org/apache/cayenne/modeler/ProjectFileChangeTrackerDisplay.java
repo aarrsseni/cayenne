@@ -24,7 +24,7 @@ import org.apache.cayenne.modeler.action.SaveAction;
 import org.apache.cayenne.modeler.dialog.FileDeletedDialog;
 import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.event.ProjectFileOnChangeTrackerEvent;
-import org.apache.cayenne.modeler.event.ProjectFileOnChangeEventListener;
+import org.apache.cayenne.modeler.event.listener.ProjectFileOnChangeEventListener;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;

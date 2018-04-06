@@ -23,7 +23,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ModelerPreferences;
 import org.apache.cayenne.modeler.action.OpenProjectAction;
 import org.apache.cayenne.modeler.event.RecentFileListEvent;
-import org.apache.cayenne.modeler.event.RecentFileListListener;
+import org.apache.cayenne.modeler.event.listener.RecentFileListListener;
 import org.apache.cayenne.swing.control.FileMenuItem;
 
 import javax.swing.*;

@@ -2,7 +2,7 @@ package org.apache.cayenne.modeler;
 
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
 
 /**
  * @since 4.1

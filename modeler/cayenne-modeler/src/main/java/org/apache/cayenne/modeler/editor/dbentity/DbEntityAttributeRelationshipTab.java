@@ -26,7 +26,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
-import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.ModelerUtil;

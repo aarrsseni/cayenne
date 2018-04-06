@@ -19,7 +19,7 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
-import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.ShowLogConsoleEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
@@ -31,7 +31,7 @@ import java.awt.event.ActionEvent;
 public class ShowLogConsoleAction extends CayenneAction {
 
     @Inject
-    public Application application;
+    public ProjectController projectController;
 
     /**
      * Readable name for this action
@@ -50,7 +50,7 @@ public class ShowLogConsoleAction extends CayenneAction {
     
     @Override
     public void performAction(ActionEvent e) {
-        application.getProjectController().fireEvent(new ShowLogConsoleEvent(this));
+        projectController.fireEvent(new ShowLogConsoleEvent(this));
     }
 
 }

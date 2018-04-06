@@ -2,7 +2,7 @@ package org.apache.cayenne.modeler.action.listener;
 
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.CreateProcedureEvent;
-import org.apache.cayenne.modeler.event.CreateProcedureListener;
+import org.apache.cayenne.modeler.event.listener.CreateProcedureListener;
 import org.apache.cayenne.modeler.undo.CreateProcedureUndoableEdit;
 
 public class CreateProcedureActionListener implements CreateProcedureListener{

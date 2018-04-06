@@ -22,6 +22,7 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
+import org.apache.cayenne.modeler.event.listener.EmbeddableAttributeDisplayListener;
 
 import java.util.EventListener;
 

@@ -1,6 +1,7 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.modeler.event.listener.GenerateCodeListener;
 
 import java.util.Collection;
 import java.util.EventListener;

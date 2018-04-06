@@ -44,7 +44,7 @@ public class QueryType extends CayenneController{
 
     protected QueryTypeView view;
     protected String type;
-    
+
     public QueryType(ProjectController projectController, DataMap root) {
         super();
 

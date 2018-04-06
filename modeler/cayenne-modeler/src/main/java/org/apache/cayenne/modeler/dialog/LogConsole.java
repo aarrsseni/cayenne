@@ -20,9 +20,9 @@ package org.apache.cayenne.modeler.dialog;
 
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.ConsoleStopLoggingEvent;
-import org.apache.cayenne.modeler.event.ConsoleStopLoggingListener;
+import org.apache.cayenne.modeler.event.listener.ConsoleStopLoggingListener;
 import org.apache.cayenne.modeler.event.ShowLogConsoleEvent;
-import org.apache.cayenne.modeler.event.ShowLogConsoleListener;
+import org.apache.cayenne.modeler.event.listener.ShowLogConsoleListener;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.util.Util;

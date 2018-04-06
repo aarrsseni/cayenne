@@ -31,6 +31,7 @@ import org.apache.cayenne.modeler.dialog.datadomain.FilterController;
 import org.apache.cayenne.modeler.editor.datanode.DataNodeEditor;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityTabbedView;
 import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.*;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.slf4j.LoggerFactory;
 

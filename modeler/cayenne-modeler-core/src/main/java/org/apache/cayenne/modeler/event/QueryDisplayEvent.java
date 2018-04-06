@@ -21,9 +21,9 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.modeler.event.listener.QueryDisplayListener;
 
 import java.util.EventListener;
 

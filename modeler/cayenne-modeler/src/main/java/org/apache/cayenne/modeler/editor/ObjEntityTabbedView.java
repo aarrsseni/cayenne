@@ -27,6 +27,9 @@ import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
 import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
 import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.ObjAttributeDisplayListener;
+import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.ObjRelationshipDisplayListener;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

@@ -23,8 +23,10 @@ import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoaderContext;
+import org.apache.cayenne.modeler.dialog.db.load.DbLoaderData;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoaderOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.load.LoadDataMapTask;
+import org.apache.cayenne.modeler.services.DbService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -39,6 +41,12 @@ public class ReverseEngineeringAction extends DBWizardAction<DbLoaderOptionsDial
     @Inject
     public Application application;
 
+    @Inject
+    public DbService dbService;
+
+    @Inject
+    DbLoaderContext context;
+
     public ReverseEngineeringAction() {
         super(getActionName());
     }
@@ -52,15 +60,14 @@ public class ReverseEngineeringAction extends DBWizardAction<DbLoaderOptionsDial
      */
     @Override
     public void performAction(ActionEvent event) {
-        final DbLoaderContext context = new DbLoaderContext();
+//        final DbLoaderContext context = new DbLoaderContext();
         final DataSourceWizard connectWizard = dataSourceWizardDialog("Reengineer DB Schema: Connect to Database");
         if(connectWizard == null) {
             return;
         }
 
-        context.setProjectController(getProjectController());
         try {
-            context.setConnection(connectWizard.getDataSource().getConnection());
+            dbService.setConnection(dbService.createConnection());
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(
                     Application.getFrame(),
@@ -70,20 +77,30 @@ public class ReverseEngineeringAction extends DBWizardAction<DbLoaderOptionsDial
             return;
         }
 
-        final DbLoaderOptionsDialog loaderOptionsDialog = loaderOptionDialog(connectWizard);
-        if(!context.buildConfig(connectWizard, loaderOptionsDialog)) {
+        final DbLoaderOptionsDialog loaderOptionsDialog = loaderOptionDialog();
+        if(loaderOptionsDialog == null) {
             try {
-                context.getConnection().close();
+                dbService.getConnection().close();
             } catch (SQLException ignored) {}
             return;
         }
+
+        context.buildConfig(new DbLoaderData(loaderOptionsDialog.getSelectedCatalog(),
+                loaderOptionsDialog.getSelectedSchema(),
+                loaderOptionsDialog.getTableIncludePattern(),
+                loaderOptionsDialog.getTableExcludePattern(),
+                loaderOptionsDialog.getProcedureNamePattern(),
+                loaderOptionsDialog.getMeaningfulPk(),
+                loaderOptionsDialog.getNamingStrategy(),
+                loaderOptionsDialog.isUsePrimitives(),
+                loaderOptionsDialog.isUseJava7Typed()));
 
         runLoaderInThread(context, new Runnable() {
             @Override
             public void run() {
                 application.getUndoManager().discardAllEdits();
                 try {
-                    context.getConnection().close();
+                    dbService.getConnection().close();
                 } catch (SQLException ignored) {}
             }
         });

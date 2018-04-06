@@ -6,10 +6,14 @@ import org.apache.cayenne.configuration.event.DbEntityEvent;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.CreateDbEntityEvent;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 public class DefaultDbEntityService implements DbEntityService{
 
@@ -66,6 +70,17 @@ public class DefaultDbEntityService implements DbEntityService{
     @Override
     public void syncDbEntity() {
 
+    }
+
+    @Override
+    public void filterInheritedEntities(Collection<ObjEntity> entities) {
+        // entities.removeIf(c -> c.getSuperEntity() != null);
+        Iterator<ObjEntity> it = entities.iterator();
+        while(it.hasNext()) {
+            if(it.next().getSuperEntity() != null) {
+                it.remove();
+            }
+        }
     }
 }
 

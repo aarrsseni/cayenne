@@ -26,6 +26,9 @@ import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
 import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.DbAttributeDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DbRelationshipDisplayListener;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

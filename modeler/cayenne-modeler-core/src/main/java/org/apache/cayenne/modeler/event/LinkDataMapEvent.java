@@ -3,6 +3,7 @@ package org.apache.cayenne.modeler.event;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.listener.LinkDataMapListener;
 
 import java.util.Collection;
 import java.util.EventListener;

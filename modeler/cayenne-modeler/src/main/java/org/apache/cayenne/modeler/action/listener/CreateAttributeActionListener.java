@@ -4,7 +4,7 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.CreateAttributeEvent;
-import org.apache.cayenne.modeler.event.CreateAttributeListener;
+import org.apache.cayenne.modeler.event.listener.CreateAttributeListener;
 import org.apache.cayenne.modeler.undo.CreateAttributeUndoableEdit;
 import org.apache.cayenne.modeler.undo.CreateEmbAttributeUndoableEdit;
 

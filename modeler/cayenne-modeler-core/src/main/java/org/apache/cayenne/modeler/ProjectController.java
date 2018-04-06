@@ -32,6 +32,8 @@ import org.apache.cayenne.map.event.EmbeddableEvent;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.ListenerDescriptor;
+import org.apache.cayenne.modeler.event.listener.ListenerDescriptorCreator;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.DataNodeDefaults;
 import org.apache.cayenne.modeler.pref.ProjectStatePreferences;
@@ -84,8 +86,6 @@ public class ProjectController {
 
     protected ListenerDescriptorCreator listenerDescriptorCreator;
 
-    protected ActionEventListener actionEventListener;
-
     /**
      * Project files watcher. When project file is changed, user will be asked
      * to confirm loading the changes
@@ -101,7 +101,6 @@ public class ProjectController {
 
         adapterMapping = new AdapterMapping();
 
-        actionEventListener = new ActionEventListener(this);
     }
 
     public Project getProject() {
@@ -343,148 +342,6 @@ public class ProjectController {
         }
     }
 
-    /**
-     * @since 4.1
-     */
-    public void moveBackward(){
-        int size = controllerStateHistory.size();
-        if (size == 0)
-            return;
-
-        int i = controllerStateHistory.indexOf(currentState);
-        ControllerState cs;
-        if (size == 1) {
-            cs = controllerStateHistory.get(0);
-        }
-        else {
-            int counter = 0;
-            while (true) {
-                if (i < 0) {
-                    // a new state got created without it being saved.
-                    try {
-                        cs = controllerStateHistory.get(size - 2);
-                    } catch (ArrayIndexOutOfBoundsException ex) {
-                        cs = controllerStateHistory.get(size - 1);
-                    }
-                } else if (i - 1 >= 0) {
-                    // move to the previous one
-                    cs = controllerStateHistory.get(i - 1);
-                } else {
-                    // wrap around
-                    cs = controllerStateHistory.get(size - 1);
-                }
-                if (!cs.isEquivalent(currentState)) {
-                    break;
-                }
-                // if it doesn't find it within 5 tries it is probably stuck in a loop
-                if (++counter > 5) {
-                    break;
-                }
-                i--;
-            }
-        }
-        runDisplayEvent(cs);
-
-    }
-
-    /**
-     * @since 4.1
-     */
-    public void moveForward() {
-        int size = controllerStateHistory.size();
-        if (size == 0)
-            return;
-
-        int i = controllerStateHistory.indexOf(currentState);
-        ControllerState cs;
-        if (size == 1) {
-            cs = controllerStateHistory.get(0);
-        }
-        else {
-            int counter = 0;
-            while (true) {
-                if (i < 0) {
-                    // a new state got created without it being saved.
-                    // just move to the beginning of the list
-                    cs = controllerStateHistory.get(0);
-                } else if (i + 1 < size) {
-                    // move forward
-                    cs = controllerStateHistory.get(i + 1);
-                } else {
-                    // wrap around
-                    cs = controllerStateHistory.get(0);
-                }
-                if (!cs.isEquivalent(currentState)) {
-                    break;
-                }
-
-                // if it doesn't find it within 5 tries it is probably stuck in
-                // a loop
-                if (++counter > 5) {
-                    break;
-                }
-                i++;
-            }
-        }
-        runDisplayEvent(cs);
-    }
-
-    private void runDisplayEvent(ControllerState cs) {
-        // reset the current state to the one we just navigated to
-        currentState = cs;
-        DisplayEvent de = cs.getEvent();
-        if (de == null) {
-            return;
-        }
-
-        // make sure that isRefiring is turned off prior to exiting this routine
-        // this flag is used to tell the controller to not create new states
-        // when we are refiring the event that we saved earlier
-        currentState.setRefiring(true);
-
-        // the order of the following is checked in most specific to generic
-        // because of the inheritance hierarchy
-        de.setRefired(true);
-        if (de instanceof EntityDisplayEvent) {
-            if(de instanceof DbEntityDisplayEvent) {
-                DbEntityDisplayEvent ede = (DbEntityDisplayEvent) de;
-                ede.setEntityChanged(true);
-                fireEvent(ede);
-            } else if(de instanceof ObjEntityDisplayEvent) {
-                ObjEntityDisplayEvent ede = (ObjEntityDisplayEvent) de;
-                ede.setEntityChanged(true);
-                fireEvent(ede);
-            }
-        } else if (de instanceof EmbeddableDisplayEvent) {
-            EmbeddableDisplayEvent ede = (EmbeddableDisplayEvent) de;
-            ede.setEmbeddableChanged(true);
-            fireEvent(ede);
-        } else if (de instanceof ProcedureDisplayEvent) {
-            ProcedureDisplayEvent pde = (ProcedureDisplayEvent) de;
-            pde.setProcedureChanged(true);
-            fireEvent(pde);
-        } else if (de instanceof QueryDisplayEvent) {
-            QueryDisplayEvent qde = (QueryDisplayEvent) de;
-            qde.setQueryChanged(true);
-            fireEvent(qde);
-        } else if (de instanceof DataMapDisplayEvent) {
-            DataMapDisplayEvent dmde = (DataMapDisplayEvent) de;
-            dmde.setDataMapChanged(true);
-            fireEvent(dmde);
-        } else if (de instanceof DataNodeDisplayEvent) {
-            DataNodeDisplayEvent dnde = (DataNodeDisplayEvent) de;
-            dnde.setDataNodeChanged(true);
-            fireEvent(dnde);
-        } else if (de instanceof DomainDisplayEvent) {
-            DomainDisplayEvent dde = (DomainDisplayEvent) de;
-            dde.setDomainChanged(true);
-            fireEvent(dde);
-        }
-
-        // turn off refiring
-        currentState.setRefiring(false);
-    }
-
     public void addDataMap(Object src, DataMap map) {
         addDataMap(src, map, true);
     }
@@ -652,10 +509,6 @@ public class ProjectController {
      */
     public com.google.inject.Injector getBootiqueInjector() {
         return bootiqueInjector;
-    }
-
-    public void updateActionEventListeners() {
-        actionEventListener.initListeners();
     }
 
     public AdapterMapping getAdapterMapping() {

@@ -19,7 +19,7 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.event.DataMapListener;
+import org.apache.cayenne.modeler.event.listener.MultipleObjectsDisplayListener;
 
 import java.util.EventListener;
 import java.util.EventObject;
