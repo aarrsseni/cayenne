@@ -17,17 +17,27 @@
  *  under the License.
  ****************************************************************/
 
-package org.apache.cayenne.modeler.action;
-
-//TODO fix it when will be able to inject services in tests
-public class CreateNodeActionTest {
-
+//package org.apache.cayenne.modeler.action;
+//
+//import org.apache.cayenne.configuration.DataChannelDescriptor;
+//import org.apache.cayenne.configuration.DataNodeDescriptor;
+//import org.apache.cayenne.conn.DataSourceInfo;
+//import org.apache.cayenne.modeler.services.DefaultNodeService;
+//import org.apache.cayenne.modeler.services.NodeService;
+//import org.junit.Test;
+//
+//import static junit.framework.TestCase.assertSame;
+//import static org.junit.Assert.assertNotNull;
+//
+////TODO fix it when will be able to inject services in tests
+//public class CreateNodeActionTest {
+//
 //    @Test
 //    public void testCreateDataNode() {
-//        CreateNodeAction action;
+//        NodeService action;
 //
 //        try {
-//            action = new CreateNodeAction();
+//            action = new DefaultNodeService();
 //        }
 //        catch (InternalError e) {
 //            // caused by headless server running the tests ...
@@ -37,7 +47,7 @@ public class CreateNodeActionTest {
 //
 //        DataChannelDescriptor domain = new DataChannelDescriptor();
 //        domain.setName("aa");
-//        DataNodeDescriptor node = action.nodeService.buildDataNode();
+//        DataNodeDescriptor node = action.buildDataNode();
 //
 //        assertNotNull(node);
 //        assertNotNull(node.getName());
@@ -48,4 +58,4 @@ public class CreateNodeActionTest {
 //        assertSame("Project DataNode must not wrap the DataSource", ds1, node
 //                .getDataSourceDescriptor());
 //    }
-}
+//}

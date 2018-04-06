@@ -27,6 +27,7 @@ import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.*;
 import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.*;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.CellRenderers;
 import org.apache.cayenne.modeler.util.Comparators;

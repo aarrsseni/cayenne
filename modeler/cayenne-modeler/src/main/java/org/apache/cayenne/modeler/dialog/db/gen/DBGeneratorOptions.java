@@ -28,20 +28,17 @@ import org.apache.cayenne.modeler.dialog.ValidationResultBrowser;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.pref.DBGeneratorDefaults;
-import org.apache.cayenne.modeler.pref.CoreDbAdapterFactory;
+import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.DbAdapterInfo;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
 import org.apache.cayenne.validation.ValidationResult;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.Component;
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -69,14 +66,14 @@ public class DBGeneratorOptions extends CayenneController {
 
     protected ProjectController projectController;
 
-    protected CoreDbAdapterFactory dbAdapterFactory;
+    protected DbService dbService;
 
     public DBGeneratorOptions(ProjectController projectController, String title, Collection<DataMap> dataMaps) {
         super();
 
         this.projectController = projectController;
 
-        this.dbAdapterFactory = getProjectController().getBootiqueInjector().getInstance(CoreDbAdapterFactory.class);
+        this.dbService = getProjectController().getBootiqueInjector().getInstance(DbService.class);
 
         this.dataMaps = dataMaps;
         this.tables = new TableSelectorController(projectController);
@@ -171,7 +168,7 @@ public class DBGeneratorOptions extends CayenneController {
      */
     protected void prepareGenerator() {
         try {
-            DbAdapter adapter = dbAdapterFactory.createAdapter(connectionInfo);
+            DbAdapter adapter = dbService.createDbAdapter(connectionInfo);
             generators = new ArrayList<>();
             for (DataMap dataMap : dataMaps) {
                 this.generators.add(new DbGenerator(
@@ -264,7 +261,9 @@ public class DBGeneratorOptions extends CayenneController {
             return;
         }
 
-        this.connectionInfo = connectWizard.getConnectionInfo();
+        DbService dbService = projectController.getBootiqueInjector().getInstance(DbService.class);
+
+        this.connectionInfo = dbService.getDbConnectionInfo();
 
         refreshGeneratorAction();
 
@@ -278,7 +277,7 @@ public class DBGeneratorOptions extends CayenneController {
             }
 
             try {
-                generator.runGenerator(connectWizard.getDataSource());
+                generator.runGenerator(dbService.getDataSource());
                 failures.add(generator.getFailures());
             } catch (Throwable th) {
                 reportError("Schema Generation Error", th);

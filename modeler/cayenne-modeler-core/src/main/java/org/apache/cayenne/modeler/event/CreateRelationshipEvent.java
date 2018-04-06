@@ -4,6 +4,7 @@ import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.modeler.event.listener.CreateRelationshipListener;
 
 import java.util.EventListener;
 import java.util.EventObject;

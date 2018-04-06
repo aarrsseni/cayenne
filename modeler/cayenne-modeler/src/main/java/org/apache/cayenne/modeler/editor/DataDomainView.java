@@ -29,7 +29,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
 import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.pref.RenamedPreferences;
 import org.apache.cayenne.util.Util;

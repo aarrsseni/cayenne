@@ -34,9 +34,9 @@ import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
 import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayListener;
+import org.apache.cayenne.modeler.event.listener.EmbeddableAttributeDisplayListener;
 import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayListener;
+import org.apache.cayenne.modeler.event.listener.EmbeddableDisplayListener;
 
 public class EmbeddableTabbedView extends JTabbedPane implements
         EmbeddableAttributeDisplayListener, EmbeddableDisplayListener {

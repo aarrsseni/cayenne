@@ -2,7 +2,7 @@ package org.apache.cayenne.modeler.action.listener;
 
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.LinkDataMapEvent;
-import org.apache.cayenne.modeler.event.LinkDataMapListener;
+import org.apache.cayenne.modeler.event.listener.LinkDataMapListener;
 import org.apache.cayenne.modeler.undo.LinkDataMapUndoableEdit;
 
 public class LinkDataMapActionListener implements LinkDataMapListener{

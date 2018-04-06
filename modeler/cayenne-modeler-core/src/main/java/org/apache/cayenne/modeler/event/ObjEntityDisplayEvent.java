@@ -4,6 +4,7 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
 
 import java.util.EventListener;
 

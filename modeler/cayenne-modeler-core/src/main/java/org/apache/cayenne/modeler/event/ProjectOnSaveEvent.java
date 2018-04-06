@@ -18,8 +18,8 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.event;
 
-import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.event.CayenneEvent;
+import org.apache.cayenne.modeler.event.listener.ProjectOnSaveListener;
 
 import java.util.EventListener;
 

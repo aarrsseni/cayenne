@@ -2,7 +2,7 @@ package org.apache.cayenne.modeler.action.listener;
 
 import org.apache.cayenne.modeler.CayenneModelerController;
 import org.apache.cayenne.modeler.event.ProjectOpenEvent;
-import org.apache.cayenne.modeler.event.ProjectOpenListener;
+import org.apache.cayenne.modeler.event.listener.ProjectOpenListener;
 
 public class ProjectOpenActionListener implements ProjectOpenListener{
 

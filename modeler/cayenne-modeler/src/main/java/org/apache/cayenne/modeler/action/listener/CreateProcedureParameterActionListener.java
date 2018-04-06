@@ -3,7 +3,7 @@ package org.apache.cayenne.modeler.action.listener;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.CreateProcedureParameterEvent;
-import org.apache.cayenne.modeler.event.CreateProcedureParameterListener;
+import org.apache.cayenne.modeler.event.listener.CreateProcedureParameterListener;
 import org.apache.cayenne.modeler.undo.CreateProcedureParameterUndoableEdit;
 
 public class CreateProcedureParameterActionListener implements CreateProcedureParameterListener{

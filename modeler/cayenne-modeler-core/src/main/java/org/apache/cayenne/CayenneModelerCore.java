@@ -50,7 +50,7 @@ public class CayenneModelerCore implements Module{
 
     @Override
     public void configure(Binder binder) {
-        binder.bind(ClassLoadingService.class).to(FileClassLoadingService.class);
+        binder.bind(ClassLoadingService.class).to(FileClassLoadingService.class).in(Singleton.class);
         binder.bind(CayenneProjectPreferences.class).in(Singleton.class);
         binder.bind(ConfigurationNodeParentGetter.class).to(DefaultConfigurationNodeParentGetter.class);
         binder.bind(ProjectController.class).in(Singleton.class);
@@ -75,7 +75,8 @@ public class CayenneModelerCore implements Module{
         binder.bind(GenerateCodeService.class).to(DefaultGenerateCodeService.class);
         binder.bind(SaveService.class).to(DefaultSaveService.class);
         binder.bind(EOModelService.class).to(DefaultEOModelService.class);
-        binder.bind(DbService.class).to(DefaultDbService.class);
+        binder.bind(DbService.class).to(DefaultDbService.class).in(Singleton.class);
+        binder.bind(NavigationService.class).to(DefaultNavigationService.class);
 
         contributeModuleClass(binder).addBinding().to(ProjectModule.class);
         addModuleClass(binder, new ProjectModule());

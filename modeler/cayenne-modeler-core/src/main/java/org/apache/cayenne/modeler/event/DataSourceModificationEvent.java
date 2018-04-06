@@ -19,8 +19,8 @@
 
 package org.apache.cayenne.modeler.event;
 
-import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.event.MapEvent;
+import org.apache.cayenne.modeler.event.listener.DataSourceModificationListener;
 
 import java.util.EventListener;
 

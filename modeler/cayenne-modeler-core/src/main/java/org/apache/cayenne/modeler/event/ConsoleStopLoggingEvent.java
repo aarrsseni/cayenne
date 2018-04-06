@@ -1,6 +1,6 @@
 package org.apache.cayenne.modeler.event;
 
-import org.apache.cayenne.configuration.event.DataMapListener;
+import org.apache.cayenne.modeler.event.listener.ConsoleStopLoggingListener;
 
 import java.util.EventListener;
 import java.util.EventObject;

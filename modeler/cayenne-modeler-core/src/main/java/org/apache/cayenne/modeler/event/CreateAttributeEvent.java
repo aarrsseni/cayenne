@@ -1,6 +1,7 @@
 package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.map.*;
+import org.apache.cayenne.modeler.event.listener.CreateAttributeListener;
 
 import java.util.EventListener;
 import java.util.EventObject;

@@ -1,6 +1,6 @@
 package org.apache.cayenne.modeler.event;
 
-import org.apache.cayenne.configuration.event.DataMapListener;
+import org.apache.cayenne.modeler.event.listener.ProjectOpenListener;
 import org.apache.cayenne.project.Project;
 
 import java.util.EventListener;

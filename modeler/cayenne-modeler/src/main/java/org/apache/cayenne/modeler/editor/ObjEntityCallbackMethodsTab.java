@@ -21,7 +21,7 @@ package org.apache.cayenne.modeler.editor;
 import org.apache.cayenne.map.CallbackMap;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
 
 import java.awt.event.ComponentAdapter;

@@ -20,7 +20,7 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
-import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.services.NavigationService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
@@ -30,7 +30,7 @@ import java.awt.event.ActionEvent;
 public class NavigateBackwardAction extends CayenneAction {
 
     @Inject
-    public ProjectController projectController;
+    public NavigationService navigationService;
 
     public static final String getActionName() {
         return "Move Backward";
@@ -52,6 +52,6 @@ public class NavigateBackwardAction extends CayenneAction {
      * Moves to the next element in the navigation history
      */
     public void performAction(ActionEvent e) {
-        projectController.moveBackward();
+        navigationService.moveBackward();
     }
 }

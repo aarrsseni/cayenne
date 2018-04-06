@@ -19,6 +19,8 @@
 
 package org.apache.cayenne.modeler.event;
 
+import org.apache.cayenne.modeler.event.listener.ProjectDirtyEventListener;
+
 import java.util.EventListener;
 import java.util.EventObject;
 

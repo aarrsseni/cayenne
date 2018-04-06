@@ -21,6 +21,7 @@ package org.apache.cayenne.modeler.event;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
+import org.apache.cayenne.modeler.event.listener.DataNodeDisplayListener;
 
 import java.util.EventListener;
 

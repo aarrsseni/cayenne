@@ -23,9 +23,11 @@ import com.google.inject.Inject;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactoryProvider;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.merge.MergerOptions;
+import org.apache.cayenne.modeler.services.DbService;
 
 import java.awt.event.ActionEvent;
 import java.util.Collection;
@@ -37,6 +39,12 @@ public class MigrateAction extends DBWizardAction<DbActionOptionsDialog> {
 
     @Inject
     public Application application;
+
+    @Inject
+    public DbService dbService;
+
+    @Inject
+    public ProjectController projectController;
 
     private boolean dialogShown;
 
@@ -55,13 +63,13 @@ public class MigrateAction extends DBWizardAction<DbActionOptionsDialog> {
             return;
         }
 
-        DataMap map = getProjectController().getCurrentState().getDataMap();
+        DataMap map = projectController.getCurrentState().getDataMap();
         if (map == null) {
             throw new IllegalStateException("No current DataMap selected.");
         }
 
         dialogShown = false;
-        DbActionOptionsDialog optionsDialog = loaderOptionDialog(connectWizard);
+        DbActionOptionsDialog optionsDialog = loaderOptionDialog();
         if(dialogShown && optionsDialog == null) {
             return;
         }
@@ -70,13 +78,12 @@ public class MigrateAction extends DBWizardAction<DbActionOptionsDialog> {
         String selectedSchema = optionsDialog == null ? null : optionsDialog.getSelectedSchema();
 
         MergerTokenFactoryProvider mergerTokenFactoryProvider =
-                application.getInjector().getInstance(MergerTokenFactoryProvider.class);
+                projectController.getInjector().getInstance(MergerTokenFactoryProvider.class);
 
         // ... show dialog...
         new MergerOptions(
-                getProjectController(),
+                projectController,
                 "Migrate DB Schema: Options",
-                connectWizard.getConnectionInfo(),
                 map, selectedCatalog, selectedSchema, mergerTokenFactoryProvider).startupAction();
     }
 

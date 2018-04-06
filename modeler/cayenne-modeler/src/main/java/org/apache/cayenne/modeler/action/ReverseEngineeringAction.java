@@ -25,7 +25,10 @@ import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoadResultDialog;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoaderContext;
+import org.apache.cayenne.modeler.dialog.db.load.DbLoaderData;
+import org.apache.cayenne.modeler.dialog.db.load.DbLoaderOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.load.LoadDataMapTask;
+import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.editor.DbImportController;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
@@ -58,6 +61,12 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
     @Inject
     public Application application;
 
+    @Inject
+    public DbService dbService;
+
+    @Inject
+    DbLoaderContext context;
+
     public ReverseEngineeringAction() {
         super(getActionName());
     }
@@ -67,7 +76,7 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
     }
 
     public void performAction() {
-        final DbLoaderContext context = new DbLoaderContext(application.getMetaData());
+//        final DbLoaderContext context = new DbLoaderContext(application.getMetaData());
         DBConnectionInfo connectionInfo;
         if (!datamapPreferencesExist()) {
             final DataSourceWizard connectWizard = dataSourceWizardDialog(DIALOG_TITLE);
@@ -79,9 +88,8 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
         } else {
             connectionInfo = getConnectionInfoFromPreferences();
         }
-        context.setProjectController(getProjectController());
         try {
-            context.setConnection(connectionInfo.makeDataSource(getApplication().getClassLoadingService()).getConnection());
+            dbService.setConnection(dbService.createConnection());
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(
                     Application.getFrame(),
@@ -99,7 +107,7 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
 
         if(!context.buildConfig(connectionInfo, view)) {
             try {
-                context.getConnection().close();
+                dbService.getConnection().close();
             } catch (SQLException ignored) {}
             return;
         }

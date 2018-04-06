@@ -22,7 +22,7 @@ package org.apache.cayenne.modeler;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.event.*;
 import org.apache.cayenne.map.event.*;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.*;
 
 import java.util.EventListener;
 import java.util.EventObject;

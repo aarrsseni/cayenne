@@ -25,6 +25,9 @@ import org.apache.cayenne.modeler.action.RevertAction;
 import org.apache.cayenne.modeler.action.SaveAction;
 import org.apache.cayenne.modeler.action.SaveAsAction;
 import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.CallbackMethodListener;
+import org.apache.cayenne.modeler.event.listener.EntityListenerListener;
+import org.apache.cayenne.modeler.event.listener.ProjectDirtyEventListener;
 
 /**
  * @since 4.1
