@@ -22,14 +22,12 @@ package org.apache.cayenne.modeler.action;
 import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.RecentFileListEvent;
 import org.apache.cayenne.modeler.services.SaveService;
 import org.apache.cayenne.project.Project;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
 
 /**
  * An action that saves a project using to its default location.
@@ -69,17 +67,7 @@ public class SaveAction extends SaveAsAction {
         if (p == null || p.getConfigurationResource() == null) {
             return super.saveAll();
         }
-        File oldProjectFile = new File(p.getConfigurationResource().getURL().toURI());
 
-        saveService.saveAll(p);
-
-        File newProjectFile = new File(p.getConfigurationResource().getURL().toURI());
-        application.getFrameController().changePathInLastProjListAction(oldProjectFile, newProjectFile);
-        application.getFrame().fireRecentFileListChanged(new RecentFileListEvent(this));
-
-        // Reset the watcher now
-        projectController.getFileChangeTracker().reconfigure();
-
-        return true;
+        return saveService.saveAll();
     }
 }

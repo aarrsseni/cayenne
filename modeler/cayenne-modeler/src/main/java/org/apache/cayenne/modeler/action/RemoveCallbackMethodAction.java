@@ -19,13 +19,9 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
-import org.apache.cayenne.modeler.editor.CallbackType;
-import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
 import org.apache.cayenne.modeler.services.CallbackMethodService;
-import org.apache.cayenne.modeler.undo.RemoveCallbackMethodUndoableEdit;
+import org.apache.cayenne.modeler.services.util.RemoveServiceStatus;
 
 import java.awt.event.ActionEvent;
 
@@ -36,12 +32,6 @@ import java.awt.event.ActionEvent;
  * @version 1.0 Oct 30, 2007
  */
 public class RemoveCallbackMethodAction extends RemoveAction {
-
-    @Inject
-    public Application application;
-
-    @Inject
-    public ProjectController projectController;
 
     @Inject
     public CallbackMethodService callbackMethodService;
@@ -88,30 +78,12 @@ public class RemoveCallbackMethodAction extends RemoveAction {
      */
     public void performAction(ActionEvent e, boolean allowAsking) {
         ConfirmRemoveDialog dialog = getConfirmDeleteDialog(allowAsking);
-        
-        ObjCallbackMethod[] methods = projectController.getCurrentState().getCallbackMethods();
 
-        if ((methods.length == 1 && dialog.shouldDelete("callback method", methods[0].getName()))
-        		|| (methods.length > 1 && dialog.shouldDelete("selected callback methods"))) {
-        	removeCallbackMethods(e);
+        RemoveServiceStatus status = callbackMethodService.isRemove();
+
+        if(status != null && dialog.shouldDelete(status.getType(), status.getName())) {
+            callbackMethodService.remove();
         }
-    }
-
-    /**
-     * base logic for callback method removing
-     * @param actionEvent event
-     */
-    private void removeCallbackMethods(ActionEvent actionEvent) {
-        CallbackType callbackType = projectController.getCurrentState().getCallbackType();
-
-        ObjCallbackMethod[] callbackMethods = projectController.getCurrentState().getCallbackMethods();
-
-        for (ObjCallbackMethod callbackMethod : callbackMethods) {
-            callbackMethodService.removeCallbackMethod(callbackType, callbackMethod.getName());
-        }
-        
-        application.getUndoManager().addEdit(
-        		new RemoveCallbackMethodUndoableEdit(callbackType, callbackMethods));
     }
 }
 

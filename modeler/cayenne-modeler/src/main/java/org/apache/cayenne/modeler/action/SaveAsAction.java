@@ -26,13 +26,11 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.validator.ValidatorDialog;
 import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
-import org.apache.cayenne.modeler.event.RecentFileListEvent;
+import org.apache.cayenne.modeler.services.ProjectService;
+import org.apache.cayenne.modeler.services.SaveService;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.pref.RenamedPreferences;
 import org.apache.cayenne.project.Project;
-import org.apache.cayenne.project.ProjectSaver;
 import org.apache.cayenne.project.validation.ProjectValidator;
-import org.apache.cayenne.resource.URLResource;
 import org.apache.cayenne.validation.ValidationResult;
 
 import javax.swing.*;
@@ -40,7 +38,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.prefs.Preferences;
 
 /**
  * A "Save As" action that allows user to pick save location.
@@ -54,7 +51,14 @@ public class SaveAsAction extends CayenneAction {
     @Inject
     public ProjectController projectController;
 
+    @Inject
     private ProjectOpener fileChooser;
+
+    @Inject
+    public ProjectService projectService;
+
+    @Inject
+    public SaveService saveService;
 
     public static String getActionName() {
         return "Save As...";
@@ -80,76 +84,13 @@ public class SaveAsAction extends CayenneAction {
      * only on successful save, master files are replaced with new versions.
      */
     protected boolean saveAll() throws Exception {
-        Project p = getCurrentProject();
 
-        String oldPath = null;
-        if (p.getConfigurationResource() != null) {
-            oldPath = p.getConfigurationResource().getURL().getPath();
-        }
-
-        File projectDir = fileChooser.newProjectDir(Application.getFrame(), p);
+        File projectDir = fileChooser.newProjectDir(Application.getFrame(), projectController.getProject());
         if (projectDir == null) {
             return false;
         }
 
-        if (projectDir.exists() && !projectDir.canWrite()) {
-            JOptionPane.showMessageDialog(Application.getFrame(), "Can't save project - unable to write to file \""
-                    + projectDir.getPath() + "\"", "Can't Save Project", JOptionPane.OK_OPTION);
-            return false;
-        }
-
-        projectController.getFileChangeTracker().pauseWatching();
-
-        URLResource res = new URLResource(projectDir.toURI().toURL());
-
-        ProjectSaver saver = projectController.getInjector().getInstance(ProjectSaver.class);
-
-        boolean isNewProject = p.getConfigurationResource() == null;
-        Preferences tempOldPref = null;
-        if (isNewProject) {
-            tempOldPref = application.getMainPreferenceForProject();
-        }
-
-        saver.saveAs(p, res);
-
-        if (oldPath != null && oldPath.length() != 0
-                && !oldPath.equals(p.getConfigurationResource().getURL().getPath())) {
-
-            String newName = p.getConfigurationResource().getURL().getPath().replace(".xml", "");
-            String oldName = oldPath.replace(".xml", "");
-
-            Preferences oldPref = projectController.getPreferenceForProject();
-            String projPath = oldPref.absolutePath().replace(oldName, "");
-            Preferences newPref = projectController.getPreferenceForProject().node(projPath + newName);
-            RenamedPreferences.copyPreferences(newPref, getProjectController().getPreferenceForProject(), false);
-        } else if (isNewProject) {
-            if (tempOldPref != null) {
-
-                String newProjectName = application.getNewProjectTemporaryName();
-
-                if (tempOldPref.absolutePath().contains(newProjectName)) {
-
-                    String projPath = tempOldPref.absolutePath().replace("/" + newProjectName, "");
-                    String newName = p.getConfigurationResource().getURL().getPath().replace(".xml", "");
-
-                    Preferences newPref = application.getMainPreferenceForProject().node(projPath + newName);
-
-                    RenamedPreferences.copyPreferences(newPref, tempOldPref, false);
-                    tempOldPref.removeNode();
-                }
-            }
-        }
-
-        RenamedPreferences.removeNewPreferences();
-
-        File file = new File(p.getConfigurationResource().getURL().toURI());
-        application.getFrameController().addToLastProjListAction(file);
-        Application.getFrame().fireRecentFileListChanged(new RecentFileListEvent(this));
-
-        // Reset the watcher now
-        projectController.getFileChangeTracker().reconfigure();
-
-        return true;
+        return saveService.saveAll(projectDir);
     }
 
     /**

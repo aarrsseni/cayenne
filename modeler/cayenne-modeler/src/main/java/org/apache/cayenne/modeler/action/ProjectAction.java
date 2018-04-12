@@ -38,6 +38,9 @@ public class ProjectAction extends CayenneAction {
     @Inject
     public SaveAction saveAction;
 
+    @Inject
+    public ProjectController projectController;
+
     public static String getActionName() {
         return "Close Project";
     }
@@ -65,7 +68,7 @@ public class ProjectAction extends CayenneAction {
     /** Returns true if successfully closed project, false otherwise. */
     public boolean closeProject(boolean checkUnsaved) {
         // check if there is a project...
-        if (getProjectController() == null || getProjectController().getProject() == null) {
+        if (projectController == null || projectController.getProject() == null) {
             return true;
         }
 
@@ -88,22 +91,18 @@ public class ProjectAction extends CayenneAction {
      * Returns false if cancel closing the window, true otherwise.
      */
     public boolean checkSaveOnClose() {
-        ProjectController projectController = getProjectController();
         if (projectController != null && projectController.isDirty()) {
+
             UnsavedChangesDialog dialog = new UnsavedChangesDialog(Application.getFrame());
             dialog.show();
 
             if (dialog.shouldCancel()) {
                 // discard changes and DO NOT close
                 return false;
-            }
-            else if (dialog.shouldSave()) {
+            } else if (dialog.shouldSave()) {
                 // save changes and close
-                ActionEvent e = new ActionEvent(
-                        this,
-                        ActionEvent.ACTION_PERFORMED,
-                        "SaveAll");
-                saveAction.actionPerformed(e);
+                saveAction.performAction();
+
                 if (projectController.isDirty()) {
                     // save was canceled... do not close
                     return false;

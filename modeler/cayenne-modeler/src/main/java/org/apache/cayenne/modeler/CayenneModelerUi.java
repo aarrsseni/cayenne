@@ -76,8 +76,6 @@ public class CayenneModelerUi implements com.google.inject.Module{
 
         setModuleClass(binder, new CayenneModelerModule());
 
-
-
         setActionClass(binder, new ExitAction());
         setActionClass(binder, new ProjectAction());
         setActionClass(binder, new NewProjectAction());

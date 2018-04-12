@@ -1,5 +1,12 @@
+/**
+ * @since 4.1
+ *
+ */
 package org.apache.cayenne.modeler.dialog.db.load;
 
+/**
+ * @since 4.1
+ */
 public class DbLoaderData {
     private String catalog;
     private String schema;

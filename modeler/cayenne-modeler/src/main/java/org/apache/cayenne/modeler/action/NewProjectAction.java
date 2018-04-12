@@ -20,6 +20,7 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.services.ProjectService;
 
 import javax.swing.*;
@@ -31,6 +32,9 @@ public class NewProjectAction extends ProjectAction {
 
     @Inject
     public ProjectService newProjectService;
+
+    @Inject
+    public ProjectController projectController;
 
     public static String getActionName() {
         return "New Project";
@@ -53,7 +57,7 @@ public class NewProjectAction extends ProjectAction {
 
     public void performAction(ActionEvent e) {
         // Save and close (if needed) currently open project.
-        if (getCurrentProject() != null && !closeProject(true)) {
+        if (projectController.getProject() != null && !closeProject(true)) {
             return;
         }
         newProjectService.newProject();

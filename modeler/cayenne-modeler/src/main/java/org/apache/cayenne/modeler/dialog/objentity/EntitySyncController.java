@@ -24,8 +24,9 @@ import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
 import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.services.NameGeneratorService;
 import org.apache.cayenne.modeler.util.CayenneController;
-import org.apache.cayenne.modeler.util.NameGeneratorPreferences;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -39,12 +40,15 @@ public class EntitySyncController extends CayenneController {
     private ObjEntity objEntity;
     private EntitySyncDialog view;
 
+    private NameGeneratorService nameGeneratorService;
+
     /**
      * Creates a controller for synchronizing all ObjEntities mapped to a given DbEntity.
      */
     public EntitySyncController(CayenneController parent, DbEntity dbEntity) {
         super(parent);
         this.dbEntity = dbEntity;
+        this.nameGeneratorService = Application.getInstance().getProjectController().getBootiqueInjector().getInstance(NameGeneratorService.class);
     }
 
     /**
@@ -61,12 +65,11 @@ public class EntitySyncController extends CayenneController {
             return null;
         }
 
-
         ObjectNameGenerator namingStrategy;
         try {
-            namingStrategy = NameGeneratorPreferences.getInstance().createNamingStrategy(application);
+            namingStrategy = nameGeneratorService.createNamingStrategy();
         } catch (Throwable e) {
-            namingStrategy = NameGeneratorPreferences.defaultNameGenerator();
+            namingStrategy = nameGeneratorService.defaultNameGenerator();
         }
 
         // TODO: Modeler-controlled defaults for all the hardcoded boolean flags here.

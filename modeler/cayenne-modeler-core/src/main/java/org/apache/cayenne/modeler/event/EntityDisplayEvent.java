@@ -23,6 +23,9 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
+
+import java.util.EventListener;
 
 /**
  * Represents a display event of an Entity.
@@ -93,5 +96,9 @@ public class EntityDisplayEvent extends DataMapDisplayEvent {
 
     public boolean isMainTabFocus() {
         return mainTabFocus;
+    }
+
+    public Class<? extends EventListener> getEventListener() {
+        return DomainDisplayListener.class;
     }
 }

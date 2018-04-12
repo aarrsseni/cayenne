@@ -21,14 +21,11 @@ package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.CayenneModelerController;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ErrorDebugDialog;
-import org.apache.cayenne.project.Project;
-import org.apache.cayenne.project.ProjectLoader;
-import org.apache.cayenne.project.upgrade.UpgradeMetaData;
-import org.apache.cayenne.project.upgrade.UpgradeService;
+import org.apache.cayenne.modeler.services.OpenProjectService;
+import org.apache.cayenne.modeler.services.util.OpenProjectStatus;
 import org.apache.cayenne.resource.Resource;
-import org.apache.cayenne.resource.URLResource;
 import org.apache.cayenne.swing.control.FileMenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,31 +35,21 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OpenProjectAction extends ProjectAction {
 
     @Inject
     public Application application;
 
+    @Inject
+    public ProjectController projectController;
+
+    @Inject
+    public OpenProjectService openProjectService;
+
     private static Logger logObj = LoggerFactory.getLogger(OpenProjectAction.class);
 
-    private static final Map<String, String> PROJECT_TO_MODELER_VERSION;
-    static {
-        // Correspondence between project version and latest Modeler version that can upgrade it.
-        // Modeler v4.1 can handle versions from 3.1 and 4.0 (including intermediate versions) modeler.
-        Map<String, String> map = new HashMap<>();
-        map.put("1.0",      "v3.0");
-        map.put("1.1",      "v3.0");
-        map.put("1.2",      "v3.0");
-        map.put("2.0",      "v3.0");
-        map.put("3.0.0.1",  "v3.1");
-        PROJECT_TO_MODELER_VERSION = Collections.unmodifiableMap(map);
-    }
-
+    @Inject
     private ProjectOpener fileChooser;
 
     public static String getActionName() {
@@ -71,7 +58,6 @@ public class OpenProjectAction extends ProjectAction {
 
     public OpenProjectAction() {
         super(getActionName());
-        this.fileChooser = new ProjectOpener();
         setAlwaysOn(true);
     }
 
@@ -89,7 +75,7 @@ public class OpenProjectAction extends ProjectAction {
     public void performAction(ActionEvent e) {
 
         // Save and close (if needed) currently open project.
-        if (getProjectController() != null && !checkSaveOnClose()) {
+        if (projectController != null && !checkSaveOnClose()) {
             return;
         }
 
@@ -112,7 +98,7 @@ public class OpenProjectAction extends ProjectAction {
 
         if (f != null) {
             // by now if the project is unsaved, this has been a user choice...
-            if (getProjectController() != null && !closeProject(false)) {
+            if (projectController != null && !closeProject(false)) {
                 return;
             }
 
@@ -125,64 +111,32 @@ public class OpenProjectAction extends ProjectAction {
     /** Opens specified project file. File must already exist. */
     public void openProject(File file) {
         try {
-            if (!file.exists()) {
-                JOptionPane.showMessageDialog(
-                        Application.getFrame(),
-                        "Can't open project - file \"" + file.getPath() + "\" does not exist",
-                        "Can't Open Project",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            OpenProjectStatus status = openProjectService.canOpen(file);
 
-            CayenneModelerController controller = Application.getInstance().getFrameController();
-            controller.addToLastProjListAction(file);
-
-            URL url = file.toURI().toURL();
-            Resource rootSource = new URLResource(url);
-
-            UpgradeService upgradeService = application.getInjector().getInstance(UpgradeService.class);
-            UpgradeMetaData metaData = upgradeService.getUpgradeType(rootSource);
-            switch (metaData.getUpgradeType()) {
-                case INTERMEDIATE_UPGRADE_NEEDED:
-                    String modelerVersion = PROJECT_TO_MODELER_VERSION.get(metaData.getProjectVersion());
-                    if(modelerVersion == null) {
-                        modelerVersion = "";
-                    }
-                    JOptionPane.showMessageDialog(Application.getFrame(),
-                                    "Open the project in the older Modeler " + modelerVersion
-                                            + " to do an intermediate upgrade\nbefore you can upgrade to latest version.",
-                                    "Can't Upgrade Project", JOptionPane.ERROR_MESSAGE);
+            Resource rootSource = openProjectService.getRootSource(file);
+            switch (status.getProjectStatus()) {
+                case ERROR:
+                    JOptionPane.showMessageDialog(
+                            Application.getFrame(),
+                            status.getMessage(),
+                            status.getTitle(),
+                            JOptionPane.ERROR_MESSAGE);
                     closeProject(false);
                     return;
-
-                case DOWNGRADE_NEEDED:
-                    JOptionPane.showMessageDialog(Application.getFrame(),
-                                    "Can't open project - it was created using a newer version of the Modeler",
-                                    "Can't Open Project", JOptionPane.ERROR_MESSAGE);
-                    closeProject(false);
-                    return;
-
                 case UPGRADE_NEEDED:
                     if (processUpgrades()) {
-                        rootSource = upgradeService.upgradeProject(rootSource);
+                        rootSource = openProjectService.upgradeResource(rootSource);
                     } else {
                         closeProject(false);
                         return;
                     }
                     break;
             }
-
-            openProjectResourse(rootSource, controller);
+            openProjectService.openProjectResourse(rootSource);
         } catch (Exception ex) {
             logObj.warn("Error loading project file.", ex);
             ErrorDebugDialog.guiWarning(ex, "Error loading project");
         }
-    }
-
-    private Project openProjectResourse(Resource resource, CayenneModelerController controller) {
-        Project project = application.getInjector().getInstance(ProjectLoader.class).loadProject(resource);
-        controller.projectOpenedAction(project);
-        return project;
     }
 
     private boolean processUpgrades() {

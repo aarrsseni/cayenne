@@ -26,7 +26,7 @@ import org.apache.cayenne.modeler.CayenneModelerFrame;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.EditorView;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.GraphDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import java.awt.event.ActionEvent;
@@ -85,7 +85,7 @@ public class ShowGraphEntityAction extends CayenneAction {
                         .getSelectionPath()
                         .getParentPath()
                         .getParentPath());
-        DomainDisplayEvent event = new EntityDisplayEvent(
+        DomainDisplayEvent event = new GraphDisplayEvent(
                 editor.getProjectTreeView(),
                 entity,
                 entity.getDataMap(),

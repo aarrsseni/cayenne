@@ -18,16 +18,15 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.editor;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.GraphDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
 import org.apache.cayenne.modeler.graph.DataDomainGraphTab;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * DataDomain editing tabs container 
@@ -76,7 +75,7 @@ public class DataDomainTabbedView extends JTabbedPane
     }
 
     public void currentDomainChanged(DomainDisplayEvent e) {
-        if (e instanceof EntityDisplayEvent) {
+        if (e instanceof GraphDisplayEvent) {
             //need select an entity
             setSelectedComponent(graphTab);
         }

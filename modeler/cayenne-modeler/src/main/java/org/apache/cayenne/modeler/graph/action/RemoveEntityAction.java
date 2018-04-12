@@ -22,6 +22,7 @@ import com.google.inject.Inject;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.action.RemoveAction;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.graph.GraphBuilder;
@@ -36,6 +37,9 @@ import java.awt.event.ActionEvent;
  */
 public class RemoveEntityAction extends RemoveAction {
     GraphBuilder builder;
+
+    @Inject
+    private Application application;
 
     @Inject
     public ObjEntityService objEntityService;

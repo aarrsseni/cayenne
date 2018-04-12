@@ -1,3 +1,21 @@
+/*****************************************************************
+ *   Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ ****************************************************************/
 package org.apache.cayenne.modeler.services;
 
 import com.google.inject.Inject;
@@ -11,12 +29,14 @@ import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.CreateRelationshipEvent;
-import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
-import org.apache.cayenne.modeler.event.ObjRelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.services.util.RemoveServiceStatus;
 import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.util.DeleteRuleUpdater;
 
+/**
+ * @since 4.1
+ */
 public class DefaultRelationshipService implements RelationshipService{
 
     @Inject
@@ -108,5 +128,52 @@ public class DefaultRelationshipService implements RelationshipService{
                 (DataChannelDescriptor) mediator.getProject().getRootNode());
 
         mediator.fireEvent(rde);
+    }
+
+    @Override
+    public RemoveServiceStatus isRemove() {
+        ObjRelationship[] rels = projectController
+                .getCurrentState()
+                .getObjRels();
+        if (rels != null && rels.length > 0) {
+            if(rels.length == 1) {
+                return new RemoveServiceStatus("ObjRelationship", rels[0].getName());
+            } else {
+                return new RemoveServiceStatus(null, "selected ObjRelationships");
+            }
+        } else {
+            DbRelationship[] dbRels = projectController
+                    .getCurrentState()
+                    .getDbRels();
+            if (dbRels != null && dbRels.length > 0) {
+                if(dbRels.length == 1) {
+                    return new RemoveServiceStatus("DbRelationship", dbRels[0].getName());
+                } else {
+                    return new RemoveServiceStatus(null, "selected DbRelationships");
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void remove() {
+        ObjRelationship[] rels = projectController
+                .getCurrentState()
+                .getObjRels();
+        if(rels != null && rels.length > 0) {
+            ObjEntity entity = projectController.getCurrentState().getObjEntity();
+            removeObjRelationships(entity, rels);
+            projectController.fireEvent(new RemoveObjRelationshipsEvent(this, entity, rels));
+        } else {
+            DbRelationship[] dbRels = projectController
+                    .getCurrentState()
+                    .getDbRels();
+            if(dbRels != null && dbRels.length > 0) {
+                DbEntity entity = projectController.getCurrentState().getDbEntity();
+                removeDbRelationships(entity, dbRels);
+                projectController.fireEvent(new RemoveDbRelationshipsEvent(this, entity, dbRels));
+            }
+        }
     }
 }

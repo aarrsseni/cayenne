@@ -19,20 +19,20 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.Frame;
-import java.io.File;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
+import com.google.inject.Inject;
 import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.OverwriteDialog;
+import org.apache.cayenne.modeler.services.ProjectService;
 import org.apache.cayenne.modeler.util.FileFilters;
 import org.apache.cayenne.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.io.File;
 
 
 /**
@@ -41,6 +41,9 @@ import org.slf4j.LoggerFactory;
  */
 class ProjectOpener extends JFileChooser {
 
+    @Inject
+    public ProjectService projectService;
+
     private static Logger logObj = LoggerFactory.getLogger(ProjectOpener.class);
 
     /**
@@ -48,13 +51,8 @@ class ProjectOpener extends JFileChooser {
      */
     File newProjectDir(Frame f, Project p) {
         if (p != null) {
-            StringBuilder nameProject = new StringBuilder("cayenne");
-            if(((DataChannelDescriptor)p.getRootNode()).getName()!=null){
-                nameProject.append("-").append(((DataChannelDescriptor)p.getRootNode()).getName());
-            }
-            nameProject.append(".xml");
             // configure for application project
-            return newProjectDir(f, nameProject.toString(), FileFilters.getApplicationFilter());
+            return newProjectDir(f, projectService.createNameProject(p), FileFilters.getApplicationFilter());
         } else {
             throw new CayenneRuntimeException("Null project.");
         }

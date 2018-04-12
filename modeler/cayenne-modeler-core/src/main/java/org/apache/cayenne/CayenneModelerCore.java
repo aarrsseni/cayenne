@@ -54,6 +54,7 @@ public class CayenneModelerCore implements Module{
         binder.bind(CayenneProjectPreferences.class).in(Singleton.class);
         binder.bind(ConfigurationNodeParentGetter.class).to(DefaultConfigurationNodeParentGetter.class);
         binder.bind(ProjectController.class).in(Singleton.class);
+        binder.bind(PreferenceService.class).in(Singleton.class);
 
         binder.bind(ProjectService.class).to(DefaultProjectService.class);
         binder.bind(ExitService.class).to(DefaultExitService.class);
