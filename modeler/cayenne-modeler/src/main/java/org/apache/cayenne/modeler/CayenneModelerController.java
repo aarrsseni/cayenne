@@ -30,6 +30,7 @@ import org.apache.cayenne.modeler.event.SaveFlagEvent;
 import org.apache.cayenne.modeler.event.RecentFileListEvent;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.pref.FSPath;
+import org.apache.cayenne.modeler.services.ProjectService;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.FileFilters;
 import org.apache.cayenne.modeler.util.state.ProjectStateUtil;
@@ -77,20 +78,24 @@ public class CayenneModelerController extends CayenneController {
 
     private ModelerActionListener modelerActionListener;
 
+    private ProjectService projectService;
+
     public CayenneModelerController(){}
 
     public CayenneModelerController(Application application) {
         super(application);
 
-        this.frame = new CayenneModelerFrame(application.getActionManager());
-        application.getPlatformInitializer().setupMenus(frame);
         this.projectController = application.getProjectController();
+        this.frame = new CayenneModelerFrame(application.getActionManager(), projectController);
+        application.getPlatformInitializer().setupMenus(frame);
 
         initHelpers();
         this.projectController = new ProjectController(this);
         this.dbImportController = new DbImportController();
 
         this.modelerActionListener = new ModelerActionListener(this);
+
+        projectService = projectController.getBootiqueInjector().getInstance(ProjectService.class);
     }
 
     @Override
@@ -211,11 +216,7 @@ public class CayenneModelerController extends CayenneController {
         frame.repaint();
         frame.setTitle("");
 
-        projectController.setProject(null);
-
-        projectController.fireEvent(new ProjectDirtyEvent(this, false));
-
-        projectController.reset();
+        projectService.projectClosed();
 
         this.updateModelerActionListener();
 
@@ -249,7 +250,7 @@ public class CayenneModelerController extends CayenneController {
         // update preferences
         if (projectController.getProject().getConfigurationResource() != null) {
             getLastDirectory().setDirectory(new File(projectController.getProject().getConfigurationResource().getURL().getPath()));
-            frame.fireRecentFileListChanged(new RecentFileListEvent(this));
+            projectController.fireEvent(new RecentFileListEvent(this));
         }
 
         PROJECT_STATE_UTIL.fireLastState(projectController);
@@ -277,34 +278,6 @@ public class CayenneModelerController extends CayenneController {
 
     public EditorView getEditorView() {
     	return editorView;
-    }
-
-	/** Adds path to the list of last opened projects in preferences. */
-    public void addToLastProjListAction(File file) {
-
-        Preferences prefLastProjFiles = ModelerPreferences.getLastProjFilesPref();
-        List<File> arr = ModelerPreferences.getLastProjFiles();
-        // Add proj path to the preferences
-        // Prevent duplicate entries.
-        if (arr.contains(file)) {
-            arr.remove(file);
-        }
-
-        arr.add(0, file);
-        while (arr.size() > ModelerPreferences.LAST_PROJ_FILES_SIZE) {
-            arr.remove(arr.size() - 1);
-        }
-
-        try {
-            prefLastProjFiles.clear();
-        } catch (BackingStoreException ignored) {
-            // ignore exception
-        }
-
-        int size = arr.size();
-        for (int i = 0; i < size; i++) {
-            prefLastProjFiles.put(String.valueOf(i), arr.get(i).getAbsolutePath());
-        }
     }
 
     /**
@@ -372,7 +345,7 @@ public class CayenneModelerController extends CayenneController {
         }
 
         getLastDirectory().setDirectory(newFile);
-        frame.fireRecentFileListChanged(new RecentFileListEvent(this));
+        projectController.fireEvent(new RecentFileListEvent(this));
     }
 
     public void projectOpened() {

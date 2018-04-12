@@ -18,13 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog;
 
-import java.util.prefs.Preferences;
-
-import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
-
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
+
+import javax.swing.*;
+import java.util.prefs.Preferences;
 
 /**
  * Used to confirm deleting items in the model.
@@ -74,6 +72,9 @@ public class ConfirmRemoveDialog {
     }
 
     public boolean shouldDelete(String type, String name) {
+        if(type == null){
+            return shouldDelete(name);
+        }
         return shouldDelete(String.format("%s named '%s'", type, name));
     }
 

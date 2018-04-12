@@ -21,12 +21,10 @@ package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.map.*;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.services.RelationshipService;
-import org.apache.cayenne.modeler.undo.RemoveRelationshipUndoableEdit;
+import org.apache.cayenne.modeler.services.util.RemoveServiceStatus;
 
 import java.awt.event.ActionEvent;
 
@@ -37,12 +35,6 @@ import java.awt.event.ActionEvent;
  */
 public class RemoveRelationshipAction extends RemoveAction implements
 		MultipleObjectsAction {
-
-	@Inject
-	public ProjectController projectController;
-
-	@Inject
-	public Application application;
 
 	@Inject
 	public RelationshipService relationshipService;
@@ -83,34 +75,10 @@ public class RemoveRelationshipAction extends RemoveAction implements
 	public void performAction(ActionEvent e, boolean allowAsking) {
 		ConfirmRemoveDialog dialog = getConfirmDeleteDialog(allowAsking);
 
-		ObjRelationship[] rels = projectController
-				.getCurrentState()
-				.getObjRels();
-		if (rels != null && rels.length > 0) {
-			if ((rels.length == 1 && dialog.shouldDelete("ObjRelationship",
-					rels[0].getName()))
-					|| (rels.length > 1 && dialog
-							.shouldDelete("selected ObjRelationships"))) {
-				ObjEntity entity = projectController.getCurrentState().getObjEntity();
-				relationshipService.removeObjRelationships(entity, rels);
-				application.getUndoManager().addEdit(
-						new RemoveRelationshipUndoableEdit(entity, rels));
-			}
-		} else {
-			DbRelationship[] dbRels = projectController
-					.getCurrentState()
-					.getDbRels();
-			if (dbRels != null && dbRels.length > 0) {
-				if ((dbRels.length == 1 && dialog.shouldDelete(
-						"DbRelationship", dbRels[0].getName()))
-						|| (dbRels.length > 1 && dialog
-								.shouldDelete("selected DbRelationships"))) {
-					DbEntity entity = projectController.getCurrentState().getDbEntity();
-					relationshipService.removeDbRelationships(entity, dbRels);
-					application.getUndoManager().addEdit(
-							new RemoveRelationshipUndoableEdit(entity, dbRels));
-				}
-			}
+		RemoveServiceStatus status = relationshipService.isRemove();
+
+		if(status != null && dialog.shouldDelete(status.getType(), status.getName())) {
+			relationshipService.remove();
 		}
 	}
 }

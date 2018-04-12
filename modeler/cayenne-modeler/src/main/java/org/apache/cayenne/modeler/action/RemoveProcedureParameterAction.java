@@ -24,6 +24,7 @@ import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.map.ProcedureParameter;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.services.ProcedureParameterService;
+import org.apache.cayenne.modeler.services.util.RemoveServiceStatus;
 
 import java.awt.event.ActionEvent;
 
@@ -72,17 +73,10 @@ public class RemoveProcedureParameterAction extends RemoveAction {
     public void performAction(ActionEvent e, boolean allowAsking) {
         ConfirmRemoveDialog dialog = getConfirmDeleteDialog(allowAsking);
 
-        ProcedureParameter[] params = getProjectController()
-                .getCurrentState()
-                .getProcedureParameters();
-        if (params.length > 0) {
-            if ((params.length == 1 && dialog.shouldDelete(
-                    "procedure parameter",
-                    params[0].getName()))
-                    || (params.length > 1 && dialog
-                            .shouldDelete("selected procedure parameters"))) {
-                procedureParameterService.removeProcedureParameters();
-            }
+        RemoveServiceStatus status = procedureParameterService.isRemove();
+
+        if(status != null && dialog.shouldDelete(status.getType(), status.getName())) {
+            procedureParameterService.remove();
         }
     }
 }

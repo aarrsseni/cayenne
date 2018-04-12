@@ -212,6 +212,8 @@ public class ProjectController {
 
     protected ListenerDescriptorCreator listenerDescriptorCreator;
 
+    private String newProjectTemporaryName;
+
     /**
      * Project files watcher. When project file is changed, user will be asked
      * to confirm loading the changes
@@ -226,7 +228,6 @@ public class ProjectController {
         listenerDescriptorCreator = new ListenerDescriptorCreator();
 
         adapterMapping = new AdapterMapping();
-
     }
 
     public void setCurrentDataMap(DataMap dataMap) {
@@ -643,5 +644,19 @@ public class ProjectController {
 
     public AdapterMapping getAdapterMapping() {
         return adapterMapping;
+    }
+
+    public String getNewProjectTemporaryName() {
+
+        // TODO: andrus 4/4/2010 - should that be reset every time a new project is opened
+        if (newProjectTemporaryName == null) {
+            StringBuffer buffer = new StringBuffer("new_project_");
+            for (byte aKey : IDUtil.pseudoUniqueByteSequence(16)) {
+                IDUtil.appendFormattedByte(buffer, aKey);
+            }
+            newProjectTemporaryName = buffer.toString();
+        }
+
+        return newProjectTemporaryName;
     }
 }

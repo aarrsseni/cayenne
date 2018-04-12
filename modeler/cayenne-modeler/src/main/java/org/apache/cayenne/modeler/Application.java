@@ -19,20 +19,18 @@
 
 package org.apache.cayenne.modeler;
 
-import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.xml.DataChannelMetaData;
 import org.apache.cayenne.di.Injector;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.dialog.LogConsole;
 import org.apache.cayenne.modeler.dialog.pref.ClasspathPreferences;
 import org.apache.cayenne.modeler.init.platform.PlatformInitializer;
+import org.apache.cayenne.modeler.services.PreferenceService;
 import org.apache.cayenne.modeler.undo.CayenneUndoManager;
 import org.apache.cayenne.modeler.util.WidgetFactory;
-import org.apache.cayenne.pref.CayennePreference;
 import org.apache.cayenne.pref.CayenneProjectPreferences;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.swing.BindingFactory;
-import org.apache.cayenne.util.IDUtil;
 
 import javax.swing.*;
 import java.io.File;
@@ -78,7 +76,8 @@ public class Application {
     @com.google.inject.Inject
     protected CayenneProjectPreferences cayenneProjectPreferences;
 
-    protected CayennePreference cayennePreference;
+    @com.google.inject.Inject
+    protected PreferenceService preferenceService;
 
     @com.google.inject.Inject
     protected Injector cayenneInjector;
@@ -91,8 +90,6 @@ public class Application {
 
     @com.google.inject.Inject
     protected ActionManager actionManager;
-
-    private String newProjectTemporaryName;
 
     public static Application getInstance() {
         return instance;
@@ -112,24 +109,9 @@ public class Application {
         return (CayenneModelerFrame) getInstance().getFrameController().getView();
     }
 
-    public String getNewProjectTemporaryName() {
-
-        // TODO: andrus 4/4/2010 - should that be reset every time a new project is opened
-        if (newProjectTemporaryName == null) {
-            StringBuffer buffer = new StringBuffer("new_project_");
-            for (byte aKey : IDUtil.pseudoUniqueByteSequence(16)) {
-                IDUtil.appendFormattedByte(buffer, aKey);
-            }
-            newProjectTemporaryName = buffer.toString();
-        }
-
-        return newProjectTemporaryName;
-    }
-
     public Application() {
         String configuredName = System.getProperty(APPLICATION_NAME_PROPERTY);
         this.name = (configuredName != null) ? configuredName : DEFAULT_APPLICATION_NAME;
-        this.cayennePreference = new CayennePreference();
     }
 
     public Injector getInjector() {
@@ -145,7 +127,7 @@ public class Application {
     }
 
     public Preferences getPreferencesNode(Class<?> className, String path) {
-        return cayennePreference.getNode(className, path);
+        return preferenceService.getCayennePreference().getNode(className, path);
     }
 
     public String getName() {
@@ -212,25 +194,7 @@ public class Application {
     }
 
     public Preferences getMainPreferenceForProject() {
-
-        DataChannelDescriptor descriptor = (DataChannelDescriptor) getFrameController()
-                .getProjectController()
-                .getProject()
-                .getRootNode();
-
-        // if new project
-        if (descriptor.getConfigurationSource() == null) {
-            return getPreferencesNode(
-                    getProject().getClass(),
-                    getNewProjectTemporaryName());
-        }
-
-        String path = CayennePreference.filePathToPrefereceNodePath(descriptor
-                .getConfigurationSource()
-                .getURL()
-                .getPath());
-        Preferences pref = getPreferencesNode(getProject().getClass(), "");
-        return pref.node(pref.absolutePath() + path);
+        return preferenceService.getMainPreferenceForProject();
     }
 
     /**

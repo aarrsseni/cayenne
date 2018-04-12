@@ -138,7 +138,7 @@ public abstract class CayenneController implements BoundComponent {
     /**
      * Centers view on parent window.
      */
-    protected void centerView() {
+    public void centerView() {
         Window parentWindow = this.getWindow();
 
         Dimension parentSize = parentWindow.getSize();
@@ -159,7 +159,7 @@ public abstract class CayenneController implements BoundComponent {
      * "defaultCloseOperation" property is taken into account when processing ESC button
      * click.
      */
-    protected void makeCloseableOnEscape() {
+    public void makeCloseableOnEscape() {
 
         Window window = getWindow();
         if (!(window instanceof JDialog)) {

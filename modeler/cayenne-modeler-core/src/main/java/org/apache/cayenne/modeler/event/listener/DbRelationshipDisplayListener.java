@@ -1,4 +1,3 @@
-package org.apache.cayenne.modeler.event.listener;
 /*****************************************************************
  *   Licensed to the Apache Software Foundation (ASF) under one
  *  or more contributor license agreements.  See the NOTICE file
@@ -17,7 +16,7 @@ package org.apache.cayenne.modeler.event.listener;
  *  specific language governing permissions and limitations
  *  under the License.
  ****************************************************************/
-
+package org.apache.cayenne.modeler.event.listener;
 
 import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
 

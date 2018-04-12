@@ -24,12 +24,16 @@ import org.apache.cayenne.modeler.action.dbimport.ReverseEngineeringToolMenuActi
 import org.apache.cayenne.modeler.editor.cgen.domain.CgenTabController;
 import org.apache.cayenne.modeler.editor.dbimport.domain.DbImportTabController;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.GraphDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
 import org.apache.cayenne.modeler.graph.DataDomainGraphTab;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -97,7 +101,7 @@ public class DataDomainTabbedView extends JTabbedPane
     }
 
     public void currentDomainChanged(DomainDisplayEvent e) {
-        if (e instanceof EntityDisplayEvent) {
+        if (e instanceof GraphDisplayEvent) {
             //need select an entity
             setSelectedComponent(graphTab);
         }

@@ -143,6 +143,8 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
     protected ActionManager actionManager;
     protected JLabel status;
 
+    protected ProjectController projectController;
+
     /**
      * Menu which shows/hides log console
      */
@@ -169,10 +171,12 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
      */
     protected WelcomeScreen welcomeScreen;
 
-    public CayenneModelerFrame(ActionManager actionManager) {
+    public CayenneModelerFrame(ActionManager actionManager, ProjectController projectController) {
         this.actionManager = actionManager;
 
         recentFileListeners = new Vector<>();
+
+        this.projectController = projectController;
 
         setIconImage(ModelerUtil.buildIcon("CayenneModeler.png").getImage());
         initMenus();
@@ -180,7 +184,8 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
         initStatusBar();
         initWelcome();
 
-        fireRecentFileListChanged(new RecentFileListEvent(this)); // start filling list in welcome screen and in menu
+        // start filling list in welcome screen and in menu
+        projectController.fireEvent(new RecentFileListEvent(this));
 
         setView(null);
     }
@@ -224,7 +229,7 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
         editMenu.add(getAction(PasteAction.class).buildMenu());
 
         recentFileMenu = new RecentFileMenu("Recent Projects");
-        addRecentFileListListener(recentFileMenu);
+        projectController.getEventController().addListener(RecentFileListListener.class, recentFileMenu);
         fileMenu.add(recentFileMenu);
 
         fileMenu.addSeparator();
@@ -329,7 +334,7 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
      */
     protected void initWelcome() {
         welcomeScreen = new WelcomeScreen();
-        addRecentFileListListener(welcomeScreen);
+        projectController.getEventController().addListener(RecentFileListListener.class, welcomeScreen);
     }
 
     /**
@@ -538,11 +543,11 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
     /**
      * Notifies all listeners that recent file list has changed
      */
-    public void fireRecentFileListChanged(RecentFileListEvent e) {
-        for (RecentFileListListener recentFileListener : recentFileListeners) {
-            recentFileListener.recentFileListChanged(e);
-        }
-    }
+//    public void fireRecentFileListChanged(RecentFileListEvent e) {
+//        for (RecentFileListListener recentFileListener : recentFileListeners) {
+//            recentFileListener.recentFileListChanged(e);
+//        }
+//    }
 
     public class SearchPanel extends JPanel {
 

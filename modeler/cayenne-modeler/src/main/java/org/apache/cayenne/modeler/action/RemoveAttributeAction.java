@@ -21,12 +21,10 @@ package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.map.*;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.services.AttributeService;
-import org.apache.cayenne.modeler.undo.RemoveAttributeUndoableEdit;
+import org.apache.cayenne.modeler.services.util.RemoveServiceStatus;
 
 import java.awt.event.ActionEvent;
 
@@ -36,9 +34,6 @@ import java.awt.event.ActionEvent;
 public class RemoveAttributeAction extends RemoveAction implements MultipleObjectsAction {
 
     private final static String ACTION_NAME = "Remove Attribute";
-
-    @Inject
-    public Application application;
 
     @Inject
     public AttributeService attributeService;
@@ -72,50 +67,11 @@ public class RemoveAttributeAction extends RemoveAction implements MultipleObjec
     @Override
     public void performAction(ActionEvent e, boolean allowAsking) {
         ConfirmRemoveDialog dialog = getConfirmDeleteDialog(allowAsking);
-        ProjectController mediator = getProjectController();
 
-        EmbeddableAttribute[] embAttrs = getProjectController().getCurrentState().getEmbAttrs();
-        ObjAttribute[] objAttrs = getProjectController().getCurrentState().getObjAttrs();
-        DbAttribute[] dbAttrs = getProjectController().getCurrentState().getDbAttrs();
+        RemoveServiceStatus status = attributeService.isRemove();
 
-        
-        if (embAttrs != null && embAttrs.length > 0) {
-            if ((embAttrs.length == 1 && dialog.shouldDelete(
-                    "Embeddable Attribute",
-                    embAttrs[0].getName()))
-                    || (embAttrs.length > 1 && dialog
-                            .shouldDelete("selected EmbAttributes"))) {
-
-                Embeddable embeddable = mediator.getCurrentState().getEmbeddable();
-
-                application.getUndoManager().addEdit(
-                        new RemoveAttributeUndoableEdit(embeddable, embAttrs));
-
-                attributeService.removeEmbeddableAttributes(embeddable, embAttrs);
-
-            }
-        } else if (objAttrs != null && objAttrs.length > 0) {
-            if ((objAttrs.length == 1 && dialog.shouldDelete("ObjAttribute", objAttrs[0]
-                    .getName()))
-                    || (objAttrs.length > 1 && dialog.shouldDelete("selected ObjAttributes"))) {
-
-                ObjEntity entity = mediator.getCurrentState().getObjEntity();
-
-                application.getUndoManager().addEdit(new RemoveAttributeUndoableEdit(entity, objAttrs));
-
-                attributeService.removeObjAttributes(entity, objAttrs);
-            }
-        } else if (dbAttrs != null && dbAttrs.length > 0) {
-        	if ((dbAttrs.length == 1 && dialog.shouldDelete("DbAttribute", dbAttrs[0]
-        			.getName()))
-                    || (dbAttrs.length > 1 && dialog.shouldDelete("selected DbAttributes"))) {
-
-        		DbEntity entity = mediator.getCurrentState().getDbEntity();
-
-                application.getUndoManager().addEdit(new RemoveAttributeUndoableEdit(entity, dbAttrs));
-
-                attributeService.removeDbAttributes(mediator.getCurrentState().getDataMap(), entity, dbAttrs);
-        	}
+        if(status != null && dialog.shouldDelete(status.getType(), status.getName())){
+            attributeService.remove();
         }
     }
 }

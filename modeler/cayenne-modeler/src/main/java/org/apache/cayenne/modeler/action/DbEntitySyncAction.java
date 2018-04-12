@@ -20,6 +20,7 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
+import org.apache.cayenne.modeler.services.EntitySyncService;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
@@ -40,7 +41,6 @@ import javax.swing.KeyStroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.Collection;
 
 /**
  * Action that synchronizes all ObjEntities with the current state of the
@@ -49,13 +49,7 @@ import java.util.Collection;
 public class DbEntitySyncAction extends CayenneAction {
 
 	@Inject
-	public Application application;
-
-	@Inject
-	public DbEntityService dbEntityService;
-
-	@Inject
-	public ProjectController projectController;
+	public EntitySyncService entitySyncService;
 
 	public static String getActionName() {
 		return "Sync Dependent ObjEntities with DbEntity";
@@ -79,82 +73,9 @@ public class DbEntitySyncAction extends CayenneAction {
 	/**
 	 * @see org.apache.cayenne.modeler.util.CayenneAction#performAction(ActionEvent)
 	 */
-	public void performAction(final ActionEvent e) {
-		syncDbEntity();
+	public void performAction(ActionEvent e) {
+		entitySyncService.syncDbEntity();
 	}
 
-	protected void syncDbEntity() {
-
-		DbEntity dbEntity = projectController.getCurrentState().getDbEntity();
-
-		if (dbEntity != null) {
-
-			final Collection<ObjEntity> entities = dbEntity.getDataMap().getMappedEntities(dbEntity);
-			if (entities.isEmpty()) {
-				return;
-			}
-
-			final EntityMergeSupport merger = new EntitySyncController(Application.getInstance().getFrameController(), dbEntity)
-					.createMerger();
-
-			if (merger == null) {
-				return;
-			}
-
-			merger.setNameGenerator(new PreserveRelationshipNameGenerator());
-
-			final DbEntitySyncUndoableEdit undoableEdit = new DbEntitySyncUndoableEdit((DataChannelDescriptor) projectController
-					.getProject().getRootNode(), projectController.getCurrentState().getDataMap());
-
-			// filter out inherited entities, as we need to add attributes only to the roots
-			dbEntityService.filterInheritedEntities(entities);
-
-			boolean hasChanges = false;
-			for (final ObjEntity entity : entities) {
-
-				final DbEntitySyncUndoableEdit.EntitySyncUndoableListener listener = undoableEdit.new EntitySyncUndoableListener(
-						entity);
-
-				merger.addEntityMergeListener(listener);
-
-				final Collection<DbAttribute> meaningfulFKs = merger.getMeaningfulFKs(entity);
-
-				// TODO: addition or removal of model objects should be reflected in listener callbacks...
-				// we should not be trying to introspect the merger
-				if (merger.isRemovingMeaningfulFKs() && !meaningfulFKs.isEmpty()) {
-					undoableEdit.addEdit(undoableEdit.new MeaningfulFKsUndoableEdit(entity, meaningfulFKs));
-					hasChanges = true;
-				}
-
-				if (merger.synchronizeWithDbEntity(entity)) {
-					projectController.fireEvent(new ObjEntityEvent(this, entity, MapEvent.CHANGE));
-					hasChanges = true;
-				}
-
-				merger.removeEntityMergeListener(listener);
-			}
-
-			if (hasChanges) {
-				application.getUndoManager().addEdit(undoableEdit);
-			}
-		}
-	}
-
-	static class PreserveRelationshipNameGenerator extends DefaultObjectNameGenerator {
-
-		@Override
-		public String relationshipName(final DbRelationship... relationshipChain) {
-			if (relationshipChain.length == 0) {
-				return super.relationshipName(relationshipChain);
-			}
-			final DbRelationship last = relationshipChain[relationshipChain.length - 1];
-			// must be in sync with DefaultBaseNameVisitor.visitDbRelationship
-			if (last.getName().startsWith("untitledRel")) {
-				return super.relationshipName(relationshipChain);
-			}
-
-			// keep manually set relationship name
-			return last.getName();
-		}
-	}
 }
+
