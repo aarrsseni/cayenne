@@ -24,11 +24,17 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
+import org.apache.cayenne.configuration.ConfigurationNameMapper;
+import org.apache.cayenne.configuration.DefaultConfigurationNameMapper;
 import org.apache.cayenne.configuration.server.ServerModule;
 import org.apache.cayenne.dbsync.DbSyncModule;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.FileClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.pref.CoreDataSourceFactory;
+import org.apache.cayenne.modeler.pref.CoreDbAdapterFactory;
+import org.apache.cayenne.modeler.pref.DefaultCoreDataSourceFactory;
+import org.apache.cayenne.modeler.pref.DefaultCoreDbAdapterFactory;
 import org.apache.cayenne.modeler.services.*;
 import org.apache.cayenne.pref.CayenneProjectPreferences;
 import org.apache.cayenne.project.*;
@@ -55,6 +61,10 @@ public class CayenneModelerCore implements Module{
         binder.bind(ConfigurationNodeParentGetter.class).to(DefaultConfigurationNodeParentGetter.class);
         binder.bind(ProjectController.class).in(Singleton.class);
         binder.bind(PreferenceService.class).in(Singleton.class);
+
+        binder.bind(CoreDbAdapterFactory.class).to(DefaultCoreDbAdapterFactory.class);
+        binder.bind(CoreDataSourceFactory.class).to(DefaultCoreDataSourceFactory.class);
+        binder.bind(ConfigurationNameMapper.class).to(DefaultConfigurationNameMapper.class);
 
         binder.bind(ProjectService.class).to(DefaultProjectService.class);
         binder.bind(ExitService.class).to(DefaultExitService.class);

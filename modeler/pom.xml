@@ -42,7 +42,8 @@
 		<module>cayenne-modeler-win</module>
         <module>cayenne-modeler-win-ext</module>
 		<module>cayenne-modeler-core</module>
-    </modules>
+		<module>cayenne-modeler-javafx</module>
+	</modules>
 
 	<dependencyManagement>
 		<dependencies>

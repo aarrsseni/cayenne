@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+
+<VBox stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.apache.cayenne.modeler.controller.ToolBarController">
+   <children>
+      <ToolBar fx:id="toolBar" minHeight="65.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="65.0" prefWidth="1100.0">
+        <items>
+            <HBox alignment="CENTER" prefHeight="65.0" prefWidth="72.0">
+               <children>
+                  <Button fx:id="moveBackwardButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn">
+                     <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/back.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="moveForwardButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn">
+                     <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/forward.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+               </children>
+            </HBox>
+            <HBox maxHeight="-Infinity">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="-Infinity" style="-fx-background-color: white; -fx-border-color: rgb(210, 208, 210); -fx-border-radius: 4px; -fx-background-radius: 4px;">
+                     <children>
+                        <Button fx:id="newProjectButton" alignment="CENTER" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/new.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="openProjectButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/open.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                      <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveAction" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/floppy.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="35.0" />
+               </padding>
+            </HBox>
+            <HBox maxHeight="-Infinity" maxWidth="-Infinity" style="-fx-background-radius: 4px; -fx-border-radius: 4px; -fx-background-color: transparent;">
+               <children>
+                  <Button fx:id="deleteButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn">
+                     <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@images/binVarsInside.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+            </HBox>
+            <HBox maxHeight="-Infinity">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="-Infinity" style="-fx-background-color: white; -fx-border-color: rgb(210, 208, 210); -fx-border-radius: 4px; -fx-background-radius: 4px;">
+                     <children>
+                        <Button fx:id="cutButton" alignment="CENTER" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/anotherBlade.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="copyButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/copy.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="pasteButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/paste.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+            </HBox>
+            <HBox maxHeight="-Infinity">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="-Infinity" style="-fx-background-color: white; -fx-border-color: rgb(210, 208, 210); -fx-border-radius: 4px; -fx-background-radius: 4px;">
+                     <children>
+                        <Button fx:id="undoButton" alignment="CENTER" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/undoVarsInside.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="redoButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/redoVarsInside.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+            </HBox>
+            <HBox maxHeight="-Infinity">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="-Infinity" style="-fx-background-color: white; -fx-border-color: rgb(210, 208, 210); -fx-border-radius: 4px; -fx-background-radius: 4px;">
+                     <children>
+                        <Button fx:id="createDataNodeButton" alignment="CENTER" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/dbNode.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="createDataMapButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/original.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+            </HBox>
+            <HBox maxHeight="-Infinity">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="-Infinity" style="-fx-background-color: white; -fx-border-color: rgb(210, 208, 210); -fx-border-radius: 4px; -fx-background-radius: 4px;">
+                     <children>
+                        <Button fx:id="createDbEntityButton" alignment="CENTER" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/dbEntity.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="createStoredProcedureButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/dbStoreProcedureCopy.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+            </HBox>
+            <HBox maxHeight="-Infinity">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="-Infinity" style="-fx-background-color: white; -fx-border-color: rgb(210, 208, 210); -fx-border-radius: 4px; -fx-background-radius: 4px;">
+                     <children>
+                        <Button fx:id="createObjEntityButton" alignment="CENTER" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/newObjentity.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="createEmbeddableButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/newEmbedable.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="createQueryButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/newQuery.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+            </HBox>
+            <HBox maxHeight="-Infinity" maxWidth="-Infinity">
+               <children>
+                  <TextField maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" prefWidth="185.0" promptText="Search" styleClass="search-field">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+               <padding>
+                  <Insets left="35.0" right="20.0" />
+               </padding>
+            </HBox>
+        </items>
+         <padding>
+            <Insets left="8.0" right="20.0" />
+         </padding>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </ToolBar>
+   </children>
+</VBox>

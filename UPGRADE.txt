@@ -521,7 +521,7 @@ UPGRADING TO 3.0M2
 * Lifecycle Callbacks require no setup:
   Per CAY-843, lifecycle callback functionality is now built into DataContext and DataDomain, 
   so all the custom code to set them up is no longer needed. Also as a result of this change
-  'org.apache.cayenne.intercept' package is removed from Cayenne.
+  'org.apache.cayenne.modeler.intercept' package is removed from Cayenne.
   Further information can be found here: http://cayenne.apache.org/doc/lifecycle-callbacks.html
 
 UPGRADING TO 3.0M1

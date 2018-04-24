@@ -1,0 +1,58 @@
+.welcome-screen{
+    -fx-background-image: url(images/welcome-screen-bg.jpg);
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+}
+.list-cell {
+    -fx-background-color: transparent;
+}
+.list-view {
+    -fx-background-color: transparent;
+}
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-text-fill: black;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #EEEEEE;
+}
+.new-button{
+    -fx-background-color: transparent;
+    -fx-background-image: url(images/welcome-screen-new-btn.png);
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100%;
+}
+.open-button{
+    -fx-background-color: transparent;
+    -fx-background-image: url(images/welcome-screen-open-btn.png);
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100%;
+}
+.new-button:hover{
+     -fx-background-image: url(images/welcome-screen-new-btn-hover.png);
+     -fx-background-repeat: no-repeat;
+}
+ .open-button:hover {
+     -fx-background-image: url(images/welcome-screen-open-btn-hover.png);
+     -fx-background-repeat: no-repeat;
+}
+.tool-bar .button:hover{
+    -fx-background-color:rgb(210, 208, 210);
+}
+.btn {
+    -fx-background-color:white;
+    -fx-border-radius:4px;
+    -fx-border-color:rgb(210, 208, 210);
+}
+.btn-group {
+    -fx-background-color:transparent;
+    -fx-border-radius:0px;
+    -fx-border-color:transparent;
+}
+.search-field{
+    -fx-background-image:url(images/icon-zoom-in.png);
+      -fx-background-repeat: no-repeat;
+      -fx-background-position: 10px;
+      -fx-font-size: 13;
+      -fx-padding:0 0 0 30px;
+}

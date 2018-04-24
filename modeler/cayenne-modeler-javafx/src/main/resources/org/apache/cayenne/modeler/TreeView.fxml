@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" prefWidth="150.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.apache.cayenne.modeler.controller.TreeViewController">
+   <children>
+      <ToolBar prefHeight="40.0" prefWidth="200.0">
+        <items>
+            <HBox maxHeight="-Infinity">
+               <children>
+                  <HBox alignment="CENTER" maxHeight="-Infinity" style="-fx-background-color: white; -fx-border-color: rgb(210, 208, 210); -fx-border-radius: 4px; -fx-background-radius: 4px;">
+                     <children>
+                        <Button alignment="CENTER" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/treeCollapse.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/filterVarsInside.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+        </items>
+      </ToolBar>
+      <TreeView fx:id="treeView" VBox.vgrow="ALWAYS" />
+   </children>
+</VBox>

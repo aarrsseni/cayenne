@@ -20,7 +20,6 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.services.SaveService;
 import org.apache.cayenne.project.Project;
@@ -33,9 +32,6 @@ import java.awt.event.KeyEvent;
  * An action that saves a project using to its default location.
  */
 public class SaveAction extends SaveAsAction {
-
-    @Inject
-    public Application application;
 
     @Inject
     public ProjectController projectController;

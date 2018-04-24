@@ -22,16 +22,10 @@ package org.apache.cayenne.modeler;
 import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
 import io.bootique.BQCoreModule;
-import org.apache.cayenne.configuration.ConfigurationNameMapper;
-import org.apache.cayenne.configuration.DefaultConfigurationNameMapper;
 import org.apache.cayenne.di.DIBootstrap;
 import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.graph.action.ShowGraphEntityAction;
 import org.apache.cayenne.modeler.init.CayenneModelerModule;
-import org.apache.cayenne.modeler.pref.CoreDataSourceFactory;
-import org.apache.cayenne.modeler.pref.CoreDbAdapterFactory;
-import org.apache.cayenne.modeler.pref.DefaultCoreDataSourceFactory;
-import org.apache.cayenne.modeler.pref.DefaultCoreDbAdapterFactory;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.*;
@@ -69,10 +63,7 @@ public class CayenneModelerUi implements com.google.inject.Module{
         BQCoreModule.extend(binder).addCommand(UiCommand.class);
         binder.bind(Launcher.class).to(GenericLauncher.class);
         binder.bind(Application.class).in(Singleton.class);
-        binder.bind(CoreDbAdapterFactory.class).to(DefaultCoreDbAdapterFactory.class);
-        binder.bind(CoreDataSourceFactory.class).to(DefaultCoreDataSourceFactory.class);
         binder.bind(ActionManager.class).to(DefaultActionManager.class);
-        binder.bind(ConfigurationNameMapper.class).to(DefaultConfigurationNameMapper.class);
 
         setModuleClass(binder, new CayenneModelerModule());
 

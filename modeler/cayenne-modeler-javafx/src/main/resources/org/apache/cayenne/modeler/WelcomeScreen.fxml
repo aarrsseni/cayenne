@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="rootPane" prefHeight="309.0" prefWidth="1757.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.apache.cayenne.modeler.controller.WelcomeController">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <TilePane fx:id="welcomeScreenParent" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: grey;" stylesheets="@style.css" BorderPane.alignment="CENTER">
+         <children>
+            <HBox fx:id="welcomeScreen" minHeight="-Infinity" minWidth="-Infinity" styleClass="welcome-screen">
+               <children>
+                  <TilePane alignment="BOTTOM_LEFT" minWidth="250.0" orientation="VERTICAL">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#newProjectAction" prefHeight="40.0" prefWidth="150.0" styleClass="new-button">
+                           <TilePane.margin>
+                              <Insets bottom="10.0" />
+                           </TilePane.margin>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#openProjectAction" prefHeight="40.0" prefWidth="150.0" styleClass="open-button" />
+                     </children>
+                     <padding>
+                        <Insets bottom="30.0" left="15.0" />
+                     </padding>
+                  </TilePane>
+                  <ListView fx:id="recentFiles" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                     <padding>
+                        <Insets bottom="40.0" left="70.0" right="30.0" top="40.0" />
+                     </padding>
+                  </ListView>
+               </children>
+            </HBox>
+         </children>
+      </TilePane>
+   </center>
+</BorderPane>
