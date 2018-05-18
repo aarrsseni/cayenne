@@ -4,7 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.FloatStringConverter;
-import javafx.util.converter.NumberStringConverter;
+import javafx.util.converter.IntegerStringConverter;
 import org.apache.cayenne.CayenneRuntimeException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,11 +19,15 @@ public class Observer {
     private Object bean;
     private Map<String, Property> fieldsProperties;
     private Map<String, Method> fieldSetter;
+    private Map<String, Method> fieldGetter;
+    private Map<Property, Property> bindings;
 
     public Observer(Object bean) {
         this.bean = bean;
         fieldsProperties = new HashMap<>();
         fieldSetter = new HashMap<>();
+        fieldGetter = new HashMap<>();
+        bindings = new HashMap<>();
     }
 
     /* May be string/number/boolean ? */
@@ -33,13 +37,19 @@ public class Observer {
             fieldProperty = getPropertyImpl(fieldName);
             fieldsProperties.put(fieldName, fieldProperty);
         }
+        bindings.put(bindedProperty, fieldProperty);
         if (fieldProperty.getClass() == SimpleIntegerProperty.class) {
-            Bindings.bindBidirectional(bindedProperty, fieldProperty, new NumberStringConverter());
+            System.out.println("hello");
+            fieldProperty.setValue(callBeanGetter(fieldName));
+            Bindings.bindBidirectional(bindedProperty, fieldProperty, new IntegerStringConverter());
         } else if (fieldProperty.getClass() == SimpleDoubleProperty.class) {
+            fieldProperty.setValue(callBeanGetter(fieldName));
             Bindings.bindBidirectional(bindedProperty, fieldProperty, new DoubleStringConverter());
         } else if (fieldProperty.getClass() == SimpleFloatProperty.class) {
+            fieldProperty.setValue(callBeanGetter(fieldName));
             Bindings.bindBidirectional(bindedProperty, fieldProperty, new FloatStringConverter());
-        } else {
+        } else{
+            fieldProperty.setValue(callBeanGetter(fieldName));
             Bindings.bindBidirectional(bindedProperty, fieldProperty);
         }
         return this;
@@ -51,6 +61,12 @@ public class Observer {
             throw new CayenneRuntimeException("Field '" + fieldName + "' not binded.");
         }
         Bindings.unbindBidirectional(bindedProperty, fieldProperty);
+    }
+
+    public void unbindAll() {
+//        fieldsProperties.forEach((key, value) -> Bindings.unbindBidirectional(bindings.get(fieldsProperties.get(key)), value));
+
+        bindings.forEach((key, value) -> Bindings.unbindBidirectional(key, value));
     }
 
     public void unbind() {
@@ -117,12 +133,25 @@ public class Observer {
         try {
             Class fieldType = getFieldType(fieldName);
             Property property = getPropertyInstance(fieldType);
-            property.addListener((observable, oldValue, newValue) -> callBeanSetter(newValue, fieldName));
+            property.addListener((observable, oldValue, newValue) -> {
+                callBeanSetter(newValue, fieldName);
+            });
             return property;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public <T> Property<T> getPropertyWithoutBinding(String fieldName){
+        Property<T> property = fieldsProperties.get(fieldName);
+        if(property == null) {
+            property = getPropertyImpl(fieldName);
+            fieldsProperties.put(fieldName, property);
+            property.setValue(callBeanGetter(fieldName));
+        }
+
+        return property;
     }
 
     public static String getAccessMethodName(String access, String fieldName) {
@@ -149,6 +178,28 @@ public class Observer {
         } catch (SecurityException | NoSuchMethodException | ClassNotFoundException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    // Calling setter for field
+    private <T> T callBeanGetter(String fieldName) {
+        Method method = null;
+        try {
+            method = fieldGetter.get(fieldName);
+            if(method == null) {
+                if (!getFieldType(fieldName).equals(boolean.class)) {
+                    method = bean.getClass().getMethod(getAccessMethodName("get", fieldName));
+                } else {
+                    method = bean.getClass().getMethod(getAccessMethodName("is", fieldName));
+                }
+                fieldGetter.put(fieldName, method);
+            }
+            if (method != null) {
+                return (T)method.invoke(bean);
+            }
+        } catch (SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Object getBean() {

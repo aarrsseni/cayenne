@@ -168,7 +168,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="createDataMapButton" mnemonicParsing="false" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
+                        <Button fx:id="createDataMapButton" mnemonicParsing="false" onAction="#createDataMapAction" prefHeight="22.0" prefWidth="26.0" styleClass="btn-group">
                            <graphic>
                               <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -188,7 +188,7 @@
                <children>
                   <HBox alignment="CENTER" maxHeight="-Infinity" style="-fx-background-color: white; -fx-border-color: rgb(210, 208, 210); -fx-border-radius: 4px; -fx-background-radius: 4px;">
                      <children>
-                        <Button fx:id="createDbEntityButton" alignment="CENTER" mnemonicParsing="false" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
+                        <Button fx:id="createDbEntityButton" alignment="CENTER" mnemonicParsing="false" onAction="#createDbEntityAction" prefHeight="22.0" prefWidth="16.0" styleClass="btn-group">
                            <graphic>
                               <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                  <image>

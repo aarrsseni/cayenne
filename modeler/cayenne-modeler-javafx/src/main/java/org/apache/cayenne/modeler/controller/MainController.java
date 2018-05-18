@@ -1,16 +1,19 @@
 package org.apache.cayenne.modeler.controller;
 
+import com.google.inject.Inject;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
-import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
 
-import java.io.IOException;
+public class MainController implements Unbindable, DataMapDisplayListener, DomainDisplayListener, DbEntityDisplayListener{
 
-import static org.apache.cayenne.modeler.BQApplication.getInjector;
-
-public class MainController implements Unbindable{
-
+    @Inject
     public ScreenController screenController;
 
     @FXML
@@ -28,81 +31,65 @@ public class MainController implements Unbindable{
     @FXML
     public Pane projectViewPane;
 
+    @Inject
+    public ProjectController projectController;
+
     @FXML
     @SuppressWarnings("unchecked")
     public void initialize() {
+        projectController.getCurrentState().initControllerStateListeners();
+
         initToolBar();
         initStatusBar();
         initTreeView();
         initLastView();
-        screenController = getInjector().getInstance(ScreenController.class);
+        initListeners();
     }
 
-    public void setPaneResizable(Pane rootPane, Pane childPane) {
-        rootPane.heightProperty().addListener((arg0, arg1, arg2) -> childPane.setPrefHeight(arg2.doubleValue()));
-        rootPane.widthProperty().addListener((arg0, arg1, arg2) -> childPane.setPrefWidth(arg2.doubleValue()));
-
-        childPane.setPrefSize(rootPane.getPrefWidth(), rootPane.getPrefHeight());
+    private void initToolBar() {
+        screenController.loadAndUpdatePane(toolBarPane, "../ToolBar.fxml");
     }
 
-    public void initToolBar() {
-        try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../ToolBar.fxml"));
-        Pane childPane = loader.load();
-
-        toolBarPane.getChildren().clear();
-        toolBarPane.getChildren().add(childPane);
-
-        setPaneResizable(toolBarPane, childPane);
-        } catch (IOException e) {
-            throw new CayenneRuntimeException("Can't load tool bar." , e);
-        }
+    private void initStatusBar() {
+        screenController.loadAndUpdatePane(statusBarPane, "../StatusBar.fxml");
     }
 
-    public void initStatusBar() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../StatusBar.fxml"));
-            Pane childPane = loader.load();
-
-            statusBarPane.getChildren().clear();
-            statusBarPane.getChildren().add(childPane);
-
-            setPaneResizable(statusBarPane, childPane);
-        } catch (IOException e) {
-            throw new CayenneRuntimeException("Can't load status bar." , e);
-        }
+    private void initTreeView() {
+        screenController.loadAndUpdatePane(treeViewPane, "../TreeView.fxml");
     }
 
-    public void initTreeView() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../TreeView.fxml"));
-            Pane childPane = loader.load();
-
-            treeViewPane.getChildren().clear();
-            treeViewPane.getChildren().add(childPane);
-
-            setPaneResizable(treeViewPane, childPane);
-        } catch (IOException e) {
-            throw new CayenneRuntimeException("Can't load tree view." , e);
-        }
+    private void initLastView() {
+        screenController.loadAndUpdatePane(projectViewPane, "../DomainView.fxml");
     }
 
-    public void initLastView() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../DomainView.fxml"));
-            Pane childPane = loader.load();
+    private void initListeners() {
+        projectController.getEventController().addListener(DataMapDisplayListener.class, this);
+        projectController.getEventController().addListener(DomainDisplayListener.class, this);
+        projectController.getEventController().addListener(DbEntityDisplayListener.class, this);
+    }
 
-            projectViewPane.getChildren().clear();
-            projectViewPane.getChildren().add(childPane);
-
-            setPaneResizable(projectViewPane, childPane);
-        } catch (IOException e) {
-            throw new CayenneRuntimeException("Can't load status bar." , e);
-        }
+    @Override
+    public void bind() {
+        System.out.println("Bind mainController");
     }
 
     @Override
     public void unbind() {
+        System.out.println("Unbind mainController");
+    }
 
+    @Override
+    public void currentDataMapChanged(DataMapDisplayEvent e) {
+        screenController.loadAndUpdatePane(projectViewPane, "../DataMapView.fxml");
+    }
+
+    @Override
+    public void currentDomainChanged(DomainDisplayEvent e) {
+        screenController.loadAndUpdatePane(projectViewPane, "../DomainView.fxml");
+    }
+
+    @Override
+    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
+        screenController.loadAndUpdatePane(projectViewPane, "../DbEntityView.fxml");
     }
 }

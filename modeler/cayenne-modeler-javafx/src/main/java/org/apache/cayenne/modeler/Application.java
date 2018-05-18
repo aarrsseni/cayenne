@@ -25,7 +25,6 @@ public class Application extends BQApplication{
         primaryStage.setMinHeight(650);
 
         getInjector().getInstance(ScreenController.class).setScene(scene);
-        getInjector().getInstance(ScreenController.class).setUnbindableController(loader.getController());
         getInjector().getInstance(ScreenController.class).setPrimaryStage(primaryStage);
 
         primaryStage.setTitle("JavaFX Cayenne modeler");

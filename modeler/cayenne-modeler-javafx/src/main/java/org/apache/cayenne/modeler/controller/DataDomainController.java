@@ -1,5 +1,6 @@
 package org.apache.cayenne.modeler.controller;
 
+import com.google.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
@@ -33,24 +34,18 @@ public class DataDomainController implements Unbindable, DomainDisplayListener{
     @FXML
     private TabPane tabPane;
 
-    private DataChannelDescriptor dataDomain;
-
+    @Inject
     public ProjectController projectController;
+
+    private DataChannelDescriptor dataDomain;
 
     @FXML
     @SuppressWarnings("unchecked")
     public void initialize() {
-        projectController = BQApplication.getInjector().getInstance(ProjectController.class);
         dataDomain = projectController.getCurrentState().getDomain();
 
-        bindDataDomain();
         initListeners();
         makeResizable();
-    }
-
-    private void bindDataDomain() {
-        ObserverDictionary.getObserver(dataDomain)
-                .bind("name", name.textProperty());
     }
 
     public void initListeners() {
@@ -58,13 +53,21 @@ public class DataDomainController implements Unbindable, DomainDisplayListener{
     }
 
     @Override
+    public void bind() {
+        ObserverDictionary.getObserver(dataDomain)
+                .bind("name", name.textProperty());
+        System.out.println("Bind dataDomainController");
+    }
+
+    @Override
     public void unbind() {
-        ObserverDictionary.getObserver(dataDomain).unbind("name", name.textProperty());
+        ObserverDictionary.getObserver(dataDomain).unbindAll();
+        System.out.println("Unbind dataDomain.");
     }
 
     @Override
     public void currentDomainChanged(DomainDisplayEvent e) {
-        name.setText(e.getDomain().getName());
+//        name.setText(e.getDomain().getName());
     }
 
     public void makeResizable() {
@@ -77,12 +80,5 @@ public class DataDomainController implements Unbindable, DomainDisplayListener{
 
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
-
-        scrollPane.heightProperty().addListener((arg0, arg1, arg2) -> {
-            tabPane.setPrefHeight(arg2.doubleValue());
-        });
-        scrollPane.widthProperty().addListener((arg0, arg1, arg2) -> {
-            tabPane.setPrefWidth(arg2.doubleValue());
-        });
     }
 }

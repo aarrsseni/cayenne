@@ -16,6 +16,8 @@ public class MethodInterceptor {
      *   Where Xxx - field name with first upper case letter
      */
     private static final String SETTER_REGEX = "set.*";
+    private static final String GETTER_REGEX = "get.*";
+    private static final String IS_GETTER_REGEX = "is.*";
     private static final byte SETTER_PARAMETER_COUNT = 1;
     private static final Class SETTER_RETURN_TYPE = void.class;
     private static final byte GETTER_PARAMETER_COUNT = 0;
@@ -76,10 +78,10 @@ public class MethodInterceptor {
     }
 
     private static boolean isGetter(Method method) {
-        String getterName = Observer.getAccessMethodName("get", getFieldNameFromMethod(method));
-        String booleanGetterName = Observer.getAccessMethodName("is", getFieldNameFromMethod(method));
+        boolean hasGetPrefix = method.getName().matches(GETTER_REGEX) || method.getName().matches(IS_GETTER_REGEX);
         boolean hasNotParameters = method.getParameterCount() == GETTER_PARAMETER_COUNT;
-        return ((method.getName().equals(getterName)) || (method.getName().equals(booleanGetterName))) && hasNotParameters;
+
+        return hasGetPrefix && hasNotParameters;
     }
 
     private static boolean isSetter(Method method) {

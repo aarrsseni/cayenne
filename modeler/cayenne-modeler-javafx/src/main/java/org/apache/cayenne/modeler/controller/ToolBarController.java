@@ -4,15 +4,23 @@ import com.google.inject.Inject;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import org.apache.cayenne.modeler.BQApplication;
+import org.apache.cayenne.modeler.action.CreateDataMapAction;
+import org.apache.cayenne.modeler.action.NewProjectAction;
 import org.apache.cayenne.modeler.action.SaveAsAction;
+import org.apache.cayenne.modeler.services.DbEntityService;
 
 import java.io.IOException;
 
 public class ToolBarController implements Unbindable{
 
     @Inject
-    public SaveAsAction saveAction;
+    private SaveAsAction saveAction;
+
+    @Inject
+    private CreateDataMapAction createDataMapAction;
+
+    @Inject
+    private DbEntityService dbEntityService;
 
     @FXML
     private Button moveBackwardButton;
@@ -68,20 +76,40 @@ public class ToolBarController implements Unbindable{
     @FXML
     private Button createQueryButton;
 
+    @Inject
+    private NewProjectAction newProjectAction;
+
+    @Inject
+    public ScreenController screenController;
+
     @FXML
     @SuppressWarnings("unchecked")
     public void initialize() throws IOException {
-        saveAction = BQApplication.getInjector().getInstance(SaveAsAction.class);
+    }
+
+    @Override
+    public void bind() {
+        System.out.println("Bind toolBarController");
     }
 
     @Override
     public void unbind() {
+        System.out.println("Unbind toolBarController");
+    }
 
+    @FXML
+    public void createDataMapAction(ActionEvent e) {
+        createDataMapAction.handle(e);
     }
 
     @FXML
     public void saveAction(ActionEvent e) throws Exception {
         saveAction.handle(e);
+    }
+
+    @FXML
+    public void createDbEntityAction(ActionEvent e) throws Exception {
+        dbEntityService.createDbEntity();
     }
 
 }

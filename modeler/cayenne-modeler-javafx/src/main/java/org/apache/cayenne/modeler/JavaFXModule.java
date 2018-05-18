@@ -1,17 +1,20 @@
 package org.apache.cayenne.modeler;
 
 import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
 import io.bootique.BQCoreModule;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import org.apache.cayenne.di.DIBootstrap;
+import org.apache.cayenne.modeler.action.CreateDataMapAction;
 import org.apache.cayenne.modeler.action.NewProjectAction;
 import org.apache.cayenne.modeler.action.SaveAction;
 import org.apache.cayenne.modeler.action.SaveAsAction;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.init.CayenneModelerModule;
 import org.apache.cayenne.modeler.util.AbstractCayenneAction;
+import org.apache.cayenne.modeler.components.CayenneTreeHelper;
 import org.apache.cayenne.project.validation.DefaultProjectValidator;
 import org.apache.cayenne.project.validation.ProjectValidator;
 
@@ -65,9 +68,11 @@ public class JavaFXModule implements Module {
         setActionClass(binder, new NewProjectAction());
         setActionClass(binder, new SaveAction());
         setActionClass(binder, new SaveAsAction());
+        setActionClass(binder, new CreateDataMapAction());
 
         binder.bind(JavaFXLauncher.class).to(GenericJavaFXLauncher.class);
         binder.bind(BaseApplication.class).in(Singleton.class);
+        binder.bind(CayenneTreeHelper.class).in(Singleton.class);
 
         binder.bind(ProjectValidator.class).to(DefaultProjectValidator.class);
     }

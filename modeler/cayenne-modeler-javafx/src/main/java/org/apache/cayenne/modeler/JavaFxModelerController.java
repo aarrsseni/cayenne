@@ -30,6 +30,9 @@ public class JavaFxModelerController{
     @Inject
     public ProjectValidator projectValidator;
 
+    @Inject
+    public FXMLLoaderFactory fxmlLoaderFactory;
+
     public TreeViewController treeViewController;
 
     public void initActionListeners() {
@@ -40,10 +43,13 @@ public class JavaFxModelerController{
         projectController.setProject(project);
 
         try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
+        FXMLLoader loader = fxmlLoaderFactory.getLoader(getClass().getResource("Main.fxml"));
         Pane loadedPane = loader.load();
+
         screenController.setUnbindableController(loader.getController());
         screenController.updateScene(loadedPane);
+
+        screenController.addController("Main.fxml", loadedPane, loader.getController());
 
         } catch (IOException e) {
             e.printStackTrace();

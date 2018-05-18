@@ -56,3 +56,28 @@
       -fx-font-size: 13;
       -fx-padding:0 0 0 30px;
 }
+
+.table-cell {
+    -fx-padding: 0;
+}
+.table-cell .text-field {
+    -fx-padding: 1;
+    -fx-border-color:none;
+    -fx-background-color:transparent;
+}
+.table-cell .combo-box .list-cell  {
+   -fx-padding: 1;
+   -fx-border-color:none;
+   -fx-background-color:white;
+}
+.table-cell .combo-box .list-cell:hover  {
+   -fx-padding: 1;
+   -fx-background-color:grey;
+}
+.table-cell .combo-box .list-cell:focused  {
+   -fx-padding: 1;
+   -fx-background-color:grey;
+}
+.table-cell:focused {
+   -fx-padding: 1;
+}

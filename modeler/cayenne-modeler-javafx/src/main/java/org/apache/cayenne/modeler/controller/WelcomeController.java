@@ -12,9 +12,8 @@ import org.apache.cayenne.modeler.ModelerPreferences;
 import org.apache.cayenne.modeler.action.NewProjectAction;
 
 import java.io.File;
-import java.io.IOException;
 
-public class WelcomeController implements Unbindable{
+public class WelcomeController{
 
     @FXML
     private Pane welcomeScreenParent;
@@ -55,13 +54,8 @@ public class WelcomeController implements Unbindable{
     }
 
     @FXML
-    public void newProjectAction(ActionEvent e) throws IOException {
+    public void newProjectAction(ActionEvent e) {
         newProjectAction.handle(e);
-    }
-
-    @Override
-    public void unbind() {
-        System.out.println("Unbind welcome screen");
     }
 
     private void makeResizable() {
