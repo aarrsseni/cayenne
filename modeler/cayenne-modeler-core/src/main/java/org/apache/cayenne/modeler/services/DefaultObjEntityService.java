@@ -62,7 +62,7 @@ public class DefaultObjEntityService implements ObjEntityService{
 
         DbEntity dbEntity = projectController.getCurrentState().getDbEntity();
         if (dbEntity != null) {
-            entity.setDbEntity(dbEntity);
+            entity.setDbEntityName(dbEntity.getName());
 
             // TODO: use injectable name generator
             String baseName = new DefaultObjectNameGenerator(NoStemStemmer.getInstance()).objEntityName(dbEntity);
@@ -71,6 +71,7 @@ public class DefaultObjEntityService implements ObjEntityService{
                     .baseName(baseName)
                     .name());
         }
+
         entity.setClassName(dataMap.getNameWithDefaultPackage(entity.getName()));
 
         if (dataMap.isClientSupported()) {

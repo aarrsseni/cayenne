@@ -8,14 +8,20 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import org.apache.cayenne.configuration.event.DbAttributeEvent;
+import org.apache.cayenne.map.Attribute;
+import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.components.AttributeTable;
+import org.apache.cayenne.modeler.controllers.DbEntityFieldsController;
 import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DbAttributeDisplayListener;
 import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
 import org.apache.cayenne.modeler.services.AttributeService;
-import org.apache.cayenne.modeler.components.AttributeTable;
+import org.apache.cayenne.modeler.services.ObjEntityService;
+import org.apache.cayenne.modeler.services.RelationshipService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +40,7 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
     public TableView<Observer> tableView;
 
     @FXML
-    public TableView relView;
+    public TableView<Observer> relView;
 
     @FXML
     public SplitPane splitPane;
@@ -78,6 +84,18 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
     @Inject
     private AttributeService createAttributeService;
 
+    @Inject
+    public ObjEntityService objEntityService;
+
+    @Inject
+    private DbEntityFieldsController dbEntityFieldsController;
+
+    @Inject
+    private RelationshipService relationshipService;
+
+    @Inject
+    private DbRelationshipsController dbRelationshipsController;
+
     private Map<DbEntity, ObservableList<Observer>> dbAttrsMap;
 
     static final String PK_DEFAULT_GENERATOR = "Cayenne-Generated (Default)";
@@ -96,9 +114,11 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
 
         tableView.setEditable(true);
 
-        prepareTables();
         initListeners();
         makeResizable();
+        prepareTables();
+
+        dbRelationshipsController.init(relView, dbEntity);
     }
 
 
@@ -114,12 +134,16 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
 
         tableView.setItems(dbAttrsMap.get(dbEntity));
 
+        dbRelationshipsController.bindTable(dbEntity);
+        dbRelationshipsController.addDbEntity(dbEntity);
+
         System.out.println("Bind " + getClass());
     }
 
     @Override
     public void unbind() {
         tableView.setItems(null);
+        dbRelationshipsController.unbindTable();
         ObserverDictionary.getObserver(dbEntity).unbindAll();
         System.out.println("Unbind " + getClass());
     }
@@ -168,12 +192,18 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
     @Override
     public void currentDbAttributeChanged(DbAttributeDisplayEvent e) {
         checkDbAttrs(dbEntity, ObserverDictionary.getObserver(e.getAttributes()[0]));
-
         tableView.setItems(dbAttrsMap.get(dbEntity));
+
+        addListenersToAttr(e.getAttributes()[0]);
     }
 
     private void initListeners(){
         projectController.getEventController().addListener(DbAttributeDisplayListener.class, this);
+
+        dbEntityName.textProperty().addListener((observable, oldName, newName) -> dbEntityFieldsController.dbEntityNameChanged(newName));
+        dbEntityCatalog.textProperty().addListener(((observable, oldValue, newValue) -> dbEntityFieldsController.dbEntityCatalogChanged(newValue)));
+        dbEntitySchema.textProperty().addListener(((observable, oldValue, newValue) -> dbEntityFieldsController.dbEntitySchemaChanged(newValue)));
+        dbEntityQualifier.textProperty().addListener(((observable, oldValue, newValue) -> dbEntityFieldsController.dbEntityQualifierChenged(newValue)));
     }
 
     private void checkDbAttrs(DbEntity dbEntity, Observer dbAttributeRow){
@@ -188,13 +218,28 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
 
     private void prepareTables(){
         tableView.getColumns().addAll(attributeTable.createDbTable());
-
         // single cell selection mode
         tableView.getSelectionModel().setCellSelectionEnabled(true);
     }
 
     @FXML
     public void createObjEntityAction(ActionEvent e) {
-        System.out.println("test");
+        objEntityService.createObjEntity();
+    }
+
+    @FXML
+    public void createRelationships(ActionEvent e) {
+        relationshipService.createRelationship();
+    }
+
+    private void addListenersToAttr(Attribute dbAttr){
+        ObserverDictionary.getObserver(dbAttr).getPropertyWithoutBinding("name").addListener(((observable, oldValue, newValue) -> {
+            DbAttribute dbAttribute = projectController.getCurrentState().getDbEntity().getAttribute((String) oldValue);
+            DbAttributeEvent event = new DbAttributeEvent(this, dbAttribute, projectController.getCurrentState().getDbEntity());
+            event.setOldName((String) oldValue);
+
+            dbAttribute.setName((String) newValue);
+            dbAttribute.getEntity().dbAttributeChanged(event);
+        }));
     }
 }

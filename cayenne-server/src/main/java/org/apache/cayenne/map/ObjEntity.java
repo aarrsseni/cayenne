@@ -73,7 +73,7 @@ public class ObjEntity extends Entity implements ObjEntityListener, Configuratio
     protected String superEntityName;
     protected Expression qualifier;
     protected boolean readOnly;
-    protected int lockType;
+    protected int declaredLockType;
 
     protected boolean _abstract;
     protected boolean serverOnly;
@@ -90,7 +90,7 @@ public class ObjEntity extends Entity implements ObjEntityListener, Configuratio
 
     public ObjEntity(String name) {
         setName(name);
-        this.lockType = LOCK_TYPE_NONE;
+        this.declaredLockType = LOCK_TYPE_NONE;
         this.callbacks = new CallbackMap();
         this.attributeOverrides = new TreeMap<>();
     }
@@ -288,12 +288,12 @@ public class ObjEntity extends Entity implements ObjEntityListener, Configuratio
     public int getLockType() {
         // if this entity has an explicit lock,
         // no need to lookup inheritance hierarchy
-        if (lockType != LOCK_TYPE_NONE) {
-            return lockType;
+        if (declaredLockType != LOCK_TYPE_NONE) {
+            return declaredLockType;
         }
 
         ObjEntity superEntity = getSuperEntity();
-        return (superEntity != null) ? superEntity.getLockType() : lockType;
+        return (superEntity != null) ? superEntity.getLockType() : declaredLockType;
     }
 
     /**
@@ -303,7 +303,7 @@ public class ObjEntity extends Entity implements ObjEntityListener, Configuratio
      * @since 1.1
      */
     public int getDeclaredLockType() {
-        return lockType;
+        return declaredLockType;
     }
 
     /**
@@ -312,7 +312,7 @@ public class ObjEntity extends Entity implements ObjEntityListener, Configuratio
      * @since 1.1
      */
     public void setDeclaredLockType(int i) {
-        lockType = i;
+        declaredLockType = i;
     }
 
     /**

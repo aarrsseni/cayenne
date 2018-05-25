@@ -23,12 +23,12 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.DbEntityEvent;
-import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.controllers.DbEntityFieldsController;
 import org.apache.cayenne.modeler.editor.ExistingSelectionProcessor;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
@@ -36,7 +36,6 @@ import org.apache.cayenne.modeler.graph.action.ShowGraphEntityAction;
 import org.apache.cayenne.modeler.util.ExpressionConvertor;
 import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
-import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
 import javax.swing.*;
@@ -74,9 +73,13 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
 
     private JToolBar toolBar;
 
+    private DbEntityFieldsController dbEntityFieldsController;
+
     public DbEntityTab(ProjectController mediator) {
         super();
         this.mediator = mediator;
+
+        dbEntityFieldsController = mediator.getBootiqueInjector().getInstance(DbEntityFieldsController.class);
 
         initView();
         initController();
@@ -252,81 +255,19 @@ public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, D
     }
 
     void setEntityName(String newName) {
-        if (newName != null && newName.trim().length() == 0) {
-            newName = null;
-        }
-
-        DbEntity entity = mediator.getCurrentState().getDbEntity();
-
-        if (entity == null || Util.nullSafeEquals(newName, entity.getName())) {
-            return;
-        }
-
-        if (newName == null) {
-            throw new ValidationException("Entity name is required.");
-        } else if (entity.getDataMap().getDbEntity(newName) == null) {
-            // completely new name, set new name for entity
-            DbEntityEvent e = new DbEntityEvent(this, entity, entity.getName());
-            entity.setName(newName);
-            // ProjectUtil.setDbEntityName(entity, newName);
-            mediator.fireEvent(e);
-        } else {
-            // there is an entity with the same name
-            throw new ValidationException("There is another entity with name '" + newName + "'.");
-        }
+        dbEntityFieldsController.dbEntityNameChanged(newName);
     }
 
     void setCatalog(String text) {
-
-        if (text != null && text.trim().length() == 0) {
-            text = null;
-        }
-
-        DbEntity ent = mediator.getCurrentState().getDbEntity();
-
-        if (ent != null && !Util.nullSafeEquals(ent.getCatalog(), text)) {
-            ent.setCatalog(text);
-            mediator.fireEvent(new DbEntityEvent(this, ent));
-        }
+        dbEntityFieldsController.dbEntityCatalogChanged(text);
     }
 
     void setSchema(String text) {
-
-        if (text != null && text.trim().length() == 0) {
-            text = null;
-        }
-
-        DbEntity ent = mediator.getCurrentState().getDbEntity();
-
-        if (ent != null && !Util.nullSafeEquals(ent.getSchema(), text)) {
-            ent.setSchema(text);
-            mediator.fireEvent(new DbEntityEvent(this, ent));
-        }
+        dbEntityFieldsController.dbEntitySchemaChanged(text);
     }
 
     void setQualifier(String qualifier) {
-
-        if (qualifier != null && qualifier.trim().length() == 0) {
-            qualifier = null;
-        }
-
-        DbEntity ent = mediator.getCurrentState().getDbEntity();
-
-        if (ent != null && !Util.nullSafeEquals(ent.getQualifier(), qualifier)) {
-            ExpressionConvertor convertor = new ExpressionConvertor();
-            try {
-                String oldQualifier = convertor.valueAsString(ent.getQualifier());
-                if (!Util.nullSafeEquals(oldQualifier, qualifier)) {
-                    Expression exp = (Expression) convertor.stringAsValue(qualifier);
-                    ent.setQualifier(exp);
-                    mediator.fireEvent(new DbEntityEvent(this, ent));
-                }
-            } catch (IllegalArgumentException ex) {
-                // unparsable qualifier
-                throw new ValidationException(ex.getMessage());
-            }
-
-        }
+        dbEntityFieldsController.dbEntityQualifierChenged(qualifier);
     }
 
     private String getComment(DbEntity entity) {

@@ -17,11 +17,12 @@ import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
 import org.apache.cayenne.modeler.components.CayenneTreeHelper;
 import org.apache.cayenne.modeler.components.CayenneTreeItem;
+import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TreeViewController implements Unbindable, DomainDisplayListener, DataMapDisplayListener, DataMapListener, DbEntityDisplayListener {
+public class TreeViewController implements Unbindable, DomainDisplayListener, DataMapDisplayListener, DataMapListener, DbEntityDisplayListener, ObjEntityDisplayListener {
 
     @FXML
     TreeView treeView;
@@ -70,6 +71,7 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
         projectController.getEventController().addListener(DomainDisplayListener.class, this);
         projectController.getEventController().addListener(DataMapDisplayListener.class, this);
         projectController.getEventController().addListener(DbEntityDisplayListener.class, this);
+        projectController.getEventController().addListener(ObjEntityDisplayListener.class, this);
     }
 
     @Override
@@ -216,6 +218,17 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
 
     @Override
     public void currentDbEntityChanged(DbEntityDisplayEvent e) {
+        e.setEntityChanged(true);
+
+        if ((e.getSource() == this || !e.isEntityChanged()) && !e.isRefired()) {
+            return;
+        }
+
+        cayenneTreeHelper.createTreeItem(e.getDomain(), e.getDataMap(), e.getEntity());
+    }
+
+    @Override
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
         e.setEntityChanged(true);
 
         if ((e.getSource() == this || !e.isEntityChanged()) && !e.isRefired()) {

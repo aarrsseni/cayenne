@@ -64,7 +64,7 @@ public class CustomComboBoxCell<Observer, T> extends BasicTableCell<Observer, T>
                 setText(null);
                 setGraphic(comboBox);
             } else {
-                if(getItem() != null && (Integer)getItem() != Integer.MAX_VALUE) {
+                if(getItem() != null) {
                     setText(comboBoxCellConverter.fromItem(getItem()));
                     comboBox.getSelectionModel().select(comboBoxCellConverter.fromItem(getItem()));
                     setGraphic(null);
@@ -81,6 +81,10 @@ public class CustomComboBoxCell<Observer, T> extends BasicTableCell<Observer, T>
         comboBox.setItems(types);
         comboBox.setEditable(true);
         comboBox.setVisibleRowCount(10);
+
+        this.widthProperty().addListener((arg0, arg1, arg2) -> {
+            comboBox.setPrefWidth(arg2.doubleValue());
+        });
     }
 
     private void initComboBoxFocus(){

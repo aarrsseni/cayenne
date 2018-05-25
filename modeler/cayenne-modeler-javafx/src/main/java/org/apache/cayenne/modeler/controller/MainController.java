@@ -7,11 +7,13 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
+import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
 
-public class MainController implements Unbindable, DataMapDisplayListener, DomainDisplayListener, DbEntityDisplayListener{
+public class MainController implements Unbindable, DataMapDisplayListener, DomainDisplayListener, DbEntityDisplayListener, ObjEntityDisplayListener{
 
     @Inject
     public ScreenController screenController;
@@ -66,6 +68,7 @@ public class MainController implements Unbindable, DataMapDisplayListener, Domai
         projectController.getEventController().addListener(DataMapDisplayListener.class, this);
         projectController.getEventController().addListener(DomainDisplayListener.class, this);
         projectController.getEventController().addListener(DbEntityDisplayListener.class, this);
+        projectController.getEventController().addListener(ObjEntityDisplayListener.class, this);
     }
 
     @Override
@@ -91,5 +94,10 @@ public class MainController implements Unbindable, DataMapDisplayListener, Domai
     @Override
     public void currentDbEntityChanged(DbEntityDisplayEvent e) {
         screenController.loadAndUpdatePane(projectViewPane, "../DbEntityView.fxml");
+    }
+
+    @Override
+    public void currentObjEntityChanged(ObjEntityDisplayEvent e) {
+        screenController.loadAndUpdatePane(projectViewPane, "../ObjEntityView.fxml");
     }
 }

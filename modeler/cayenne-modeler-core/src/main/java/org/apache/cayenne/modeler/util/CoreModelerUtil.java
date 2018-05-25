@@ -22,6 +22,17 @@ package org.apache.cayenne.modeler.util;
 import org.apache.cayenne.reflect.PropertyUtils;
 import org.apache.cayenne.util.CayenneMapEntry;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.UUID;
+
 /**
  * @since 4.1
  */
@@ -42,5 +53,53 @@ public final class CoreModelerUtil {
                 return null;
             }
         }
+    }
+
+    public static String[] getRegisteredTypeNames() {
+        String[] nonPrimitivesNames = {
+                String.class.getName(),
+                BigDecimal.class.getName(),
+                BigInteger.class.getName(),
+                Boolean.class.getName(),
+                Byte.class.getName(),
+                Character.class.getName(),
+                Date.class.getName(),
+                java.util.Date.class.getName(),
+                Double.class.getName(),
+                Float.class.getName(),
+                Integer.class.getName(),
+                Long.class.getName(),
+                Short.class.getName(),
+                Time.class.getName(),
+                Timestamp.class.getName(),
+                Date.class.getName(),
+                GregorianCalendar.class.getName(),
+                Calendar.class.getName(),
+                UUID.class.getName(),
+                Serializable.class.getName(),
+                "java.lang.Character[]",
+                "java.lang.Byte[]",
+                "java.time.LocalDate",
+                "java.time.LocalTime",
+                "java.time.LocalDateTime"
+        };
+        Arrays.sort(nonPrimitivesNames);
+
+        String[] primitivesNames = {
+                "boolean", "byte", "byte[]", "char", "char[]", "double", "float", "int", "long", "short"
+        };
+
+        String[] finalList = new String[primitivesNames.length + nonPrimitivesNames.length + 1];
+
+        finalList[0] = "";
+        System.arraycopy(primitivesNames, 0, finalList, 1, primitivesNames.length);
+        System.arraycopy(
+                nonPrimitivesNames,
+                0,
+                finalList,
+                primitivesNames.length + 1,
+                nonPrimitivesNames.length);
+
+        return finalList;
     }
 }

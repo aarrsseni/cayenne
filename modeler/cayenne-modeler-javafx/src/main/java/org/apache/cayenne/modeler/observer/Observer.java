@@ -39,7 +39,6 @@ public class Observer {
         }
         bindings.put(bindedProperty, fieldProperty);
         if (fieldProperty.getClass() == SimpleIntegerProperty.class) {
-            System.out.println("hello");
             fieldProperty.setValue(callBeanGetter(fieldName));
             Bindings.bindBidirectional(bindedProperty, fieldProperty, new IntegerStringConverter());
         } else if (fieldProperty.getClass() == SimpleDoubleProperty.class) {
@@ -48,7 +47,7 @@ public class Observer {
         } else if (fieldProperty.getClass() == SimpleFloatProperty.class) {
             fieldProperty.setValue(callBeanGetter(fieldName));
             Bindings.bindBidirectional(bindedProperty, fieldProperty, new FloatStringConverter());
-        } else{
+        } else {
             fieldProperty.setValue(callBeanGetter(fieldName));
             Bindings.bindBidirectional(bindedProperty, fieldProperty);
         }
@@ -148,9 +147,18 @@ public class Observer {
         if(property == null) {
             property = getPropertyImpl(fieldName);
             fieldsProperties.put(fieldName, property);
-            property.setValue(callBeanGetter(fieldName));
         }
+        property.setValue(callBeanGetter(fieldName));
 
+        return property;
+    }
+
+    public <T> Property<T> getCustomPropertyWithoutBinding(String fieldName, Class<T> fieldType) {
+        Property<T> property = fieldsProperties.get(fieldName);
+        if(property == null){
+            property = getPropertyInstance(fieldType);
+            fieldsProperties.put(fieldName, property);
+        }
         return property;
     }
 
@@ -169,7 +177,7 @@ public class Observer {
         try {
             method = fieldSetter.get(fieldName);
             if (method == null) {
-                method = bean.getClass().getMethod(getAccessMethodName("set", fieldName), getFieldType(fieldName));
+                method = bean.getClass().getMethod(getAccessMethodName("set", makeCorrectField(fieldName)), getFieldType(fieldName));
                 fieldSetter.put(fieldName, method);
             }
             if (method != null) {
@@ -187,9 +195,9 @@ public class Observer {
             method = fieldGetter.get(fieldName);
             if(method == null) {
                 if (!getFieldType(fieldName).equals(boolean.class)) {
-                    method = bean.getClass().getMethod(getAccessMethodName("get", fieldName));
+                    method = bean.getClass().getMethod(getAccessMethodName("get", makeCorrectField(fieldName)));
                 } else {
-                    method = bean.getClass().getMethod(getAccessMethodName("is", fieldName));
+                    method = bean.getClass().getMethod(getAccessMethodName("is", makeCorrectField(fieldName)));
                 }
                 fieldGetter.put(fieldName, method);
             }
@@ -210,4 +218,10 @@ public class Observer {
         return fieldsProperties;
     }
 
+    private String makeCorrectField(String fieldName){
+        if(fieldName.startsWith("_")){
+            fieldName = fieldName.substring(1);
+        }
+        return fieldName;
+    }
 }

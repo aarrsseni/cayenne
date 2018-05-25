@@ -11,6 +11,7 @@ import org.apache.cayenne.modeler.action.CreateDataMapAction;
 import org.apache.cayenne.modeler.action.NewProjectAction;
 import org.apache.cayenne.modeler.action.SaveAction;
 import org.apache.cayenne.modeler.action.SaveAsAction;
+import org.apache.cayenne.modeler.controller.DbRelationshipsController;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.init.CayenneModelerModule;
 import org.apache.cayenne.modeler.util.AbstractCayenneAction;
@@ -75,6 +76,8 @@ public class JavaFXModule implements Module {
         binder.bind(CayenneTreeHelper.class).in(Singleton.class);
 
         binder.bind(ProjectValidator.class).to(DefaultProjectValidator.class);
+
+        binder.bind(DbRelationshipsController.class).in(Singleton.class);
     }
 
     @Provides

@@ -8,6 +8,7 @@ import org.apache.cayenne.modeler.action.CreateDataMapAction;
 import org.apache.cayenne.modeler.action.NewProjectAction;
 import org.apache.cayenne.modeler.action.SaveAsAction;
 import org.apache.cayenne.modeler.services.DbEntityService;
+import org.apache.cayenne.modeler.services.ObjEntityService;
 
 import java.io.IOException;
 
@@ -82,6 +83,9 @@ public class ToolBarController implements Unbindable{
     @Inject
     public ScreenController screenController;
 
+    @Inject
+    public ObjEntityService objEntityService;
+
     @FXML
     @SuppressWarnings("unchecked")
     public void initialize() throws IOException {
@@ -112,4 +116,8 @@ public class ToolBarController implements Unbindable{
         dbEntityService.createDbEntity();
     }
 
+    @FXML
+    public void createObjEntityAction(ActionEvent e) {
+        objEntityService.createObjEntity();
+    }
 }

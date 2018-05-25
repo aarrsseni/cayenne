@@ -28,6 +28,7 @@ import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.controllers.ObjEntityFieldsController;
 import org.apache.cayenne.modeler.dialog.objentity.ClassNameUpdater;
 import org.apache.cayenne.modeler.dialog.validator.DuplicatedAttributesDialog;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
@@ -88,8 +89,13 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
     protected TextAdapter clientClassName;
     protected TextAdapter clientSuperClassName;
 
+    private ObjEntityFieldsController objEntityFieldsController;
+
     public ObjEntityTab(ProjectController mediator) {
         this.mediator = mediator;
+
+        objEntityFieldsController = mediator.getBootiqueInjector().getInstance(ObjEntityFieldsController.class);
+
         initView();
         initController();
     }
@@ -216,14 +222,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
 
             public void actionPerformed(ActionEvent e) {
                 // Change DbEntity for current ObjEntity
-                ObjEntity entity = mediator.getCurrentState().getObjEntity();
-                DbEntity dbEntity = (DbEntity) dbEntityCombo.getSelectedItem();
-       
-
-                if (dbEntity != entity.getDbEntity()) {
-                    entity.setDbEntity(dbEntity);
-                    mediator.fireEvent(new ObjEntityEvent(this, entity));
-                }
+                objEntityFieldsController.dbEntityChanged((DbEntity)dbEntityCombo.getSelectedItem());
             }
         });
 
@@ -307,11 +306,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
 
             @Override
             public void itemStateChanged(ItemEvent e) {
-                ObjEntity entity = mediator.getCurrentState().getObjEntity();
-                if (entity != null) {
-                    entity.setReadOnly(readOnly.isSelected());
-                    mediator.fireEvent(new ObjEntityEvent(this, entity));
-                }
+                objEntityFieldsController.isReadOnlyChanged(readOnly.isSelected());
             }
         });
 
@@ -345,11 +340,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
 
             @Override
             public void itemStateChanged(ItemEvent e) {
-                ObjEntity entity = mediator.getCurrentState().getObjEntity();
-                if (entity != null) {
-                    entity.setAbstract(isAbstract.isSelected());
-                    mediator.fireEvent(new ObjEntityEvent(this, entity));
-                }
+                objEntityFieldsController.isAbstractChanged(isAbstract.isSelected());
             }
         });
     }
@@ -414,31 +405,11 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
     }
 
     void setClassName(String className) {
-        if (className != null && className.trim().length() == 0) {
-            className = null;
-        }
-
-        ObjEntity entity = mediator.getCurrentState().getObjEntity();
-
-        // "ent" may be null if we quit editing by changing tree selection
-        if (entity != null && !Util.nullSafeEquals(entity.getClassName(), className)) {
-            entity.setClassName(className);
-            mediator.fireEvent(new ObjEntityEvent(this, entity));
-        }
+        objEntityFieldsController.objEntityClassNameChanged(className);
     }
 
     void setSuperClassName(String text) {
-
-        if (text != null && text.trim().length() == 0) {
-            text = null;
-        }
-
-        ObjEntity ent = mediator.getCurrentState().getObjEntity();
-
-        if (ent != null && !Util.nullSafeEquals(ent.getSuperClassName(), text)) {
-            ent.setSuperClassName(text);
-            mediator.fireEvent(new ObjEntityEvent(this, ent));
-        }
+        objEntityFieldsController.objEntitySuperclassChanged(text);
     }
 
     void setClientClassName(String className) {
@@ -457,16 +428,6 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
 
     void setClientSuperClassName(String text) {
 
-        if (text != null && text.trim().length() == 0) {
-            text = null;
-        }
-
-        ObjEntity ent = mediator.getCurrentState().getObjEntity();
-
-        if (ent != null && !Util.nullSafeEquals(ent.getClientSuperClassName(), text)) {
-            ent.setClientSuperClassName(text);
-            mediator.fireEvent(new ObjEntityEvent(this, ent));
-        }
     }
 
     void setQualifier(String text) {

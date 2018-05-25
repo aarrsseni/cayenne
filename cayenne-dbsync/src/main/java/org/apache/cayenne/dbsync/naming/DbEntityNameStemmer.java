@@ -23,7 +23,8 @@ package org.apache.cayenne.dbsync.naming;
  *
  * @since 4.0
  */
-public interface DbEntityNameStemmer {
+public interface
+DbEntityNameStemmer {
 
     String stem(String dbEntityName);
 }

@@ -1,9 +1,7 @@
 package org.apache.cayenne.modeler.intercept;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.asm.MethodInterceptor;
 
 import java.lang.instrument.ClassDefinition;
@@ -28,6 +26,8 @@ public class CustomAgent {
         redefinedClasses.add(DataMap.class);
         redefinedClasses.add(DbEntity.class);
         redefinedClasses.add(DbAttribute.class);
+        redefinedClasses.add(ObjEntity.class);
+        redefinedClasses.add(ObjAttribute.class);
     }
 
     public static void premain(String arguments, Instrumentation instrumentation) {

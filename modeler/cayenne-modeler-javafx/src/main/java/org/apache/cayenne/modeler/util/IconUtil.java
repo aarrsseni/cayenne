@@ -5,6 +5,7 @@ import javafx.scene.image.ImageView;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.modeler.ModelerConstants;
 
 public final class IconUtil {
@@ -12,6 +13,7 @@ public final class IconUtil {
     protected static Image domainImage = createImage("dbMore.png");
     protected static Image dataMapImage = createImage("original.png");
     protected static Image dbEntityImage = createImage("dbEntity.png");
+    protected static Image objEntityImage = createImage("newObjentity.png");
 
 
     private static Image createImage(String name) {
@@ -35,6 +37,9 @@ public final class IconUtil {
             return imageView;
         } else if(object instanceof DbEntity) {
             imageView.setImage(dbEntityImage);
+            return imageView;
+        } else if(object instanceof ObjEntity) {
+            imageView.setImage(objEntityImage);
             return imageView;
         }
         return null;

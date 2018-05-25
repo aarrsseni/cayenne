@@ -65,6 +65,19 @@
     -fx-border-color:none;
     -fx-background-color:transparent;
 }
+.combo-box .list-cell{
+    -fx-border-color:grey;
+    -fx-background-color:white;
+}
+.combo-box .list-cell:hover  {
+    -fx-color:white;
+   -fx-background-color:grey;
+}
+.table-cell .combo-box{
+   -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, white;
+   -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+   -fx-background-radius: 3px, 3px, 2px, 1px;
+}
 .table-cell .combo-box .list-cell  {
    -fx-padding: 1;
    -fx-border-color:none;
@@ -80,4 +93,7 @@
 }
 .table-cell:focused {
    -fx-padding: 1;
+}
+.cell-disabled {
+    -fx-background-color: grey;
 }
