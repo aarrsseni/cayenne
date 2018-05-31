@@ -15,7 +15,7 @@ import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.ObjEntityListener;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.components.AttributeTable;
+import org.apache.cayenne.modeler.components.TableFactory;
 import org.apache.cayenne.modeler.controllers.ObjEntityFieldsController;
 import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
@@ -26,6 +26,7 @@ import org.apache.cayenne.modeler.event.listener.ObjAttributeDisplayListener;
 import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
 import org.apache.cayenne.modeler.services.AttributeService;
+import org.apache.cayenne.modeler.services.RelationshipService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,10 +100,16 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
     private ObjEntityFieldsController objEntityFieldsController;
 
     @Inject
-    private AttributeTable attributeTable;
+    private TableFactory tableFactory;
 
     @Inject
     private AttributeService createAttributeService;
+
+    @Inject
+    private ObjRelationshipsController objRelationshipsController;
+
+    @Inject
+    public RelationshipService relationshipService;
 
     public ObjEntityController(){
         this.objAttrsMap = new HashMap<>();
@@ -119,6 +126,8 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
         initListeners();
         makeResizable();
         prepareTables();
+
+        objRelationshipsController.init(relationshipView);
     }
 
     @Override
@@ -142,6 +151,9 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
 
        fillTable();
 
+       objRelationshipsController.bindTable(objEntity);
+       objRelationshipsController.setObjEntity(objEntity);
+
        System.out.println("Bind " + getClass());
     }
 
@@ -149,6 +161,8 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
     public void unbind() {
         ObserverDictionary.getObserver(objEntity)
                 .unbindAll();
+
+        objRelationshipsController.unbindTable();
 
         tableView.setItems(null);
 
@@ -215,7 +229,7 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
     }
 
     private void prepareTables(){
-        tableView.getColumns().addAll(attributeTable.createObjTable());
+        tableView.getColumns().addAll(tableFactory.createObjTable());
 
         // single cell selection mode
         tableView.getSelectionModel().setCellSelectionEnabled(true);
@@ -295,6 +309,11 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
         }
     }
 
+    @FXML
+    public void createObjRelationships(ActionEvent e) throws Exception {
+        relationshipService.createRelationship();
+    }
+
     @Override
     public void currentObjAttributeChanged(ObjAttributeDisplayEvent e) {
         checkObjAttrs(objEntity, ObserverDictionary.getObserver(e.getAttributes()[0]));
@@ -332,5 +351,9 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
     @Override
     public void objEntityRemoved(EntityEvent e) {
 
+    }
+
+    public Map<ObjEntity, ObservableList<Observer>> getObjAttrsMap(){
+        return objAttrsMap;
     }
 }

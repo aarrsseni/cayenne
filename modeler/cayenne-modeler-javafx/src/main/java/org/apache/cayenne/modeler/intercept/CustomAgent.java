@@ -28,6 +28,8 @@ public class CustomAgent {
         redefinedClasses.add(DbAttribute.class);
         redefinedClasses.add(ObjEntity.class);
         redefinedClasses.add(ObjAttribute.class);
+        redefinedClasses.add(DbRelationship.class);
+        redefinedClasses.add(DbJoin.class);
     }
 
     public static void premain(String arguments, Instrumentation instrumentation) {

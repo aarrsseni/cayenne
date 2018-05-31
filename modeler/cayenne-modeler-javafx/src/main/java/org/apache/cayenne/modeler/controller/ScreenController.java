@@ -20,6 +20,8 @@ public class ScreenController {
     private Stage primaryStage;
     private Unbindable unbindableController;
 
+    private Stage currentPopStage;
+
     @Inject
     private FXMLLoaderFactory fxmlLoaderFactory;
 
@@ -112,5 +114,13 @@ public class ScreenController {
 
         rootPane.heightProperty().addListener((arg0, arg1, arg2) -> childPane.setPrefHeight(arg2.doubleValue()));
         rootPane.widthProperty().addListener((arg0, arg1, arg2) -> childPane.setPrefWidth(arg2.doubleValue()));
+    }
+
+    public Stage getCurrentPopStage() {
+        return currentPopStage;
+    }
+
+    public void setCurrentPopStage(Stage currentPopStage) {
+        this.currentPopStage = currentPopStage;
     }
 }

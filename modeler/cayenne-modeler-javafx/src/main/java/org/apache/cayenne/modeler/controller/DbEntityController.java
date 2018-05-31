@@ -13,7 +13,7 @@ import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.components.AttributeTable;
+import org.apache.cayenne.modeler.components.TableFactory;
 import org.apache.cayenne.modeler.controllers.DbEntityFieldsController;
 import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DbAttributeDisplayListener;
@@ -73,7 +73,7 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
     private ChoiceBox pkGenerator;
 
     @Inject
-    private AttributeTable attributeTable;
+    private TableFactory tableFactory;
 
     @Inject
     public ProjectController projectController;
@@ -118,7 +118,7 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
         makeResizable();
         prepareTables();
 
-        dbRelationshipsController.init(relView, dbEntity);
+        dbRelationshipsController.init(relView);
     }
 
 
@@ -217,7 +217,7 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
     }
 
     private void prepareTables(){
-        tableView.getColumns().addAll(attributeTable.createDbTable());
+        tableView.getColumns().addAll(tableFactory.createDbTable());
         // single cell selection mode
         tableView.getSelectionModel().setCellSelectionEnabled(true);
     }
