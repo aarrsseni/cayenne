@@ -8,7 +8,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.modeler.BQApplication;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
@@ -42,7 +41,8 @@ public class DataDomainController implements Unbindable, DomainDisplayListener{
     @FXML
     @SuppressWarnings("unchecked")
     public void initialize() {
-        dataDomain = projectController.getCurrentState().getDomain();
+
+        dataDomain = (DataChannelDescriptor) projectController.getProject().getRootNode();
 
         initListeners();
         makeResizable();

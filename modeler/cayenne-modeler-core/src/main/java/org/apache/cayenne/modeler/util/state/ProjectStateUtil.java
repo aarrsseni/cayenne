@@ -62,11 +62,11 @@ public final class ProjectStateUtil {
     public void fireLastState(ProjectController controller) {
         ProjectStatePreferences preferences = controller.getProjectStatePreferences();
 
-        String displayEventName = preferences.getEvent();
-        if (!displayEventName.isEmpty()) {
-            DisplayEventTypes.valueOf(displayEventName)
-                    .createDisplayEventType(controller)
-                    .fireLastDisplayEvent();
+            String displayEventName = preferences.getEvent();
+            if (!displayEventName.isEmpty()) {
+                DisplayEventTypes.valueOf(displayEventName)
+                        .createDisplayEventType(controller)
+                        .fireLastDisplayEvent();
         }
     }
 

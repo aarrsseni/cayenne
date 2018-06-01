@@ -6,6 +6,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.controller.TreeViewController;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
+import org.apache.cayenne.modeler.util.state.ProjectStateUtil;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.project.validation.ProjectValidator;
 import org.apache.cayenne.validation.ValidationFailure;
@@ -17,6 +19,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class JavaFxModelerController{
+
+    private static final ProjectStateUtil PROJECT_STATE_UTIL = new ProjectStateUtil();
 
     @Inject
     public ScreenController screenController;
@@ -70,7 +74,7 @@ public class JavaFxModelerController{
 
         //update preferences!
 
-        //fire last state
+//        PROJECT_STATE_UTIL.fireLastState(projectController);
 
         // for validation purposes combine load failures with post-load validation (not
         // sure if that'll cause duplicate messages?).
@@ -118,6 +122,13 @@ public class JavaFxModelerController{
             Thread cleanup = new ExpireThread(message, 6);
             cleanup.start();
         }
+    }
+
+    public void projectSavedAction() {
+        projectController.fireEvent(new ProjectDirtyEvent(this, false));
+        projectController.updateProjectControllerPreferences();
+        updateStatus("Project saved...");
+//        frame.setTitle(projectController.getProject().getConfigurationResource().getURL().getPath());
     }
 
     class ExpireThread extends Thread {

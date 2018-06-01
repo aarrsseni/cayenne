@@ -243,7 +243,7 @@ public class CayenneModelerController extends CayenneController {
             projectController.fireEvent(new RecentFileListEvent(this));
         }
 
-        PROJECT_STATE_UTIL.fireLastState(projectController);
+//        PROJECT_STATE_UTIL.fireLastState(projectController);
 
         // for validation purposes combine load failures with post-load validation (not
         // sure if that'll cause duplicate messages?).

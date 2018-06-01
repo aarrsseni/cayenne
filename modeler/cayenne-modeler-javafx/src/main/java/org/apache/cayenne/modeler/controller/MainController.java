@@ -48,6 +48,13 @@ public class MainController implements Unbindable, DataMapDisplayListener, Domai
         initListeners();
     }
 
+    private void initView() {
+//        initToolBar();
+//        initStatusBar();
+
+        initLastView();
+    }
+
     private void initToolBar() {
         screenController.loadAndUpdatePane(toolBarPane, "../ToolBar.fxml");
     }

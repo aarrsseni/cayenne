@@ -132,6 +132,11 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
                 .bind("schema", dbEntitySchema.textProperty())
                 .bind("qualifier", dbEntityQualifier.textProperty());
 
+
+        for(DbAttribute dbAttribute : dbEntity.getAttributes()){
+            checkDbAttrs(dbEntity, ObserverDictionary.getObserver(dbAttribute));
+        }
+
         tableView.setItems(dbAttrsMap.get(dbEntity));
 
         dbRelationshipsController.bindTable(dbEntity);
@@ -142,6 +147,10 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
 
     @Override
     public void unbind() {
+        if(!dbAttrsMap.isEmpty()) {
+            dbAttrsMap.get(dbEntity).clear();
+        }
+
         tableView.setItems(null);
         dbRelationshipsController.unbindTable();
         ObserverDictionary.getObserver(dbEntity).unbindAll();

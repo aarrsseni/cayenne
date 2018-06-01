@@ -5,6 +5,7 @@ import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.stage.DirectoryChooser;
 import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.modeler.JavaFxModelerController;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
@@ -25,6 +26,9 @@ public class SaveAsAction extends AbstractCayenneAction {
 
     @Inject
     public ProjectController projectController;
+
+    @Inject
+    public JavaFxModelerController javaFxModelerController;
 
     protected boolean saveAll() throws Exception {
 
@@ -52,6 +56,8 @@ public class SaveAsAction extends AbstractCayenneAction {
         } catch (Exception ex) {
             throw new CayenneRuntimeException("Error on save", ex);
         }
+
+        javaFxModelerController.projectSavedAction();
 
         // If there were errors or warnings at validation, display them
         if (validationResult.getFailures().size() > 0) {

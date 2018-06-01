@@ -7,22 +7,21 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TreeView;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.configuration.event.DataMapEvent;
-import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.components.CayenneTreeHelper;
+import org.apache.cayenne.modeler.components.CayenneTreeItem;
 import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
-import org.apache.cayenne.modeler.components.CayenneTreeHelper;
-import org.apache.cayenne.modeler.components.CayenneTreeItem;
 import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
+import org.apache.cayenne.project.Project;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TreeViewController implements Unbindable, DomainDisplayListener, DataMapDisplayListener, DataMapListener, DbEntityDisplayListener, ObjEntityDisplayListener {
+public class TreeViewController implements Unbindable, DomainDisplayListener, DataMapDisplayListener, DbEntityDisplayListener, ObjEntityDisplayListener {
 
     @FXML
     TreeView treeView;
@@ -55,6 +54,23 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
                 processSelection(selectedItem);
             }
         });
+
+        initFromModel(projectController.getProject());
+    }
+
+    private void initFromModel(Project project) {
+        DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor)project.getConfigurationTree().getRootNode();
+        cayenneTreeHelper.createTreeItem(dataChannelDescriptor);
+        for(DataMap dataMap : dataChannelDescriptor.getDataMaps()){
+            cayenneTreeHelper.createTreeItem(dataChannelDescriptor, dataMap);
+            for(DbEntity dbEntity : dataMap.getDbEntities()){
+                cayenneTreeHelper.createTreeItem(dataChannelDescriptor, dataMap, dbEntity);
+            }
+            for(ObjEntity objEntity : dataMap.getObjEntities()){
+                cayenneTreeHelper.createTreeItem(dataChannelDescriptor, dataMap, objEntity);
+            }
+        }
+        treeView.getSelectionModel().select(treeView.getRoot());
     }
 
     @Override
@@ -92,20 +108,6 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
         cayenneTreeHelper.createTreeItem(e.getDomain(), e.getDataMap());
     }
 
-    @Override
-    public void dataMapChanged(DataMapEvent e) {
-
-    }
-
-    @Override
-    public void dataMapAdded(DataMapEvent e) {
-
-    }
-
-    @Override
-    public void dataMapRemoved(DataMapEvent e) {
-
-    }
 
     /**
      * Returns array of the user objects ending with this and starting with one under

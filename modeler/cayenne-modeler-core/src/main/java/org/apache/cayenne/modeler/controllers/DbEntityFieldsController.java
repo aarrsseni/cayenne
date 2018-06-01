@@ -6,6 +6,7 @@ import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.ExpressionConvertor;
+import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
@@ -31,7 +32,7 @@ public class DbEntityFieldsController {
             // completely new name, set new name for entity
             DbEntityEvent e = new DbEntityEvent(this, entity, entity.getName());
             entity.setName(newName);
-            // ProjectUtil.setDbEntityName(entity, newName);
+            ProjectUtil.setDbEntityName(entity, newName);
             projectController.fireEvent(e);
         } else {
             // there is an entity with the same name

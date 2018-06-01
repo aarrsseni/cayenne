@@ -67,6 +67,24 @@ public class WelcomeController{
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         File res = fileChooser.showOpenDialog(screenController.getPrimaryStage());
+
+        if (res == null) {
+            try {
+                // Get the project file name (always cayenne.xml)
+
+            } catch (Exception ex) {
+
+            }
+        }
+
+        if (res != null) {
+            // by now if the project is unsaved, this has been a user choice...
+//            if (projectController != null) {
+//                return;
+//            }
+
+            openProject(res);
+        }
     }
 
     @FXML
