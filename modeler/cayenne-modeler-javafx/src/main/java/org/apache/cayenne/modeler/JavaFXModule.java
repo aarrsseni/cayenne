@@ -66,22 +66,18 @@ public class JavaFXModule implements Module {
 
         contributeApplicationClass(binder);
 
-        binder.bind(ScreenController.class).in(Singleton.class);
-
         setActionClass(binder, new NewProjectAction());
         setActionClass(binder, new SaveAction());
         setActionClass(binder, new SaveAsAction());
         setActionClass(binder, new CreateDataMapAction());
 
+        binder.bind(ScreenController.class).in(Singleton.class);
         binder.bind(JavaFXLauncher.class).to(GenericJavaFXLauncher.class);
         binder.bind(BaseApplication.class).in(Singleton.class);
         binder.bind(CayenneTreeHelper.class).in(Singleton.class);
-
         binder.bind(ProjectValidator.class).to(DefaultProjectValidator.class);
-
         binder.bind(DbRelationshipsController.class).in(Singleton.class);
         binder.bind(ObjRelationshipsController.class).in(Singleton.class);
-
         binder.bind(Consumer.class).to(DbRelationshipConsumer.class);
     }
 

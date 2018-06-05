@@ -41,9 +41,6 @@ public class DataDomainController implements Unbindable, DomainDisplayListener{
     @FXML
     @SuppressWarnings("unchecked")
     public void initialize() {
-
-        dataDomain = (DataChannelDescriptor) projectController.getProject().getRootNode();
-
         initListeners();
         makeResizable();
     }
@@ -54,20 +51,19 @@ public class DataDomainController implements Unbindable, DomainDisplayListener{
 
     @Override
     public void bind() {
+        dataDomain = (DataChannelDescriptor) projectController.getProject().getRootNode();
         ObserverDictionary.getObserver(dataDomain)
                 .bind("name", name.textProperty());
-        System.out.println("Bind dataDomainController");
     }
 
     @Override
     public void unbind() {
         ObserverDictionary.getObserver(dataDomain).unbindAll();
-        System.out.println("Unbind dataDomain.");
     }
 
     @Override
     public void currentDomainChanged(DomainDisplayEvent e) {
-//        name.setText(e.getDomain().getName());
+
     }
 
     public void makeResizable() {

@@ -12,10 +12,7 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.components.CayenneTreeHelper;
 import org.apache.cayenne.modeler.components.CayenneTreeItem;
 import org.apache.cayenne.modeler.event.*;
-import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
-import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
-import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.*;
 import org.apache.cayenne.project.Project;
 
 import java.util.ArrayList;
@@ -49,13 +46,12 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
                                 Object newValue) {
                 CayenneTreeItem selectedItem = (CayenneTreeItem) newValue;
 
-                selectedItem.bind();
-
                 processSelection(selectedItem);
+
+                selectedItem.bind();
             }
         });
 
-        initFromModel(projectController.getProject());
     }
 
     private void initFromModel(Project project) {
@@ -75,12 +71,12 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
 
     @Override
     public void bind() {
-        System.out.println("Bind treeViewController");
+        initFromModel(projectController.getProject());
     }
 
     @Override
     public void unbind() {
-        System.out.println("Unbind treeViewController");
+
     }
 
     public void initListeners() {
@@ -104,7 +100,6 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
         if ((e.getSource() == this || !e.isDataMapChanged()) && !e.isRefired()) {
             return;
         }
-
         cayenneTreeHelper.createTreeItem(e.getDomain(), e.getDataMap());
     }
 
@@ -132,7 +127,7 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
             return;
         }
 
-        CayenneTreeItem currentNode = (CayenneTreeItem) treeItem;
+        CayenneTreeItem currentNode = treeItem;
 
         Object[] data = getUserObjects(currentNode);
         if (data.length == 0) {

@@ -55,5 +55,4 @@ public class CayenneTreeHelper {
         treeView.getSelectionModel().select(item);
 
     }
-
 }

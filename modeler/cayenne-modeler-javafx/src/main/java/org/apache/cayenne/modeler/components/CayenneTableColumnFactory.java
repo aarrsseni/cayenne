@@ -1,6 +1,5 @@
 package org.apache.cayenne.modeler.components;
 
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -17,12 +16,7 @@ public class CayenneTableColumnFactory {
 
     private <T> TableColumn<Observer, T> createColumn(String columnName, String attrName){
         TableColumn<Observer, T> tableColumn = new TableColumn<>(columnName);
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Observer, T>, ObservableValue<T>>() {
-            @Override
-            public ObservableValue<T> call(TableColumn.CellDataFeatures<Observer, T> cell) {
-                return cell.getValue().getPropertyWithoutBinding(attrName);
-            }
-        });
+        tableColumn.setCellValueFactory(cell -> cell.getValue().getPropertyWithoutBinding(attrName));
 
         return tableColumn;
     }
@@ -125,12 +119,7 @@ public class CayenneTableColumnFactory {
 
     public TableColumn<Observer, String> createComboBoxWithCustomProperty(String columnName, String attrName, ObservableList<String> list, ComboBoxCellConverter<String> comboBoxCellConverter) {
         TableColumn<Observer, String> tableColumn = new TableColumn<>(columnName);
-        tableColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Observer, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Observer, String> cell) {
-                return cell.getValue().getCustomPropertyWithoutBinding(attrName, String.class);
-            }
-        });
+        tableColumn.setCellValueFactory(cell -> cell.getValue().getCustomPropertyWithoutBinding(attrName, String.class));
 
         tableColumn.setCellFactory(cell -> new AutoCompleteComboBoxWithIcon<>(list, comboBoxCellConverter));
 

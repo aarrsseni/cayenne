@@ -3,6 +3,7 @@ package org.apache.cayenne.modeler.intercept;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.asm.MethodInterceptor;
+import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
@@ -30,6 +31,7 @@ public class CustomAgent {
         redefinedClasses.add(ObjAttribute.class);
         redefinedClasses.add(DbRelationship.class);
         redefinedClasses.add(DbJoin.class);
+        redefinedClasses.add(ObjRelationship.class);
     }
 
     public static void premain(String arguments, Instrumentation instrumentation) {
@@ -39,7 +41,7 @@ public class CustomAgent {
             try {
                 instrumentation.redefineClasses(new ClassDefinition(clazz, bytecode));
             } catch (ClassNotFoundException | UnmodifiableClassException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger(CustomAgent.class).error("Can't redefine class " + clazz + "." + e);
             }
         });
     }

@@ -23,12 +23,12 @@ public class StatusBarController implements Unbindable, DomainDisplayListener{
 
     @Override
     public void bind() {
-        System.out.println("Bind statusBarController");
+
     }
 
     @Override
     public void unbind() {
-        System.out.println("Unbind statusBarController");
+
     }
 
     public void initListeners() {

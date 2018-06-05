@@ -74,7 +74,6 @@ public class DataMapController implements Unbindable{
     @Override
     public void bind() {
         selectedDataMap = projectController.getCurrentState().getDataMap();
-        System.out.println("Bind dataMap");
         ObserverDictionary.getObserver(selectedDataMap)
                 .bind("name", datamapName.textProperty())
                 .bind("defaultCatalog", dbCatalog.textProperty())
@@ -89,14 +88,10 @@ public class DataMapController implements Unbindable{
     @Override
     public void unbind() {
         ObserverDictionary.getObserver(selectedDataMap).unbindAll();
-
-        System.out.println("Unbind " + getClass());
     }
 
     public void initListeners() {
-
     }
-
 
     public void makeResizable() {
         dataMapRoot.heightProperty().addListener((arg0, arg1, arg2) -> {

@@ -2,18 +2,14 @@ package org.apache.cayenne.modeler.controller;
 
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
+import javafx.scene.control.MenuBar;
 import javafx.scene.layout.Pane;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
-import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
-import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
-import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
+import org.apache.cayenne.modeler.components.MenuBarFactory;
+import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.listener.*;
 
-public class MainController implements Unbindable, DataMapDisplayListener, DomainDisplayListener, DbEntityDisplayListener, ObjEntityDisplayListener{
+public class MainController implements Unbindable, DataMapDisplayListener, DbEntityDisplayListener, ObjEntityDisplayListener{
 
     @Inject
     public ScreenController screenController;
@@ -33,8 +29,14 @@ public class MainController implements Unbindable, DataMapDisplayListener, Domai
     @FXML
     public Pane projectViewPane;
 
+    @FXML
+    public MenuBar menuBar;
+
     @Inject
     public ProjectController projectController;
+
+    @Inject
+    public MenuBarFactory menuBarFactory;
 
     @FXML
     @SuppressWarnings("unchecked")
@@ -44,15 +46,9 @@ public class MainController implements Unbindable, DataMapDisplayListener, Domai
         initToolBar();
         initStatusBar();
         initTreeView();
-        initLastView();
+        initDomainView();
+        initMenuBar();
         initListeners();
-    }
-
-    private void initView() {
-//        initToolBar();
-//        initStatusBar();
-
-        initLastView();
     }
 
     private void initToolBar() {
@@ -67,35 +63,32 @@ public class MainController implements Unbindable, DataMapDisplayListener, Domai
         screenController.loadAndUpdatePane(treeViewPane, "../TreeView.fxml");
     }
 
-    private void initLastView() {
+    private void initDomainView() {
         screenController.loadAndUpdatePane(projectViewPane, "../DomainView.fxml");
+    }
+
+    private void initMenuBar() {
+        menuBarFactory.setMenuBar(menuBar);
+        menuBarFactory.createMenuBar();
     }
 
     private void initListeners() {
         projectController.getEventController().addListener(DataMapDisplayListener.class, this);
-        projectController.getEventController().addListener(DomainDisplayListener.class, this);
         projectController.getEventController().addListener(DbEntityDisplayListener.class, this);
         projectController.getEventController().addListener(ObjEntityDisplayListener.class, this);
     }
 
     @Override
     public void bind() {
-        System.out.println("Bind mainController");
     }
 
     @Override
     public void unbind() {
-        System.out.println("Unbind mainController");
     }
 
     @Override
     public void currentDataMapChanged(DataMapDisplayEvent e) {
         screenController.loadAndUpdatePane(projectViewPane, "../DataMapView.fxml");
-    }
-
-    @Override
-    public void currentDomainChanged(DomainDisplayEvent e) {
-        screenController.loadAndUpdatePane(projectViewPane, "../DomainView.fxml");
     }
 
     @Override

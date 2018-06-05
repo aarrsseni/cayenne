@@ -3,6 +3,8 @@ package org.apache.cayenne.modeler.asm;
 import javassist.*;
 import javassist.bytecode.ClassFile;
 import org.apache.cayenne.modeler.observer.Observer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -27,6 +29,8 @@ public class MethodInterceptor {
                     " org.apache.cayenne.modeler.observer.ObserverDictionary.getObserver(this); " +
                     " observer.update(\"%s\", %s); ";
 
+    private static final Logger logger = LoggerFactory.getLogger(MethodInterceptor.class);
+
     public static byte[] addCallbackToClass(Class clazz) {
         ClassPool pool = ClassPool.getDefault();
         try {
@@ -49,7 +53,7 @@ public class MethodInterceptor {
                         method.insertAfter(callbackCode);
                     }
                 } catch (CannotCompileException e) {
-                    e.printStackTrace();
+                    logger.error("Can't modify class. " + e);
                 }
             });
             return ctClass.toBytecode();
@@ -104,7 +108,9 @@ public class MethodInterceptor {
         boolean result = false;
         try {
             result = clazz.getDeclaredField(getFieldNameFromMethod(setter)) != null;
-        } catch (NoSuchFieldException e) {}
+        } catch (NoSuchFieldException e) {
+//            logger.error("MethodInterceptor can't find field in " + clazz + "." + e);
+        }
         return result;
     }
 

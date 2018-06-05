@@ -79,8 +79,6 @@ public class ObjRelationshipInspectorController implements Unbindable {
         });
 
         doneButton.setOnAction(val -> {
-//            save();
-
             cancel();
         });
     }
@@ -89,8 +87,6 @@ public class ObjRelationshipInspectorController implements Unbindable {
         if(screenController.getCurrentPopStage() != null){
             screenController.getCurrentPopStage().close();
             unbind();
-//            objRelationshipsController.unbindTable();
-//            objRelationshipsController.bindTable(objRelationshipsController.getObjEntity());
         }
     }
 

@@ -93,12 +93,10 @@ public class ToolBarController implements Unbindable{
 
     @Override
     public void bind() {
-        System.out.println("Bind toolBarController");
     }
 
     @Override
     public void unbind() {
-        System.out.println("Unbind toolBarController");
     }
 
     @FXML

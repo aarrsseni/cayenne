@@ -6,8 +6,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.modeler.FXMLLoaderFactory;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,11 +53,6 @@ public class ScreenController {
 
     public void setUnbindableController(Unbindable unbindableController) {
         controllers.add(unbindableController);
-
-//        if(this.unbindableController != null) {
-//            unbindableController.unbind();
-//        }
-
         this.unbindableController = unbindableController;
     }
 
@@ -70,7 +65,7 @@ public class ScreenController {
     }
 
     public void clearScene(Pane parentPane) {
-        for(Node node : parentPane.getChildren()) {
+        for (Node node : parentPane.getChildren()) {
             controllersCache.get(node).unbind();
         }
 
@@ -88,6 +83,8 @@ public class ScreenController {
     public void loadAndUpdatePane(Pane parentPane, String path) {
 
         if(getPanesCache().containsKey(path)) {
+            controllersCache.get(getPanesCache().get(path)).unbind();
+
             clearScene(parentPane);
 
             parentPane.getChildren().add(getPanesCache().get(path));
@@ -101,10 +98,9 @@ public class ScreenController {
 
                 parentPane.getChildren().add(childPane);
                 addController(path, childPane, loader.getController());
-
                 setPaneResizable(parentPane, childPane);
             } catch (Exception ex) {
-                throw new CayenneRuntimeException("Can't load " + path);
+                LoggerFactory.getLogger(getClass()).error("Can't load " + path + "." + ex);
             }
         }
     }

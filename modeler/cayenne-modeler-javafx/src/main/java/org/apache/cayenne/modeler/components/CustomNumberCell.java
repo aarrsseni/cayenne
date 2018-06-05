@@ -86,4 +86,3 @@ public class CustomNumberCell extends BasicTableCell<Observer, Integer>{
         });
     }
 }
-// String regex = "[0-9]+";

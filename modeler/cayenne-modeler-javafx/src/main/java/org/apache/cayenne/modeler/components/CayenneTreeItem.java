@@ -1,7 +1,5 @@
 package org.apache.cayenne.modeler.components;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.scene.control.TreeItem;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DataMap;
@@ -10,7 +8,7 @@ import org.apache.cayenne.modeler.controller.Unbindable;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
 import org.apache.cayenne.modeler.util.IconUtil;
 
-public class CayenneTreeItem extends TreeItem implements Unbindable, Observable {
+public class CayenneTreeItem extends TreeItem implements Unbindable{
 
     private static final String UNDEFINED_MESSAGE = "undefined";
 
@@ -49,17 +47,5 @@ public class CayenneTreeItem extends TreeItem implements Unbindable, Observable 
     }
 
     @Override
-    public void unbind() {
-
-    }
-
-    @Override
-    public void addListener(InvalidationListener listener) {
-
-    }
-
-    @Override
-    public void removeListener(InvalidationListener listener) {
-
-    }
+    public void unbind() {}
 }

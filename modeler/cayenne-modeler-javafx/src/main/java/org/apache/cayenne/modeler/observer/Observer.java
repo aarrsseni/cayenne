@@ -6,6 +6,8 @@ import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import org.apache.cayenne.CayenneRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Observer {
+
+    private static final Logger logger = LoggerFactory.getLogger(Observer.class);
 
     private static final byte FIRST_CHAR_INDEX = 0;
     private static final byte SUBSTRING_START_INDEX = 1;
@@ -63,8 +67,6 @@ public class Observer {
     }
 
     public void unbindAll() {
-//        fieldsProperties.forEach((key, value) -> Bindings.unbindBidirectional(bindings.get(fieldsProperties.get(key)), value));
-
         bindings.forEach((key, value) -> Bindings.unbindBidirectional(key, value));
     }
 
@@ -115,13 +117,17 @@ public class Observer {
         while (fieldType == null) {
             try {
                 fieldType = beanClass.getDeclaredField(fieldName).getType();
-            } catch (NoSuchFieldException e) {}
+            } catch (NoSuchFieldException e) {
+//                logger.error("Can't find field " + fieldName + " in " + beanClass + "." + e);
+            }
             // ---------------------------------------
             parentClass = beanClass.getSuperclass();
             while (parentClass != Object.class) {
                 try {
                     fieldType = parentClass.getDeclaredField(fieldName).getType();
-                } catch (NoSuchFieldException e) {}
+                } catch (NoSuchFieldException e) {
+//                    logger.error("Can't find field " + fieldName + " in " + parentClass + "." + e);
+                }
                 parentClass = parentClass.getSuperclass();
             }
         }
@@ -137,7 +143,7 @@ public class Observer {
             });
             return property;
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+//            logger.error("Can't find type for field " + fieldName + "." + e);
         }
         return null;
     }
@@ -184,7 +190,7 @@ public class Observer {
                 method.invoke(bean, value);
             }
         } catch (SecurityException | NoSuchMethodException | ClassNotFoundException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            logger.error("Can't call setter for " + fieldName + "." + e);
         }
     }
 
@@ -205,7 +211,7 @@ public class Observer {
                 return (T)method.invoke(bean);
             }
         } catch (SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Can't call getter for " + fieldName + "." + e);
         }
         return null;
     }

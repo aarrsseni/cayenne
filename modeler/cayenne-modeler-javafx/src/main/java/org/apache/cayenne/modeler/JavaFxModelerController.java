@@ -2,16 +2,19 @@ package org.apache.cayenne.modeler;
 
 import com.google.inject.Inject;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
 import org.apache.cayenne.modeler.controller.ScreenController;
+import org.apache.cayenne.modeler.controller.StatusBarController;
 import org.apache.cayenne.modeler.controller.TreeViewController;
 import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
+import org.apache.cayenne.modeler.services.ProjectService;
+import org.apache.cayenne.modeler.util.ModelerUtils;
 import org.apache.cayenne.modeler.util.state.ProjectStateUtil;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.project.validation.ProjectValidator;
 import org.apache.cayenne.validation.ValidationFailure;
 import org.apache.cayenne.validation.ValidationResult;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +40,12 @@ public class JavaFxModelerController{
     @Inject
     public FXMLLoaderFactory fxmlLoaderFactory;
 
+    @Inject
+    public ProjectService projectService;
+
+    @Inject
+    public StatusBarController statusBarController;
+
     public TreeViewController treeViewController;
 
     public void initActionListeners() {
@@ -44,7 +53,11 @@ public class JavaFxModelerController{
     }
 
     public void projectOpenedAction(Project project) {
+
         projectController.setProject(project);
+
+        screenController.getControllersCache().clear();
+        screenController.getPanesCache().clear();
 
         try {
         FXMLLoader loader = fxmlLoaderFactory.getLoader(getClass().getResource("Main.fxml"));
@@ -56,7 +69,7 @@ public class JavaFxModelerController{
         screenController.addController("Main.fxml", loadedPane, loader.getController());
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger(getClass()).error("Can't load Main panel." + e);
         }
 
         projectOpened();
@@ -73,7 +86,6 @@ public class JavaFxModelerController{
         }
 
         //update preferences!
-
 //        PROJECT_STATE_UTIL.fireLastState(projectController);
 
         // for validation purposes combine load failures with post-load validation (not
@@ -91,15 +103,8 @@ public class JavaFxModelerController{
         ValidationResult validationResult = projectValidator.validate(projectController.getProject().getRootNode());
         allFailures.addAll(validationResult.getFailures());
         if (!allFailures.isEmpty()) {
-//            ValidatorDialog.showDialog(frame, validationResult.getFailures());
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText("Look, an Information Dialog");
-            alert.setContentText("I have a great message for you!");
-
-            alert.showAndWait();
+            ModelerUtils.showAlert(validationResult);
         }
-
     }
 
     public ProjectController getProjectController() {
@@ -116,42 +121,39 @@ public class JavaFxModelerController{
      */
     public void updateStatus(String message) {
         screenController.getPrimaryStage().setTitle(message);
+//        statusBarController.updateStatusBar(message);
 
         // start message cleanup thread that would remove the message after X seconds
-        if (message != null && message.trim().length() > 0) {
-            Thread cleanup = new ExpireThread(message, 6);
-            cleanup.start();
-        }
+//        if (message != null && message.trim().length() > 0) {
+//            Thread cleanup = new ExpireThread(message, 6);
+//            cleanup.start();
+//        }
     }
 
     public void projectSavedAction() {
         projectController.fireEvent(new ProjectDirtyEvent(this, false));
         projectController.updateProjectControllerPreferences();
         updateStatus("Project saved...");
-//        frame.setTitle(projectController.getProject().getConfigurationResource().getURL().getPath());
     }
 
-    class ExpireThread extends Thread {
+    public void projectClosedAction() {
+        PROJECT_STATE_UTIL.saveLastState(projectController);
 
-        int seconds;
-        protected String message;
 
-        ExpireThread(String message, int seconds) {
-            this.seconds = seconds;
-            this.message = message;
-        }
+//        // --- update view
+//        frame.setView(null);
+//
+//        // repaint is needed, since sometimes there is a
+//        // trace from menu left on the screen
+//        frame.repaint();
+//        frame.setTitle("");
 
-        @Override
-        public void run() {
-            try {
-                sleep(seconds * 1000);
-            } catch (InterruptedException e) {
-                // ignore exception
-            }
+        projectService.projectClosed();
 
-            if (message.equals(screenController.getPrimaryStage().getTitle())) {
-                updateStatus(null);
-            }
-        }
+        this.initActionListeners();
+//
+//        application.getActionManager().projectClosed();
+
+        updateStatus("Project Closed...");
     }
 }

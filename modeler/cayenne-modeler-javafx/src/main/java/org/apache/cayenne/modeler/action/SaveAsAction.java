@@ -2,7 +2,6 @@ package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
 import javafx.event.Event;
-import javafx.scene.control.Alert;
 import javafx.stage.DirectoryChooser;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.modeler.JavaFxModelerController;
@@ -11,8 +10,10 @@ import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
 import org.apache.cayenne.modeler.services.SaveService;
 import org.apache.cayenne.modeler.util.AbstractCayenneAction;
+import org.apache.cayenne.modeler.util.ModelerUtils;
 import org.apache.cayenne.project.validation.ProjectValidator;
 import org.apache.cayenne.validation.ValidationResult;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -54,6 +55,7 @@ public class SaveAsAction extends AbstractCayenneAction {
                 return;
             }
         } catch (Exception ex) {
+            LoggerFactory.getLogger(getClass()).error("Error on save", ex);
             throw new CayenneRuntimeException("Error on save", ex);
         }
 
@@ -61,12 +63,7 @@ public class SaveAsAction extends AbstractCayenneAction {
 
         // If there were errors or warnings at validation, display them
         if (validationResult.getFailures().size() > 0) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText("Look, an Information Dialog");
-            alert.setContentText("I have a great message for you!");
-
-            alert.showAndWait();
+            ModelerUtils.showAlert(validationResult);
         }
     }
 }

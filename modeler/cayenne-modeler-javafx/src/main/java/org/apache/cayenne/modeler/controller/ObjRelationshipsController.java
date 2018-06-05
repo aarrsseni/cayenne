@@ -7,11 +7,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.event.EntityEvent;
@@ -23,6 +27,8 @@ import org.apache.cayenne.modeler.event.ObjRelationshipDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.ObjRelationshipDisplayListener;
 import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
+import org.apache.cayenne.modeler.util.ModelerUtils;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -122,11 +128,7 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
             databaseMapping.setOnAction(val -> {
                 rowMap.put((ObjRelationship) row.getItem().getBean(), row);
                 if (((ObjRelationship) row.getItem().getBean()).getSourceEntity().getDbEntity() == null) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Information Dialog");
-                    alert.setHeaderText("Error");
-                    alert.setContentText("Please select DbEntity!");
-                    alert.showAndWait();
+                    ModelerUtils.showErrorAlert("Please select DbEntity!");
                 } else {
 
                     Stage dialog = new Stage();
@@ -140,7 +142,7 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
                         ((ObjRelationshipInspectorController) loader.getController()).setObjRelationship((ObjRelationship) row.getItem().getBean());
                         ((ObjRelationshipInspectorController) loader.getController()).bind();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LoggerFactory.getLogger(getClass()).error("Can't load Obj Relationship inspector view." + e);
                     }
 
                     Scene popup = new Scene(childPane);
@@ -204,17 +206,12 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
 
     @Override
     public void currentObjRelationshipChanged(ObjRelationshipDisplayEvent e) {
-//        objRels.add(ObserverDictionary.getObserver(e.getRelationships()[0]));
-//
-//        tableView.setItems(objRels);
-        unbindTable();
-        bindTable((ObjEntity) e.getEntity());
+        resetTable(e.getEntity());
     }
 
     @Override
     public void objEntityChanged(EntityEvent e) {
-        unbindTable();
-        bindTable((ObjEntity) e.getEntity());
+        resetTable(e.getEntity());
     }
 
     @Override
@@ -225,6 +222,11 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
     @Override
     public void objEntityRemoved(EntityEvent e) {
 
+    }
+
+    private void resetTable(Entity e){
+        unbindTable();
+        bindTable((ObjEntity)e);
     }
 
     private static class PropertyListener implements ChangeListener<String> {

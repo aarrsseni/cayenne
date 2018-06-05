@@ -151,7 +151,6 @@ public class DataBaseMappingController implements Unbindable {
             joinsTable.getItems().add(ObserverDictionary.getObserver(dbJoin));
         }
 
-
         for(DbAttribute dbAttribute : dbRelationship.getSourceEntity().getAttributes()){
             dbSourceAttrs.add(dbAttribute.getName());
         }
@@ -251,8 +250,6 @@ public class DataBaseMappingController implements Unbindable {
 
         projectController.fireEvent(
                 new DbRelationshipEvent(this, dbRelationship, dbRelationship.getSourceEntity()));
-
-
     }
 
     private void handleNameUpdate(DbRelationship relationship, String userInputName) {

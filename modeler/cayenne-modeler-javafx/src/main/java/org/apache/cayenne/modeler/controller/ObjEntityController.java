@@ -153,8 +153,6 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
 
        objRelationshipsController.bindTable(objEntity);
        objRelationshipsController.setObjEntity(objEntity);
-
-       System.out.println("Bind " + getClass());
     }
 
     @Override
@@ -168,8 +166,6 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
 
         dbEntityList.clear();
         tablesComboBox.setItems(dbEntityList);
-
-        System.out.println("Unbind " + getClass());
     }
 
     private void makeResizable() {

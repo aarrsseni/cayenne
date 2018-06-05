@@ -121,7 +121,6 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
         dbRelationshipsController.init(relView);
     }
 
-
     @Override
     public void bind() {
         dbEntity = projectController.getCurrentState().getDbEntity();
@@ -141,20 +140,17 @@ public class DbEntityController implements Unbindable, DbAttributeDisplayListene
 
         dbRelationshipsController.bindTable(dbEntity);
         dbRelationshipsController.addDbEntity(dbEntity);
-
-        System.out.println("Bind " + getClass());
     }
 
     @Override
     public void unbind() {
-        if(!dbAttrsMap.isEmpty()) {
+        if(!dbAttrsMap.isEmpty() && dbAttrsMap.containsKey(dbEntity)) {
             dbAttrsMap.get(dbEntity).clear();
         }
 
         tableView.setItems(null);
         dbRelationshipsController.unbindTable();
         ObserverDictionary.getObserver(dbEntity).unbindAll();
-        System.out.println("Unbind " + getClass());
     }
 
     private void makeResizable() {

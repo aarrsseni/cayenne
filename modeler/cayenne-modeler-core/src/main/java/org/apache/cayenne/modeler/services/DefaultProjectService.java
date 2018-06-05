@@ -56,7 +56,7 @@ public class DefaultProjectService implements ProjectService {
                 new ConfigurationTree<DataChannelDescriptor>(dataChannelDescriptor));
 
         //TODO FIX IT!!! Controller state must be service!
-        projectController.getCurrentState().currentDomainChanged(new DomainDisplayEvent(this, dataChannelDescriptor));
+//        projectController.getCurrentState().currentDomainChanged(new DomainDisplayEvent(this, dataChannelDescriptor));
 
         projectController.fireEvent(new ProjectOpenEvent(this, project));
 

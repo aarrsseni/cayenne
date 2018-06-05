@@ -26,6 +26,7 @@ import org.apache.cayenne.modeler.event.listener.DbRelationshipDisplayListener;
 import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
 import org.apache.cayenne.modeler.util.Consumer;
+import org.apache.cayenne.modeler.util.ModelerUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -93,11 +94,7 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
             databaseMapping.setOnAction(val -> {
                 rowMap.put((DbRelationship) row.getItem().getBean(), row);
                 if (((DbRelationship) row.getItem().getBean()).getTargetEntity() == null) {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Information Dialog");
-                    alert.setHeaderText("Error");
-                    alert.setContentText("Please select target DbEntity!");
-                    alert.showAndWait();
+                    ModelerUtils.showErrorAlert("Please select target DbEntity!");
                 } else {
 
                     Stage dialog = new Stage();
@@ -160,7 +157,6 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
         targetDbEntity.clear();
         dbRels.clear();
 
-//        setDbEntity(null);
         tableView.setItems(null);
     }
 

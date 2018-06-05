@@ -9,7 +9,7 @@ import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.util.ComboBoxCellConverter;
 import org.apache.cayenne.modeler.util.IconUtil;
 
-public class AutoCompleteComboBoxWithIcon<O extends Observer, T> extends CustomComboBoxCell<O, T> {
+public class AutoCompleteComboBoxWithIcon<O extends Observer, T> extends CustomAutoCompleteComboBoxCell<O, T> {
 
     public AutoCompleteComboBoxWithIcon(ObservableList<String> types, ComboBoxCellConverter<T> comboBoxCellConverter) {
         super(types, comboBoxCellConverter);
@@ -26,6 +26,5 @@ public class AutoCompleteComboBoxWithIcon<O extends Observer, T> extends CustomC
                 setText("");
             }
         });
-        new AutoCompleteComboBoxListener<>(getComboBox());
     }
 }
