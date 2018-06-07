@@ -377,7 +377,7 @@ public class EOModelHelper {
 			path = path.substring(0, path.length() - 1);
 		}
 
-		// strip path components
+		// strip path component
 		int i1 = path.lastIndexOf("/");
 		int i2 = path.lastIndexOf("\\");
 		int i = (i1 > i2) ? i1 : i2;

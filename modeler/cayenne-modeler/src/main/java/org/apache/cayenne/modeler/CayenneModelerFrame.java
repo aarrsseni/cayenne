@@ -328,7 +328,7 @@ public class CayenneModelerFrame extends JFrame implements DataNodeDisplayListen
         toolBar.add(getAction(CreateEmbeddableAction.class).buildButton(2));
         toolBar.add(getAction(CreateQueryAction.class).buildButton(3));
 
-        // is used to place search feature components the most right on a toolbar
+        // is used to place search feature component the most right on a toolbar
         toolBar.add(new SearchPanel());
 
         getContentPane().add(toolBar, BorderLayout.NORTH);

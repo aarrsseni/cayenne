@@ -915,7 +915,7 @@ public class ObjEntity extends Entity implements ObjEntityListener, Configuratio
     }
 
     /**
-     * Returns an Iterable instance over expression path components based on
+     * Returns an Iterable instance over expression path component based on
      * this entity.
      * 
      * @since 3.0
@@ -1055,7 +1055,7 @@ public class ObjEntity extends Entity implements ObjEntityListener, Configuratio
 
                     buf.append(subComponent.getName());
                     
-                    // use OUTER join for all components of the path is Obj path is OUTER
+                    // use OUTER join for all component of the path is Obj path is OUTER
                     if (component.getJoinType() == JoinType.LEFT_OUTER) {
                         buf.append(OUTER_JOIN_INDICATOR);
                     }

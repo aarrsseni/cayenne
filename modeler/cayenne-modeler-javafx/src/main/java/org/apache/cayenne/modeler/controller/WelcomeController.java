@@ -32,13 +32,13 @@ public class WelcomeController{
     ScreenController screenController;
 
     @Inject
-    NewProjectAction newProjectAction;
+    private NewProjectAction newProjectAction;
 
     @Inject
     public ProjectController projectController;
 
     @Inject
-    public OpenProjectAction openProjectAction;
+    private OpenProjectAction openProjectAction;
 
     public WelcomeController(){}
 

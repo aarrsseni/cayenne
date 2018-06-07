@@ -330,7 +330,7 @@ public abstract class Entity implements CayenneMapEntry, XMLSerializable, Serial
     }
 
     /**
-     * Returns an Iterable over the path components with elements represented as
+     * Returns an Iterable over the path component with elements represented as
      * {@link PathComponent} instances, encapsulating a relationship, an attribute or a
      * subpath alias. An optional "aliasMap" parameter is used to resolve subpaths from
      * aliases.
@@ -349,7 +349,7 @@ public abstract class Entity implements CayenneMapEntry, XMLSerializable, Serial
 
     /**
      * Processes expression <code>pathExp</code> and returns an Iterator of path
-     * components that contains a sequence of Attributes and Relationships. Note that if
+     * component that contains a sequence of Attributes and Relationships. Note that if
      * path is invalid and can not be resolved from this entity, this method will still
      * return an Iterator, but an attempt to read the first invalid path component will
      * result in ExpressionException.
@@ -357,7 +357,7 @@ public abstract class Entity implements CayenneMapEntry, XMLSerializable, Serial
     public abstract Iterator<CayenneMapEntry> resolvePathComponents(Expression pathExp) throws ExpressionException;
 
     /**
-     * Returns an Iterator over the path components that contains a sequence of Attributes
+     * Returns an Iterator over the path component that contains a sequence of Attributes
      * and Relationships. Note that if path is invalid and can not be resolved from this
      * entity, this method will still return an Iterator, but an attempt to read the first
      * invalid path component will result in ExpressionException.
@@ -367,7 +367,7 @@ public abstract class Entity implements CayenneMapEntry, XMLSerializable, Serial
     }
 
     /**
-     * An iterator resolving mapping components represented by the path string.
+     * An iterator resolving mapping component represented by the path string.
      * This entity is assumed to be the root of the path.
      */
     final class PathIterator implements Iterator<CayenneMapEntry> {

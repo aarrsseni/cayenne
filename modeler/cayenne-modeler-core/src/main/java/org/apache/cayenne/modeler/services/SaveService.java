@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.services;
 
+import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.project.Project;
 
 import java.io.File;
@@ -32,4 +33,6 @@ public interface SaveService {
     boolean saveAll(File projectDir) throws Exception;
 
     boolean saveAll() throws Exception;
+
+    void saveDbMapping(DbRelationship dbRelationship, DbRelationship reverseRelationship);
 }

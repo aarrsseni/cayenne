@@ -2,6 +2,7 @@ package org.apache.cayenne.modeler;
 
 import com.google.inject.Inject;
 import javafx.application.Application;
+import org.apache.cayenne.modeler.controller.JavaFxModelerController;
 
 public class BaseApplication {
 

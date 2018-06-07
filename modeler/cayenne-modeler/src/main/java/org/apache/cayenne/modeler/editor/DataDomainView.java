@@ -58,7 +58,7 @@ public class DataDomainView extends JPanel implements DomainDisplayListener {
     public DataDomainView(ProjectController projectController) {
         this.projectController = projectController;
 
-        // Create and layout components
+        // Create and layout component
         initView();
 
         // hook up listeners to widgets

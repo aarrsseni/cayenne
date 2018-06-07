@@ -5,18 +5,17 @@ import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
-import org.apache.cayenne.modeler.JavaFxModelerController;
+import org.apache.cayenne.modeler.controller.JavaFxModelerController;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.services.OpenProjectService;
 import org.apache.cayenne.modeler.services.ProjectService;
 import org.apache.cayenne.modeler.services.util.OpenProjectStatus;
-import org.apache.cayenne.modeler.util.AbstractCayenneAction;
 import org.apache.cayenne.resource.Resource;
 
 import java.io.File;
 
-public class OpenProjectAction extends AbstractCayenneAction {
+public class OpenProjectAction extends ProjectAction {
 
     @Inject
     OpenProjectService openProjectService;
@@ -125,20 +124,5 @@ public class OpenProjectAction extends AbstractCayenneAction {
         alert.setContentText("Error");
         alert.showAndWait();
         return alert.getResult() != ButtonType.NO;
-    }
-
-    public boolean closeProject(boolean checkUnsaved) {
-        // check if there is a project...
-        if (projectController == null || projectController.getProject() == null) {
-            return true;
-        }
-
-        if (checkUnsaved) {
-            return false;
-        }
-
-        javaFxModelerController.projectClosedAction();
-
-        return true;
     }
 }

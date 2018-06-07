@@ -1,6 +1,6 @@
 package org.apache.cayenne.modeler.action.listener;
 
-import org.apache.cayenne.modeler.JavaFxModelerController;
+import org.apache.cayenne.modeler.controller.JavaFxModelerController;
 import org.apache.cayenne.modeler.event.ProjectOpenEvent;
 import org.apache.cayenne.modeler.event.listener.ProjectOpenListener;
 

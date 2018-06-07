@@ -26,7 +26,7 @@ import java.util.Collection;
 public interface ResourceLocator {
 
     /**
-     * Finds a collection of matching resources for a given name. The name components must
+     * Finds a collection of matching resources for a given name. The name component must
      * be separated by forward slashes.
      */
     Collection<Resource> findResources(String name);

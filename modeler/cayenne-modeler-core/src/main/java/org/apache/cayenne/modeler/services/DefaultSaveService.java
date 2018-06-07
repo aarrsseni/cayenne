@@ -19,6 +19,7 @@
 package org.apache.cayenne.modeler.services;
 
 import com.google.inject.Inject;
+import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.ChangePathInLastProjListEvent;
 import org.apache.cayenne.modeler.event.RecentFileListEvent;
@@ -150,6 +151,11 @@ public class DefaultSaveService implements SaveService {
         projectController.getFileChangeTracker().reconfigure();
 
         return true;
+    }
+
+    @Override
+    public void saveDbMapping(DbRelationship dbRelationship, DbRelationship reverseRelationship) {
+
     }
 
 }

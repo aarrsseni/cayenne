@@ -428,7 +428,7 @@ public class MultiColumnBrowser extends JPanel {
 
     /**
      * Builds a TreePath to the new node, that is known to be a peer or a child
-     * of one of the path components. As the method walks the current path
+     * of one of the path component. As the method walks the current path
      * backwards, it cleans columns that are not common with the new path.
      */
     private Object[] rebuildPath(Object[] path, Object node, int panelIndex) {

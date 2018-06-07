@@ -24,7 +24,7 @@ import java.beans.PropertyChangeListener;
 
 /**
  * An API for a binding child that allows to establish bindings to custom Swing
- * components.
+ * component.
  * 
  * @since 1.2
  */

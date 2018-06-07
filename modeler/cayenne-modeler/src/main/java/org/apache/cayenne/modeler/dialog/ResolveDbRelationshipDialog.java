@@ -102,7 +102,7 @@ public class ResolveDbRelationshipDialog extends CayenneDialog {
     }
 
     /**
-     * Creates graphical components.
+     * Creates graphical component.
      */
     private void initView() {
 
@@ -182,7 +182,7 @@ public class ResolveDbRelationshipDialog extends CayenneDialog {
         relationship = aRelationship;
         reverseRelationship = relationship.getReverseRelationship();
 
-        // init UI components
+        // init UI component
         setTitle("DbRelationship Info: "
                 + relationship.getSourceEntity().getName()
                 + " to "

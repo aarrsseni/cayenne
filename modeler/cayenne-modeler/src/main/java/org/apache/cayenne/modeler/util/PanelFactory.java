@@ -40,7 +40,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /** 
- * Implements a set of utility methods for laying out components on the panels.
+ * Implements a set of utility methods for laying out component on the panels.
  * 
  */
 
@@ -97,7 +97,7 @@ public class PanelFactory {
 
         int numRows = leftComponents.length;
         if (numRows == 0) {
-            throw new IllegalArgumentException("Zero components.");
+            throw new IllegalArgumentException("Zero component.");
         }
 
         FormLayout layout = new FormLayout("right:100, 3dlu, left:300", "");

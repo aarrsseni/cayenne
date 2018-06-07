@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.apache.cayenne.modeler.controller.dataDomain.DataDomainController">
+   <children>
+      <ScrollPane fx:id="scrollPane" prefHeight="404.0" prefWidth="537.0">
+         <content>
+            <TabPane fx:id="tabPane" minHeight="500.0" minWidth="500.0" tabClosingPolicy="UNAVAILABLE">
+               <tabs>
+                  <Tab text="Main">
+                    <content>
+                      <AnchorPane>
+                           <children>
+                              <Label layoutX="28.0" layoutY="32.0" text="DataDomain Configuration">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                              <CheckBox fx:id="useSharedCache" layoutX="172.0" layoutY="144.0" mnemonicParsing="false" selected="true" />
+                              <Label layoutX="37.0" layoutY="186.0" text="Use shared cache:" />
+                              <CheckBox fx:id="objectValidation" layoutX="172.0" layoutY="186.0" mnemonicParsing="false" selected="true" />
+                              <Label layoutX="38.0" layoutY="144.0" text="Object Validation:" />
+                              <Label layoutX="35.0" layoutY="94.0" text="DataDomain Name:" />
+                              <TextField fx:id="name" layoutX="172.0" layoutY="89.0" prefHeight="27.0" prefWidth="189.0" />
+                              <Separator layoutX="30.0" layoutY="66.0" prefHeight="3.0" prefWidth="332.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+                  <Tab text="Graph">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
+         </content>
+      </ScrollPane>
+   </children>
+</Pane>

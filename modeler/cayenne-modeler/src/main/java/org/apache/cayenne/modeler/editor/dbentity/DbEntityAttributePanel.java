@@ -60,7 +60,7 @@ public class DbEntityAttributePanel extends JPanel implements DbEntityDisplayLis
         this.mediator = mediator;
         this.parentPanel = parentPanel;
 
-        // Create and layout components
+        // Create and layout component
         initView();
         initController();
     }

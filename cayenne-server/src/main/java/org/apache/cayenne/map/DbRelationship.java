@@ -364,7 +364,7 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
      * relationship based on a snapshot of a source. Only "to-one" relationships
      * are supported. Returns null if relationship does not point to an object.
      * Throws CayenneRuntimeException if relationship is "to many" or if
-     * snapshot is missing id components.
+     * snapshot is missing id component.
      */
     public Map<String, Object> targetPkSnapshotWithSrcSnapshot(Map<String, Object> srcSnapshot) {
 

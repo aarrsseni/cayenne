@@ -29,7 +29,7 @@ import org.apache.cayenne.exp.Expression;
 public class ASTExtract extends ASTFunctionCall {
 
     /**
-     * Available components of date/time.
+     * Available component of date/time.
      * Names must be in sync with tokens used in dateTimeExtractingFunction() rule in ExpressionParser.jjt
      */
     public enum DateTimePart {

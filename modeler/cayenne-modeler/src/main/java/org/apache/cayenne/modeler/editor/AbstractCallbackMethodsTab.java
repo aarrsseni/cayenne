@@ -179,7 +179,7 @@ public abstract class AbstractCallbackMethodsTab extends JPanel {
     }
 
     /**
-     * GUI components initialization
+     * GUI component initialization
      */
     protected void init() {
         this.setLayout(new BorderLayout());

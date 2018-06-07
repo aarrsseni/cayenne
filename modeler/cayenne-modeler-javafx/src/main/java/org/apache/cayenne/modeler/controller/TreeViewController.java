@@ -5,14 +5,19 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeView;
+import org.apache.cayenne.configuration.BaseConfigurationNodeVisitor;
+import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.components.CayenneTreeHelper;
-import org.apache.cayenne.modeler.components.CayenneTreeItem;
 import org.apache.cayenne.modeler.event.*;
-import org.apache.cayenne.modeler.event.listener.*;
+import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
+import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
+import org.apache.cayenne.modeler.jFx.component.factory.CayenneTreeFactory;
+import org.apache.cayenne.modeler.jFx.component.tree.CayenneTreeItem;
 import org.apache.cayenne.project.Project;
 
 import java.util.ArrayList;
@@ -21,10 +26,10 @@ import java.util.List;
 public class TreeViewController implements Unbindable, DomainDisplayListener, DataMapDisplayListener, DbEntityDisplayListener, ObjEntityDisplayListener {
 
     @FXML
-    TreeView treeView;
+    private TreeView treeView;
 
     @Inject
-    private CayenneTreeHelper cayenneTreeHelper;
+    private CayenneTreeFactory cayenneTreeFactory;
 
     @Inject
     public ProjectController projectController;
@@ -36,7 +41,7 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
     @FXML
     @SuppressWarnings("unchecked")
     public void initialize() {
-        cayenneTreeHelper.setTreeView(treeView);
+        cayenneTreeFactory.setTreeView(treeView);
 
         initListeners();
 
@@ -48,6 +53,8 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
 
                 processSelection(selectedItem);
 
+                treeView.getSelectionModel().select(selectedItem);
+
                 selectedItem.bind();
             }
         });
@@ -56,14 +63,14 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
 
     private void initFromModel(Project project) {
         DataChannelDescriptor dataChannelDescriptor = (DataChannelDescriptor)project.getConfigurationTree().getRootNode();
-        cayenneTreeHelper.createTreeItem(dataChannelDescriptor);
+        cayenneTreeFactory.createTreeItem(dataChannelDescriptor);
         for(DataMap dataMap : dataChannelDescriptor.getDataMaps()){
-            cayenneTreeHelper.createTreeItem(dataChannelDescriptor, dataMap);
+            cayenneTreeFactory.createTreeItem(dataChannelDescriptor, dataMap);
             for(DbEntity dbEntity : dataMap.getDbEntities()){
-                cayenneTreeHelper.createTreeItem(dataChannelDescriptor, dataMap, dbEntity);
+                cayenneTreeFactory.createTreeItem(dataChannelDescriptor, dataMap, dbEntity);
             }
             for(ObjEntity objEntity : dataMap.getObjEntities()){
-                cayenneTreeHelper.createTreeItem(dataChannelDescriptor, dataMap, objEntity);
+                cayenneTreeFactory.createTreeItem(dataChannelDescriptor, dataMap, objEntity);
             }
         }
         treeView.getSelectionModel().select(treeView.getRoot());
@@ -92,7 +99,7 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
             return;
         }
 
-        cayenneTreeHelper.createTreeItem(e.getDomain());
+        cayenneTreeFactory.createTreeItem(e.getDomain());
     }
 
     @Override
@@ -100,7 +107,7 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
         if ((e.getSource() == this || !e.isDataMapChanged()) && !e.isRefired()) {
             return;
         }
-        cayenneTreeHelper.createTreeItem(e.getDomain(), e.getDataMap());
+        cayenneTreeFactory.createTreeItem(e.getDomain(), e.getDataMap());
     }
 
 
@@ -130,6 +137,7 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
         CayenneTreeItem currentNode = treeItem;
 
         Object[] data = getUserObjects(currentNode);
+
         if (data.length == 0) {
             // this should clear the right-side panel
             DomainDisplayEvent domEvent = new DomainDisplayEvent(this, null);
@@ -141,76 +149,86 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
         }
 
         Object obj = data[data.length - 1];
-        if (obj instanceof DataChannelDescriptor) {
-            projectController.fireEvent(new DomainDisplayEvent(
-                    this,
-                    (DataChannelDescriptor) obj));
-        } else if (obj instanceof DataMap) {
-            if (data.length == 2) {
-                projectController.fireEvent(new DataMapDisplayEvent(
+        ConfigurationNode node = (ConfigurationNode)obj;
+
+        node.acceptVisitor(new BaseConfigurationNodeVisitor<Object>() {
+            @Override
+            public Object visitDataChannelDescriptor(DataChannelDescriptor channelDescriptor) {
+                projectController.fireEvent(new DomainDisplayEvent(
                         this,
-                        (DataMap) obj,
-                        (DataChannelDescriptor) projectController.getProject().getRootNode(),
-                        (DataNodeDescriptor) data[data.length - 2]));
-            } else if (data.length == 1) {
-                projectController.fireEvent(new DataMapDisplayEvent(
-                        this,
-                        (DataMap) obj,
-                        (DataChannelDescriptor) projectController.getProject().getRootNode()));
+                        (DataChannelDescriptor) obj));
+                return channelDescriptor;
             }
-        } else if (obj instanceof DataNodeDescriptor) {
-            if (data.length == 1) {
-                projectController.fireEvent(new DataNodeDisplayEvent(
-                        this,
-                        (DataChannelDescriptor) projectController.getProject().getRootNode(),
-                        (DataNodeDescriptor) obj));
+
+            @Override
+            public Object visitDataNodeDescriptor(DataNodeDescriptor nodeDescriptor) {
+                return null;
             }
-        } else if (obj instanceof DbEntity) {
-            DbEntityDisplayEvent e = new DbEntityDisplayEvent(this, (Entity) obj);
-            e.setUnselectAttributes(true);
-            if (data.length == 3) {
-                e.setDataMap((DataMap) data[data.length - 2]);
-                e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
-                e.setDataNode((DataNodeDescriptor) data[data.length - 3]);
-            } else if (data.length == 2) {
-                e.setDataMap((DataMap) data[data.length - 2]);
-                e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
+
+            @Override
+            public Object visitDataMap(DataMap dataMap) {
+                if (data.length == 2) {
+                    projectController.fireEvent(new DataMapDisplayEvent(
+                            this,
+                            (DataMap) obj,
+                            (DataChannelDescriptor) projectController.getProject().getRootNode(),
+                            (DataNodeDescriptor) data[data.length - 2]));
+                } else if (data.length == 1) {
+                    projectController.fireEvent(new DataMapDisplayEvent(
+                            this,
+                            (DataMap) obj,
+                            (DataChannelDescriptor) projectController.getProject().getRootNode()));
+                }
+                return dataMap;
             }
-            projectController.fireEvent(e);
-        } else if (obj instanceof ObjEntity) {
-            ObjEntityDisplayEvent e = new ObjEntityDisplayEvent(this, (Entity) obj);
-            e.setUnselectAttributes(true);
-            if (data.length == 3) {
-                e.setDataMap((DataMap) data[data.length - 2]);
-                e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
-                e.setDataNode((DataNodeDescriptor) data[data.length - 3]);
-            } else if (data.length == 2) {
-                e.setDataMap((DataMap) data[data.length - 2]);
-                e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
+
+            @Override
+            public Object visitObjEntity(ObjEntity entity) {
+                ObjEntityDisplayEvent e = new ObjEntityDisplayEvent(this, (Entity) obj);
+                e.setUnselectAttributes(true);
+                if (data.length == 3) {
+                    e.setDataMap((DataMap) data[data.length - 2]);
+                    e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
+                    e.setDataNode((DataNodeDescriptor) data[data.length - 3]);
+                } else if (data.length == 2) {
+                    e.setDataMap((DataMap) data[data.length - 2]);
+                    e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
+                }
+                projectController.fireEvent(e);
+                return entity;
             }
-            projectController.fireEvent(e);
-        } else if (obj instanceof Embeddable) {
-            EmbeddableDisplayEvent e = new EmbeddableDisplayEvent(
-                    this,
-                    (Embeddable) obj,
-                    (DataMap) data[data.length - 2],
-                    (DataChannelDescriptor) projectController.getProject().getRootNode());
-            projectController.fireEvent(e);
-        } else if (obj instanceof Procedure) {
-            ProcedureDisplayEvent e = new ProcedureDisplayEvent(
-                    this,
-                    (Procedure) obj,
-                    (DataMap) data[data.length - 2],
-                    (DataChannelDescriptor) projectController.getProject().getRootNode());
-            projectController.fireEvent(e);
-        } else if (obj instanceof QueryDescriptor) {
-            QueryDisplayEvent e = new QueryDisplayEvent(
-                    this,
-                    (QueryDescriptor) obj,
-                    (DataMap) data[data.length - 2],
-                    (DataChannelDescriptor) projectController.getProject().getRootNode());
-            projectController.fireEvent(e);
-        }
+
+            @Override
+            public Object visitDbEntity(DbEntity entity) {
+                DbEntityDisplayEvent e = new DbEntityDisplayEvent(this, (Entity) obj);
+                e.setUnselectAttributes(true);
+                if (data.length == 3) {
+                    e.setDataMap((DataMap) data[data.length - 2]);
+                    e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
+                    e.setDataNode((DataNodeDescriptor) data[data.length - 3]);
+                } else if (data.length == 2) {
+                    e.setDataMap((DataMap) data[data.length - 2]);
+                    e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
+                }
+                projectController.fireEvent(e);
+                return entity;
+            }
+
+            @Override
+            public Object visitEmbeddable(Embeddable embeddable) {
+                return null;
+            }
+
+            @Override
+            public Object visitProcedure(Procedure procedure) {
+                return null;
+            }
+
+            @Override
+            public Object visitQuery(QueryDescriptor query) {
+                return null;
+            }
+        });
     }
 
     @Override
@@ -221,7 +239,7 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
             return;
         }
 
-        cayenneTreeHelper.createTreeItem(e.getDomain(), e.getDataMap(), e.getEntity());
+        cayenneTreeFactory.createTreeItem(e.getDomain(), e.getDataMap(), e.getEntity());
     }
 
     @Override
@@ -232,6 +250,6 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
             return;
         }
 
-        cayenneTreeHelper.createTreeItem(e.getDomain(), e.getDataMap(), e.getEntity());
+        cayenneTreeFactory.createTreeItem(e.getDomain(), e.getDataMap(), e.getEntity());
     }
 }

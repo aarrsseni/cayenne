@@ -78,7 +78,7 @@ public abstract class Expression implements Serializable, XMLSerializable {
 
 	/**
 	 * Expression describes a path relative to an ObjEntity. OBJ_PATH expression
-	 * is resolved relative to some root ObjEntity. Path expression components
+	 * is resolved relative to some root ObjEntity. Path expression component
 	 * are separated by "." (dot). Path can point to either one of these:
 	 * <ul>
 	 * <li><i>An attribute of root ObjEntity.</i> For entity Gallery OBJ_PATH
@@ -96,7 +96,7 @@ public abstract class Expression implements Serializable, XMLSerializable {
 
 	/**
 	 * Expression describes a path relative to a DbEntity. DB_PATH expression is
-	 * resolved relative to some root DbEntity. Path expression components are
+	 * resolved relative to some root DbEntity. Path expression component are
 	 * separated by "." (dot). Path can point to either one of these:
 	 * <ul>
 	 * <li><i>An attribute of root DbEntity.</i> For entity GALLERY, DB_PATH

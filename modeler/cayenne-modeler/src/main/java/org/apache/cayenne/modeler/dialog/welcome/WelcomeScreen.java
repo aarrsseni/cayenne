@@ -64,7 +64,7 @@ public class WelcomeScreen extends JScrollPane implements RecentFileListListener
     }
 
     /**
-     * Creates all necessary components
+     * Creates all necessary component
      */
     protected void initView() {
         mainPanel = new JPanel(new GridBagLayout()) {

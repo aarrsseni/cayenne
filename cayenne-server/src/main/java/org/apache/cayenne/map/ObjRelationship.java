@@ -583,7 +583,7 @@ public class ObjRelationship extends Relationship implements ConfigurationNode {
 
     /**
      * Returns dot-separated path over DbRelationships, only including
-     * components that have valid DbRelationships.
+     * component that have valid DbRelationships.
      */
     String getValidRelationshipPath() {
         String path = getDbRelationshipPath();

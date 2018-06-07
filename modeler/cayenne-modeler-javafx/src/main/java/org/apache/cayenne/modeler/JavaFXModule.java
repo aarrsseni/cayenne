@@ -10,14 +10,14 @@ import org.apache.cayenne.modeler.action.CreateDataMapAction;
 import org.apache.cayenne.modeler.action.NewProjectAction;
 import org.apache.cayenne.modeler.action.SaveAction;
 import org.apache.cayenne.modeler.action.SaveAsAction;
-import org.apache.cayenne.modeler.components.CayenneTreeHelper;
-import org.apache.cayenne.modeler.controller.DbRelationshipsController;
-import org.apache.cayenne.modeler.controller.ObjRelationshipsController;
+import org.apache.cayenne.modeler.jFx.component.factory.CayenneTreeFactory;
+import org.apache.cayenne.modeler.controller.dbEntity.DbRelationshipsController;
+import org.apache.cayenne.modeler.controller.objEntity.ObjRelationshipsController;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.init.CayenneModelerModule;
-import org.apache.cayenne.modeler.util.AbstractCayenneAction;
-import org.apache.cayenne.modeler.util.Consumer;
-import org.apache.cayenne.modeler.util.DbRelationshipConsumer;
+import org.apache.cayenne.modeler.action.AbstractCayenneAction;
+import org.apache.cayenne.modeler.jFx.component.Consumer;
+import org.apache.cayenne.modeler.jFx.component.DbRelationshipConsumer;
 import org.apache.cayenne.project.validation.DefaultProjectValidator;
 import org.apache.cayenne.project.validation.ProjectValidator;
 
@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class JavaFXModule implements Module {
+public class JavaFXModule implements com.google.inject.Module {
 
     private static Multibinder<Class<? extends BQApplication>> contributeApplicationClass(Binder binder) {
         TypeLiteral<Class<? extends BQApplication>> type = new TypeLiteral<Class<? extends BQApplication>>() {
@@ -74,7 +74,7 @@ public class JavaFXModule implements Module {
         binder.bind(ScreenController.class).in(Singleton.class);
         binder.bind(JavaFXLauncher.class).to(GenericJavaFXLauncher.class);
         binder.bind(BaseApplication.class).in(Singleton.class);
-        binder.bind(CayenneTreeHelper.class).in(Singleton.class);
+        binder.bind(CayenneTreeFactory.class).in(Singleton.class);
         binder.bind(ProjectValidator.class).to(DefaultProjectValidator.class);
         binder.bind(DbRelationshipsController.class).in(Singleton.class);
         binder.bind(ObjRelationshipsController.class).in(Singleton.class);

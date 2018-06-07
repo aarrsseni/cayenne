@@ -88,6 +88,7 @@ public class CayenneModelerCore implements Module{
         binder.bind(EOModelService.class).to(DefaultEOModelService.class);
         binder.bind(DbService.class).to(DefaultDbService.class).in(Singleton.class);
         binder.bind(NavigationService.class).to(DefaultNavigationService.class);
+        binder.bind(DataBaseMappingService.class).to(DefaultDataBaseMappingService.class);
 
         contributeModuleClass(binder).addBinding().to(ProjectModule.class);
         addModuleClass(binder, new ProjectModule());

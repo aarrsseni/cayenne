@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 /**
  * A main modeler application class that provides a number of services to the Modeler
- * components. Configuration properties:
+ * component. Configuration properties:
  * <ul>
  * <li>cayenne.modeler.application.name - name of the application, 'CayenneModeler' is
  * default. Used to locate preferences domain among other things.</li>
@@ -99,7 +99,7 @@ public class Application {
         Application.instance = instance;
     }
 
-    // TODO: must be injectable directly in components
+    // TODO: must be injectable directly in component
     public static WidgetFactory getWidgetFactory() {
         return instance.getInjector().getInstance(WidgetFactory.class);
     }

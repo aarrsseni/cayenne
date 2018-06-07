@@ -287,7 +287,7 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
     }
 
     /**
-     * Returns an Iterable instance over expression path components based on
+     * Returns an Iterable instance over expression path component based on
      * this entity.
      *
      * @since 3.0
@@ -646,7 +646,7 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
 
             Iterator<CayenneMapEntry> relationshipIt = resolvePathComponents(relationshipPath);
             while (relationshipIt.hasNext()) {
-                // relationship path components must be DbRelationships
+                // relationship path component must be DbRelationships
                 DbRelationship nextDBR = (DbRelationship) relationshipIt.next();
 
                 if (nextDBR.isToMany()) {
@@ -692,7 +692,7 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
             // remaining
             // tail.
             // 3. If relationship path and input have none or some leading
-            // components in
+            // component in
             // common,
             // (a) strip common leading part;
             // (b) reverse the remaining relationship part;
@@ -714,7 +714,7 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
                 }
 
                 while (pathIt.hasNext()) {
-                    // components may be attributes or relationships
+                    // component may be attributes or relationships
                     PathComponent<Attribute, Relationship> component = pathIt.next();
                     appendPath(finalPath, component);
                 }
@@ -733,7 +733,7 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
                 DbRelationship lastDBR = null;
 
                 while (pathIt.hasNext()) {
-                    // relationship path components must be DbRelationships
+                    // relationship path component must be DbRelationships
                     lastDBR = (DbRelationship) pathIt.next().getRelationship();
                 }
 
@@ -759,15 +759,15 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
             LinkedList<String> finalPath = new LinkedList<String>();
 
             while (relationshipIt.hasNext() && pathIt.hasNext()) {
-                // relationship path components must be DbRelationships
+                // relationship path component must be DbRelationships
                 DbRelationship nextDBR = (DbRelationship) relationshipIt.next();
 
-                // expression components may be attributes or relationships
+                // expression component may be attributes or relationships
                 PathComponent<Attribute, Relationship> component = pathIt.next();
 
                 if (nextDBR != component.getRelationship()) {
                     // found split point
-                    // consume the last iteration components,
+                    // consume the last iteration component,
                     // then break out to finish the iterators independently
                     prependReversedPath(finalPath, nextDBR);
                     appendPath(finalPath, component);
@@ -784,7 +784,7 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
             }
 
             while (pathIt.hasNext()) {
-                // components may be attributes or relationships
+                // component may be attributes or relationships
                 PathComponent<Attribute, Relationship> component = pathIt.next();
                 appendPath(finalPath, component);
             }

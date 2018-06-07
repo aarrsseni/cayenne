@@ -10,13 +10,13 @@ import org.apache.cayenne.modeler.ModelerConstants;
 
 public final class IconUtil {
 
-    protected static Image domainImage = createImage("dbMore.png");
-    protected static Image dataMapImage = createImage("original.png");
-    protected static Image dbEntityImage = createImage("dbEntity.png");
-    protected static Image objEntityImage = createImage("newObjentity.png");
-    protected static Image projectImage = createImage("new.png");
-    protected static Image openProjectImage = createImage("open.png");
-    private static Image saveProjectImage = createImage("floppy.png");
+    public static Image domainImage = createImage("dbMore.png");
+    public static Image dataMapImage = createImage("original.png");
+    public static Image dbEntityImage = createImage("dbEntity.png");
+    public static Image objEntityImage = createImage("newObjentity.png");
+    public static Image projectImage = createImage("new.png");
+    public static Image openProjectImage = createImage("open.png");
+    public static Image saveProjectImage = createImage("floppy.png");
 
 
     private static Image createImage(String name) {
@@ -29,48 +29,24 @@ public final class IconUtil {
         if(object == null) {
             return null;
         }
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(16);
-        imageView.setFitHeight(16);
+
         if(object instanceof DataChannelDescriptor) {
-            imageView.setImage(domainImage);
-            return imageView;
+            return createIcon(domainImage);
         } else if(object instanceof DataMap) {
-            imageView.setImage(dataMapImage);
-            return imageView;
+            return createIcon(dataMapImage);
         } else if(object instanceof DbEntity) {
-            imageView.setImage(dbEntityImage);
-            return imageView;
+            return createIcon(dbEntityImage);
         } else if(object instanceof ObjEntity) {
-            imageView.setImage(objEntityImage);
-            return imageView;
+            return createIcon(objEntityImage);
         }
         return null;
     }
 
-    public static ImageView imageForString(String str){
+    public static ImageView createIcon(Image image){
         ImageView imageView = new ImageView();
-        imageView.setFitWidth(16);
         imageView.setFitHeight(16);
-      if(str.equals("NewProject")){
-            imageView.setImage(projectImage);
-            return imageView;
-      } else if(str.equals("OpenProject")){
-          imageView.setImage(openProjectImage);
-          return imageView;
-      } else if(str.equals("Save")){
-          imageView.setImage(saveProjectImage);
-          return imageView;
-      } else if(str.equals("DataMap")){
-          imageView.setImage(dataMapImage);
-          return imageView;
-      } else if(str.equals("DbEntity")){
-          imageView.setImage(dbEntityImage);
-          return imageView;
-      } else if(str.equals("ObjEntity")){
-          imageView.setImage(objEntityImage);
-          return imageView;
-      }
-        return null;
+        imageView.setFitWidth(16);
+        imageView.setImage(image);
+        return imageView;
     }
 }
