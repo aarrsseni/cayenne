@@ -13,7 +13,7 @@ public class CustomComboBoxCell<O extends Observer, T> extends BasicTableCell<O,
 
     private ComboBoxCellConverter<T> comboBoxCellConverter;
 
-    public CustomComboBoxCell(ObservableList<String> types, ComboBoxCellConverter<T> comboBoxCellConverter) {
+    CustomComboBoxCell(ObservableList<String> types, ComboBoxCellConverter<T> comboBoxCellConverter) {
         super();
         comboBox = new ComboBox<>();
         this.types = types;

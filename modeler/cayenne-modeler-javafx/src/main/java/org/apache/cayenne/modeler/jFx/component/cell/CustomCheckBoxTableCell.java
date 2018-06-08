@@ -8,7 +8,7 @@ import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
 import org.apache.cayenne.modeler.jFx.component.Consumer;
 
-public class CustomCheckBoxTableCell extends CheckBoxTableCell{
+public class CustomCheckBoxTableCell extends CheckBoxTableCell<Observer, Boolean>{
 
     private Consumer consumer;
 
@@ -20,15 +20,15 @@ public class CustomCheckBoxTableCell extends CheckBoxTableCell{
     }
 
     @Override
-    public void updateItem(Object item, boolean empty) {
+    public void updateItem(Boolean item, boolean empty) {
         if(!empty) {
-            Observer observer = (Observer) getTableView().getItems().get(getIndex());
+            Observer observer = getTableView().getItems().get(getIndex());
             consumer.consume(this, observer);
 
             if (item != null && dbRelationshipsController.checkForDepPK((DbRelationship) observer.getBean())) {
                 DbRelationship reverseRelationship = ((DbRelationship)observer.getBean()).getReverseRelationship();
                 if(reverseRelationship != null){
-                    ObserverDictionary.getObserver(reverseRelationship).getPropertyWithoutBinding("toDependentPK").setValue(!(Boolean)item);
+                    ObserverDictionary.getObserver(reverseRelationship).getPropertyWithoutBinding("toDependentPK").setValue(!item);
                 }
             }
         }

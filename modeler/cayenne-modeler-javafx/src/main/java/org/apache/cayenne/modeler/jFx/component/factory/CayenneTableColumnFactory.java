@@ -97,7 +97,7 @@ public class CayenneTableColumnFactory {
     public TableColumn<Observer, Boolean> createBooleanColumnWithListeners(String columnName, String attrName, Consumer consumer) {
         TableColumn<Observer, Boolean> tableColumn = createColumn(columnName, attrName);
         tableColumn.setCellFactory(cell -> {
-            TableCell tableCell = new CustomCheckBoxTableCell(consumer);
+            TableCell<Observer, Boolean> tableCell = new CustomCheckBoxTableCell(consumer);
             tableCell.setDisable(true);
             return tableCell;
         });

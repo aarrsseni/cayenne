@@ -36,7 +36,7 @@ public class MainController implements Unbindable, DataMapDisplayListener, DbEnt
     public ProjectController projectController;
 
     @Inject
-    public MenuBarFactory menuBarFactory;
+    private MenuBarFactory menuBarFactory;
 
     @FXML
     @SuppressWarnings("unchecked")

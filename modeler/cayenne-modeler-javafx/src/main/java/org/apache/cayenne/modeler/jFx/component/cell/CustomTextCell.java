@@ -2,24 +2,15 @@ package org.apache.cayenne.modeler.jFx.component.cell;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
-import org.apache.cayenne.modeler.BQApplication;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.controller.dbEntity.DbEntityController;
 import org.apache.cayenne.modeler.observer.Observer;
 
 public class CustomTextCell extends BasicTableCell<Observer, String>{
 
     private TextField textField;
 
-    DbEntityController dbEntityController;
-
-    ProjectController projectController;
-
     public CustomTextCell(){
         super();
         textField = new TextField();
-        dbEntityController = BQApplication.getInjector().getInstance(DbEntityController.class);
-        projectController = BQApplication.getInjector().getInstance(ProjectController.class);
 
         setGraphic(textField);
         initHelpers();

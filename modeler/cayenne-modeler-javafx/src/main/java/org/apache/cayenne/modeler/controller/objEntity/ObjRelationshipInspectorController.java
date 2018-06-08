@@ -15,10 +15,10 @@ import org.apache.cayenne.modeler.observer.ObserverDictionary;
 
 public class ObjRelationshipInspectorController implements Unbindable {
 
-    static final String COLLECTION_TYPE_MAP = "java.util.Map";
-    static final String COLLECTION_TYPE_SET = "java.util.Set";
-    static final String COLLECTION_TYPE_COLLECTION = "java.util.Collection";
-    static final String DEFAULT_MAP_KEY = "ID (default)";
+    private static final String COLLECTION_TYPE_MAP = "java.util.Map";
+    private static final String COLLECTION_TYPE_SET = "java.util.Set";
+    private static final String COLLECTION_TYPE_COLLECTION = "java.util.Collection";
+    private static final String DEFAULT_MAP_KEY = "ID (default)";
 
     @Inject
     public ScreenController screenController;

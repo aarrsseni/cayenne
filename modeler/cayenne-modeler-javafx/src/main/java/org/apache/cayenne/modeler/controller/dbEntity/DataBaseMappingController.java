@@ -24,16 +24,16 @@ import java.util.Map;
 public class DataBaseMappingController implements Unbindable {
 
     @Inject
-    ScreenController screenController;
+    private ScreenController screenController;
 
     @Inject
     ProjectController projectController;
 
     @Inject
-    TableFactory attributeTable;
+    private TableFactory attributeTable;
 
     @Inject
-    DbRelationshipsController dbRelationshipsController;
+    private DbRelationshipsController dbRelationshipsController;
 
     @Inject
     private DataBaseMappingService dataBaseMappingService;
@@ -45,7 +45,7 @@ public class DataBaseMappingController implements Unbindable {
     private TextField reverseRelationshipField;
 
     @FXML
-    private TableView joinsTable;
+    private TableView<Observer> joinsTable;
 
     @FXML
     private Button cancelButton;

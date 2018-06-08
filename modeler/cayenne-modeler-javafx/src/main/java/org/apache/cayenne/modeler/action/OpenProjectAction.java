@@ -5,11 +5,10 @@ import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
-import org.apache.cayenne.modeler.controller.JavaFxModelerController;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.controller.JavaFxModelerController;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.services.OpenProjectService;
-import org.apache.cayenne.modeler.services.ProjectService;
 import org.apache.cayenne.modeler.services.util.OpenProjectStatus;
 import org.apache.cayenne.resource.Resource;
 
@@ -18,10 +17,7 @@ import java.io.File;
 public class OpenProjectAction extends ProjectAction {
 
     @Inject
-    OpenProjectService openProjectService;
-
-    @Inject
-    ProjectService projectService;
+    private OpenProjectService openProjectService;
 
     @Inject
     public ScreenController screenController;

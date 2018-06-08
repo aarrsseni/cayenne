@@ -10,29 +10,17 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import org.apache.cayenne.dba.TypesMapping;
-import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.EntityEvent;
-import org.apache.cayenne.map.event.ObjEntityListener;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.CreateAttributeAction;
 import org.apache.cayenne.modeler.action.CreateRelationshipAction;
 import org.apache.cayenne.modeler.controller.Unbindable;
 import org.apache.cayenne.modeler.controllers.ObjEntityFieldsController;
-import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
-import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.listener.DbAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.listener.ObjAttributeDisplayListener;
-import org.apache.cayenne.modeler.jFx.component.factory.TableFactory;
 import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class ObjEntityController implements Unbindable, ObjAttributeDisplayListener, DbEntityDisplayListener, DbAttributeDisplayListener, ObjEntityListener {
+public class ObjEntityController implements Unbindable{
 
     @FXML
     private TextField objEntityName;
@@ -84,15 +72,9 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
 
     private ObjEntity objEntity;
 
-    private Property optimisticLockingProperty;
-
-    private Property<String> dbEntityProperty;
-
-    private Map<ObjEntity, ObservableList<Observer>> objAttrsMap;
+    private Property<String> optimisticLockingProperty;
 
     private ObservableList<String> dbEntityList;
-
-    private ObservableList<String> dbAttrObservableList;
 
     @Inject
     public ProjectController projectController;
@@ -101,20 +83,18 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
     private ObjEntityFieldsController objEntityFieldsController;
 
     @Inject
-    private TableFactory tableFactory;
-
-    @Inject
     private CreateAttributeAction createAttributeAction;
 
     @Inject
     private ObjRelationshipsController objRelationshipsController;
 
     @Inject
+    private ObjAttributesController objAttributesController;
+
+    @Inject
     private CreateRelationshipAction createRelationshipAction;
 
     public ObjEntityController(){
-        this.objAttrsMap = new HashMap<>();
-        this.dbAttrObservableList = FXCollections.observableArrayList();
         this.dbEntityList = FXCollections.observableArrayList();
     }
 
@@ -122,12 +102,11 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
     @SuppressWarnings("unchecked")
     public void initialize() {
         optimisticLockingProperty = new SimpleStringProperty();
-        dbEntityProperty = new SimpleStringProperty();
 
         initListeners();
         makeResizable();
-        prepareTables();
 
+        objAttributesController.init(tableView);
         objRelationshipsController.init(relationshipView);
     }
 
@@ -150,10 +129,13 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
                     : ObjEntity.LOCK_TYPE_NONE));
         }));
 
-       fillTable();
+        for(DbEntity dbEntity : projectController.getCurrentState().getDataMap().getDbEntities()){
+            dbEntityList.addAll(dbEntity.getName());
+        }
+        tablesComboBox.setItems(dbEntityList);
 
+       objAttributesController.bindTable(objEntity);
        objRelationshipsController.bindTable(objEntity);
-       objRelationshipsController.setObjEntity(objEntity);
     }
 
     @Override
@@ -161,9 +143,8 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
         ObserverDictionary.getObserver(objEntity)
                 .unbindAll();
 
+        objAttributesController.unbindTable();
         objRelationshipsController.unbindTable();
-
-        tableView.setItems(null);
 
         dbEntityList.clear();
         tablesComboBox.setItems(dbEntityList);
@@ -198,11 +179,6 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
     }
 
     private void initListeners(){
-        projectController.getEventController().addListener(ObjAttributeDisplayListener.class, this);
-        projectController.getEventController().addListener(DbEntityDisplayListener.class, this);
-        projectController.getEventController().addListener(DbAttributeDisplayListener.class, this);
-        projectController.getEventController().addListener(ObjEntityListener.class, this);
-
         objEntityName.textProperty().addListener(((observable, oldValue, newValue) -> objEntityFieldsController.objEntityNameChanged(newValue)));
         javaSuperclass.textProperty().addListener(((observable, oldValue, newValue) -> objEntityFieldsController.objEntitySuperclassChanged(newValue)));
         javaClass.textProperty().addListener(((observable, oldValue, newValue) -> objEntityFieldsController.objEntityClassNameChanged(newValue)));
@@ -215,84 +191,6 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
         }));
     }
 
-    private void checkObjAttrs(ObjEntity objEntity, Observer dbAttributeRow){
-        if(objAttrsMap.containsKey(objEntity)) {
-            objAttrsMap.get(objEntity).add(dbAttributeRow);
-        } else {
-            ObservableList<Observer> observableList = FXCollections.observableArrayList();
-            observableList.add(dbAttributeRow);
-            objAttrsMap.put(objEntity, observableList);
-        }
-    }
-
-    private void prepareTables(){
-        tableView.getColumns().addAll(tableFactory.createObjTable());
-
-        // single cell selection mode
-        tableView.getSelectionModel().setCellSelectionEnabled(true);
-    }
-
-    private void fillTable(){
-        for(DbEntity dbEntity : projectController.getCurrentState().getDataMap().getDbEntities()){
-            dbEntityList.addAll(dbEntity.getName());
-        }
-        tablesComboBox.setItems(dbEntityList);
-
-        resetDbAttrPathComboBox();
-        addAttrs();
-    }
-
-    private void addAttrs(){
-        ObservableList<Observer> observableList = FXCollections.observableArrayList();
-        for(ObjAttribute objAttribute : objEntity.getAttributes()) {
-            observableList.add(ObserverDictionary.getObserver(objAttribute));
-            setDbType(objAttribute);
-            addListenersToAttr(objAttribute);
-        }
-        objAttrsMap.put(objEntity, observableList);
-
-        tableView.setItems(objAttrsMap.get(objEntity));
-    }
-
-    private void resetDbAttrPathComboBox(){
-        dbAttrObservableList.clear();
-        if(objEntity.getDbEntity() != null) {
-            for (DbAttribute dbAttribute : objEntity.getDbEntity().getAttributes()) {
-                dbAttrObservableList.add(dbAttribute.getName());
-            }
-        }
-    }
-
-    public ObservableList<String> getDbAttrObservableList(){
-        return dbAttrObservableList;
-    }
-
-    private void addListenersToAttr(Attribute attribute) {
-        ObserverDictionary.getObserver(attribute).getPropertyWithoutBinding("dbAttributePath").addListener(((observable, oldValue, newValue) -> {
-            if(newValue != null){
-                if(newValue.equals("")){
-                    ObserverDictionary.getObserver(attribute).getCustomPropertyWithoutBinding("dbType", String.class).setValue(null);
-                } else {
-                    setDbType((ObjAttribute) attribute);
-                }
-            }
-        }));
-    }
-
-    private void setDbType(ObjAttribute objAttribute){
-        if(objAttribute.getDbAttribute() != null) {
-            ObserverDictionary.getObserver(objAttribute).getCustomPropertyWithoutBinding("dbType", String.class).setValue(
-                    TypesMapping.getSqlNameByType(objAttribute.getDbAttribute().getType()));
-        }
-    }
-
-    private void resetDbType(){
-        for(ObjAttribute objAttribute : objEntity.getAttributes()) {
-            ObserverDictionary.getObserver(objAttribute).getCustomPropertyWithoutBinding("dbType", String.class).setValue(
-                    null);
-        }
-    }
-
     @FXML
     public void createAttribute(ActionEvent e) {
         createAttributeAction.handle(e);
@@ -301,48 +199,5 @@ public class ObjEntityController implements Unbindable, ObjAttributeDisplayListe
     @FXML
     public void createObjRelationships(ActionEvent e) {
         createRelationshipAction.handle(e);
-    }
-
-    @Override
-    public void currentObjAttributeChanged(ObjAttributeDisplayEvent e) {
-        checkObjAttrs(objEntity, ObserverDictionary.getObserver(e.getAttributes()[0]));
-
-        tableView.setItems(objAttrsMap.get(objEntity));
-
-        setDbType((ObjAttribute) e.getAttributes()[0]);
-        addListenersToAttr(e.getAttributes()[0]);
-    }
-
-    @Override
-    public void currentDbAttributeChanged(DbAttributeDisplayEvent e) {
-        resetDbAttrPathComboBox();
-    }
-
-    @Override
-    public void currentDbEntityChanged(DbEntityDisplayEvent e) {
-
-    }
-
-    @Override
-    public void objEntityChanged(EntityEvent e) {
-        if (e.getSource() == this) {
-            return;
-        }
-        resetDbAttrPathComboBox();
-        resetDbType();
-    }
-
-    @Override
-    public void objEntityAdded(EntityEvent e) {
-
-    }
-
-    @Override
-    public void objEntityRemoved(EntityEvent e) {
-
-    }
-
-    public Map<ObjEntity, ObservableList<Observer>> getObjAttrsMap(){
-        return objAttrsMap;
     }
 }

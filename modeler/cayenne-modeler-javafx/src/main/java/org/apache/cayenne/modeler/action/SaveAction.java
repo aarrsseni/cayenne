@@ -8,7 +8,7 @@ import org.apache.cayenne.project.Project;
 public class SaveAction extends SaveAsAction {
 
     @Inject
-    public SaveService saveService;
+    private SaveService saveService;
 
     @Inject
     public ProjectController projectController;

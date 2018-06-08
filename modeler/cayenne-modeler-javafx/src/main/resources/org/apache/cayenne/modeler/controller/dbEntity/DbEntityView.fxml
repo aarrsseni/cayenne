@@ -127,7 +127,7 @@
                 </Tab>
                 <Tab text="Properties">
                   <content>
-                        <VBox>
+                        <VBox fx:id="propertyBox">
                            <children>
                               <ToolBar minHeight="-Infinity" minWidth="-Infinity" prefHeight="56.0" prefWidth="277.0" style="-fx-background-color: transparent;">
                                  <items>

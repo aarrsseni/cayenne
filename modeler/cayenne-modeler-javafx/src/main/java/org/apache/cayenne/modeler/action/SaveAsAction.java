@@ -19,7 +19,7 @@ import java.io.File;
 public class SaveAsAction extends AbstractCayenneAction {
 
     @Inject
-    public SaveService saveService;
+    private SaveService saveService;
 
     @Inject
     public ScreenController screenController;
@@ -28,7 +28,7 @@ public class SaveAsAction extends AbstractCayenneAction {
     public ProjectController projectController;
 
     @Inject
-    public JavaFxModelerController javaFxModelerController;
+    private JavaFxModelerController javaFxModelerController;
 
     protected boolean saveAll() throws Exception {
 

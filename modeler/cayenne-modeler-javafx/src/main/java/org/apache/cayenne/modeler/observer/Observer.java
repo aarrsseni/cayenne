@@ -118,7 +118,7 @@ public class Observer {
             try {
                 fieldType = beanClass.getDeclaredField(fieldName).getType();
             } catch (NoSuchFieldException e) {
-                logger.error("Can't find field " + fieldName + " in " + beanClass + "." + e);
+//                logger.error("Can't find field " + fieldName + " in " + beanClass + "." + e);
             }
             // ---------------------------------------
             parentClass = beanClass.getSuperclass();
@@ -126,7 +126,7 @@ public class Observer {
                 try {
                     fieldType = parentClass.getDeclaredField(fieldName).getType();
                 } catch (NoSuchFieldException e) {
-                    logger.error("Can't find field " + fieldName + " in " + parentClass + "." + e);
+//                    logger.error("Can't find field " + fieldName + " in " + parentClass + "." + e);
                 }
                 parentClass = parentClass.getSuperclass();
             }
@@ -143,7 +143,7 @@ public class Observer {
             });
             return property;
         } catch (ClassNotFoundException e) {
-            logger.error("Can't find type for field " + fieldName + "." + e);
+//            logger.error("Can't find type for field " + fieldName + "." + e);
         }
         return null;
     }

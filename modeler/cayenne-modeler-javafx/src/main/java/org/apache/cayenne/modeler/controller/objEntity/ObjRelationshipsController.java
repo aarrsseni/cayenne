@@ -2,7 +2,6 @@ package org.apache.cayenne.modeler.controller.objEntity;
 
 import com.google.inject.Inject;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -22,10 +21,10 @@ import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.ObjEntityListener;
 import org.apache.cayenne.modeler.FXMLLoaderFactory;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.jFx.component.factory.TableFactory;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.event.ObjRelationshipDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.ObjRelationshipDisplayListener;
+import org.apache.cayenne.modeler.jFx.component.factory.TableFactory;
 import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
 import org.apache.cayenne.modeler.util.ModelerUtils;
@@ -40,16 +39,16 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
     private TableView<Observer> tableView;
 
     @Inject
-    TableFactory tableFactory;
+    private TableFactory tableFactory;
 
     @Inject
-    ProjectController projectController;
+    private ProjectController projectController;
 
     @Inject
-    ScreenController screenController;
+    private ScreenController screenController;
 
     @Inject
-    FXMLLoaderFactory fxmlLoaderFactory;
+    private FXMLLoaderFactory fxmlLoaderFactory;
 
     private ObjEntity objEntity;
 
@@ -57,17 +56,16 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
 
     private ObservableList<String> dbAttrPath;
 
-    Map<Observer, ChangeListener<String>> changeListenerMap;
+    private Map<Observer, ChangeListener<String>> changeListenerMap;
 
-    private Map<ObjRelationship, TableRow> rowMap;
+    ChangeListener<String> changeListener;
 
-    public void init(TableView tableView){
+    public void init(TableView<Observer> tableView){
         setTableView(tableView);
 
         objRels = FXCollections.observableArrayList();
         dbAttrPath = FXCollections.observableArrayList();
         changeListenerMap = new HashMap<>();
-        rowMap = new HashMap<>();
 
         prepareTable();
         initListeners();
@@ -96,12 +94,7 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
         initListenersForRels();
     }
 
-    public void addObjEntity(ObjEntity objEntity){
-
-    }
-
     public void unbindTable(){
-
         if(changeListenerMap.size() != 0) {
             for (Observer observer : objRels) {
                 observer.getCustomPropertyWithoutBinding("dbPath", String.class).removeListener(changeListenerMap.get(observer));
@@ -127,7 +120,6 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
             row.setContextMenu(contextMenu);
 
             databaseMapping.setOnAction(val -> {
-                rowMap.put((ObjRelationship) row.getItem().getBean(), row);
                 if (((ObjRelationship) row.getItem().getBean()).getSourceEntity().getDbEntity() == null) {
                     ModelerUtils.showErrorAlert("Please select DbEntity!");
                 } else {
@@ -142,14 +134,13 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
                         childPane = loader.load();
                         ((ObjRelationshipInspectorController) loader.getController()).setObjRelationship((ObjRelationship) row.getItem().getBean());
                         ((ObjRelationshipInspectorController) loader.getController()).bind();
+                        Scene popup = new Scene(childPane);
+                        dialog.setScene(popup);
+                        screenController.setCurrentPopStage(dialog);
+                        dialog.showAndWait();
                     } catch (IOException e) {
                         LoggerFactory.getLogger(getClass()).error("Can't load Obj Relationship inspector view." + e);
                     }
-
-                    Scene popup = new Scene(childPane);
-                    dialog.setScene(popup);
-                    screenController.setCurrentPopStage(dialog);
-                    dialog.showAndWait();
                 }
             });
             return row ;
@@ -163,17 +154,14 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
 
     private void initListenersForRels() {
         for(Observer observer : objRels){
-            changeListenerMap.put(observer, new PropertyListener(observer));
+            changeListenerMap.put(observer, (observable, oldValue, newValue) ->
+                    ((ObjRelationship) observer.getBean()).setDbRelationshipPath(newValue));
             observer.getCustomPropertyWithoutBinding("dbPath", String.class).addListener(changeListenerMap.get(observer));
         }
     }
 
-    public void setTableView(TableView<Observer> tableView) {
+    private void setTableView(TableView<Observer> tableView) {
         this.tableView = tableView;
-    }
-
-    public ObjEntity getObjEntity() {
-        return objEntity;
     }
 
     public void setObjEntity(ObjEntity objEntity) {
@@ -228,18 +216,5 @@ public class ObjRelationshipsController implements ObjRelationshipDisplayListene
     private void resetTable(Entity e){
         unbindTable();
         bindTable((ObjEntity)e);
-    }
-
-    private static class PropertyListener implements ChangeListener<String> {
-        public Observer observer;
-
-        public PropertyListener(Observer observer) {
-            this.observer = observer;
-        }
-
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            ((ObjRelationship) observer.getBean()).setDbRelationshipPath(newValue);
-        }
     }
 }

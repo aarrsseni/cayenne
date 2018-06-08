@@ -20,9 +20,8 @@ public final class IconUtil {
 
 
     private static Image createImage(String name) {
-        Image image = new Image(String.valueOf(IconUtil.class.getClassLoader()
+        return new Image(String.valueOf(IconUtil.class.getClassLoader()
                 .getResource(ModelerConstants.RESOURCE_PATH + name)));
-        return image;
     }
 
     public static ImageView imageForObject(Object object) {

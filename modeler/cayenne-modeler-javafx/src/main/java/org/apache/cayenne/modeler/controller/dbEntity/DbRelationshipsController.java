@@ -17,19 +17,19 @@ import javafx.stage.Stage;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.map.event.DbEntityListener;
 import org.apache.cayenne.map.event.DbRelationshipListener;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.FXMLLoaderFactory;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.jFx.component.factory.TableFactory;
 import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DbRelationshipDisplayListener;
+import org.apache.cayenne.modeler.jFx.component.factory.TableFactory;
 import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
-import org.apache.cayenne.modeler.jFx.component.Consumer;
 import org.apache.cayenne.modeler.util.ModelerUtils;
 
 import java.io.IOException;
@@ -41,16 +41,16 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
     private TableView<Observer> tableView;
 
     @Inject
-    TableFactory tableFactory;
+    private TableFactory tableFactory;
 
     @Inject
-    ProjectController projectController;
+    private ProjectController projectController;
 
     @Inject
-    ScreenController screenController;
+    private ScreenController screenController;
 
     @Inject
-    FXMLLoaderFactory fxmlLoaderFactory;
+    private FXMLLoaderFactory fxmlLoaderFactory;
 
     private DbEntity dbEntity;
 
@@ -58,18 +58,13 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
 
     private ObservableList<Observer> dbRels;
 
-    private Map<DbRelationship, TableRow> rowMap;
+    private Map<Relationship, Property<Boolean>> dependentPropertyMap;
 
-    private Map<DbRelationship, Property> dependentPropertyMap;
-
-    private Consumer consumer;
-
-    public void init(TableView tableView){
+    public void init(TableView<Observer> tableView){
         setTableView(tableView);
 
         this.targetDbEntity = FXCollections.observableArrayList();
         this.dbRels = FXCollections.observableArrayList();
-        this.rowMap = new HashMap<>();
 
         this.dependentPropertyMap = new HashMap<>();
 
@@ -85,8 +80,6 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
 
     private void prepareTable(){
         tableView.getColumns().addAll(tableFactory.createDbRelationshipsTable());
-        // single cell selection mode
-//        tableView.getSelectionModel().setCellSelectionEnabled(true);
 
         tableView.setRowFactory( tv -> {
             TableRow<Observer> row = new TableRow<>();
@@ -96,7 +89,6 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
             row.setContextMenu(contextMenu);
 
             databaseMapping.setOnAction(val -> {
-                rowMap.put((DbRelationship) row.getItem().getBean(), row);
                 if (((DbRelationship) row.getItem().getBean()).getTargetEntity() == null) {
                     ModelerUtils.showErrorAlert("Please select target DbEntity!");
                 } else {
@@ -111,14 +103,13 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
                         childPane = loader.load();
                         ((DataBaseMappingController) loader.getController()).setDbRelationship((DbRelationship) row.getItem().getBean());
                         ((DataBaseMappingController) loader.getController()).bind();
+                        Scene popup = new Scene(childPane);
+                        dialog.setScene(popup);
+                        screenController.setCurrentPopStage(dialog);
+                        dialog.showAndWait();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-                    Scene popup = new Scene(childPane);
-                    dialog.setScene(popup);
-                    screenController.setCurrentPopStage(dialog);
-                    dialog.showAndWait();
                 }
             });
             return row ;
@@ -129,15 +120,6 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
         this.dbEntity = dbEntity;
     }
 
-    @Override
-    public void currentDbRelationshipChanged(DbRelationshipDisplayEvent e) {
-        Property depProp = new SimpleBooleanProperty();
-        dependentPropertyMap.put((DbRelationship) e.getRelationships()[0], depProp);
-
-        dbRels.add(ObserverDictionary.getObserver(e.getRelationships()[0]));
-        tableView.setItems(dbRels);
-    }
-
     public void bindTable(DbEntity dbEntity){
         setDbEntity(dbEntity);
 
@@ -146,7 +128,7 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
         for(DbRelationship dbRelationship : dbEntity.getRelationships()) {
             dbRels.add(ObserverDictionary.getObserver(dbRelationship));
             if(!dependentPropertyMap.containsKey(dbRelationship)){
-                Property depProp = new SimpleBooleanProperty();
+                Property<Boolean> depProp = new SimpleBooleanProperty();
                 depProp.setValue(checkForDepPK(dbRelationship));
                 dependentPropertyMap.put(dbRelationship, depProp);
             } else {
@@ -164,7 +146,7 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
         tableView.setItems(null);
     }
 
-    public void setTableView(TableView<Observer> tableView) {
+    private void setTableView(TableView<Observer> tableView) {
         this.tableView = tableView;
     }
 
@@ -178,7 +160,7 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
         return targetDbEntity;
     }
 
-    public void addDbEntity(DbEntity dbEntity){
+    private void addDbEntity(DbEntity dbEntity){
         if(!targetDbEntity.contains(dbEntity.getName())){
             targetDbEntity.add(dbEntity.getName());
         }
@@ -196,12 +178,23 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
                 }
             }
         }
-//        tableView.getColumns().clear();
-//        prepareTable();
     }
 
     public DbEntity getDbEntity() {
         return dbEntity;
+    }
+
+    public Map<Relationship, Property<Boolean>> getDependentPropertyMap() {
+        return dependentPropertyMap;
+    }
+
+    public boolean checkForDepPK(DbRelationship dbRelationship){
+        for(DbJoin dbJoin : dbRelationship.getJoins()){
+            if(dbJoin.getSource().isPrimaryKey() && dbJoin.getTarget().isPrimaryKey()){
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -219,7 +212,7 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
         if(dependentPropertyMap.containsKey(e.getRelationship())){
             dependentPropertyMap.get(e.getRelationship()).setValue(checkForDepPK((DbRelationship)e.getRelationship()));
         } else {
-            Property depProp = new SimpleBooleanProperty();
+            Property<Boolean> depProp = new SimpleBooleanProperty();
             dependentPropertyMap.get(e.getRelationship()).setValue(checkForDepPK((DbRelationship)e.getRelationship()));
             dependentPropertyMap.put((DbRelationship)e.getRelationship(), depProp);
         }
@@ -235,16 +228,12 @@ public class DbRelationshipsController implements DbRelationshipDisplayListener,
 
     }
 
-    public Map<DbRelationship, Property> getDependentPropertyMap() {
-        return dependentPropertyMap;
-    }
+    @Override
+    public void currentDbRelationshipChanged(DbRelationshipDisplayEvent e) {
+        Property<Boolean> depProp = new SimpleBooleanProperty();
+        dependentPropertyMap.put(e.getRelationships()[0], depProp);
 
-    public boolean checkForDepPK(DbRelationship dbRelationship){
-        for(DbJoin dbJoin : dbRelationship.getJoins()){
-            if(dbJoin.getSource().isPrimaryKey() && dbJoin.getTarget().isPrimaryKey()){
-                return true;
-            }
-        }
-        return false;
+        dbRels.add(ObserverDictionary.getObserver(e.getRelationships()[0]));
+        tableView.setItems(dbRels);
     }
 }

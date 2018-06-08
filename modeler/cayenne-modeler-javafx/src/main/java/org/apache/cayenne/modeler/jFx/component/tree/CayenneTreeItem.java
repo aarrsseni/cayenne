@@ -8,7 +8,7 @@ import org.apache.cayenne.modeler.controller.Unbindable;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
 import org.apache.cayenne.modeler.util.IconUtil;
 
-public class CayenneTreeItem extends TreeItem implements Unbindable{
+public class CayenneTreeItem extends TreeItem<String> implements Unbindable{
 
     private static final String UNDEFINED_MESSAGE = "undefined";
 

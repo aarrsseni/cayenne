@@ -10,7 +10,7 @@ public class CellEvents<O extends Observer, T> {
 
     private BasicTableCell<O, T> customCell;
 
-    public CellEvents(BasicTableCell<O, T> customCell) {
+    CellEvents(BasicTableCell<O, T> customCell) {
         this.customCell = customCell;
     }
 

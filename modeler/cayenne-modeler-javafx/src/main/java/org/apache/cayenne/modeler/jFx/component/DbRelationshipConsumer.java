@@ -8,7 +8,7 @@ import org.apache.cayenne.modeler.observer.Observer;
 public class DbRelationshipConsumer implements Consumer{
 
     @Inject
-    public DbRelationshipsController dbRelationshipsController;
+    private DbRelationshipsController dbRelationshipsController;
 
 
     @Override

@@ -2,7 +2,6 @@ package org.apache.cayenne.modeler.controller;
 
 import com.google.inject.Inject;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
@@ -42,13 +41,10 @@ public class WelcomeController{
 
     public WelcomeController(){}
 
-    private ObservableList<File> items;
-
     @FXML
     @SuppressWarnings("unchecked")
     public void initialize() {
-        items = FXCollections.observableArrayList (ModelerPreferences.getLastProjFiles());
-        recentFiles.setItems(items);
+        recentFiles.setItems(FXCollections.observableArrayList (ModelerPreferences.getLastProjFiles()));
 
         makeResizable();
 

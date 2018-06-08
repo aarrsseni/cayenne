@@ -1,8 +1,6 @@
 package org.apache.cayenne.modeler.controller;
 
 import com.google.inject.Inject;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeView;
 import org.apache.cayenne.configuration.BaseConfigurationNodeVisitor;
@@ -11,7 +9,10 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
@@ -26,7 +27,7 @@ import java.util.List;
 public class TreeViewController implements Unbindable, DomainDisplayListener, DataMapDisplayListener, DbEntityDisplayListener, ObjEntityDisplayListener {
 
     @FXML
-    private TreeView treeView;
+    private TreeView<String> treeView;
 
     @Inject
     private CayenneTreeFactory cayenneTreeFactory;
@@ -45,20 +46,12 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
 
         initListeners();
 
-        treeView.getSelectionModel().selectedItemProperty().addListener( new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue,
-                                Object newValue) {
-                CayenneTreeItem selectedItem = (CayenneTreeItem) newValue;
-
-                processSelection(selectedItem);
-
-                treeView.getSelectionModel().select(selectedItem);
-
-                selectedItem.bind();
-            }
+        treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            CayenneTreeItem selectedItem = (CayenneTreeItem) newValue;
+            processSelection(selectedItem);
+            treeView.getSelectionModel().select(selectedItem);
+            selectedItem.bind();
         });
-
     }
 
     private void initFromModel(Project project) {
@@ -129,14 +122,12 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
      * already selected node was clicked again. Normally called from event listener
      * methods.
      */
-    public void processSelection(CayenneTreeItem treeItem) {
+    private void processSelection(CayenneTreeItem treeItem) {
         if (treeItem == null) {
             return;
         }
 
-        CayenneTreeItem currentNode = treeItem;
-
-        Object[] data = getUserObjects(currentNode);
+        Object[] data = getUserObjects(treeItem);
 
         if (data.length == 0) {
             // this should clear the right-side panel

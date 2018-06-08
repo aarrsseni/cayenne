@@ -50,7 +50,7 @@ public class DataMapController implements Unbindable {
     @FXML
     private TextField clientCustomSuperclass;
 
-    protected DataMap selectedDataMap;
+    private DataMap selectedDataMap;
 
     public DataMapController(){
     }
@@ -89,7 +89,7 @@ public class DataMapController implements Unbindable {
     public void initListeners() {
     }
 
-    public void makeResizable() {
+    private void makeResizable() {
         dataMapRoot.heightProperty().addListener((arg0, arg1, arg2) -> {
             dataMapScrollPane.setPrefHeight(arg2.doubleValue());
         });

@@ -10,9 +10,7 @@ import org.apache.cayenne.modeler.FXMLLoaderFactory;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class ScreenController {
 
@@ -24,9 +22,7 @@ public class ScreenController {
 
     @Inject
     private FXMLLoaderFactory fxmlLoaderFactory;
-
-    private Set<Unbindable> controllers = new HashSet<>();
-
+    
     private Map<Pane, Unbindable> controllersCache = new HashMap<>();
 
     private Map<String, Pane> panesCache = new HashMap<>();
@@ -52,7 +48,6 @@ public class ScreenController {
     }
 
     public void setUnbindableController(Unbindable unbindableController) {
-        controllers.add(unbindableController);
         this.unbindableController = unbindableController;
     }
 

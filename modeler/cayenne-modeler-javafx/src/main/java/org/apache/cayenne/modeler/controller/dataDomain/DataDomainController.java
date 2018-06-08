@@ -67,7 +67,7 @@ public class DataDomainController implements Unbindable, DomainDisplayListener{
 
     }
 
-    public void makeResizable() {
+    private void makeResizable() {
         root.heightProperty().addListener((arg0, arg1, arg2) -> {
             scrollPane.setPrefHeight(arg2.doubleValue());
         });

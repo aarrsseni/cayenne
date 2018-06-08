@@ -29,19 +29,19 @@ public class JavaFxModelerController{
     public ScreenController screenController;
 
     @Inject
-    public JavaFxModelerActionListener actionListener;
+    private JavaFxModelerActionListener actionListener;
 
     @Inject
     public ProjectController projectController;
 
     @Inject
-    public ProjectValidator projectValidator;
+    private ProjectValidator projectValidator;
 
     @Inject
-    public FXMLLoaderFactory fxmlLoaderFactory;
+    private FXMLLoaderFactory fxmlLoaderFactory;
 
     @Inject
-    public ProjectService projectService;
+    private ProjectService projectService;
 
     public TreeViewController treeViewController;
 
@@ -107,7 +107,7 @@ public class JavaFxModelerController{
     }
 
     //init display listeners
-    public void projectOpened() {
+    private void projectOpened() {
 
     }
 

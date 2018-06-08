@@ -9,7 +9,7 @@ import org.apache.cayenne.modeler.observer.Observer;
 
 public class BasicTableCell<O extends Observer, T> extends TableCell<O, T> {
 
-    public BasicTableCell(){
+    BasicTableCell(){
         new CellEvents<>(this).initEventsListeners();
     }
 

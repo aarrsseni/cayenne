@@ -9,18 +9,18 @@ import java.util.List;
 
 public class CayenneTreeFactory {
 
-    private TreeView treeView;
+    private TreeView<String> treeView;
 
-    public List<CayenneTreeItem> treeItemList = new ArrayList<>();
+    private List<CayenneTreeItem> treeItemList = new ArrayList<>();
 
-    public List<Object> treeObjects = new ArrayList<>();
+    private List<Object> treeObjects = new ArrayList<>();
 
-    public void setTreeView(TreeView treeView) {
+    public void setTreeView(TreeView<String> treeView) {
         this.treeView = treeView;
     }
 
     public void createTreeItem(Object... objects) {
-        if(objects.length == 0 || objects == null) {
+        if(objects.length == 0) {
             return;
         }
 
