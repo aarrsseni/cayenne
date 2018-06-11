@@ -142,22 +142,22 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
         Object obj = data[data.length - 1];
         ConfigurationNode node = (ConfigurationNode)obj;
 
-        node.acceptVisitor(new BaseConfigurationNodeVisitor<Object>() {
+        node.acceptVisitor(new BaseConfigurationNodeVisitor<Void>() {
             @Override
-            public Object visitDataChannelDescriptor(DataChannelDescriptor channelDescriptor) {
+            public Void visitDataChannelDescriptor(DataChannelDescriptor channelDescriptor) {
                 projectController.fireEvent(new DomainDisplayEvent(
                         this,
                         (DataChannelDescriptor) obj));
-                return channelDescriptor;
-            }
-
-            @Override
-            public Object visitDataNodeDescriptor(DataNodeDescriptor nodeDescriptor) {
                 return null;
             }
 
             @Override
-            public Object visitDataMap(DataMap dataMap) {
+            public Void visitDataNodeDescriptor(DataNodeDescriptor nodeDescriptor) {
+                return null;
+            }
+
+            @Override
+            public Void visitDataMap(DataMap dataMap) {
                 if (data.length == 2) {
                     projectController.fireEvent(new DataMapDisplayEvent(
                             this,
@@ -170,11 +170,11 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
                             (DataMap) obj,
                             (DataChannelDescriptor) projectController.getProject().getRootNode()));
                 }
-                return dataMap;
+                return null;
             }
 
             @Override
-            public Object visitObjEntity(ObjEntity entity) {
+            public Void visitObjEntity(ObjEntity entity) {
                 ObjEntityDisplayEvent e = new ObjEntityDisplayEvent(this, (Entity) obj);
                 e.setUnselectAttributes(true);
                 if (data.length == 3) {
@@ -186,11 +186,11 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
                     e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
                 }
                 projectController.fireEvent(e);
-                return entity;
+                return null;
             }
 
             @Override
-            public Object visitDbEntity(DbEntity entity) {
+            public Void visitDbEntity(DbEntity entity) {
                 DbEntityDisplayEvent e = new DbEntityDisplayEvent(this, (Entity) obj);
                 e.setUnselectAttributes(true);
                 if (data.length == 3) {
@@ -202,21 +202,21 @@ public class TreeViewController implements Unbindable, DomainDisplayListener, Da
                     e.setDomain((DataChannelDescriptor) projectController.getProject().getRootNode());
                 }
                 projectController.fireEvent(e);
-                return entity;
-            }
-
-            @Override
-            public Object visitEmbeddable(Embeddable embeddable) {
                 return null;
             }
 
             @Override
-            public Object visitProcedure(Procedure procedure) {
+            public Void visitEmbeddable(Embeddable embeddable) {
                 return null;
             }
 
             @Override
-            public Object visitQuery(QueryDescriptor query) {
+            public Void visitProcedure(Procedure procedure) {
+                return null;
+            }
+
+            @Override
+            public Void visitQuery(QueryDescriptor query) {
                 return null;
             }
         });

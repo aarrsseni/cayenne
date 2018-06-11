@@ -4,17 +4,17 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.modeler.BQApplication;
 import org.apache.cayenne.modeler.controller.dbEntity.DbRelationshipsController;
+import org.apache.cayenne.modeler.jFx.component.DbRelationshipConsumer;
 import org.apache.cayenne.modeler.observer.Observer;
 import org.apache.cayenne.modeler.observer.ObserverDictionary;
-import org.apache.cayenne.modeler.jFx.component.Consumer;
 
 public class CustomCheckBoxTableCell extends CheckBoxTableCell<Observer, Boolean>{
 
-    private Consumer consumer;
+    private DbRelationshipConsumer consumer;
 
     private DbRelationshipsController dbRelationshipsController;
 
-    public CustomCheckBoxTableCell(Consumer consumer){
+    public CustomCheckBoxTableCell(DbRelationshipConsumer consumer){
         this.consumer = consumer;
         dbRelationshipsController = BQApplication.getInjector().getInstance(DbRelationshipsController.class);
     }
@@ -23,7 +23,7 @@ public class CustomCheckBoxTableCell extends CheckBoxTableCell<Observer, Boolean
     public void updateItem(Boolean item, boolean empty) {
         if(!empty) {
             Observer observer = getTableView().getItems().get(getIndex());
-            consumer.consume(this, observer);
+            consumer.accept(this);
 
             if (item != null && dbRelationshipsController.checkForDepPK((DbRelationship) observer.getBean())) {
                 DbRelationship reverseRelationship = ((DbRelationship)observer.getBean()).getReverseRelationship();

@@ -43,6 +43,7 @@
         <module>cayenne-modeler-win-ext</module>
 		<module>cayenne-modeler-core</module>
 		<module>cayenne-modeler-javafx</module>
+		<module>cayenne-modeler-javafx-generic</module>
 	</modules>
 
 	<dependencyManagement>

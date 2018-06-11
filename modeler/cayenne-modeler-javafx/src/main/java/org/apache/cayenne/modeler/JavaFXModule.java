@@ -6,18 +6,12 @@ import io.bootique.BQCoreModule;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import org.apache.cayenne.di.DIBootstrap;
-import org.apache.cayenne.modeler.action.CreateDataMapAction;
-import org.apache.cayenne.modeler.action.NewProjectAction;
-import org.apache.cayenne.modeler.action.SaveAction;
-import org.apache.cayenne.modeler.action.SaveAsAction;
-import org.apache.cayenne.modeler.jFx.component.factory.CayenneTreeFactory;
+import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.controller.dbEntity.DbRelationshipsController;
 import org.apache.cayenne.modeler.controller.objEntity.ObjRelationshipsController;
-import org.apache.cayenne.modeler.controller.ScreenController;
 import org.apache.cayenne.modeler.init.CayenneModelerModule;
-import org.apache.cayenne.modeler.action.AbstractCayenneAction;
-import org.apache.cayenne.modeler.jFx.component.Consumer;
-import org.apache.cayenne.modeler.jFx.component.DbRelationshipConsumer;
+import org.apache.cayenne.modeler.jFx.component.factory.CayenneTreeFactory;
 import org.apache.cayenne.project.validation.DefaultProjectValidator;
 import org.apache.cayenne.project.validation.ProjectValidator;
 
@@ -78,7 +72,6 @@ public class JavaFXModule implements com.google.inject.Module {
         binder.bind(ProjectValidator.class).to(DefaultProjectValidator.class);
         binder.bind(DbRelationshipsController.class).in(Singleton.class);
         binder.bind(ObjRelationshipsController.class).in(Singleton.class);
-        binder.bind(Consumer.class).to(DbRelationshipConsumer.class);
     }
 
     @Provides

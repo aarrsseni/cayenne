@@ -5,15 +5,17 @@ import javafx.scene.control.TableCell;
 import org.apache.cayenne.modeler.controller.dbEntity.DbRelationshipsController;
 import org.apache.cayenne.modeler.observer.Observer;
 
-public class DbRelationshipConsumer implements Consumer{
+import java.util.function.Consumer;
+
+public class DbRelationshipConsumer implements Consumer<TableCell>{
 
     @Inject
     private DbRelationshipsController dbRelationshipsController;
 
-
     @Override
-    public void consume(TableCell tableCell, Observer observer) {
-        if ((Boolean) dbRelationshipsController.getDependentPropertyMap().get(observer.getBean()).getValue()) {
+    public void accept(TableCell tableCell) {
+        Observer observer = (Observer)tableCell.getTableView().getItems().get(tableCell.getIndex());
+        if (dbRelationshipsController.getDependentPropertyMap().get(observer.getBean()).getValue()) {
             tableCell.setDisable(false);
         } else {
             tableCell.setDisable(true);

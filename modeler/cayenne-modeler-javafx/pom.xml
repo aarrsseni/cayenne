@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.apache.cayenne.modeler</groupId>
             <artifactId>cayenne-modeler-core</artifactId>
-            <version>4.1.M2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -53,5 +53,4 @@
         </plugins>
 
     </build>
-
 </project>

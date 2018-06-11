@@ -296,6 +296,40 @@
 		</profile>
 
 		<profile>
+			<!-- GENERIC cross-platform assembly. Can be created on any platform -->
+			<id>generic-javafx</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.cayenne.modeler</groupId>
+					<artifactId>cayenne-modeler-javafx-generic</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>assembly-generic-javafx</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/resources/assemblies/assembly-generic-javafx.xml</descriptor>
+									</descriptors>
+									<finalName>cayenne-${project.version}</finalName>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
 			<!-- MAC assembly (can only be run on Mac) -->
 			<id>mac</id>
 			<dependencies>

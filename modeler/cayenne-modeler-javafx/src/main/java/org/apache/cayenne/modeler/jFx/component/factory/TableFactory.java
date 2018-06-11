@@ -10,7 +10,7 @@ import org.apache.cayenne.modeler.controller.dbEntity.DbRelationshipsController;
 import org.apache.cayenne.modeler.controller.objEntity.ObjAttributesController;
 import org.apache.cayenne.modeler.controller.objEntity.ObjEntityController;
 import org.apache.cayenne.modeler.controller.objEntity.ObjRelationshipsController;
-import org.apache.cayenne.modeler.jFx.component.Consumer;
+import org.apache.cayenne.modeler.jFx.component.DbRelationshipConsumer;
 import org.apache.cayenne.modeler.jFx.converters.ComboBoxStringIntegerConverter;
 import org.apache.cayenne.modeler.jFx.converters.DefaultComboBoxCellConverter;
 import org.apache.cayenne.modeler.jFx.converters.SqlComboBoxCellConverter;
@@ -40,7 +40,7 @@ public class TableFactory {
     private DataBaseMappingController dataBaseMappingController;
 
     @Inject
-    private Consumer consumer;
+    private DbRelationshipConsumer dbRelationshipConsumer;
 
     @Inject
     private ObjRelationshipsController objRelationshipsController;
@@ -78,7 +78,7 @@ public class TableFactory {
         return new ArrayList<>(Arrays.asList(
                 cayenneTableColumnFactory.createTextColumn("Name", "name"),
                 cayenneTableColumnFactory.createAutocompleteComboBoxColumnWithIcon("Target", "targetEntityName", dbRelationshipsController.getTargetDbEntity(), new DefaultComboBoxCellConverter()),
-                cayenneTableColumnFactory.createBooleanColumnWithListeners("To Dep PK", "toDependentPK", consumer),
+                cayenneTableColumnFactory.createBooleanColumnWithListeners("To Dep PK", "toDependentPK", dbRelationshipConsumer),
                 cayenneTableColumnFactory.createBooleanColumn("To many", "toMany")
         ));
     }

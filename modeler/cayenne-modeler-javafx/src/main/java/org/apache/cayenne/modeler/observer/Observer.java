@@ -41,6 +41,7 @@ public class Observer {
             fieldProperty = getPropertyImpl(fieldName);
             fieldsProperties.put(fieldName, fieldProperty);
         }
+
         bindings.put(bindedProperty, fieldProperty);
         if (fieldProperty.getClass() == SimpleIntegerProperty.class) {
             fieldProperty.setValue(callBeanGetter(fieldName));
@@ -67,7 +68,7 @@ public class Observer {
     }
 
     public void unbindAll() {
-        bindings.forEach((key, value) -> Bindings.unbindBidirectional(key, value));
+        bindings.forEach(Bindings::unbindBidirectional);
     }
 
     public void unbind() {
@@ -134,10 +135,10 @@ public class Observer {
         return fieldType;
     }
 
-    private Property getPropertyImpl(String fieldName) {
+    private <T> Property<T> getPropertyImpl(String fieldName) {
         try {
             Class fieldType = getFieldType(fieldName);
-            Property property = getPropertyInstance(fieldType);
+            Property<T> property = getPropertyInstance(fieldType);
             property.addListener((observable, oldValue, newValue) -> {
                 callBeanSetter(newValue, fieldName);
             });
@@ -169,12 +170,9 @@ public class Observer {
     }
 
     public static String getAccessMethodName(String access, String fieldName) {
-        StringBuilder builder = new StringBuilder();
-        builder
-                .append(access)
-                .append(Character.toUpperCase(fieldName.charAt(FIRST_CHAR_INDEX)))
-                .append(fieldName.substring(SUBSTRING_START_INDEX));
-        return builder.toString();
+        return access +
+                Character.toUpperCase(fieldName.charAt(FIRST_CHAR_INDEX)) +
+                fieldName.substring(SUBSTRING_START_INDEX);
     }
 
     // Calling setter for field
@@ -218,10 +216,6 @@ public class Observer {
 
     public Object getBean() {
         return bean;
-    }
-
-    public Map<String, Property> getFieldsProperties() {
-        return fieldsProperties;
     }
 
     private String makeCorrectField(String fieldName){

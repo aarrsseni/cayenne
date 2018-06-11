@@ -6,10 +6,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
+import org.apache.cayenne.modeler.jFx.component.DbRelationshipConsumer;
 import org.apache.cayenne.modeler.jFx.component.cell.*;
 import org.apache.cayenne.modeler.jFx.converters.ComboBoxCellConverter;
 import org.apache.cayenne.modeler.observer.Observer;
-import org.apache.cayenne.modeler.jFx.component.Consumer;
 import org.apache.cayenne.modeler.util.IconUtil;
 
 public class CayenneTableColumnFactory {
@@ -94,7 +94,7 @@ public class CayenneTableColumnFactory {
         return tableColumn;
     }
 
-    public TableColumn<Observer, Boolean> createBooleanColumnWithListeners(String columnName, String attrName, Consumer consumer) {
+    public TableColumn<Observer, Boolean> createBooleanColumnWithListeners(String columnName, String attrName, DbRelationshipConsumer consumer) {
         TableColumn<Observer, Boolean> tableColumn = createColumn(columnName, attrName);
         tableColumn.setCellFactory(cell -> {
             TableCell<Observer, Boolean> tableCell = new CustomCheckBoxTableCell(consumer);

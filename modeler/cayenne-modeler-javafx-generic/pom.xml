@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cayenne-modeler-parent</artifactId>
+        <groupId>org.apache.cayenne.modeler</groupId>
+        <version>4.1.M2-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cayenne-modeler-javafx-generic</artifactId>
+    <name>cayenne-modeler-javafx-generic: Modeler Generic Assembly</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cayenne.modeler</groupId>
+            <artifactId>cayenne-modeler-javafx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- adding cayenne runtime dependencies explicitly, as they are marked
+			as "provided" in the modeler pom and won't be included in the jar -->
+        <dependency>
+            <groupId>org.apache.cayenne</groupId>
+            <artifactId>cayenne-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cayenne</groupId>
+            <artifactId>cayenne-project</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cayenne.modeler</groupId>
+            <artifactId>cayenne-wocompat</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>generic-javafx</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.objectstyle.japp</groupId>
+                        <artifactId>japp-maven-plugin</artifactId>
+                        <configuration>
+                            <destDir>${project.build.outputDirectory}</destDir>
+                            <name>CayenneModelerJavaFx</name>
+                            <mainClass>org.apache.cayenne.modeler.MainJavaFX</mainClass>
+                            <os>java</os>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>japp</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>code-quality</id>
+
+            <activation>
+                <property>
+                    <name>!fast-and-dirty</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <!--<configuration>
+                            <suppressionsLocation>${project.basedir}/cayenne-checkstyle-suppression.xml</suppressionsLocation>
+                        </configuration>-->
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>objectstyle</id>
+            <name>ObjectStyle repository</name>
+            <url>http://maven.objectstyle.org/nexus/content/groups/cayenne-deps</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+</project>
