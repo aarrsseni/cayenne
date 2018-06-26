@@ -8,8 +8,6 @@ import org.apache.cayenne.modeler.controller.ScreenController;
 
 public class Application extends BQApplication{
 
-
-
     @Override
     public void start(Stage primaryStage) throws Exception {
 

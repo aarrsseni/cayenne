@@ -50,7 +50,7 @@ public class CayenneModelerCore implements Module{
         return Multibinder.newSetBinder(binder, type);
     }
 
-    public static void addModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
+    private static void addModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
         contributeModuleClass(binder).addBinding().toInstance(moduleClass);
     }
 

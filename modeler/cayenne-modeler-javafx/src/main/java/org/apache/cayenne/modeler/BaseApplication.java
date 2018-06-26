@@ -10,7 +10,7 @@ public class BaseApplication {
     public ClassLoadingService classLoadingService;
 
     @Inject
-    public JavaFxModelerController modelerController;
+    private JavaFxModelerController modelerController;
 
     public void startup(Class<? extends BQApplication> app) {
         initClassLoader();
@@ -24,7 +24,7 @@ public class BaseApplication {
         Application.launch(app);
     }
 
-    public void initClassLoader() {
+    private void initClassLoader() {
 
     }
 

@@ -45,7 +45,7 @@ public class CayenneModelerUi implements com.google.inject.Module{
         return Multibinder.newSetBinder(binder, type);
     }
 
-    public static void setModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
+    private static void setModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
         contributeModuleClass(binder).addBinding().to(moduleClass.getClass());
     }
 
@@ -54,7 +54,7 @@ public class CayenneModelerUi implements com.google.inject.Module{
         return Multibinder.newSetBinder(binder, type);
     }
 
-    public static void setActionClass(Binder binder, CayenneAction actionClass) {
+    private static void setActionClass(Binder binder, CayenneAction actionClass) {
         contributeActionClass(binder).addBinding().to(actionClass.getClass());
     }
 
@@ -136,13 +136,14 @@ public class CayenneModelerUi implements com.google.inject.Module{
     }
 
     @Provides
-    @Inject
-    public org.apache.cayenne.di.Injector createInjector(Set<org.apache.cayenne.di.Module> modules) {
+    @Singleton
+    private org.apache.cayenne.di.Injector createInjector(Set<org.apache.cayenne.di.Module> modules) {
         return DIBootstrap.createInjector(modules);
     }
 
     @Provides
-    public Map<String, Action> getActionMap(Set<CayenneAction> set){
+    @Singleton
+    private Map<String, Action> getActionMap(Set<CayenneAction> set){
         Map<String, Action> map = new HashMap<>(40);
         Iterator<CayenneAction> iterator = set.iterator();
         while(iterator.hasNext()){

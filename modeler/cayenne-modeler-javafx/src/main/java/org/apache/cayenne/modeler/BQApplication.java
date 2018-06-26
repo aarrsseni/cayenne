@@ -14,7 +14,7 @@ public abstract class BQApplication extends Application{
         return Objects.requireNonNull(INJECTOR, "Injector is not initialized. Started outside Bootique?");
     }
 
-    public static FXMLLoader getLoader(URL resourceUrl) {
+    static FXMLLoader getLoader(URL resourceUrl) {
         return getInjector().getInstance(FXMLLoaderFactory.class).getLoader(resourceUrl);
     }
 }

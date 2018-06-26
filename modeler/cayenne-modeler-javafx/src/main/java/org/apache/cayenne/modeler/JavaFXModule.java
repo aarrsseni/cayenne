@@ -39,7 +39,7 @@ public class JavaFXModule implements com.google.inject.Module {
         return Multibinder.newSetBinder(binder, type);
     }
 
-    public static void setModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
+    private static void setModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
         contributeModuleClass(binder).addBinding().to(moduleClass.getClass());
     }
 
@@ -48,7 +48,7 @@ public class JavaFXModule implements com.google.inject.Module {
         return Multibinder.newSetBinder(binder, type);
     }
 
-    public static void setActionClass(Binder binder, AbstractCayenneAction actionClass) {
+    private static void setActionClass(Binder binder, AbstractCayenneAction actionClass) {
         contributeActionClass(binder).addBinding().to(actionClass.getClass());
     }
 
@@ -76,14 +76,14 @@ public class JavaFXModule implements com.google.inject.Module {
 
     @Provides
     @Singleton
-    UiCommand provideUICommand(Provider<Injector> injectorProvider,
+    private UiCommand provideUICommand(Provider<Injector> injectorProvider,
                                Provider<Class<? extends BQApplication>> appClassProvider) {
         return new UiCommand(appClassProvider, injectorProvider);
     }
 
     @Provides
     @Singleton
-    Class<? extends BQApplication> provideAppClass(Set<Class<? extends BQApplication>> appClasses) {
+    private Class<? extends BQApplication> provideAppClass(Set<Class<? extends BQApplication>> appClasses) {
         if (appClasses.isEmpty()) {
             throw new RuntimeException("No application class specified. Use JavaFXModule.setApplicationClass(..)");
         }
@@ -97,7 +97,7 @@ public class JavaFXModule implements com.google.inject.Module {
 
     @Provides
     @Singleton
-    FXMLLoaderFactory provideFXMLLoaderFactory(Injector injector) {
+    private FXMLLoaderFactory provideFXMLLoaderFactory(Injector injector) {
 
         return new FXMLLoaderFactory() {
             @Override
@@ -113,13 +113,14 @@ public class JavaFXModule implements com.google.inject.Module {
     }
 
     @Provides
-    @Inject
-    public org.apache.cayenne.di.Injector createInjector(Set<org.apache.cayenne.di.Module> modules) {
+    @Singleton
+    private org.apache.cayenne.di.Injector createInjector(Set<org.apache.cayenne.di.Module> modules) {
         return DIBootstrap.createInjector(modules);
     }
 
     @Provides
-    public Map<String, EventHandler> getActionMap(Set<AbstractCayenneAction> set){
+    @Singleton
+    private Map<String, EventHandler> getActionMap(Set<AbstractCayenneAction> set){
         Map<String, EventHandler> map = new HashMap<>(40);
         Iterator<AbstractCayenneAction> iterator = set.iterator();
         while(iterator.hasNext()){

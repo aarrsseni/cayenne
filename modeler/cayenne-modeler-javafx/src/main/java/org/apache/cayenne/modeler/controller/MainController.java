@@ -60,6 +60,7 @@ public class MainController implements Unbindable, DataMapDisplayListener, DbEnt
     private void initMenuBar() {
         menuBarFactory.setMenuBar(menuBar);
         menuBarFactory.createMenuBar();
+        menuBar.setUseSystemMenuBar(true);
     }
 
     private void initListeners() {
