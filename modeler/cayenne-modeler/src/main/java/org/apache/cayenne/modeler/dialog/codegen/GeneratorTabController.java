@@ -26,7 +26,7 @@ import org.apache.cayenne.pref.PreferenceDetail;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.util.Util;
 
-import java.awt.Component;
+import java.awt.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,6 +65,7 @@ public class GeneratorTabController extends CayenneController {
 
         this.view = new GeneratorTabPanel(GENERATION_MODES, modePanels);
         initBindings();
+        view.setPreferredSize(new Dimension(600, 480));
     }
 
     public Component getView() {
@@ -82,8 +83,6 @@ public class GeneratorTabController extends CayenneController {
                 getApplication().getBindingFactory(),
                 this);
 
-        builder.bindToAction(view.getGenerationMode(), "updateModeAction()");
-
         CayenneProjectPreferences cayPrPref = application.getCayenneProjectPreferences();
 
         this.preferences = (PreferenceDetail) cayPrPref.getProjectDetailObject(
@@ -97,19 +96,10 @@ public class GeneratorTabController extends CayenneController {
         builder.bindToComboSelection(
                 view.getGenerationMode(),
                 "preferences.property['mode']").updateView();
-
-        updateModeAction();
     }
 
     public PreferenceDetail getPreferences() {
         return preferences;
-    }
-
-    /**
-     * Resets selection to default values for a given controller.
-     */
-    public void updateModeAction() {
-        firePropertyChange(GENERATOR_PROPERTY, null, getGeneratorController());
     }
 
     public GeneratorController getGeneratorController() {

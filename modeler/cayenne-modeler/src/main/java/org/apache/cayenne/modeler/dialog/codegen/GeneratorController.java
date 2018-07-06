@@ -22,13 +22,7 @@ package org.apache.cayenne.modeler.dialog.codegen;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.gen.ArtifactsGenerationMode;
 import org.apache.cayenne.gen.ClassGenerationAction;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.EmbeddedAttribute;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.*;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
@@ -42,17 +36,9 @@ import org.apache.cayenne.validation.SimpleValidationFailure;
 import org.apache.cayenne.validation.ValidationFailure;
 import org.apache.cayenne.validation.ValidationResult;
 
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 
@@ -167,6 +153,13 @@ public abstract class GeneratorController extends CayenneController {
         for (DataMap map : getParentController().getDataMaps()) {
             try {
                 ClassGenerationAction generator = newGenerator();
+
+                if(getParentController().getSelectedDataMaps().contains(map)) {
+                    mode = ArtifactsGenerationMode.ALL.getLabel();
+                } else {
+                    mode = ArtifactsGenerationMode.ENTITY.getLabel();
+                }
+
                 generator.setArtifactsGenerationMode(mode);
                 generator.setDataMap(map);
 
@@ -190,13 +183,6 @@ public abstract class GeneratorController extends CayenneController {
                 generator.setDestDir(outputDir);
                 generator.setMakePairs(true);
                 generator.setForce(true);
-
-                for (StandardPanelComponent dataMapLine : dataMapLines) {
-                    if (dataMapLine.getDataMap() == map && !Util.isEmptyString(dataMapLine.getSuperclassPackage().getText())) {
-                        generator.setSuperPkg(dataMapLine.getSuperclassPackage().getText());
-                        break;
-                    }
-                }
 
                 generators.add(generator);
             } catch (CayenneRuntimeException exception) {
@@ -254,7 +240,7 @@ public abstract class GeneratorController extends CayenneController {
         return null;
     }
 
-    protected ValidationFailure validateEmbeddable(Embeddable embeddable) {
+    private ValidationFailure validateEmbeddable(Embeddable embeddable) {
 
         String name = embeddable.getClassName();
 
@@ -310,7 +296,7 @@ public abstract class GeneratorController extends CayenneController {
         }
     }
 
-    protected ValidationFailure validateEntity(ObjEntity entity) {
+    private ValidationFailure validateEntity(ObjEntity entity) {
 
         String name = entity.getName();
 
@@ -340,7 +326,7 @@ public abstract class GeneratorController extends CayenneController {
         return null;
     }
 
-    protected ValidationFailure validateAttribute(ObjAttribute attribute) {
+    private ValidationFailure validateAttribute(ObjAttribute attribute) {
 
         String name = attribute.getEntity().getName();
 
@@ -371,7 +357,7 @@ public abstract class GeneratorController extends CayenneController {
         return null;
     }
 
-    protected ValidationFailure validateEmbeddedAttribute(ObjAttribute attribute) {
+    private ValidationFailure validateEmbeddedAttribute(ObjAttribute attribute) {
 
         String name = attribute.getEntity().getName();
 
@@ -420,7 +406,7 @@ public abstract class GeneratorController extends CayenneController {
         return null;
     }
 
-    protected ValidationFailure validateRelationship(ObjRelationship relationship, boolean clientValidation) {
+    private ValidationFailure validateRelationship(ObjRelationship relationship, boolean clientValidation) {
 
         String name = relationship.getSourceEntity().getName();
 
@@ -469,37 +455,20 @@ public abstract class GeneratorController extends CayenneController {
      * Returns a predicate for default entity selection in a given mode.
      */
     public Predicate getDefaultClassFilter() {
-        final ObjEntity selectedEntity = Application.getInstance().getFrameController().getProjectController()
-                .getCurrentObjEntity();
+        return object -> {
+            if (object instanceof ObjEntity) {
+                return getParentController().getProblem(((ObjEntity) object).getName()) == null;
+            }
 
-        final Embeddable selectedEmbeddable = Application.getInstance().getFrameController().getProjectController()
-                .getCurrentEmbeddable();
+            if (object instanceof Embeddable) {
+                return getParentController().getProblem(((Embeddable) object).getClassName()) == null;
+            }
 
-        if (selectedEntity != null) {
-            // select a single entity
-            final boolean hasProblem = getParentController().getProblem(selectedEntity.getName()) != null;
-            return object -> !hasProblem && object == selectedEntity;
-        } else if (selectedEmbeddable != null) {
-            // select a single embeddable
-            final boolean hasProblem = getParentController().getProblem(selectedEmbeddable.getClassName()) != null;
-            return object -> !hasProblem && object == selectedEmbeddable;
-        } else {
-            // select all entities
-            return object -> {
-                if (object instanceof ObjEntity) {
-                    return getParentController().getProblem(((ObjEntity) object).getName()) == null;
-                }
-
-                if (object instanceof Embeddable) {
-                    return getParentController().getProblem(((Embeddable) object).getClassName()) == null;
-                }
-
-                return false;
-            };
-        }
+            return false;
+        };
     }
 
-    public File getOutputDir() {
+    private File getOutputDir() {
         String dir = ((GeneratorControllerPanel) getView()).getOutputFolder().getText();
         return dir != null ? new File(dir) : new File(System.getProperty("user.dir"));
     }
