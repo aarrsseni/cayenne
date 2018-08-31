@@ -21,7 +21,6 @@ package org.apache.cayenne.modeler.action.dbimport;
 
 import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
 import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 
 import java.awt.event.ActionEvent;
@@ -34,8 +33,8 @@ public class AddCatalogAction extends TreeManipulationAction {
     private static final String ACTION_NAME = "Add Catalog";
     private static final String ICON_NAME = "icon-dbi-catalog.png";
 
-    public AddCatalogAction(Application application) {
-        super(ACTION_NAME, application);
+    public AddCatalogAction() {
+        super(ACTION_NAME);
         insertableNodeClass = Catalog.class;
     }
 

@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.editor.dbimport;
 
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.dbimport.DeleteNodeAction;
 import org.apache.cayenne.modeler.action.dbimport.EditNodeAction;
@@ -106,13 +107,13 @@ public class DbImportTreeCellEditor extends DefaultTreeCellEditor {
             return;
         }
         if (!Util.isEmptyString(super.getCellEditorValue().toString()) && !insertableNodeExist() && (isValidReverseEngineering())) {
-            EditNodeAction action = projectController.getApplication().getActionManager().getAction(EditNodeAction.class);
+            EditNodeAction action = Application.getInstance().getActionManager().getAction(EditNodeAction.class);
             action.setActionName(super.getCellEditorValue().toString());
             action.actionPerformed(null);
         } else {
             DbImportTreeNode selectedNode = (DbImportTreeNode) tree.getSelectionPath().getLastPathComponent();
             if (Util.isEmptyString(selectedNode.getSimpleNodeName()) || (insertableNodeExist())) {
-                DeleteNodeAction action = projectController.getApplication().getActionManager().getAction(DeleteNodeAction.class);
+                DeleteNodeAction action = Application.getInstance().getActionManager().getAction(DeleteNodeAction.class);
                 TreePath parentPath = tree.getSelectionPath().getParentPath();
                 action.actionPerformed(null);
                 tree.setSelectionPath(parentPath);

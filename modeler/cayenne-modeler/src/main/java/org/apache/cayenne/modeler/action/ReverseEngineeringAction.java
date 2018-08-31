@@ -21,32 +21,32 @@ package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoadResultDialog;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoaderContext;
-import org.apache.cayenne.modeler.dialog.db.load.DbLoaderData;
-import org.apache.cayenne.modeler.dialog.db.load.DbLoaderOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.load.LoadDataMapTask;
 import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.editor.DbImportController;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
+import org.apache.cayenne.modeler.services.DbService;
+import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
-import java.util.Collection;
 
 import static org.apache.cayenne.modeler.pref.DBConnectionInfo.*;
 
 /**
  * Action that imports database structure into a DataMap.
  */
-public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDialog> {
+public class ReverseEngineeringAction extends CayenneAction {
 
     private static final String ACTION_NAME = "Reengineer Database Schema";
     private static final String ICON_NAME = "icon-dbi-runImport.png";
@@ -60,6 +60,9 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
 
     @Inject
     public Application application;
+
+    @Inject
+    public ProjectController projectController;
 
     @Inject
     public DbService dbService;
@@ -77,16 +80,28 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
 
     public void performAction() {
 //        final DbLoaderContext context = new DbLoaderContext(application.getMetaData());
+    /**
+     * Connects to DB and delegates processing to DbLoaderController, starting it asynchronously.
+     */
+    @Override
+    public void performAction(ActionEvent event) {
         DBConnectionInfo connectionInfo;
         if (!datamapPreferencesExist()) {
-            final DataSourceWizard connectWizard = dataSourceWizardDialog(DIALOG_TITLE);
-            if (connectWizard == null) {
-                return;
+            DataSourceWizard connectWizard = new DataSourceWizard(getProjectController(), DIALOG_TITLE);
+            if (!connectWizard.startupAction()) {
+                return ;
             }
             connectionInfo = connectWizard.getConnectionInfo();
-            saveConnectionInfo(connectWizard);
+            saveConnectionInfo();
         } else {
             connectionInfo = getConnectionInfoFromPreferences();
+            if(dbService.getConnection() == null) {
+                try {
+                    dbService.createDataSource(connectionInfo);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         try {
             dbService.setConnection(dbService.createConnection());
@@ -106,6 +121,7 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
         }
 
         if(!context.buildConfig(connectionInfo, view)) {
+        if(!context.buildConfig(connectionInfo)) {
             try {
                 dbService.getConnection().close();
             } catch (SQLException ignored) {}
@@ -116,6 +132,11 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
             application.getUndoManager().discardAllEdits();
             try {
                 context.getConnection().close();
+            } catch (SQLException ignored) {}
+        runLoaderInThread(context, () -> {
+            application.getUndoManager().discardAllEdits();
+            try {
+                dbService.getConnection().close();
             } catch (SQLException ignored) {}
         });
     }
@@ -131,7 +152,7 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
     private DBConnectionInfo getConnectionInfoFromPreferences() {
         DBConnectionInfo connectionInfo = new DBConnectionInfo();
         DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentDataMap());
+                getDataMapPreferences(getProjectController().getCurrentState().getDataMap());
         connectionInfo.setDbAdapter(dataMapDefaults.getCurrentPreference().get(DB_ADAPTER_PROPERTY, null));
         connectionInfo.setUrl(dataMapDefaults.getCurrentPreference().get(URL_PROPERTY, null));
         connectionInfo.setUserName(dataMapDefaults.getCurrentPreference().get(USER_NAME_PROPERTY, null));
@@ -140,19 +161,19 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
         return connectionInfo;
     }
 
-    private void saveConnectionInfo(DataSourceWizard connectWizard) {
+    private void saveConnectionInfo() {
         DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentDataMap());
-        dataMapDefaults.getCurrentPreference().put(DB_ADAPTER_PROPERTY, connectWizard.getConnectionInfo().getDbAdapter());
-        dataMapDefaults.getCurrentPreference().put(URL_PROPERTY, connectWizard.getConnectionInfo().getUrl());
-        dataMapDefaults.getCurrentPreference().put(USER_NAME_PROPERTY, connectWizard.getConnectionInfo().getUserName());
-        dataMapDefaults.getCurrentPreference().put(PASSWORD_PROPERTY, connectWizard.getConnectionInfo().getPassword());
-        dataMapDefaults.getCurrentPreference().put(JDBC_DRIVER_PROPERTY, connectWizard.getConnectionInfo().getJdbcDriver());
+                getDataMapPreferences(getProjectController().getCurrentState().getDataMap());
+        dataMapDefaults.getCurrentPreference().put(DB_ADAPTER_PROPERTY, dbService.getDbConnectionInfo().getDbAdapter());
+        dataMapDefaults.getCurrentPreference().put(URL_PROPERTY, dbService.getDbConnectionInfo().getUrl());
+        dataMapDefaults.getCurrentPreference().put(USER_NAME_PROPERTY, dbService.getDbConnectionInfo().getUserName());
+        dataMapDefaults.getCurrentPreference().put(PASSWORD_PROPERTY, dbService.getDbConnectionInfo().getPassword());
+        dataMapDefaults.getCurrentPreference().put(JDBC_DRIVER_PROPERTY, dbService.getDbConnectionInfo().getJdbcDriver());
     }
 
     private boolean datamapPreferencesExist() {
-        DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentDataMap());
+        DataMapDefaults dataMapDefaults = projectController.
+                getDataMapPreferences(projectController.getCurrentState().getDataMap());
         return dataMapDefaults.getCurrentPreference().get(DB_ADAPTER_PROPERTY, null) != null;
     }
 
@@ -163,13 +184,6 @@ public class ReverseEngineeringAction extends DBWizardAction<DbActionOptionsDial
             SwingUtilities.invokeLater(callback);
         });
         th.start();
-    }
-
-    @Override
-    protected DbActionOptionsDialog createDialog(Collection<String> catalogs, Collection<String> schemas,
-                                                 String currentCatalog, String currentSchema, int command) {
-        // NOOP
-        return null;
     }
 
     public void setView(DbImportView view) {

@@ -32,6 +32,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportModel;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportTree;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.undo.DbImportTreeUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
@@ -61,8 +62,8 @@ public abstract class TreeManipulationAction extends CayenneAction {
     protected String name;
     protected boolean updateSelected;
 
-    public TreeManipulationAction(String name, Application application) {
-        super(name, application);
+    public TreeManipulationAction(String name) {
+        super(name);
         initLevels();
     }
 
@@ -106,7 +107,7 @@ public abstract class TreeManipulationAction extends CayenneAction {
         DbImportTreeUndoableEdit undoableEdit = new DbImportTreeUndoableEdit(
                 reverseEngineeringOldCopy, reverseEngineeringNewCopy, tree, getProjectController()
         );
-        getProjectController().getApplication().getUndoManager().addEdit(undoableEdit);
+        Application.getInstance().getUndoManager().addEdit(undoableEdit);
     }
 
     boolean reverseEngineeringIsEmpty() {
@@ -196,7 +197,7 @@ public abstract class TreeManipulationAction extends CayenneAction {
     protected void updateModel(boolean updateSelected) {
         insertableNodeName = null;
         DbImportModel model = (DbImportModel) tree.getModel();
-        getProjectController().setDirty(true);
+        getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
         TreePath savedPath = null;
         if (!updateSelected) {
             savedPath = new TreePath(parentElement.getPath());

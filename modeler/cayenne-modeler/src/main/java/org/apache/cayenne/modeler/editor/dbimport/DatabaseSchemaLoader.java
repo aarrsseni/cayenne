@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.editor.dbimport;
 
+import org.apache.cayenne.dbsync.reverse.dbimport.*;
 import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
 import org.apache.cayenne.dbsync.reverse.dbimport.IncludeColumn;
 import org.apache.cayenne.dbsync.reverse.dbimport.IncludeProcedure;
@@ -27,6 +28,7 @@ import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
 import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
+import org.apache.cayenne.modeler.services.DbService;
 
 import javax.swing.tree.TreePath;
 import java.sql.Connection;
@@ -48,8 +50,8 @@ public class DatabaseSchemaLoader {
         databaseReverseEngineering = new ReverseEngineering();
     }
 
-    public ReverseEngineering load(DBConnectionInfo connectionInfo, ClassLoadingService loadingService) throws SQLException {
-        try (Connection connection = connectionInfo.makeDataSource(loadingService).getConnection()) {
+    public ReverseEngineering load(DbService dbService, DBConnectionInfo connectionInfo) throws SQLException {
+        try (Connection connection = dbService.createDataSource(connectionInfo).getConnection()) {
             String[] types = {"TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM"};
             try (ResultSet rs = connection.getMetaData().getCatalogs()) {
                 String defaultCatalog = connection.getCatalog();

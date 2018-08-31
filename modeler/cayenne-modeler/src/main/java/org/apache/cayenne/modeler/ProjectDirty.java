@@ -304,7 +304,7 @@ public class ProjectDirty implements DomainListener, DataNodeListener, DataMapLi
     /**
      * @since 4.1
      */
-    public void initAll(){
+    void initAll(){
         modelerController.getProjectController().getEventController().addDataNodeListener(this);
         modelerController.getProjectController().getEventController().addDomainListener(this);
         modelerController.getProjectController().getEventController().addDataMapListener(this);

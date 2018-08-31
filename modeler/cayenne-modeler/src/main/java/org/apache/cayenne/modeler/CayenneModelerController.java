@@ -167,16 +167,13 @@ public class CayenneModelerController extends CayenneController {
             return false;
         }
 
-        if (fileList != null) {
-
         File transferFile = fileList.get(0);
-            if (transferFile.isFile()) {
-                FileFilter filter = FileFilters.getApplicationFilter();
-                if (filter.accept(transferFile)) {
-                    ActionEvent e = new ActionEvent(transferFile, ActionEvent.ACTION_PERFORMED, "OpenProject");
-                    Application.getInstance().getActionManager().getAction(OpenProjectAction.class).actionPerformed(e);
-                    return true;
-                }
+        if (transferFile.isFile()) {
+            FileFilter filter = FileFilters.getApplicationFilter();
+            if (filter.accept(transferFile)) {
+                ActionEvent e = new ActionEvent(transferFile, ActionEvent.ACTION_PERFORMED, "OpenProject");
+                Application.getInstance().getActionManager().getAction(OpenProjectAction.class).actionPerformed(e);
+                return true;
             }
         }
 
@@ -188,7 +185,7 @@ public class CayenneModelerController extends CayenneController {
         frame.setVisible(true);
     }
 
-    public void projectModifiedAction() {
+    void projectModifiedAction() {
         String title = (projectController.getProject().getConfigurationResource() == null)
                 ? "[New Project]"
                 : projectController.getProject().getConfigurationResource().getURL().getPath();
@@ -348,7 +345,7 @@ public class CayenneModelerController extends CayenneController {
         projectController.fireEvent(new RecentFileListEvent(this));
     }
 
-    public void projectOpened() {
+    private void projectOpened() {
         CayenneModelerFrame frame = (CayenneModelerFrame) getView();
         projectController.getEventController().addDataNodeDisplayListener(frame);
         projectController.getEventController().addDataMapDisplayListener(frame);
@@ -362,18 +359,18 @@ public class CayenneModelerController extends CayenneController {
         initHelpers();
     }
 
-    protected void initHelpers(){
-        enableToSave = new ProjectDirty(this);
+    private void initHelpers(){
+        ProjectDirty enableToSave = new ProjectDirty(this);
         enableToSave.initAll();
 
-        fileProjectChangeTracker = new ProjectFileChangeTrackerDisplay(getProjectController());
+        ProjectFileChangeTrackerDisplay fileProjectChangeTracker = new ProjectFileChangeTrackerDisplay(getProjectController());
         fileProjectChangeTracker.initAll();
 
-        domainSelectedChanges = new DomainSelectedChanges(frame.getActionManager(), this);
+        DomainSelectedChanges domainSelectedChanges = new DomainSelectedChanges(frame.getActionManager(), this);
         domainSelectedChanges.initAll();
     }
 
-    public void updateModelerActionListener() {
+    private void updateModelerActionListener() {
         modelerActionListener.initListeners();
     }
 }

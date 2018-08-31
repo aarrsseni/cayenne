@@ -19,15 +19,8 @@
 
 package org.apache.cayenne.modeler.editor.dbimport;
 
-import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
-import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeColumn;
-import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeProcedure;
-import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeTable;
-import org.apache.cayenne.dbsync.reverse.dbimport.IncludeColumn;
-import org.apache.cayenne.dbsync.reverse.dbimport.IncludeProcedure;
-import org.apache.cayenne.dbsync.reverse.dbimport.IncludeTable;
-import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
-import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
+import org.apache.cayenne.dbsync.reverse.dbimport.*;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.GetDbConnectionAction;
 import org.apache.cayenne.modeler.action.dbimport.AddCatalogAction;
@@ -42,10 +35,11 @@ import org.apache.cayenne.modeler.action.dbimport.AddSchemaAction;
 import org.apache.cayenne.modeler.action.dbimport.DeleteNodeAction;
 import org.apache.cayenne.modeler.action.dbimport.EditNodeAction;
 import org.apache.cayenne.modeler.action.dbimport.TreeManipulationAction;
+import org.apache.cayenne.modeler.action.GetDbConnectionAction;
+import org.apache.cayenne.modeler.action.dbimport.*;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 
-import javax.swing.JButton;
-import javax.swing.JToolBar;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -199,13 +193,13 @@ class TreeToolbarPanel extends JToolBar {
     }
 
     private <T extends TreeManipulationAction> JButton createButton(Class<T> actionClass, int position) {
-        TreeManipulationAction action = projectController.getApplication().getActionManager().getAction(actionClass);
+        TreeManipulationAction action = Application.getInstance().getActionManager().getAction(actionClass);
         action.setTree(reverseEngineeringTree);
         return action.buildButton(position);
     }
 
     private <T extends AddPatternParamAction> JButton createButton(Class<T> actionClass, int position, Class paramClass) {
-        AddPatternParamAction action = projectController.getApplication().getActionManager().getAction(actionClass);
+        AddPatternParamAction action = Application.getInstance().getActionManager().getAction(actionClass);
         action.setTree(reverseEngineeringTree);
         action.setParamClass(paramClass);
         return action.buildButton(position);
@@ -221,11 +215,12 @@ class TreeToolbarPanel extends JToolBar {
         includeProcedureButton = createButton(AddIncludeProcedureAction.class, 2, IncludeProcedure.class);
         excludeProcedureButton = createButton(AddExcludeProcedureAction.class, 3, ExcludeProcedure.class);
         editButton = createButton(EditNodeAction.class, 0);
-        DeleteNodeAction deleteNodeAction = projectController.getApplication().getActionManager().getAction(DeleteNodeAction.class);
+        DeleteNodeAction deleteNodeAction = Application.getInstance().getActionManager().getAction(DeleteNodeAction.class);
         deleteNodeAction.setTree(reverseEngineeringTree);
         deleteNodeAction.setPanel(panel);
         deleteButton = deleteNodeAction.buildButton(0);
-        GetDbConnectionAction action = projectController.getApplication().getActionManager().getAction(GetDbConnectionAction.class);
+        GetDbConnectionAction action = Application.getInstance().getActionManager().getAction(GetDbConnectionAction.class);
         configureButton = action.buildButton(0);
+        configureButton.setEnabled(true);
     }
 }

@@ -22,7 +22,6 @@ package org.apache.cayenne.modeler.action.dbimport;
 import org.apache.cayenne.dbsync.reverse.dbimport.FilterContainer;
 import org.apache.cayenne.dbsync.reverse.dbimport.PatternParam;
 import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 import org.apache.cayenne.util.Util;
 
@@ -38,8 +37,8 @@ public class EditNodeAction extends TreeManipulationAction {
 
     private String actionName;
 
-    public EditNodeAction(Application application) {
-        super(ACTION_NAME, application);
+    public EditNodeAction() {
+        super(ACTION_NAME);
     }
 
     public String getIconName() {

@@ -19,22 +19,12 @@
 
 package org.apache.cayenne.modeler.action.dbimport;
 
-import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
-import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeColumn;
-import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeProcedure;
-import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeTable;
-import org.apache.cayenne.dbsync.reverse.dbimport.FilterContainer;
-import org.apache.cayenne.dbsync.reverse.dbimport.IncludeColumn;
-import org.apache.cayenne.dbsync.reverse.dbimport.IncludeProcedure;
-import org.apache.cayenne.dbsync.reverse.dbimport.IncludeTable;
-import org.apache.cayenne.dbsync.reverse.dbimport.PatternParam;
-import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
-import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
-import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.dbsync.reverse.dbimport.*;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportModel;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.editor.dbimport.DraggableTreePanel;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
@@ -50,8 +40,8 @@ public class DeleteNodeAction extends TreeManipulationAction {
 
     private DraggableTreePanel panel;
 
-    public DeleteNodeAction(Application application) {
-        super(ACTION_NAME, application);
+    public DeleteNodeAction() {
+        super(ACTION_NAME);
     }
 
     public String getIconName() {
@@ -116,7 +106,7 @@ public class DeleteNodeAction extends TreeManipulationAction {
     private void updateParentChilds() {
         DbImportModel model = (DbImportModel) tree.getModel();
         model.removeNodeFromParent(selectedElement);
-        getProjectController().setDirty(true);
+        getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
         model.reload(parentElement);
     }
 
@@ -151,7 +141,7 @@ public class DeleteNodeAction extends TreeManipulationAction {
                 }
             }
             if (paths.length > 1) {
-                getProjectController().setDirty(true);
+                getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
                 ArrayList<DbImportTreeNode> expandList = tree.getTreeExpandList();
                 tree.translateReverseEngineeringToTree(tree.getReverseEngineering(), false);
                 tree.expandTree(expandList);

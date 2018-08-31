@@ -25,6 +25,7 @@ import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.undo.AddPrefetchUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.EntityTreeFilter;
@@ -73,7 +74,7 @@ public class SelectQueryPrefetchTab extends SelectQueryOrderingTab {
         prefetchBox.addItem(DISJOINT_PREFETCH_SEMANTICS);
         prefetchBox.addItem(DISJOINT_BY_ID_PREFETCH_SEMANTICS);
 
-        prefetchBox.addActionListener(e -> Application.getInstance().getFrameController().getEditorView().getEventController().setDirty(true));
+        prefetchBox.addActionListener(e -> mediator.fireEvent(new ProjectDirtyEvent(this, true)));
 
         column.setCellEditor(new DefaultCellEditor(prefetchBox));
 

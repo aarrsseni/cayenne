@@ -20,6 +20,7 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
+import org.apache.cayenne.dbsync.reverse.dbload.DbLoader;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.sql.Connection;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class DBWizardAction<T extends DbActionOptionsDialog> extends CayenneAction {
@@ -103,7 +105,7 @@ public abstract class DBWizardAction<T extends DbActionOptionsDialog> extends Ca
 
     @SuppressWarnings("unchecked")
     private List<String> getCatalogs(DataSourceWizard connectWizard, Connection connection) throws Exception {
-        if(!connectWizard.getAdapter().supportsCatalogsOnReverseEngineering()) {
+        if(!dbService.getDbAdapter().supportsCatalogsOnReverseEngineering()) {
             return (List<String>) Collections.EMPTY_LIST;
         }
 

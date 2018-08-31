@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db.load;
 
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.dbimport.DeleteNodeAction;
 import org.apache.cayenne.modeler.action.dbimport.EditNodeAction;
@@ -50,12 +51,12 @@ public class DefaultPopUpMenu extends JPopupMenu {
     private void initListeners() {
         rename.addActionListener(e -> {
             if ((selectedElement != null) && (parentElement != null)) {
-                projectController.getApplication().getActionManager().getAction(EditNodeAction.class).actionPerformed(e);
+                Application.getInstance().getActionManager().getAction(EditNodeAction.class).actionPerformed(e);
             }
         });
         delete.addActionListener(e -> {
             if ((selectedElement != null) && (parentElement != null)) {
-                projectController.getApplication().getActionManager().getAction(DeleteNodeAction.class).actionPerformed(e);
+                Application.getInstance().getActionManager().getAction(DeleteNodeAction.class).actionPerformed(e);
             }
         });
     }

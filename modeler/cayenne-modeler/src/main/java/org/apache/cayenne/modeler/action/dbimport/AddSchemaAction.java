@@ -23,7 +23,6 @@ import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
 import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
 import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
 import org.apache.cayenne.dbsync.reverse.dbimport.SchemaContainer;
-import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 
 import java.awt.event.ActionEvent;
@@ -36,8 +35,8 @@ public class AddSchemaAction extends TreeManipulationAction {
     private static final String ACTION_NAME = "Add Schema";
     private static final String ICON_NAME = "icon-dbi-schema.png";
 
-    public AddSchemaAction(Application application) {
-        super(ACTION_NAME, application);
+    public AddSchemaAction() {
+        super(ACTION_NAME);
         insertableNodeClass = Schema.class;
     }
 

@@ -20,8 +20,6 @@ package org.apache.cayenne.modeler.init;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.apache.cayenne.configuration.xml.DataChannelMetaData;
-import org.apache.cayenne.configuration.xml.DefaultDataChannelMetaData;
 import org.apache.cayenne.configuration.xml.HandlerFactory;
 import org.apache.cayenne.configuration.xml.XMLReaderProvider;
 import org.apache.cayenne.dbsync.xml.DbImportExtension;
@@ -53,7 +51,7 @@ public class CayenneModelerModule implements Module {
         binder.bind(Application.class).toProviderInstance(() -> applicationProvider.get());
         binder.bind(WidgetFactory.class).to(DefaultWidgetFactory.class);
         binder.bind(HandlerFactory.class).to(ExtensionAwareHandlerFactory.class);
-        binder.bind(DataChannelMetaData.class).to(DefaultDataChannelMetaData.class);
+//        binder.bind(DataChannelMetaData.class).to(DefaultDataChannelMetaData.class);
         binder.bind(XMLReader.class).toProviderInstance(new XMLReaderProvider(true)).withoutScope();
 
         ProjectModule.contributeExtensions(binder)

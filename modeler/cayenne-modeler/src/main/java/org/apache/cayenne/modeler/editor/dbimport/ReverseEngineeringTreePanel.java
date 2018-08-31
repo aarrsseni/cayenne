@@ -29,6 +29,7 @@ import org.apache.cayenne.dbsync.reverse.dbimport.IncludeTable;
 import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
 import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.db.load.CatalogPopUpMenu;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
@@ -166,8 +167,8 @@ class ReverseEngineeringTreePanel extends JScrollPane {
     }
 
     private ReverseEngineering getReverseEngineeringBySelectedMap() {
-        DataMap dataMap = projectController.getCurrentDataMap();
-        return projectController.getApplication().getMetaData().get(dataMap, ReverseEngineering.class);
+        DataMap dataMap = projectController.getCurrentState().getDataMap();
+        return Application.getInstance().getProjectController().getMetaData().get(dataMap, ReverseEngineering.class);
     }
 
     private void changeIcons() {

@@ -26,12 +26,15 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.cayenne.configuration.server.ServerModule;
 import org.apache.cayenne.dbsync.DbSyncModule;
+import org.apache.cayenne.dbsync.reverse.dbimport.DbImportModule;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.FileClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.services.*;
 import org.apache.cayenne.pref.CayenneProjectPreferences;
-import org.apache.cayenne.project.*;
+import org.apache.cayenne.project.ConfigurationNodeParentGetter;
+import org.apache.cayenne.project.DefaultConfigurationNodeParentGetter;
+import org.apache.cayenne.project.ProjectModule;
 
 /**
  * @since 4.1
@@ -44,7 +47,7 @@ public class CayenneModelerCore implements Module{
         return Multibinder.newSetBinder(binder, type);
     }
 
-    public static void addModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
+    private static void addModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
         contributeModuleClass(binder).addBinding().toInstance(moduleClass);
     }
 
@@ -80,8 +83,10 @@ public class CayenneModelerCore implements Module{
         binder.bind(NavigationService.class).to(DefaultNavigationService.class);
 
         contributeModuleClass(binder).addBinding().to(ProjectModule.class);
+
         addModuleClass(binder, new ProjectModule());
         addModuleClass(binder, new DbSyncModule());
         addModuleClass(binder, new ServerModule());
+        addModuleClass(binder, new DbImportModule());
     }
 }

@@ -104,6 +104,7 @@ import org.apache.cayenne.modeler.event.QueryDisplayListener;
 import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
 import org.apache.cayenne.modeler.event.SaveListener;
 import org.apache.cayenne.configuration.event.*;
+import org.apache.cayenne.configuration.xml.DataChannelMetaData;
 import org.apache.cayenne.di.Injector;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.Embeddable;
@@ -113,56 +114,10 @@ import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.event.*;
 import org.apache.cayenne.modeler.event.listener.ListenerDescriptor;
-import org.apache.cayenne.modeler.event.listener.ListenerDescriptorCreator;
-import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
-import org.apache.cayenne.modeler.event.ProjectDirtyEventListener;
-import org.apache.cayenne.modeler.action.NavigateBackwardAction;
-import org.apache.cayenne.modeler.action.NavigateForwardAction;
-import org.apache.cayenne.modeler.action.RevertAction;
-import org.apache.cayenne.modeler.action.SaveAction;
-import org.apache.cayenne.modeler.action.SaveAsAction;
-import org.apache.cayenne.modeler.adapters.EventListenerMap;
-import org.apache.cayenne.modeler.editor.CallbackType;
-import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
-import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.CallbackMethodEvent;
-import org.apache.cayenne.modeler.event.CallbackMethodListener;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.DataMapDisplayListener;
-import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
-import org.apache.cayenne.modeler.event.DataNodeDisplayListener;
-import org.apache.cayenne.modeler.event.DataSourceModificationEvent;
-import org.apache.cayenne.modeler.event.DataSourceModificationListener;
-import org.apache.cayenne.modeler.event.DbAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.DbEntityDisplayListener;
-import org.apache.cayenne.modeler.event.DbRelationshipDisplayListener;
-import org.apache.cayenne.modeler.event.DisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayEvent;
-import org.apache.cayenne.modeler.event.DomainDisplayListener;
-import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
-import org.apache.cayenne.modeler.event.EmbeddableDisplayListener;
-import org.apache.cayenne.modeler.event.EntityDisplayEvent;
-import org.apache.cayenne.modeler.event.EntityListenerEvent;
-import org.apache.cayenne.modeler.event.EntityListenerListener;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayEvent;
-import org.apache.cayenne.modeler.event.MultipleObjectsDisplayListener;
-import org.apache.cayenne.modeler.event.ObjAttributeDisplayListener;
-import org.apache.cayenne.modeler.event.ObjEntityDisplayListener;
-import org.apache.cayenne.modeler.event.ObjRelationshipDisplayListener;
-import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureDisplayListener;
-import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
-import org.apache.cayenne.modeler.event.ProcedureParameterDisplayListener;
-import org.apache.cayenne.modeler.event.ProjectOnSaveEvent;
-import org.apache.cayenne.modeler.event.ProjectOnSaveListener;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
-import org.apache.cayenne.modeler.event.QueryDisplayListener;
-import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.DataNodeDefaults;
 import org.apache.cayenne.modeler.pref.ProjectStatePreferences;
+import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.util.AdapterMapping;
 import org.apache.cayenne.modeler.util.CircularArray;
 import org.apache.cayenne.modeler.util.Comparators;
@@ -183,19 +138,19 @@ public class ProjectController {
     protected EventController eventController;
 
     protected boolean dirty;
-    protected int entityTabSelection;
+    private int entityTabSelection;
 
     protected Project project;
 
-    protected Preferences projectControllerPreferences;
+    private Preferences projectControllerPreferences;
 
-    protected ControllerState currentState;
-    protected CircularArray<ControllerState> controllerStateHistory;
-    protected int maxHistorySize = 20;
+    private ControllerState currentState;
+    private CircularArray<ControllerState> controllerStateHistory;
+    private int maxHistorySize = 20;
 
     private EntityResolver entityResolver;
 
-    protected AdapterMapping adapterMapping;
+    private AdapterMapping adapterMapping;
 
     @com.google.inject.Inject
     protected CayenneProjectPreferences cayenneProjectPreferences;
@@ -210,9 +165,12 @@ public class ProjectController {
     @com.google.inject.Inject
     protected com.google.inject.Injector bootiqueInjector;
 
-    protected ListenerDescriptorCreator listenerDescriptorCreator;
+    @com.google.inject.Inject
+    protected DbService dbService;
 
     private String newProjectTemporaryName;
+
+    private DataChannelMetaData metaData;
 
     /**
      * Project files watcher. When project file is changed, user will be asked
@@ -223,10 +181,7 @@ public class ProjectController {
     public ProjectController() {
         this.eventController = new EventController();
         controllerStateHistory = new CircularArray<>(maxHistorySize);
-
         currentState = new ControllerState(this);
-        listenerDescriptorCreator = new ListenerDescriptorCreator();
-
         adapterMapping = new AdapterMapping();
     }
 
@@ -272,7 +227,7 @@ public class ProjectController {
         }
     }
 
-    public void updateEntityResolver() {
+    void updateEntityResolver() {
 
         Collection<DataMap> dataMaps = ((DataChannelDescriptor) project.getRootNode()).getDataMaps();
 
@@ -390,7 +345,7 @@ public class ProjectController {
     }
 
     /** Resets all current models to null. */
-    protected void clearState() {
+    void clearState() {
         // don't clear if we are refiring events for history navigation
         if (currentState.isRefiring()) {
             return;
@@ -399,14 +354,14 @@ public class ProjectController {
         currentState = new ControllerState(this);
     }
 
-    protected void saveState(DisplayEvent e) {
+    void saveState(DisplayEvent e) {
         if (!controllerStateHistory.contains(currentState)) {
             currentState.setEvent(e);
             controllerStateHistory.add(currentState);
         }
     }
 
-    protected void removeFromHistory(EventObject e) {
+    void removeFromHistory(EventObject e) {
 
         int count = controllerStateHistory.size();
         List<ControllerState> removeList = new ArrayList<>();
@@ -477,8 +432,7 @@ public class ProjectController {
         addDataMap(src, map, true);
     }
 
-    public void addDataMap(Object src, DataMap map, boolean makeCurrent) {
-
+    private void addDataMap(Object src, DataMap map, boolean makeCurrent) {
         map.setDataChannelDescriptor(currentState.getDomain());
         // new map was added.. link it to domain (and node if possible)
         currentState.getDomain().getDataMaps().add(map);
@@ -525,8 +479,7 @@ public class ProjectController {
             ConfigurationNodeParentGetter parentGetter = injector.getInstance(ConfigurationNodeParentGetter.class);
             Object parent = parentGetter.getParent(paths[0]);
 
-            List<ConfigurationNode> result = new ArrayList<>();
-            result.addAll(Arrays.asList(paths));
+            List<ConfigurationNode> result = new ArrayList<>(Arrays.asList(paths));
 
             /*
              * Here we sort the list of objects to minimize the risk that
@@ -534,7 +487,7 @@ public class ProjectController {
              * should go before Query, to increase chances that Query's root
              * would be set.
              */
-            Collections.sort(result, parent instanceof DataMap
+            result.sort(parent instanceof DataMap
                     ? Comparators.getDataMapChildrenComparator()
                     : Comparators.getDataDomainChildrenComparator());
 
@@ -567,7 +520,7 @@ public class ProjectController {
         return embNames;
     }
 
-    public void updateProjectControllerPreferences() {
+    void updateProjectControllerPreferences() {
         String key = getProject().getConfigurationResource() == null ? new String(IDUtil.pseudoUniqueByteSequence16())
                 : project.getConfigurationResource().getURL().getPath();
 
@@ -578,11 +531,6 @@ public class ProjectController {
                 projectControllerPreferences = projectControllerPreferences.node(projectControllerPreferences
                         .absolutePath() + key.replace(".xml", ""));
             }
-//            else {
-//                projectControllerPreferences = projectControllerPreferences.node(
-//                        projectControllerPreferences.absolutePath())
-//                        .node(getApplication().getNewProjectTemporaryName());
-//            }
         }
     }
 
@@ -635,6 +583,14 @@ public class ProjectController {
         this.entityTabSelection = entityTabSelection;
     }
 
+    public DataChannelMetaData getMetaData() {
+        return metaData;
+    }
+
+    public DbService getDbService() {
+        return dbService;
+    }
+
     /**
      * @since 4.1
      */
@@ -658,5 +614,9 @@ public class ProjectController {
         }
 
         return newProjectTemporaryName;
+    }
+
+    void setMetaData(DataChannelMetaData metaData) {
+        this.metaData = metaData;
     }
 }

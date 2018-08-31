@@ -20,7 +20,6 @@
 package org.apache.cayenne.modeler.action.dbimport;
 
 import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeProcedure;
-import org.apache.cayenne.modeler.Application;
 
 /**
  * @since 4.1
@@ -30,8 +29,8 @@ public class AddExcludeProcedureAction extends AddPatternParamAction {
     private static final String ACTION_NAME = "Add Exclude Procedure";
     private static final String ICON_NAME = "icon-dbi-excludeProcedure.png";
 
-    public AddExcludeProcedureAction(Application application) {
-        super(ACTION_NAME, application);
+    public AddExcludeProcedureAction() {
+        super(ACTION_NAME);
         insertableNodeClass = ExcludeProcedure.class;
     }
 

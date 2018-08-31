@@ -89,14 +89,14 @@ abstract class BaseQueryMainTab extends JPanel {
             throw new ValidationException("SelectQuery name is required.");
         }
 
-        DataMap map = mediator.getCurrentDataMap();
+        DataMap map = mediator.getCurrentState().getDataMap();
         QueryDescriptor matchingQuery = map.getQueryDescriptor(newName);
 
         if (matchingQuery == null) {
             // completely new name, set new name for entity
             QueryEvent e = new QueryEvent(this, query, query.getName());
             ProjectUtil.setQueryName(map, query, newName);
-            mediator.fireQueryEvent(e);
+            mediator.fireEvent(e);
         } else if (matchingQuery != query) {
             // there is a query with the same name
             throw new ValidationException("There is another query named '"

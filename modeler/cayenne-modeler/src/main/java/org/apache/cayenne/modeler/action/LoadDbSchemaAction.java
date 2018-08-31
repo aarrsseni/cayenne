@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.action;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
@@ -28,18 +29,15 @@ import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.editor.dbimport.DraggableTreePanel;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
+import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.DB_ADAPTER_PROPERTY;
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.URL_PROPERTY;
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.USER_NAME_PROPERTY;
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.PASSWORD_PROPERTY;
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.JDBC_DRIVER_PROPERTY;
+import static org.apache.cayenne.modeler.pref.DBConnectionInfo.*;
 
 /**
  * @since 4.1
@@ -50,8 +48,11 @@ public class LoadDbSchemaAction extends CayenneAction {
     private static final String ACTION_NAME = "Refresh Db Schema";
     private DraggableTreePanel draggableTreePanel;
 
-    LoadDbSchemaAction(Application application) {
-        super(ACTION_NAME, application);
+    @Inject
+    DbService dbService;
+
+    public LoadDbSchemaAction() {
+        super(ACTION_NAME);
     }
 
     public String getIconName() {
@@ -80,7 +81,7 @@ public class LoadDbSchemaAction extends CayenneAction {
                         return;
                     }
                     connectionInfo = connectWizard.getConnectionInfo();
-                    saveConnectionInfo(connectWizard);
+                    saveConnectionInfo();
                 } else {
                     connectionInfo = getConnectionInfoFromPreferences();
                 }
@@ -119,14 +120,14 @@ public class LoadDbSchemaAction extends CayenneAction {
 
     private boolean datamapPreferencesExist() {
         DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentDataMap());
+                getDataMapPreferences(getProjectController().getCurrentState().getDataMap());
         return dataMapDefaults.getCurrentPreference().get(DB_ADAPTER_PROPERTY, null) != null;
     }
 
     private DBConnectionInfo getConnectionInfoFromPreferences() {
         DBConnectionInfo connectionInfo = new DBConnectionInfo();
         DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentDataMap());
+                getDataMapPreferences(getProjectController().getCurrentState().getDataMap());
         connectionInfo.setDbAdapter(dataMapDefaults.getCurrentPreference().get(DB_ADAPTER_PROPERTY, null));
         connectionInfo.setUrl(dataMapDefaults.getCurrentPreference().get(URL_PROPERTY, null));
         connectionInfo.setUserName(dataMapDefaults.getCurrentPreference().get(USER_NAME_PROPERTY, null));
@@ -135,14 +136,14 @@ public class LoadDbSchemaAction extends CayenneAction {
         return connectionInfo;
     }
 
-    private void saveConnectionInfo(DataSourceWizard connectWizard) {
+    private void saveConnectionInfo() {
         DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentDataMap());
-        dataMapDefaults.getCurrentPreference().put(DB_ADAPTER_PROPERTY, connectWizard.getConnectionInfo().getDbAdapter());
-        dataMapDefaults.getCurrentPreference().put(URL_PROPERTY, connectWizard.getConnectionInfo().getUrl());
-        dataMapDefaults.getCurrentPreference().put(USER_NAME_PROPERTY, connectWizard.getConnectionInfo().getUserName());
-        dataMapDefaults.getCurrentPreference().put(PASSWORD_PROPERTY, connectWizard.getConnectionInfo().getPassword());
-        dataMapDefaults.getCurrentPreference().put(JDBC_DRIVER_PROPERTY, connectWizard.getConnectionInfo().getJdbcDriver());
+                getDataMapPreferences(getProjectController().getCurrentState().getDataMap());
+        dataMapDefaults.getCurrentPreference().put(DB_ADAPTER_PROPERTY, dbService.getDbConnectionInfo().getDbAdapter());
+        dataMapDefaults.getCurrentPreference().put(URL_PROPERTY, dbService.getDbConnectionInfo().getUrl());
+        dataMapDefaults.getCurrentPreference().put(USER_NAME_PROPERTY, dbService.getDbConnectionInfo().getUserName());
+        dataMapDefaults.getCurrentPreference().put(PASSWORD_PROPERTY, dbService.getDbConnectionInfo().getPassword());
+        dataMapDefaults.getCurrentPreference().put(JDBC_DRIVER_PROPERTY, dbService.getDbConnectionInfo().getJdbcDriver());
     }
 
     public void setDraggableTreePanel(DraggableTreePanel draggableTreePanel) {

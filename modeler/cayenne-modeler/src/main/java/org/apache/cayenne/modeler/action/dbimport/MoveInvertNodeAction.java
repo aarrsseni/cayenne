@@ -19,8 +19,6 @@
 
 package org.apache.cayenne.modeler.action.dbimport;
 
-import org.apache.cayenne.modeler.Application;
-
 /**
  * @since 4.1
  */
@@ -28,8 +26,8 @@ public class MoveInvertNodeAction extends MoveImportNodeAction {
 
     private static final String ACTION_NAME = "Exclude";
 
-    public MoveInvertNodeAction(Application application) {
-        super(ACTION_NAME, application);
+    public MoveInvertNodeAction() {
+        super(ACTION_NAME);
         moveInverted = true;
     }
 }

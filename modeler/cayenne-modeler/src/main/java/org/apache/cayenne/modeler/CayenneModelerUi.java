@@ -26,6 +26,7 @@ import org.apache.cayenne.configuration.ConfigurationNameMapper;
 import org.apache.cayenne.configuration.DefaultConfigurationNameMapper;
 import org.apache.cayenne.di.DIBootstrap;
 import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.action.dbimport.*;
 import org.apache.cayenne.modeler.graph.action.ShowGraphEntityAction;
 import org.apache.cayenne.modeler.init.CayenneModelerModule;
 import org.apache.cayenne.modeler.pref.CoreDataSourceFactory;
@@ -36,7 +37,6 @@ import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.*;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -142,20 +142,36 @@ public class CayenneModelerUi implements com.google.inject.Module{
         setActionClass(binder, new LinkDataMapAction());
         setActionClass(binder, new LinkDataMapsAction());
         setActionClass(binder, new CutCallbackMethodAction());
+        setActionClass(binder, new LoadDbSchemaAction());
+        setActionClass(binder, new ReverseEngineeringToolMenuAction());
+        setActionClass(binder, new MoveImportNodeAction());
+        setActionClass(binder, new MoveInvertNodeAction());
+        setActionClass(binder, new AddSchemaAction());
+        setActionClass(binder, new AddCatalogAction());
+        setActionClass(binder, new AddIncludeTableAction());
+        setActionClass(binder, new AddExcludeTableAction());
+        setActionClass(binder, new AddIncludeColumnAction());
+        setActionClass(binder, new AddExcludeColumnAction());
+        setActionClass(binder, new AddIncludeProcedureAction());
+        setActionClass(binder, new AddExcludeProcedureAction());
+        setActionClass(binder, new EditNodeAction());
+        setActionClass(binder, new DeleteNodeAction());
+        setActionClass(binder, new GetDbConnectionAction());
+        setActionClass(binder, new CreateObjEntityFromDbAction());
     }
 
     @Provides
+    @Singleton
     @Inject
     public org.apache.cayenne.di.Injector createInjector(Set<org.apache.cayenne.di.Module> modules) {
         return DIBootstrap.createInjector(modules);
     }
 
     @Provides
-    public Map<String, Action> getActionMap(Set<CayenneAction> set){
+    @Singleton
+    public Map<String, Action> getActionMap(Set<CayenneAction> actionSet){
         Map<String, Action> map = new HashMap<>(40);
-        Iterator<CayenneAction> iterator = set.iterator();
-        while(iterator.hasNext()){
-            CayenneAction cayenneAction = iterator.next();
+        for (CayenneAction cayenneAction : actionSet) {
             Action oldAction = map.put(cayenneAction.getClass().getName(), cayenneAction);
             if (oldAction != null && oldAction != cayenneAction) {
 

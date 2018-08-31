@@ -21,9 +21,7 @@ package org.apache.cayenne.modeler.dialog.db.load;
 
 import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.xml.DataChannelMetaData;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.dbsync.reverse.dbimport.*;
 import org.apache.cayenne.dbsync.reverse.dbimport.DbImportConfiguration;
 import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
 import org.apache.cayenne.dbsync.reverse.dbload.DbLoaderDelegate;
@@ -31,7 +29,7 @@ import org.apache.cayenne.dbsync.reverse.filters.FiltersConfigBuilder;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DbLoaderExceptionEvent;
-import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
+import org.apache.cayenne.modeler.event.ReverseEngineeringEvent;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.util.Util;
@@ -76,7 +74,7 @@ public class DbLoaderContext {
         return projectController;
     }
 
-    void setConfig(DbImportConfiguration config) {
+    private void setConfig(DbImportConfiguration config) {
         this.config = config;
     }
 
@@ -84,12 +82,8 @@ public class DbLoaderContext {
         return config;
     }
 
-    public boolean isStopping() {
+    boolean isStopping() {
         return stopping;
-    }
-
-    public DataChannelMetaData getMetaData() {
-        return metaData;
     }
 
     void setStopping(boolean stopping) {
@@ -104,25 +98,13 @@ public class DbLoaderContext {
         this.loadStatusNote = loadStatusNote;
     }
 
-    private void fillReverseEngineeringFromView(ReverseEngineering reverseEngineering, DbImportView view) {
-        reverseEngineering.setUsePrimitives(view.isUsePrimitives());
-        reverseEngineering.setUseJava7Types(view.isUseJava7Typed());
-        reverseEngineering.setForceDataMapCatalog(view.isForceDataMapCatalog());
-        reverseEngineering.setForceDataMapSchema(view.isForceDataMapSchema());
-        reverseEngineering.setSkipRelationshipsLoading(view.isSkipRelationshipsLoading());
-        reverseEngineering.setSkipPrimaryKeyLoading(view.isSkipPrimaryKeyLoading());
-        reverseEngineering.setMeaningfulPkTables(view.getMeaningfulPk());
-        reverseEngineering.setNamingStrategy(view.getNamingStrategy());
-        reverseEngineering.setStripFromTableNames(view.getStripFromTableNames());
-    }
-
-    public boolean buildConfig(DBConnectionInfo connectionInfo, DbImportView view) {
+    public boolean buildConfig(DBConnectionInfo connectionInfo) {
         if (connectionInfo == null) {
             return false;
         }
         // Build reverse engineering from metadata and dialog values
-        ReverseEngineering metaReverseEngineering = metaData.get(getProjectController().getCurrentDataMap(), ReverseEngineering.class);
-        fillReverseEngineeringFromView(metaReverseEngineering, view);
+        ReverseEngineering metaReverseEngineering = projectController.getMetaData().get(getProjectController().getCurrentState().getDataMap(), ReverseEngineering.class);
+        projectController.fireEvent(new ReverseEngineeringEvent(this, metaReverseEngineering));
         // Create copy of metaReverseEngineering
         ReverseEngineering reverseEngineering = new ReverseEngineering(metaReverseEngineering);
 
@@ -181,7 +163,7 @@ public class DbLoaderContext {
         LOGGER.warn(message, Util.unwindException(th));
     }
 
-    public void processException(final Throwable th, final String message) {
+    void processException(final Throwable th, final String message) {
         LOGGER.info("Exception on reverse engineering", Util.unwindException(th));
         SwingUtilities.invokeLater(new Runnable() {
 

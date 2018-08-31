@@ -19,19 +19,16 @@
 
 package org.apache.cayenne.modeler.action;
 
-import org.apache.cayenne.modeler.Application;
+import com.google.inject.Inject;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
+import org.apache.cayenne.modeler.services.DbService;
 
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.DB_ADAPTER_PROPERTY;
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.URL_PROPERTY;
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.USER_NAME_PROPERTY;
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.PASSWORD_PROPERTY;
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.JDBC_DRIVER_PROPERTY;
+import static org.apache.cayenne.modeler.pref.DBConnectionInfo.*;
 
 /**
  * @since 4.1
@@ -42,8 +39,11 @@ public class GetDbConnectionAction extends DBWizardAction<DbActionOptionsDialog>
     private static final String ACTION_NAME = "Configure Connection";
     private static final String ICON_NAME = "icon-dbi-config.png";
 
-    public GetDbConnectionAction(final Application application) {
-        super(ACTION_NAME, application);
+    @Inject
+    private DbService dbService;
+
+    public GetDbConnectionAction() {
+        super(ACTION_NAME);
     }
 
     public String getIconName() {
@@ -65,14 +65,14 @@ public class GetDbConnectionAction extends DBWizardAction<DbActionOptionsDialog>
         }
 
         final DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentDataMap());
+                getDataMapPreferences(getProjectController().getCurrentState().getDataMap());
 
-        if (connectWizard.getConnectionInfo().getDbAdapter() != null) {
-            dataMapDefaults.getCurrentPreference().put(DB_ADAPTER_PROPERTY, connectWizard.getConnectionInfo().getDbAdapter());
+        if (dbService.getDbConnectionInfo().getDbAdapter() != null) {
+            dataMapDefaults.getCurrentPreference().put(DB_ADAPTER_PROPERTY, dbService.getDbConnectionInfo().getDbAdapter());
         }
-        dataMapDefaults.getCurrentPreference().put(URL_PROPERTY, connectWizard.getConnectionInfo().getUrl());
-        dataMapDefaults.getCurrentPreference().put(USER_NAME_PROPERTY, connectWizard.getConnectionInfo().getUserName());
-        dataMapDefaults.getCurrentPreference().put(PASSWORD_PROPERTY, connectWizard.getConnectionInfo().getPassword());
-        dataMapDefaults.getCurrentPreference().put(JDBC_DRIVER_PROPERTY, connectWizard.getConnectionInfo().getJdbcDriver());
+        dataMapDefaults.getCurrentPreference().put(URL_PROPERTY, dbService.getDbConnectionInfo().getUrl());
+        dataMapDefaults.getCurrentPreference().put(USER_NAME_PROPERTY, dbService.getDbConnectionInfo().getUserName());
+        dataMapDefaults.getCurrentPreference().put(PASSWORD_PROPERTY, dbService.getDbConnectionInfo().getPassword());
+        dataMapDefaults.getCurrentPreference().put(JDBC_DRIVER_PROPERTY, dbService.getDbConnectionInfo().getJdbcDriver());
     }
 }

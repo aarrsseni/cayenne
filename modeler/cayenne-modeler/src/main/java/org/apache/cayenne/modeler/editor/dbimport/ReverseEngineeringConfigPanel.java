@@ -24,14 +24,11 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.util.NameGeneratorPreferences;
 import org.apache.cayenne.modeler.util.TextAdapter;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.util.Vector;
 
 /**
@@ -93,8 +90,8 @@ public class ReverseEngineeringConfigPanel extends JPanel {
     }
 
     private ReverseEngineering getReverseEngineeringBySelectedMap() {
-        DataMap dataMap = projectController.getCurrentDataMap();
-        return projectController.getApplication().getMetaData().get(dataMap, ReverseEngineering.class);
+        DataMap dataMap = projectController.getCurrentState().getDataMap();
+        return projectController.getMetaData().get(dataMap, ReverseEngineering.class);
     }
 
     private void initStrategy() {
@@ -110,7 +107,7 @@ public class ReverseEngineeringConfigPanel extends JPanel {
             getReverseEngineeringBySelectedMap().setNamingStrategy(
                     (String) ReverseEngineeringConfigPanel.this.getStrategyCombo().getSelectedItem()
             );
-            projectController.setDirty(true);
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         });
         strategyCombo.setVisible(false);
 
@@ -121,7 +118,7 @@ public class ReverseEngineeringConfigPanel extends JPanel {
         meaningfulPk = new TextAdapter(meaningfulPkField) {
             protected void updateModel(String text) {
                 getReverseEngineeringBySelectedMap().setMeaningfulPkTables(text);
-                projectController.setDirty(true);
+                projectController.fireEvent(new ProjectDirtyEvent(this, true));
             }
         };
 
@@ -131,7 +128,7 @@ public class ReverseEngineeringConfigPanel extends JPanel {
         stripFromTableNames = new TextAdapter(stripFromTableNamesField) {
             protected void updateModel(String text) {
                 getReverseEngineeringBySelectedMap().setStripFromTableNames(text);
-                projectController.setDirty(true);
+                projectController.fireEvent(new ProjectDirtyEvent(this, true));
             }
         };
 
@@ -158,27 +155,27 @@ public class ReverseEngineeringConfigPanel extends JPanel {
     private void initListeners() {
         skipRelationshipsLoading.addActionListener(e -> {
             getReverseEngineeringBySelectedMap().setSkipRelationshipsLoading(skipRelationshipsLoading.isSelected());
-            projectController.setDirty(true);
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         });
         skipPrimaryKeyLoading.addActionListener(e -> {
             getReverseEngineeringBySelectedMap().setSkipPrimaryKeyLoading(skipPrimaryKeyLoading.isSelected());
-            projectController.setDirty(true);
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         });
         forceDataMapCatalog.addActionListener(e -> {
             getReverseEngineeringBySelectedMap().setForceDataMapCatalog(forceDataMapCatalog.isSelected());
-            projectController.setDirty(true);
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         });
         forceDataMapSchema.addActionListener(e -> {
             getReverseEngineeringBySelectedMap().setForceDataMapSchema(forceDataMapSchema.isSelected());
-            projectController.setDirty(true);
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         });
         usePrimitives.addActionListener(e -> {
             getReverseEngineeringBySelectedMap().setUsePrimitives(usePrimitives.isSelected());
-            projectController.setDirty(true);
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         });
         useJava7Types.addActionListener(e -> {
             getReverseEngineeringBySelectedMap().setUseJava7Types(useJava7Types.isSelected());
-            projectController.setDirty(true);
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         });
     }
 

@@ -54,8 +54,8 @@ public class Application {
 
     public static final String DEFAULT_MESSAGE_BUNDLE = "org.apache.cayenne.modeler.cayennemodeler-strings";
 
-    public static final String APPLICATION_NAME_PROPERTY = "cayenne.modeler.application.name";
-    public static final String DEFAULT_APPLICATION_NAME = "CayenneModeler";
+    private static final String APPLICATION_NAME_PROPERTY = "cayenne.modeler.application.name";
+    private static final String DEFAULT_APPLICATION_NAME = "CayenneModeler";
 
     private static Application instance;
 
@@ -65,13 +65,13 @@ public class Application {
     @com.google.inject.Inject
     protected ProjectController projectController;
 
-    protected CayenneModelerController frameController;
+    private CayenneModelerController frameController;
 
     protected String name;
 
-    protected BindingFactory bindingFactory;
+    private BindingFactory bindingFactory;
 
-    protected CayenneUndoManager undoManager;
+    private CayenneUndoManager undoManager;
 
     @com.google.inject.Inject
     protected CayenneProjectPreferences cayenneProjectPreferences;
@@ -90,6 +90,8 @@ public class Application {
 
     @com.google.inject.Inject
     protected ActionManager actionManager;
+
+    private DataChannelMetaData metaData;
 
     public static Application getInstance() {
         return instance;
@@ -167,6 +169,9 @@ public class Application {
 
         initClassLoader();
 
+        this.metaData = cayenneInjector.getInstance(DataChannelMetaData.class);
+        projectController.setMetaData(metaData);
+
         actionManager.initAllActions();
 
         this.bindingFactory = new BindingFactory();
@@ -215,7 +220,6 @@ public class Application {
                 ClasspathPreferences.class,
                 "");
 
-        Collection<String> details = new ArrayList<>();
         String[] keys;
         ArrayList<String> values = new ArrayList<>();
 
@@ -227,7 +231,7 @@ public class Application {
         } catch (BackingStoreException ignored) {
         }
 
-        details.addAll(values);
+        Collection<String> details = new ArrayList<>(values);
 
         if (details.size() > 0) {
             modelerClassLoader.setPathFiles(details.stream().map(File::new).collect(Collectors.toList()));
@@ -249,14 +253,14 @@ public class Application {
     }
 
     public DataChannelMetaData getMetaData() {
-        return cayenneInjector.getInstance(DataChannelMetaData.class);
+        return metaData;
     }
 
     protected void initPreferences() {
         this.cayenneProjectPreferences = new CayenneProjectPreferences();
     }
 
-    public PlatformInitializer getPlatformInitializer() {
+    PlatformInitializer getPlatformInitializer() {
         return platformInitializer;
     }
 

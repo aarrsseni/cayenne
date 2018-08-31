@@ -33,6 +33,7 @@ import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportTree;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.editor.dbimport.DraggableTreePanel;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.undo.DbImportTreeUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
@@ -58,12 +59,12 @@ public class MoveImportNodeAction extends CayenneAction {
     protected boolean moveInverted;
     private Map<Class, Class> classMap;
 
-    public MoveImportNodeAction(Application application) {
-        super(ACTION_NAME, application);
+    public MoveImportNodeAction() {
+        super(ACTION_NAME);
     }
 
-    MoveImportNodeAction(String actionName, Application application) {
-        super(actionName, application);
+    MoveImportNodeAction(String actionName) {
+        super(actionName);
         initMap();
     }
 
@@ -184,7 +185,7 @@ public class MoveImportNodeAction extends CayenneAction {
                     }
                 }
                 if ((paths.length > 1) && (targetTree.getSelectionPath() != null)) {
-                    getProjectController().setDirty(true);
+                    getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
                     ArrayList<DbImportTreeNode> expandList = targetTree.getTreeExpandList();
                     targetTree.translateReverseEngineeringToTree(targetTree.getReverseEngineering(), false);
                     targetTree.expandTree(expandList);
@@ -194,7 +195,7 @@ public class MoveImportNodeAction extends CayenneAction {
                     DbImportTreeUndoableEdit undoableEdit = new DbImportTreeUndoableEdit(
                             reverseEngineeringOldCopy, reverseEngineeringNewCopy, targetTree, getProjectController()
                     );
-                    getProjectController().getApplication().getUndoManager().addEdit(undoableEdit);
+                    Application.getInstance().getUndoManager().addEdit(undoableEdit);
                 }
             } finally {
                 rootParent.getReverseEngineeringProgress().setVisible(false);

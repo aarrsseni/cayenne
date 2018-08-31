@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db.load;
 
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.action.dbimport.AddCatalogAction;
 import org.apache.cayenne.modeler.action.dbimport.AddExcludeColumnAction;
 import org.apache.cayenne.modeler.action.dbimport.AddExcludeProcedureAction;
@@ -58,21 +59,21 @@ public class RootPopUpMenu extends DefaultPopUpMenu {
     }
 
     private void initListeners() {
-        addCatalog.addActionListener(e -> projectController.getApplication().getActionManager()
+        addCatalog.addActionListener(e -> Application.getInstance().getActionManager()
                 .getAction(AddCatalogAction.class).actionPerformed(e));
-        addSchema.addActionListener(e -> projectController.getApplication().getActionManager()
+        addSchema.addActionListener(e -> Application.getInstance().getActionManager()
                 .getAction(AddSchemaAction.class).actionPerformed(e));
-        addIncludeTable.addActionListener(e -> projectController.getApplication().getActionManager()
+        addIncludeTable.addActionListener(e -> Application.getInstance().getActionManager()
                 .getAction(AddIncludeTableAction.class).actionPerformed(e));
-        addExcludeTable.addActionListener(e -> projectController.getApplication().getActionManager()
+        addExcludeTable.addActionListener(e -> Application.getInstance().getActionManager()
                 .getAction(AddExcludeTableAction.class).actionPerformed(e));
-        addIncludeColumn.addActionListener(e -> projectController.getApplication().getActionManager()
+        addIncludeColumn.addActionListener(e -> Application.getInstance().getActionManager()
                 .getAction(AddIncludeColumnAction.class).actionPerformed(e));
-        addExcludeColumn.addActionListener(e -> projectController.getApplication().getActionManager()
+        addExcludeColumn.addActionListener(e -> Application.getInstance().getActionManager()
                 .getAction(AddExcludeColumnAction.class).actionPerformed(e));
-        addIncludeProcedure.addActionListener(e -> projectController.getApplication().getActionManager()
+        addIncludeProcedure.addActionListener(e -> Application.getInstance().getActionManager()
                 .getAction(AddIncludeProcedureAction.class).actionPerformed(e));
-        addExcludeProcedure.addActionListener(e -> projectController.getApplication().getActionManager()
+        addExcludeProcedure.addActionListener(e -> Application.getInstance().getActionManager()
                 .getAction(AddExcludeProcedureAction.class).actionPerformed(e));
     }
 

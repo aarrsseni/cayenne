@@ -103,7 +103,7 @@ public abstract class GeneratorController extends CayenneController {
 
     public abstract void updateConfiguration(CgenConfiguration cgenConfiguration);
 
-    public void validateEmbeddable(ValidationResult validationBuffer, Embeddable embeddable) {
+    void validateEmbeddable(ValidationResult validationBuffer, Embeddable embeddable) {
         ValidationFailure embeddableFailure = validateEmbeddable(embeddable);
         if (embeddableFailure != null) {
             validationBuffer.addFailure(embeddableFailure);
@@ -168,7 +168,7 @@ public abstract class GeneratorController extends CayenneController {
         return null;
     }
 
-    public void validateEntity(ValidationResult validationBuffer, ObjEntity entity, boolean clientValidation) {
+    void validateEntity(ValidationResult validationBuffer, ObjEntity entity, boolean clientValidation) {
 
         ValidationFailure entityFailure = validateEntity(clientValidation ? entity.getClientEntity() : entity);
         if (entityFailure != null) {
@@ -363,7 +363,7 @@ public abstract class GeneratorController extends CayenneController {
     /**
      * Returns a predicate for default entity selection in a given mode.
      */
-    public Predicate getDefaultClassFilter() {
+    Predicate getDefaultClassFilter() {
         final ObjEntity selectedEntity = Application.getInstance().getFrameController().getProjectController()
                 .getCurrentState().getObjEntity();
 
@@ -386,12 +386,13 @@ public abstract class GeneratorController extends CayenneController {
                     return getParentController().getProblem(((ObjEntity) object).getName()) == null;
                 }
 
-            if (object instanceof Embeddable) {
-                return getParentController().getProblem(((Embeddable) object).getClassName()) == null;
-            }
+                if (object instanceof Embeddable) {
+                    return getParentController().getProblem(((Embeddable) object).getClassName()) == null;
+                }
 
-            return false;
-        };
+                return false;
+            };
+        }
     }
 
     /**

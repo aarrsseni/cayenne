@@ -27,6 +27,7 @@ import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.map.SQLTemplateDescriptor;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.undo.AddPrefetchUndoableEditForSqlTemplate;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.EntityTreeFilter;
@@ -125,7 +126,7 @@ public class SQLTemplatePrefetchTab extends JPanel implements PropertyChangeList
     }
 
     protected void initFromModel() {
-        QueryDescriptor query = mediator.getCurrentQuery();
+        QueryDescriptor query = mediator.getCurrentState().getQuery();
 
         if (query == null || !QueryDescriptor.SQL_TEMPLATE.equals(query.getType())) {
             processInvalidModel("Unknown query.");
@@ -163,7 +164,7 @@ public class SQLTemplatePrefetchTab extends JPanel implements PropertyChangeList
         prefetchBox.addItem(SelectQueryPrefetchTab.JOINT_PREFETCH_SEMANTICS);
         prefetchBox.addItem(SelectQueryPrefetchTab.DISJOINT_BY_ID_PREFETCH_SEMANTICS);
 
-        prefetchBox.addActionListener(e -> Application.getInstance().getFrameController().getEditorView().getEventController().setDirty(true));
+        prefetchBox.addActionListener(e -> mediator.fireEvent(new ProjectDirtyEvent(this, true)));
 
         column.setCellEditor(new DefaultCellEditor(prefetchBox));
 
@@ -307,7 +308,7 @@ public class SQLTemplatePrefetchTab extends JPanel implements PropertyChangeList
         table.setModel(createTableModel());
         setUpPrefetchBox(table.getColumnModel().getColumn(2));
 
-        mediator.fireQueryEvent(new QueryEvent(this, sqlTemplate));
+        mediator.fireEvent(new QueryEvent(this, sqlTemplate));
     }
 
     public void removePrefetch(String prefetch) {
@@ -317,7 +318,7 @@ public class SQLTemplatePrefetchTab extends JPanel implements PropertyChangeList
         table.setModel(createTableModel());
         setUpPrefetchBox(table.getColumnModel().getColumn(2));
 
-        mediator.fireQueryEvent(new QueryEvent(this, sqlTemplate));
+        mediator.fireEvent(new QueryEvent(this, sqlTemplate));
     }
 
     /**

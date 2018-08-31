@@ -29,6 +29,7 @@ import org.apache.cayenne.dbsync.reverse.dbimport.IncludeTable;
 import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
 import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.dbimport.AddCatalogAction;
 import org.apache.cayenne.modeler.action.dbimport.AddExcludeColumnAction;
@@ -158,7 +159,7 @@ public class DraggableTreePanel extends JScrollPane {
         sourceTree.setCellRenderer(new ColorTreeRenderer());
         sourceTree.setDropMode(DropMode.INSERT);
 
-        MoveImportNodeAction action = projectController.getApplication().
+        MoveImportNodeAction action = Application.getInstance().
                 getActionManager().getAction(MoveImportNodeAction.class);
         action.setPanel(this);
         action.setSourceTree(sourceTree);
@@ -166,7 +167,7 @@ public class DraggableTreePanel extends JScrollPane {
         moveButton = (CayenneAction.CayenneToolbarButton) action.buildButton();
         moveButton.setShowingText(true);
         moveButton.setText(MOVE_BUTTON_LABEL);
-        MoveInvertNodeAction actionInv = projectController.getApplication().
+        MoveInvertNodeAction actionInv = Application.getInstance().
                 getActionManager().getAction(MoveInvertNodeAction.class);
         actionInv.setPanel(this);
         actionInv.setSourceTree(sourceTree);
@@ -274,7 +275,7 @@ public class DraggableTreePanel extends JScrollPane {
     public TreeManipulationAction getActionByNodeType(Class nodeType) {
         Class actionClass = actions.get(nodeType);
         if (actionClass != null) {
-            TreeManipulationAction action = (TreeManipulationAction) projectController.getApplication().
+            TreeManipulationAction action = (TreeManipulationAction) Application.getInstance().
                     getActionManager().getAction(actionClass);
             return action;
         }
@@ -411,7 +412,7 @@ public class DraggableTreePanel extends JScrollPane {
                 return false;
             }
             if (transferData != null) {
-                MoveImportNodeAction action = projectController.getApplication().
+                MoveImportNodeAction action = Application.getInstance().
                         getActionManager().getAction(MoveImportNodeAction.class);
                 action.setSourceTree(sourceTree);
                 action.setTargetTree(targetTree);
