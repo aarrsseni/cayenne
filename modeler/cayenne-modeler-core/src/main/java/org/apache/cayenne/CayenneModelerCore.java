@@ -30,6 +30,7 @@ import org.apache.cayenne.dbsync.reverse.dbimport.DbImportModule;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.FileClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.dialog.db.load.DbLoaderContext;
 import org.apache.cayenne.modeler.services.*;
 import org.apache.cayenne.pref.CayenneProjectPreferences;
 import org.apache.cayenne.project.ConfigurationNodeParentGetter;
@@ -81,6 +82,8 @@ public class CayenneModelerCore implements Module{
         binder.bind(EOModelService.class).to(DefaultEOModelService.class);
         binder.bind(DbService.class).to(DefaultDbService.class).in(Singleton.class);
         binder.bind(NavigationService.class).to(DefaultNavigationService.class);
+        binder.bind(ReverseEngineeringService.class).to(DefaultReverseEngineeringService.class);
+        binder.bind(DbLoaderContext.class).in(Singleton.class);
 
         contributeModuleClass(binder).addBinding().to(ProjectModule.class);
 

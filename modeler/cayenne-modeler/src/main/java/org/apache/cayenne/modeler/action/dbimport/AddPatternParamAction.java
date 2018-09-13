@@ -19,8 +19,10 @@
 
 package org.apache.cayenne.modeler.action.dbimport;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.dbsync.reverse.dbimport.*;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
+import org.apache.cayenne.modeler.services.ReverseEngineeringService;
 
 import java.awt.event.ActionEvent;
 
@@ -29,6 +31,9 @@ import java.awt.event.ActionEvent;
  */
 public abstract class AddPatternParamAction extends TreeManipulationAction {
 
+    @Inject
+    ReverseEngineeringService reverseEngineeringService;
+
     private Class paramClass;
 
     AddPatternParamAction(String name) {
@@ -36,46 +41,18 @@ public abstract class AddPatternParamAction extends TreeManipulationAction {
     }
 
     private void addPatternParamToContainer(Class paramClass, Object selectedObject, String name, DbImportTreeNode node) {
-        FilterContainer container = (FilterContainer) selectedObject;
-        PatternParam element = null;
-        if (paramClass == ExcludeTable.class) {
-            element = new ExcludeTable(name);
-            container.addExcludeTable((ExcludeTable) element);
-        } else if (paramClass == IncludeColumn.class) {
-            element = new IncludeColumn(name);
-            container.addIncludeColumn((IncludeColumn) element);
-        } else if (paramClass == ExcludeColumn.class) {
-            element = new ExcludeColumn(name);
-            container.addExcludeColumn((ExcludeColumn) element);
-        } else if (paramClass == IncludeProcedure.class) {
-            element = new IncludeProcedure(name);
-            container.addIncludeProcedure((IncludeProcedure) element);
-        } else if (paramClass == ExcludeProcedure.class) {
-            element = new ExcludeProcedure(name);
-            container.addExcludeProcedure((ExcludeProcedure) element);
-        }
-        node.add(new DbImportTreeNode(element));
+        node.add(new DbImportTreeNode(reverseEngineeringService.getPatternParamToContainer(paramClass, selectedObject, name)));
     }
 
     private void addPatternParamToIncludeTable(Class paramClass, Object selectedObject, String name, DbImportTreeNode node) {
-        IncludeTable includeTable = (IncludeTable) selectedObject;
-        PatternParam element = null;
-        if (paramClass == IncludeColumn.class) {
-            element = new IncludeColumn(name);
-            includeTable.addIncludeColumn((IncludeColumn) element);
-
-        } else if (paramClass == ExcludeColumn.class) {
-            element = new ExcludeColumn(name);
-            includeTable.addExcludeColumn((ExcludeColumn) element);
-        }
-        node.add(new DbImportTreeNode(element));
+        node.add(new DbImportTreeNode(reverseEngineeringService.getPatternParamToIncludeTable(paramClass, selectedObject, name)));
     }
 
     @Override
     public void performAction(ActionEvent e) {
         ReverseEngineering reverseEngineeringOldCopy = prepareElements();
         Object selectedObject;
-        if (reverseEngineeringIsEmpty()) {
+        if (reverseEngineeringService.reverseEngineeringIsEmpty(tree.getReverseEngineering())) {
             tree.getRootNode().removeAllChildren();
         }
         if (canBeInserted(selectedElement)) {

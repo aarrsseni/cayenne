@@ -19,18 +19,20 @@
 
 package org.apache.cayenne.modeler.dialog.db.load;
 
-import javax.swing.JFrame;
-
 import org.apache.cayenne.dbsync.DbSyncModule;
-import org.apache.cayenne.di.DIBootstrap;
-import org.apache.cayenne.di.Injector;
-import org.apache.cayenne.modeler.util.LongRunningTask;
-import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.dbsync.reverse.configuration.ToolsModule;
 import org.apache.cayenne.dbsync.reverse.dbimport.DbImportAction;
 import org.apache.cayenne.dbsync.reverse.dbimport.DbImportModule;
+import org.apache.cayenne.di.DIBootstrap;
+import org.apache.cayenne.di.Injector;
+import org.apache.cayenne.modeler.event.DbLoaderExceptionEvent;
+import org.apache.cayenne.modeler.util.LongRunningTask;
+import org.apache.cayenne.modeler.util.ProjectUtil;
+import org.apache.cayenne.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
 
 /**
  * @since 4.0
@@ -54,7 +56,7 @@ final public class LoadDataMapTask extends LongRunningTask {
         try {
             createAction().execute(context.getConfig());
         } catch (Exception e) {
-            context.processException(e, "Error importing database schema.");
+            processException(e, "Error importing database schema.");
         }
         ProjectUtil.cleanObjMappings(context.getDataMap());
     }
@@ -93,5 +95,15 @@ final public class LoadDataMapTask extends LongRunningTask {
             context.setStatusNote("Canceling..");
         }
         context.setStopping(canceled);
+    }
+
+    private void processException(final Throwable th, final String message) {
+        LOGGER.info("Exception on reverse engineering", Util.unwindException(th));
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                context.getProjectController().fireEvent(new DbLoaderExceptionEvent(this, th, message));
+            }
+        });
     }
 }

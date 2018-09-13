@@ -31,8 +31,8 @@ import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.editor.DbImportController;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
-import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.services.DbService;
+import org.apache.cayenne.modeler.services.ReverseEngineeringService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.JOptionPane;
@@ -40,8 +40,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
-
-import static org.apache.cayenne.modeler.pref.DBConnectionInfo.*;
 
 /**
  * Action that imports database structure into a DataMap.
@@ -52,23 +50,24 @@ public class ReverseEngineeringAction extends CayenneAction {
     private static final String ICON_NAME = "icon-dbi-runImport.png";
     private static final String DIALOG_TITLE = "Reengineer DB Schema: Connect to Database";
 
-    private DbImportView view;
-
     public String getIconName() {
         return ICON_NAME;
     }
 
     @Inject
-    public Application application;
+    private Application application;
 
     @Inject
-    public ProjectController projectController;
+    private ProjectController projectController;
 
     @Inject
-    public DbService dbService;
+    private DbService dbService;
 
     @Inject
-    DbLoaderContext context;
+    private DbLoaderContext context;
+
+    @Inject
+    private ReverseEngineeringService reverseEngineeringService;
 
     public ReverseEngineeringAction() {
         super(getActionName());
@@ -86,23 +85,17 @@ public class ReverseEngineeringAction extends CayenneAction {
     @Override
     public void performAction(ActionEvent event) {
         DBConnectionInfo connectionInfo;
-        if (!datamapPreferencesExist()) {
+        if (!reverseEngineeringService.datamapPreferencesExist()) {
             DataSourceWizard connectWizard = new DataSourceWizard(getProjectController(), DIALOG_TITLE);
             if (!connectWizard.startupAction()) {
                 return ;
             }
             connectionInfo = connectWizard.getConnectionInfo();
-            saveConnectionInfo();
+            reverseEngineeringService.saveConnectionInfo();
         } else {
-            connectionInfo = getConnectionInfoFromPreferences();
-            if(dbService.getConnection() == null) {
-                try {
-                    dbService.createDataSource(connectionInfo);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            connectionInfo = reverseEngineeringService.getConnectionInfoFromPreferences();
         }
+
         try {
             dbService.setConnection(dbService.createConnection());
         } catch (SQLException ex) {
@@ -184,9 +177,5 @@ public class ReverseEngineeringAction extends CayenneAction {
             SwingUtilities.invokeLater(callback);
         });
         th.start();
-    }
-
-    public void setView(DbImportView view) {
-        this.view = view;
     }
 }

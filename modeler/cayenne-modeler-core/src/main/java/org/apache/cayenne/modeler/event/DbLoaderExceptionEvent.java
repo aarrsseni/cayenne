@@ -53,7 +53,7 @@ public class DbLoaderExceptionEvent extends EventObject {
         return msg;
     }
 
-    public Class<? extends EventListener> getEventLIstener() {
+    public Class<? extends EventListener> getEventListener() {
         return DbLoaderExceptionListener.class;
     }
 }

@@ -117,7 +117,7 @@ public class DbImportView extends JPanel implements ReverseEngineeringListener {
         reverseEngineeringHeaderBuilder.append("Import Configuration");
         ReverseEngineeringAction reverseEngineeringAction = Application.getInstance().getActionManager().
                 getAction(ReverseEngineeringAction.class);
-        reverseEngineeringAction.setView(this);
+//        reverseEngineeringAction.setView(this);
         CayenneAction.CayenneToolbarButton reverseEngineeringButton = (CayenneAction.CayenneToolbarButton)
                 reverseEngineeringAction.buildButton(0);
         reverseEngineeringButton.setShowingText(true);

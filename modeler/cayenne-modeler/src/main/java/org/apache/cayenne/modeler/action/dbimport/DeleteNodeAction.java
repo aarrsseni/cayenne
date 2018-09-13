@@ -19,12 +19,18 @@
 
 package org.apache.cayenne.modeler.action.dbimport;
 
-import org.apache.cayenne.dbsync.reverse.dbimport.*;
+import com.google.inject.Inject;
+import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
+import org.apache.cayenne.dbsync.reverse.dbimport.IncludeTable;
+import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
+import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportModel;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.editor.dbimport.DraggableTreePanel;
 import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
+import org.apache.cayenne.modeler.services.ReverseEngineeringService;
 
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
@@ -40,6 +46,12 @@ public class DeleteNodeAction extends TreeManipulationAction {
 
     private DraggableTreePanel panel;
 
+    @Inject
+    private ReverseEngineeringService reverseEngineeringService;
+
+    @Inject
+    private ProjectController projectController;
+
     public DeleteNodeAction() {
         super(ACTION_NAME);
     }
@@ -48,59 +60,24 @@ public class DeleteNodeAction extends TreeManipulationAction {
         return ICON_NAME;
     }
 
-    private void removePatternParams(FilterContainer container, Object selectedObject) {
-        container.getExcludeTables().remove(selectedObject);
-        container.getIncludeColumns().remove(selectedObject);
-        container.getExcludeColumns().remove(selectedObject);
-        container.getIncludeProcedures().remove(selectedObject);
-        container.getExcludeProcedures().remove(selectedObject);
-    }
-
     private void deleteChilds(Catalog catalog) {
         Object selectedObject = this.selectedElement.getUserObject();
-        if (selectedObject instanceof Schema) {
-            catalog.getSchemas().remove(selectedObject);
-        } else if (selectedObject instanceof IncludeTable) {
-            catalog.getIncludeTables().remove(selectedObject);
-        } else if (selectedObject instanceof PatternParam) {
-            removePatternParams(catalog, selectedObject);
-        }
+        reverseEngineeringService.deleteChilds(catalog, selectedObject);
     }
 
     private void deleteChilds(Schema schema) {
         Object selectedObject = this.selectedElement.getUserObject();
-        if (selectedObject instanceof IncludeTable) {
-            schema.getIncludeTables().remove(selectedObject);
-        } else if (selectedObject instanceof PatternParam) {
-            removePatternParams(schema, selectedObject);
-        }
+        reverseEngineeringService.deleteChilds(schema, selectedObject);
     }
 
     private void deleteChilds(IncludeTable includeTable) {
         Object selectedObject = this.selectedElement.getUserObject();
-        includeTable.getIncludeColumns().remove(selectedObject);
-        includeTable.getExcludeColumns().remove(selectedObject);
+        reverseEngineeringService.deleteChilds(includeTable, selectedObject);
     }
 
     private void deleteChilds(ReverseEngineering reverseEngineering) {
         Object selectedObject = this.selectedElement.getUserObject();
-        if (selectedObject instanceof Catalog) {
-            reverseEngineering.getCatalogs().remove(selectedObject);
-        } else if (selectedObject instanceof Schema) {
-            reverseEngineering.getSchemas().remove(selectedObject);
-        } else if (selectedObject instanceof IncludeTable) {
-            reverseEngineering.getIncludeTables().remove(selectedObject);
-        } else if (selectedObject instanceof ExcludeTable) {
-            reverseEngineering.getExcludeTables().remove(selectedObject);
-        } else if (selectedObject instanceof IncludeColumn) {
-            reverseEngineering.getIncludeColumns().remove(selectedObject);
-        } else if (selectedObject instanceof ExcludeColumn) {
-            reverseEngineering.getExcludeColumns().remove(selectedObject);
-        } else if (selectedObject instanceof IncludeProcedure) {
-            reverseEngineering.getIncludeProcedures().remove(selectedObject);
-        } else if (selectedObject instanceof ExcludeProcedure) {
-            reverseEngineering.getExcludeProcedures().remove(selectedObject);
-        }
+        reverseEngineeringService.deleteChilds(reverseEngineering, selectedObject);
     }
 
     private void updateParentChilds() {
@@ -141,7 +118,7 @@ public class DeleteNodeAction extends TreeManipulationAction {
                 }
             }
             if (paths.length > 1) {
-                getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
+                projectController.fireEvent(new ProjectDirtyEvent(this, true));
                 ArrayList<DbImportTreeNode> expandList = tree.getTreeExpandList();
                 tree.translateReverseEngineeringToTree(tree.getReverseEngineering(), false);
                 tree.expandTree(expandList);

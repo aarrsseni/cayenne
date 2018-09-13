@@ -28,15 +28,10 @@ import org.apache.cayenne.dbsync.reverse.dbload.DbLoaderDelegate;
 import org.apache.cayenne.dbsync.reverse.filters.FiltersConfigBuilder;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.DbLoaderExceptionEvent;
 import org.apache.cayenne.modeler.event.ReverseEngineeringEvent;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.services.DbService;
-import org.apache.cayenne.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.io.File;
 
 /**
@@ -44,20 +39,18 @@ import java.io.File;
  */
 public class DbLoaderContext {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(DbLoaderContext.class);
-
     private DbImportConfiguration config;
 
     @Inject
     private ProjectController projectController;
 
+    @Inject
+    private DbService dbService;
+
     private boolean existingMap;
     private DataMap dataMap;
     private boolean stopping;
     private String loadStatusNote;
-
-    @Inject
-    private DbService dbService;
 
     public DbLoaderContext() {
     }
@@ -157,19 +150,5 @@ public class DbLoaderContext {
         if (dataMap.getConfigurationSource() != null) {
             getConfig().setTargetDataMap(new File(dataMap.getConfigurationSource().getURL().getPath()));
         }
-    }
-
-    public void processWarn(final Throwable th, final String message) {
-        LOGGER.warn(message, Util.unwindException(th));
-    }
-
-    void processException(final Throwable th, final String message) {
-        LOGGER.info("Exception on reverse engineering", Util.unwindException(th));
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                projectController.fireEvent(new DbLoaderExceptionEvent(this, th, message));
-            }
-        });
     }
 }

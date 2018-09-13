@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.action.dbimport;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
 import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeColumn;
 import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeProcedure;
@@ -33,6 +34,7 @@ import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportModel;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportTree;
 import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
+import org.apache.cayenne.modeler.services.ReverseEngineeringService;
 import org.apache.cayenne.modeler.undo.DbImportTreeUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
@@ -49,6 +51,9 @@ import java.util.Map;
 public abstract class TreeManipulationAction extends CayenneAction {
 
     static final String EMPTY_NAME = "";
+
+    @Inject
+    ReverseEngineeringService reverseEngineeringService;
 
     protected DbImportTree tree;
     protected DbImportTreeNode selectedElement;
@@ -96,7 +101,7 @@ public abstract class TreeManipulationAction extends CayenneAction {
         if (parentElement == null) {
             parentElement = selectedElement;
         }
-        if (reverseEngineeringIsEmpty()) {
+        if (reverseEngineeringService.reverseEngineeringIsEmpty(tree.getReverseEngineering())) {
             tree.getRootNode().removeAllChildren();
         }
         return new ReverseEngineering(tree.getReverseEngineering());
@@ -108,14 +113,6 @@ public abstract class TreeManipulationAction extends CayenneAction {
                 reverseEngineeringOldCopy, reverseEngineeringNewCopy, tree, getProjectController()
         );
         Application.getInstance().getUndoManager().addEdit(undoableEdit);
-    }
-
-    boolean reverseEngineeringIsEmpty() {
-        ReverseEngineering reverseEngineering = tree.getReverseEngineering();
-        return ((reverseEngineering.getCatalogs().size() == 0) && (reverseEngineering.getSchemas().size() == 0)
-                && (reverseEngineering.getIncludeTables().size() == 0) && (reverseEngineering.getExcludeTables().size() == 0)
-                && (reverseEngineering.getIncludeColumns().size() == 0) && (reverseEngineering.getExcludeColumns().size() == 0)
-                && (reverseEngineering.getIncludeProcedures().size() == 0) && (reverseEngineering.getExcludeProcedures().size() == 0));
     }
 
     private void initLevels() {

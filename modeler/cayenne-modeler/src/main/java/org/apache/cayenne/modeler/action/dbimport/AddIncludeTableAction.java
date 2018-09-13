@@ -46,7 +46,7 @@ public class AddIncludeTableAction extends TreeManipulationAction {
     @Override
     public void performAction(ActionEvent e) {
         ReverseEngineering reverseEngineeringOldCopy = prepareElements();
-        if (reverseEngineeringIsEmpty()) {
+        if (reverseEngineeringService.reverseEngineeringIsEmpty(tree.getReverseEngineering())) {
             tree.getRootNode().removeAllChildren();
         }
         IncludeTable newTable = new IncludeTable(name);
