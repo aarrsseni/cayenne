@@ -27,7 +27,6 @@ import org.apache.cayenne.modeler.pref.FSPath;
 import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
 import org.apache.cayenne.modeler.services.EOModelService;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.modeler.util.Comparators;
 import org.apache.cayenne.modeler.util.FileFilters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +38,6 @@ import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Action handler for WebObjects EOModel import function.

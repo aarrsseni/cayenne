@@ -20,6 +20,7 @@
 package org.apache.cayenne.modeler.dialog.datamap;
 
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneController;
 
@@ -35,7 +36,7 @@ public abstract class DefaultsPreferencesController extends CayenneController {
     protected boolean allEntities;
 
     public DefaultsPreferencesController(ProjectController mediator, DataMap dataMap) {
-        super();
+        super(Application.getInstance().getFrameController());
         this.allEntities = true;
         this.dataMap = dataMap;
         this.mediator = mediator;

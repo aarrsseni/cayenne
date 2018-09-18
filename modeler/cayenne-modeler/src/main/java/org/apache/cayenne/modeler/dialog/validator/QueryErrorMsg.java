@@ -26,7 +26,7 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 /**
  * @since 1.1

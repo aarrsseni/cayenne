@@ -22,17 +22,57 @@ package org.apache.cayenne.modeler;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.configuration.event.*;
-import org.apache.cayenne.map.*;
-import org.apache.cayenne.map.event.*;
+import org.apache.cayenne.configuration.event.DataMapEvent;
+import org.apache.cayenne.configuration.event.DataMapListener;
+import org.apache.cayenne.configuration.event.DataNodeEvent;
+import org.apache.cayenne.configuration.event.DataNodeListener;
+import org.apache.cayenne.configuration.event.DomainEvent;
+import org.apache.cayenne.configuration.event.DomainListener;
+import org.apache.cayenne.configuration.event.ProcedureEvent;
+import org.apache.cayenne.configuration.event.ProcedureListener;
+import org.apache.cayenne.configuration.event.QueryEvent;
+import org.apache.cayenne.configuration.event.QueryListener;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.Embeddable;
+import org.apache.cayenne.map.EmbeddableAttribute;
+import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.Procedure;
+import org.apache.cayenne.map.ProcedureParameter;
+import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.map.event.DbEntityListener;
+import org.apache.cayenne.map.event.DbRelationshipListener;
+import org.apache.cayenne.map.event.EntityEvent;
+import org.apache.cayenne.map.event.ObjEntityListener;
+import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.editor.CallbackType;
 import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
+import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.DisplayEvent;
+import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
+import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.MultipleObjectsDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjRelationshipDisplayEvent;
+import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
+import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
+import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.*;
 
 import java.util.Arrays;
 
-/*
+/**
  * @since 4.1
  * A snapshot of the current state of the project controller. This was added
  * so that we could support history of recent objects.

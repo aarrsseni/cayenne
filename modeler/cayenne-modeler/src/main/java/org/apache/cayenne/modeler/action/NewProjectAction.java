@@ -23,8 +23,8 @@ import com.google.inject.Inject;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.services.ProjectService;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 

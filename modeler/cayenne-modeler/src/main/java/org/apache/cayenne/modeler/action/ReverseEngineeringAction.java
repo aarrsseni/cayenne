@@ -21,7 +21,6 @@ package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
 import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoadResultDialog;
@@ -35,6 +34,8 @@ import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.services.ReverseEngineeringService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.*;
@@ -56,9 +57,6 @@ public class ReverseEngineeringAction extends CayenneAction {
 
     @Inject
     private Application application;
-
-    @Inject
-    private ProjectController projectController;
 
     @Inject
     private DbService dbService;
@@ -90,7 +88,7 @@ public class ReverseEngineeringAction extends CayenneAction {
             if (!connectWizard.startupAction()) {
                 return ;
             }
-            connectionInfo = connectWizard.getConnectionInfo();
+            connectionInfo = dbService.getDbConnectionInfo();
             reverseEngineeringService.saveConnectionInfo();
         } else {
             connectionInfo = reverseEngineeringService.getConnectionInfoFromPreferences();

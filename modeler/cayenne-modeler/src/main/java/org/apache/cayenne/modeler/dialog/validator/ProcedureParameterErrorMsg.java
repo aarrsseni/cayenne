@@ -28,7 +28,7 @@ import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
 import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 /**
  */

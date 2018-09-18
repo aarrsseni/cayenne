@@ -379,7 +379,7 @@ public class ProjectUtil {
         Entity parent = attribute.getEntity();
 
         if (parent == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         Collection<DbRelationship> parentRelationships = (Collection<DbRelationship>) parent
@@ -405,12 +405,12 @@ public class ProjectUtil {
         Entity parent = attribute.getEntity();
 
         if (parent == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         DataMap map = parent.getDataMap();
         if (map == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         Collection<DbRelationship> relationships = new ArrayList<DbRelationship>();

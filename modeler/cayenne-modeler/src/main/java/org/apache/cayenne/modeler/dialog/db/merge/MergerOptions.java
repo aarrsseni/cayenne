@@ -52,10 +52,12 @@ import org.apache.cayenne.validation.ValidationResult;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.Component;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -90,7 +92,7 @@ public class MergerOptions extends CayenneController {
                          String defaultCatalog,
                          String defaultSchema,
                          MergerTokenFactoryProvider mergerTokenFactoryProvider) {
-        super();
+        super(Application.getInstance().getFrameController());
 
         this.projectController = projectController;
 

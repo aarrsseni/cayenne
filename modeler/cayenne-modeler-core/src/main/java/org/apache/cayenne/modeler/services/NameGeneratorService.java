@@ -62,7 +62,7 @@ public class NameGeneratorService {
             return PREDEFINED_STRATEGIES;
         }
 
-        return new Vector<String>(Arrays.asList(prop.split(",")));
+        return new Vector<>(Arrays.asList(prop.split(",")));
     }
 
     public ObjectNameGenerator createNamingStrategy()

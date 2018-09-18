@@ -32,7 +32,7 @@ public class InferRelationshipsAction extends CayenneAction {
     @Inject
     public Application application;
 
-    public static final String getActionName() {
+    public static String getActionName() {
         return "Infer Relationships";
     }
     

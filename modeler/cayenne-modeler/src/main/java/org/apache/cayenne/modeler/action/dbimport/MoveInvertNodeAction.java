@@ -28,6 +28,7 @@ public class MoveInvertNodeAction extends MoveImportNodeAction {
 
     public MoveInvertNodeAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         moveInverted = true;
     }
 }

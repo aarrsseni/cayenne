@@ -21,7 +21,7 @@ package org.apache.cayenne.modeler.undo;
 
 import org.apache.cayenne.modeler.Application;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
 import javax.swing.undo.UndoableEdit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

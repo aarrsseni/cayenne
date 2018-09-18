@@ -20,8 +20,20 @@
 package org.apache.cayenne.modeler;
 
 import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.configuration.event.*;
-import org.apache.cayenne.map.event.*;
+import org.apache.cayenne.configuration.event.DataMapListener;
+import org.apache.cayenne.configuration.event.DataNodeListener;
+import org.apache.cayenne.configuration.event.DomainListener;
+import org.apache.cayenne.configuration.event.ProcedureListener;
+import org.apache.cayenne.configuration.event.ProcedureParameterListener;
+import org.apache.cayenne.configuration.event.QueryListener;
+import org.apache.cayenne.map.event.DbAttributeListener;
+import org.apache.cayenne.map.event.DbEntityListener;
+import org.apache.cayenne.map.event.DbRelationshipListener;
+import org.apache.cayenne.map.event.EmbeddableAttributeListener;
+import org.apache.cayenne.map.event.EmbeddableListener;
+import org.apache.cayenne.map.event.ObjAttributeListener;
+import org.apache.cayenne.map.event.ObjEntityListener;
+import org.apache.cayenne.map.event.ObjRelationshipListener;
 import org.apache.cayenne.modeler.event.listener.*;
 
 import java.util.EventListener;
@@ -242,6 +254,7 @@ public class EventController {
         listenerMap.add(listenerClass, listener);
     }
 
+    @SuppressWarnings("unchecked")
     ListenerDescriptor getListenerDescriptor(EventObject key) {
         try {
             listenerDescriptorMap.putIfAbsent(key.getClass(), listenerDescriptorCreator.create((Class<? extends EventListener>) key.getClass().getMethod("getEventListener").invoke(key)));

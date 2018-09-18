@@ -65,6 +65,7 @@ public class MoveImportNodeAction extends CayenneAction {
 
     MoveImportNodeAction(String actionName) {
         super(actionName);
+        setAlwaysOn(true);
         initMap();
     }
 
@@ -217,10 +218,8 @@ public class MoveImportNodeAction extends CayenneAction {
             }
         }
         if (sourceElement.getUserObject().getClass() == IncludeProcedure.class) {
-            if ((selectedElement.getUserObject().getClass() == IncludeProcedure.class)
-                    || (selectedElement.getUserObject().getClass() == ExcludeProcedure.class)) {
-                return true;
-            }
+            return (selectedElement.getUserObject().getClass() == IncludeProcedure.class)
+                    || (selectedElement.getUserObject().getClass() == ExcludeProcedure.class);
         }
         return false;
     }

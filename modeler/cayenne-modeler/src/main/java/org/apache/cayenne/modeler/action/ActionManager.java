@@ -21,7 +21,8 @@ package org.apache.cayenne.modeler.action;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
 
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.JComponent;
 
 /**
  * Stores a map of modeler actions, and deals with activating/deactivating those actions

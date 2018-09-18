@@ -26,17 +26,44 @@ import org.apache.cayenne.modeler.ProjectTreeView;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.CollapseTreeAction;
 import org.apache.cayenne.modeler.action.FilterAction;
-import org.apache.cayenne.modeler.dialog.LogConsole;
 import org.apache.cayenne.modeler.dialog.datadomain.FilterController;
 import org.apache.cayenne.modeler.editor.datanode.DataNodeEditor;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityTabbedView;
-import org.apache.cayenne.modeler.event.*;
-import org.apache.cayenne.modeler.event.listener.*;
+import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
+import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
+import org.apache.cayenne.modeler.event.MultipleObjectsDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
+import org.apache.cayenne.modeler.event.QueryDisplayEvent;
+import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DataNodeDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
+import org.apache.cayenne.modeler.event.listener.EmbeddableDisplayListener;
+import org.apache.cayenne.modeler.event.listener.MultipleObjectsDisplayListener;
+import org.apache.cayenne.modeler.event.listener.ObjEntityDisplayListener;
+import org.apache.cayenne.modeler.event.listener.ProcedureDisplayListener;
+import org.apache.cayenne.modeler.event.listener.QueryDisplayListener;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Container;
+import java.awt.Dimension;
 
 /**
  * Main display area split into the project navigation tree on the left and selected
@@ -253,8 +280,6 @@ public class EditorView extends JPanel implements ObjEntityDisplayListener,
         eventController.getEventController().addEmbeddableDisplayListener(this);
 
         eventController.getCurrentState().initControllerStateListeners();
-
-        LogConsole.getInstance().initListeners();
 
         // Moving this to try-catch block per CAY-940. Exception will be stack-traced
         try {

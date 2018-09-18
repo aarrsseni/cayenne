@@ -21,13 +21,6 @@ package org.apache.cayenne.modeler.editor;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import java.awt.BorderLayout;
-import java.util.EventObject;
-
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.ProcedureEvent;
 import org.apache.cayenne.map.Procedure;
@@ -46,8 +39,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.EventObject;
 
 /**

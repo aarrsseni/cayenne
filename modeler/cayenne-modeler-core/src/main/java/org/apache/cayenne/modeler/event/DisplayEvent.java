@@ -53,7 +53,7 @@ public class DisplayEvent extends EventObject {
     * Returns the last object in the path.
     */
     public Object getPathObject() {
-        return (pathObject != null) ? pathObject : null;
+        return pathObject;
     }
 
     /**
@@ -84,7 +84,7 @@ public class DisplayEvent extends EventObject {
         }
 
         Object last = getPathObject();
-        return (last != null) ? last.getClass() == nodeClass : false;
+        return (last != null) && last.getClass() == nodeClass;
     }
 
 }

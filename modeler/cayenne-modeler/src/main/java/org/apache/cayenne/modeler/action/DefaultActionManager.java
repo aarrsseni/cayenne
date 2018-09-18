@@ -21,25 +21,20 @@ package org.apache.cayenne.modeler.action;
 import org.apache.cayenne.configuration.ConfigurationNameMapper;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.action.dbimport.AddCatalogAction;
-import org.apache.cayenne.modeler.action.dbimport.AddExcludeColumnAction;
-import org.apache.cayenne.modeler.action.dbimport.AddExcludeProcedureAction;
-import org.apache.cayenne.modeler.action.dbimport.AddExcludeTableAction;
-import org.apache.cayenne.modeler.action.dbimport.AddIncludeColumnAction;
-import org.apache.cayenne.modeler.action.dbimport.AddIncludeProcedureAction;
-import org.apache.cayenne.modeler.action.dbimport.AddIncludeTableAction;
-import org.apache.cayenne.modeler.action.dbimport.AddSchemaAction;
-import org.apache.cayenne.modeler.action.dbimport.DeleteNodeAction;
-import org.apache.cayenne.modeler.action.dbimport.EditNodeAction;
-import org.apache.cayenne.modeler.action.dbimport.MoveImportNodeAction;
-import org.apache.cayenne.modeler.action.dbimport.MoveInvertNodeAction;
 import org.apache.cayenne.modeler.action.dbimport.ReverseEngineeringToolMenuAction;
 import org.apache.cayenne.modeler.graph.action.ShowGraphEntityAction;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.project.ConfigurationNodeParentGetter;
 
-import javax.swing.*;
-import java.util.*;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.JComponent;
+import javax.swing.TransferHandler;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Stores a map of modeler actions, and deals with activating/deactivating those actions

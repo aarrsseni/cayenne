@@ -242,7 +242,7 @@ public abstract class CayenneTableModel<T> extends AbstractTableModel {
     public abstract boolean isColumnSortable(int sortCol);
     
     public void sortByElementProperty(String string, boolean isAscent) {
-        Collections.sort(objectList, new PropertyComparator<>(string, getElementsClass()));
+        objectList.sort(new PropertyComparator<>(string, getElementsClass()));
         if(!isAscent){
             Collections.reverse(objectList);
         }

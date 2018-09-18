@@ -18,21 +18,18 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.undo;
 
+import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.util.TextAdapter;
+
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.JTextComponent;
+import javax.swing.undo.CompoundEdit;
+import javax.swing.undo.UndoableEdit;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.JTextComponent;
-import javax.swing.undo.CompoundEdit;
-import javax.swing.undo.UndoableEdit;
-
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.util.TextAdapter;
 
 public class JTextFieldUndoListener implements UndoableEditListener {
 

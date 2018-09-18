@@ -44,6 +44,7 @@ public class GetDbConnectionAction extends DBWizardAction<DbActionOptionsDialog>
 
     public GetDbConnectionAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
     }
 
     public String getIconName() {

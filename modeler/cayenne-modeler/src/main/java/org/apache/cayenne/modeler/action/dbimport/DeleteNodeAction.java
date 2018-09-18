@@ -54,6 +54,7 @@ public class DeleteNodeAction extends TreeManipulationAction {
 
     public DeleteNodeAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
     }
 
     public String getIconName() {

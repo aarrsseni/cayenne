@@ -19,21 +19,29 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.Attribute;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DbRelationshipDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DbAttributeDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DbEntityDisplayListener;
 import org.apache.cayenne.modeler.event.listener.DbRelationshipDisplayListener;
 
-import javax.swing.*;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.Component;
 
 public class DbEntityTabbedView extends JTabbedPane implements ChangeListener,
         DbEntityDisplayListener, DbRelationshipDisplayListener,

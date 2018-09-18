@@ -139,7 +139,7 @@ public abstract class CayenneController implements BoundComponent {
      * Centers view on parent window.
      */
     public void centerView() {
-        Window parentWindow = this.getWindow();
+        Window parentWindow = parent.getWindow();
 
         Dimension parentSize = parentWindow.getSize();
         Dimension windowSize = getView().getSize();

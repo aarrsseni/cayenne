@@ -35,6 +35,7 @@ public class AddCatalogAction extends TreeManipulationAction {
 
     public AddCatalogAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         insertableNodeClass = Catalog.class;
     }
 

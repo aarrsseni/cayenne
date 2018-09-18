@@ -92,10 +92,7 @@ public class CallbackType implements Serializable {
 
         CallbackType that = (CallbackType) o;
 
-        if (type != that.type)
-            return false;
-
-        return true;
+        return type == that.type;
     }
 
     public int hashCode() {

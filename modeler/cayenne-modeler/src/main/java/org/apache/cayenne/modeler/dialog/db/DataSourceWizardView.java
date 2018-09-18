@@ -26,8 +26,12 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.pref.DBConnectionInfoEditor;
 import org.apache.cayenne.modeler.util.CayenneController;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 
 /**
  */

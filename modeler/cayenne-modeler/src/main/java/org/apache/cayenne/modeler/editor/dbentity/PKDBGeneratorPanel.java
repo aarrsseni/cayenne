@@ -27,9 +27,13 @@ import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.modeler.ProjectController;
 
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.MutableComboBoxModel;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collection;
@@ -123,7 +127,6 @@ public class PKDBGeneratorPanel extends PKGeneratorPanel {
                             a.setGenerated(generated);
                             mediator.fireEvent(new DbEntityEvent(this, entity));
                         }
-                    }
                 }
             });
         }

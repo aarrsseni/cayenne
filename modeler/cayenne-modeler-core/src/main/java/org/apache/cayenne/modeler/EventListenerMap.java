@@ -24,18 +24,17 @@ import java.util.Deque;
 import java.util.EventListener;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
- * A class that holds all listeners.
- *
  * @since 4.1
+ * A class that holds all listeners.
  */
 public class EventListenerMap {
     private Map<Object, Deque<Object>> listenerMap;
 
-    public EventListenerMap(){
+    EventListenerMap(){
         this.listenerMap = new ConcurrentHashMap<>();
     }
 
@@ -44,7 +43,8 @@ public class EventListenerMap {
      *
      * @since 4.1
      */
-    public <T extends EventListener> T[] getListeners(Class<T> key){
+    @SuppressWarnings("unchecked")
+    <T extends EventListener> T[] getListeners(Class<T> key){
         //Order of listeners is important!
         if(listenerMap.containsKey(key)) {
             Deque<Object> result = new LinkedList<>(listenerMap.get(key));
@@ -66,7 +66,7 @@ public class EventListenerMap {
      * @since 4.1
      */
     public synchronized <T extends EventListener> void add(Class<T> keyClass, T val){
-        listenerMap.compute(keyClass, (key, list) -> listenerMap.containsKey(key) ? list : new LinkedList<>()).addFirst(val);
+        Objects.requireNonNull(listenerMap.compute(keyClass, (key, list) -> listenerMap.containsKey(key) ? list : new LinkedList<>())).addFirst(val);
     }
 
     /**

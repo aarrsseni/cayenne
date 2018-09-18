@@ -21,7 +21,7 @@ package org.apache.cayenne.modeler.dialog;
 
 import org.apache.cayenne.modeler.CayenneModelerFrame;
 
-import java.awt.*;
+import java.awt.HeadlessException;
 
 /**
  * Dialog for CayenneModeler warnings.

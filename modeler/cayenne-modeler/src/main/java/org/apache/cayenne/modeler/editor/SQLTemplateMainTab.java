@@ -38,8 +38,13 @@ import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

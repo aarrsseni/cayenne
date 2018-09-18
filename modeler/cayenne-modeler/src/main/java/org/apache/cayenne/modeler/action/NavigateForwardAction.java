@@ -32,7 +32,7 @@ public class NavigateForwardAction extends CayenneAction {
     @Inject
     public NavigationService navigationService;
 
-    public static final String getActionName() {
+    public static String getActionName() {
         return "Move Forward";
     }
 

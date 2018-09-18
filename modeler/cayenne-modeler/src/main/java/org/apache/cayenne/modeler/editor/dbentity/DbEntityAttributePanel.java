@@ -37,12 +37,15 @@ import org.apache.cayenne.modeler.util.UIUtil;
 import org.apache.cayenne.modeler.util.combo.AutoCompletion;
 import org.apache.cayenne.swing.components.LimitedTextField;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.util.List;
 
 /**

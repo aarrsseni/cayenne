@@ -33,14 +33,6 @@ import org.apache.cayenne.project.extension.info.ObjectInfo;
 import javax.swing.*;
 import java.util.*;
 
-import javax.swing.JOptionPane;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Model for DbEntity attributes. Allows adding/removing attributes, modifying types and names.
  */
@@ -288,13 +280,7 @@ public class DbAttributeTableModel extends CayenneTableModel<DbAttribute> {
                     .addAll(ProjectUtil.getRelationshipsUsingAttributeAsSource(attr));
 
             if (relationships.size() > 0) {
-                Iterator<DbRelationship> it = relationships.iterator();
-                while (it.hasNext()) {
-                    DbRelationship relationship = it.next();
-                    if (!relationship.isToDependentPK()) {
-                        it.remove();
-                    }
-                }
+                relationships.removeIf(relationship -> !relationship.isToDependentPK());
 
                 // filtered only those that are to dep PK
                 if (relationships.size() > 0) {
@@ -363,24 +349,20 @@ public class DbAttributeTableModel extends CayenneTableModel<DbAttribute> {
                 sortByElementProperty("name", isAscent);
                 break;
             case DB_ATTRIBUTE_TYPE:
-                Collections.sort(objectList, new Comparator<DbAttribute>() {
-
-                    public int compare(DbAttribute o1, DbAttribute o2) {
-                        if ((o1 == null && o2 == null) || o1 == o2) {
-                            return 0;
-                        } else if (o1 == null) {
-                            return -1;
-                        } else if (o2 == null) {
-                            return 1;
-                        }
-                        
-                        String attrType1 = getAttributeType(o1);
-                        String attrType2 = getAttributeType(o2);
-                        
-                        return (attrType1 == null) ? -1
-                                : (attrType2 == null) ? 1 : attrType1.compareTo(attrType2);
+                objectList.sort((o1, o2) -> {
+                    if ((o1 == null && o2 == null) || o1 == o2) {
+                        return 0;
+                    } else if (o1 == null) {
+                        return -1;
+                    } else if (o2 == null) {
+                        return 1;
                     }
 
+                    String attrType1 = getAttributeType(o1);
+                    String attrType2 = getAttributeType(o2);
+
+                    return (attrType1 == null) ? -1
+                            : (attrType2 == null) ? 1 : attrType1.compareTo(attrType2);
                 });
                 if (!isAscent) {
                     Collections.reverse(objectList);

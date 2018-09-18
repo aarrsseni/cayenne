@@ -92,7 +92,7 @@ public class MergerTokenTableModel extends AbstractTableModel {
         MergerToken token = getToken(rowIndex);
         switch (columnIndex) {
             case COL_SELECT:
-                return Boolean.valueOf(getController().isSelected(token));
+                return getController().isSelected(token);
             case COL_NAME:
                 return token.getTokenName();
             case COL_DIRECTION:
@@ -117,7 +117,7 @@ public class MergerTokenTableModel extends AbstractTableModel {
         switch (columnIndex) {
             case COL_SELECT:
                 Boolean val = (Boolean) value;
-                getController().select(token, val.booleanValue());
+                getController().select(token, val);
                 break;
             case COL_DIRECTION:
                 MergeDirection direction = (MergeDirection) value;

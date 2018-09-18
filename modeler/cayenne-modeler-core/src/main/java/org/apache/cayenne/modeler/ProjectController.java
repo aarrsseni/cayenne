@@ -112,7 +112,14 @@ import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.event.EmbeddableEvent;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
+import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
+import org.apache.cayenne.modeler.event.DisplayEvent;
+import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
+import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
+import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.ListenerDescriptor;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.DataNodeDefaults;
@@ -126,7 +133,15 @@ import org.apache.cayenne.project.ConfigurationNodeParentGetter;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.util.IDUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EventListener;
+import java.util.EventObject;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.prefs.Preferences;
 
 /**

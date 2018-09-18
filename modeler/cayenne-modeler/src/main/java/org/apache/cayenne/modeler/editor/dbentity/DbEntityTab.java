@@ -19,17 +19,6 @@
 
 package org.apache.cayenne.modeler.editor.dbentity;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.util.EventObject;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
@@ -39,7 +28,6 @@ import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.*;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.CreateAttributeAction;
 import org.apache.cayenne.modeler.action.CreateObjEntityFromDbAction;
@@ -56,10 +44,15 @@ import org.apache.cayenne.project.extension.info.ObjectInfo;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.util.EventObject;
 
 /**
@@ -68,9 +61,9 @@ import java.util.EventObject;
  */
 public class DbEntityTab extends JPanel implements ExistingSelectionProcessor, DbEntityDisplayListener {
 
-    static final String PK_DEFAULT_GENERATOR = "Cayenne-Generated (Default)";
-    static final String PK_DB_GENERATOR = "Database-Generated";
-    static final String PK_CUSTOM_SEQUENCE_GENERATOR = "Custom Sequence";
+    private static final String PK_DEFAULT_GENERATOR = "Cayenne-Generated (Default)";
+    private static final String PK_DB_GENERATOR = "Database-Generated";
+    private static final String PK_CUSTOM_SEQUENCE_GENERATOR = "Custom Sequence";
 
     static final String[] PK_GENERATOR_TYPES = { PK_DEFAULT_GENERATOR, PK_DB_GENERATOR, PK_CUSTOM_SEQUENCE_GENERATOR };
 

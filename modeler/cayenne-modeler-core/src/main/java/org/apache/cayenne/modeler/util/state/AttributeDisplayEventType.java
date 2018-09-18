@@ -21,9 +21,17 @@ package org.apache.cayenne.modeler.util.state;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.Attribute;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.AttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 
 import java.util.ArrayList;
 import java.util.List;

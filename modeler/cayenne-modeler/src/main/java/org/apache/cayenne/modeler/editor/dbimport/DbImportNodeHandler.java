@@ -82,13 +82,10 @@ class DbImportNodeHandler {
                 return true;
             }
         }
-        if ((nodesClassesComparation(reverseEngineeringNode.getUserObject().getClass(), dbSchemaNode.getUserObject().getClass()))
+        return (nodesClassesComparation(reverseEngineeringNode.getUserObject().getClass(), dbSchemaNode.getUserObject().getClass()))
                 && namesIsEqual(reverseEngineeringNode)
                 && (dbSchemaNode.getLevel() >= reverseEngineeringNode.getLevel())
-                && (dbSchemaNode.parentsIsEqual(reverseEngineeringNode))) {
-            return true;
-        }
-        return false;
+                && (dbSchemaNode.parentsIsEqual(reverseEngineeringNode));
     }
 
     public boolean checkTreesLevels(DbImportTree dbTree) {
@@ -100,6 +97,7 @@ class DbImportNodeHandler {
         for (int i = 0; i < childCount; i++) {
             if (((DbImportTreeNode) reverseEngineeringTree.getRootNode().getChildAt(i)).
                     getUserObject().getClass() == Catalog.class) {
+                return dbNode.getUserObject().getClass() == Catalog.class;
                 if (dbNode.getUserObject().getClass() == Catalog.class || dbNode.getUserObject().getClass() == IncludeTable.class) {
                     return true;
                 } else {
@@ -115,13 +113,10 @@ class DbImportNodeHandler {
         if ((reverseEngineeringNode == null) || (dbSchemaNode.getParent() == null)) {
             return false;
         }
-        if ((((DbImportTreeNode)dbSchemaNode.getParent()).getUserObject().getClass() == reverseEngineeringNode.getUserObject().getClass())
-                && (((DbImportTreeNode)dbSchemaNode.getParent()).getSimpleNodeName().equals(reverseEngineeringNode.getSimpleNodeName()))
-                && (((DbImportTreeNode)dbSchemaNode.getParent()).getLevel() >= reverseEngineeringNode.getLevel())
-                && (((DbImportTreeNode)dbSchemaNode.getParent())).parentsIsEqual(reverseEngineeringNode)) {
-            return true;
-        }
-        return false;
+        return (((DbImportTreeNode) dbSchemaNode.getParent()).getUserObject().getClass() == reverseEngineeringNode.getUserObject().getClass())
+                && (((DbImportTreeNode) dbSchemaNode.getParent()).getSimpleNodeName().equals(reverseEngineeringNode.getSimpleNodeName()))
+                && (((DbImportTreeNode) dbSchemaNode.getParent()).getLevel() >= reverseEngineeringNode.getLevel())
+                && (((DbImportTreeNode) dbSchemaNode.getParent())).parentsIsEqual(reverseEngineeringNode);
     }
 
     // Get child IncludeTable's count in node, if exists

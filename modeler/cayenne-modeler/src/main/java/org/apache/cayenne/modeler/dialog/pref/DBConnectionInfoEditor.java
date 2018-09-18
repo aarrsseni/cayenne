@@ -19,15 +19,14 @@
 
 package org.apache.cayenne.modeler.dialog.pref;
 
-import java.awt.Component;
-
-import javax.swing.DefaultComboBoxModel;
-
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.DbAdapterInfo;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A reusable editor for DBConnectionInfo object.
@@ -56,7 +55,7 @@ public class DBConnectionInfoEditor extends CayenneController {
     protected void initBindings() {
         this.view.setEnabled(false);
 
-        DefaultComboBoxModel adapterModel = new DefaultComboBoxModel(DbAdapterInfo
+        DefaultComboBoxModel<String> adapterModel = new DefaultComboBoxModel<>(DbAdapterInfo
                 .getStandardAdapters());
         view.getAdapters().setModel(adapterModel);
         view.getAdapters().setSelectedIndex(0);

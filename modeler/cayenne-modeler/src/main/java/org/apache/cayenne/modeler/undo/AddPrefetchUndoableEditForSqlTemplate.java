@@ -20,7 +20,6 @@
 package org.apache.cayenne.modeler.undo;
 
 import org.apache.cayenne.modeler.editor.SQLTemplatePrefetchTab;
-import org.apache.cayenne.modeler.editor.SelectQueryPrefetchTab;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;

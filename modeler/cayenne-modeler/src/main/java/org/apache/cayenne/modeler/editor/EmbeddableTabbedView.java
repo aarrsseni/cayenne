@@ -18,14 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.editor;
 
-import java.awt.Component;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.modeler.Application;
@@ -34,9 +26,14 @@ import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.RemoveAttributeAction;
 import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
 import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
-import org.apache.cayenne.modeler.event.listener.EmbeddableAttributeDisplayListener;
 import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
+import org.apache.cayenne.modeler.event.listener.EmbeddableAttributeDisplayListener;
 import org.apache.cayenne.modeler.event.listener.EmbeddableDisplayListener;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 public class EmbeddableTabbedView extends JTabbedPane implements
         EmbeddableAttributeDisplayListener, EmbeddableDisplayListener {
@@ -96,7 +93,7 @@ public class EmbeddableTabbedView extends JTabbedPane implements
 
     public void currentEmbeddableChanged(EmbeddableDisplayEvent e) {
         Embeddable emb = e.getEmbeddable();
-        if (e.isMainTabFocus() && emb instanceof Embeddable) {
+        if (e.isMainTabFocus() && emb != null) {
             
             if (getSelectedComponent() != embeddablePanel) {
                 setSelectedComponent(embeddablePanel);

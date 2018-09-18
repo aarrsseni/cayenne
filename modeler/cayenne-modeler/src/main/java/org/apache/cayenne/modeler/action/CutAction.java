@@ -22,8 +22,8 @@ import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 

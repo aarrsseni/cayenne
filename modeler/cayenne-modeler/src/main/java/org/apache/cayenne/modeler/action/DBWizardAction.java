@@ -29,7 +29,7 @@ import org.apache.cayenne.modeler.util.CayenneAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.Collections;

@@ -78,7 +78,7 @@ public class DefaultDbService implements DbService{
     @Override
     public List<String> getCatalogs(Connection connection) throws Exception {
         if(!getDbAdapter().supportsCatalogsOnReverseEngineering()) {
-            return (List<String>) Collections.EMPTY_LIST;
+            return  Collections.emptyList();
         }
 
         return DbLoader.loadCatalogs(connection);

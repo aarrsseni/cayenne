@@ -26,7 +26,7 @@ import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.modeler.util.CayenneController;
 
-import java.awt.*;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;

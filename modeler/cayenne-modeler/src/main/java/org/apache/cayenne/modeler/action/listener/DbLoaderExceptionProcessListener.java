@@ -22,7 +22,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.DbLoaderExceptionEvent;
 import org.apache.cayenne.modeler.event.listener.DbLoaderExceptionListener;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 /**
  * @since 4.1

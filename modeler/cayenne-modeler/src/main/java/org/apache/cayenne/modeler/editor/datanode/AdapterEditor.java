@@ -23,8 +23,6 @@ import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.event.DataNodeEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
-import org.apache.cayenne.modeler.event.listener.DataNodeDisplayListener;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
@@ -61,12 +59,7 @@ public class AdapterEditor extends CayenneController {
                 "adapterName");
 
         projectController.getEventController()
-                .addDataNodeDisplayListener(new DataNodeDisplayListener() {
-
-                    public void currentDataNodeChanged(DataNodeDisplayEvent e) {
-                        refreshView(e.getDataNode());
-                    }
-                });
+                .addDataNodeDisplayListener(e -> refreshView(e.getDataNode()));
 
         getView().addComponentListener(new ComponentAdapter() {
 
@@ -104,8 +97,6 @@ public class AdapterEditor extends CayenneController {
             return;
         }
 
-//        ModelerDbAdapter adapter = new ModelerDbAdapter(name, node.getDataSource());
-//        adapter.validate();
         node.setAdapterType(name);
         
         DataNodeEvent e = new DataNodeEvent(AdapterEditor.this, node);

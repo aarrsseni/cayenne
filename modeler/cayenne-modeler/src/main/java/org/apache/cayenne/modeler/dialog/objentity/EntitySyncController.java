@@ -28,9 +28,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.services.NameGeneratorService;
 import org.apache.cayenne.modeler.util.CayenneController;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Component;
 import java.util.Collection;
 import java.util.Collections;
 

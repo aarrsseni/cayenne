@@ -76,10 +76,8 @@ public class ProjectFileChangeTracker extends Thread {
             String projectPath = project.getConfigurationResource().getURL().getPath() + File.separator;
             addFile(projectPath);
 
-            Iterator<DataMap> it = ((DataChannelDescriptor) project.getRootNode()).getDataMaps().iterator();
-            while (it.hasNext()) {
-                DataMap dm = it.next();
-                if(dm.getConfigurationSource() != null) {
+            for (DataMap dm : ((DataChannelDescriptor) project.getRootNode()).getDataMaps()) {
+                if (dm.getConfigurationSource() != null) {
                     // if DataMap is in separate file, monitor it
                     addFile(dm.getConfigurationSource().getURL().getPath());
                 }

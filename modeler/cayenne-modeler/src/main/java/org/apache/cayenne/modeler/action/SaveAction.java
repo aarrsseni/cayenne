@@ -25,8 +25,8 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.services.SaveService;
 import org.apache.cayenne.project.Project;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 
 /**

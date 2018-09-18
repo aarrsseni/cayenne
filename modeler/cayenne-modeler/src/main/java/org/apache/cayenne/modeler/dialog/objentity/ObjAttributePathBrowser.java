@@ -18,15 +18,13 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.objentity;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JButton;
-import javax.swing.SwingUtilities;
-import javax.swing.tree.TreePath;
-
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbRelationship;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ObjAttributePathBrowser extends ObjRelationshipPathBrowser {
 
@@ -88,7 +86,7 @@ public class ObjAttributePathBrowser extends ObjRelationshipPathBrowser {
             Object selectedNode = panel.getSelectedValue();
 
             // ignore unselected
-            if (selectedNode != null && selectedNode instanceof DbRelationship) {
+            if (selectedNode instanceof DbRelationship) {
                 updateFromModel(selectedNode, columns.indexOf(panel));
                 selectPathButton.setEnabled(false);
                 doneButton.setEnabled(false);

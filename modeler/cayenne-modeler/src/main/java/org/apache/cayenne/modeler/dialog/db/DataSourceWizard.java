@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db;
 
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.GetDbConnectionAction;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
@@ -32,8 +33,10 @@ import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
+import java.awt.Component;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -55,24 +58,18 @@ public class DataSourceWizard extends CayenneController {
 	private String dataSourceKey;
 	private ProjectController projectController;
 
-	// this object is a clone of an object selected from the dropdown, as we
-	// need to allow
-	// local temporary modifications
-	private DBConnectionInfo connectionInfo;
-
 	private boolean canceled;
 
 	private DataSourceModificationListener dataSourceListener;
 
-	DbService dbService;
+	private DbService dbService;
 
 	public DataSourceWizard(ProjectController projectController, String title) {
-		super();
+		super(Application.getInstance().getFrameController());
 
 		this.projectController = projectController;
 		this.view = createView(title);
 		this.view.setTitle(title);
-		this.connectionInfo = new DBConnectionInfo();
 
 		dbService = projectController.getDbService();
 		dbService.createDbConnectionInfo();
@@ -185,7 +182,7 @@ public class DataSourceWizard extends CayenneController {
 		final DataMapDefaults dataMapDefaults = projectController.
 				getDataMapPreferences(projectController.getCurrentState().getDataMap());
 		if (dataMapDefaults.getCurrentPreference().get(DB_ADAPTER_PROPERTY, null) != null) {
-			getConnectionInfoFromPreferences().copyTo(connectionInfo);
+			getConnectionInfoFromPreferences().copyTo(dbService.getDbConnectionInfo());
 		}
 		view.pack();
 		view.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -293,9 +290,5 @@ public class DataSourceWizard extends CayenneController {
 		if (selection == 0) {
 			classPathConfigAction();
 		}
-	}
-
-	public DBConnectionInfo getConnectionInfo() {
-		return connectionInfo;
 	}
 }

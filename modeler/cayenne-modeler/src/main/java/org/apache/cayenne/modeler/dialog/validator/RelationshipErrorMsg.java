@@ -20,7 +20,11 @@
 package org.apache.cayenne.modeler.dialog.validator;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
@@ -29,7 +33,7 @@ import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjRelationshipDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 /**
  * Relationship validation message.

@@ -46,12 +46,12 @@ import static org.apache.cayenne.modeler.editor.datanode.MainDataNodeEditor.DBCP
 public class MainDataNodeView extends JPanel {
 
     protected JTextField dataNodeName;
-    protected JComboBox factories;
+    protected JComboBox<String> factories;
     protected JPanel dataSourceDetail;
     protected CardLayout dataSourceDetailLayout;
     protected JComboBox localDataSources;
     protected JButton configLocalDataSources;
-    protected JComboBox schemaUpdateStrategy;
+    protected JComboBox<String> schemaUpdateStrategy;
 
     public MainDataNodeView(final ProjectController projectController) {
 
@@ -102,7 +102,7 @@ public class MainDataNodeView extends JPanel {
         add(dataSourceDetail, BorderLayout.CENTER);
     }
 
-    public JComboBox getSchemaUpdateStrategy() {
+    public JComboBox<String> getSchemaUpdateStrategy() {
         return schemaUpdateStrategy;
     }
 
@@ -122,7 +122,7 @@ public class MainDataNodeView extends JPanel {
         return dataSourceDetailLayout;
     }
 
-    public JComboBox getFactories() {
+    public JComboBox<String> getFactories() {
         return factories;
     }
 

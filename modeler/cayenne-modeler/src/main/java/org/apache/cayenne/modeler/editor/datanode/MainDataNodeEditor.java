@@ -46,8 +46,13 @@ import javax.swing.DefaultComboBoxModel;
 import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 
 /**
  * A controller for the main tab of the DataNode editor panel.
@@ -177,7 +182,7 @@ public class MainDataNodeEditor extends CayenneController {
 		view.getDataSourceDetail().add(defaultSubeditor.getView(), "default");
 		view.getFactories().setEditable(true);
 		// init combo box choices
-		view.getFactories().setModel(new DefaultComboBoxModel(standardDataSourceFactories));
+		view.getFactories().setModel(new DefaultComboBoxModel<>(standardDataSourceFactories));
 
 		view.getSchemaUpdateStrategy().setEditable(true);
 		view.getSchemaUpdateStrategy().setModel(new DefaultComboBoxModel(standardSchemaUpdateStrategy));

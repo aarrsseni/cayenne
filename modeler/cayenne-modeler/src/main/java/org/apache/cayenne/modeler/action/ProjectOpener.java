@@ -29,9 +29,9 @@ import org.apache.cayenne.project.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import java.awt.*;
+import java.awt.Frame;
 import java.io.File;
 
 
@@ -58,7 +58,7 @@ class ProjectOpener extends JFileChooser {
         }
     }
 
-    File newProjectDir(Frame f, String location, FileFilter filter) {
+    private File newProjectDir(Frame f, String location, FileFilter filter) {
         // configure dialog
         setDialogTitle("Select Project Directory");
         setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -139,7 +139,7 @@ class ProjectOpener extends JFileChooser {
      * Returns directory where file search should start. This is either coming from saved
      * preferences, or a current directory is used.
      */
-    File getDefaultStartDir() {
+    private File getDefaultStartDir() {
         // find start directory in preferences
         File existingDir = Application
                 .getInstance()

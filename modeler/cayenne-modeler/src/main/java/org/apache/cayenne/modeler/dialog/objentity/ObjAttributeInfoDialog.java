@@ -23,6 +23,7 @@ import org.apache.cayenne.configuration.event.ObjAttributeEvent;
 import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.MapEvent;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.ObjAttributeTableModel;
 import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
@@ -45,8 +46,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class ObjAttributeInfoDialog extends CayenneController implements TreeSelectionListener {
 
@@ -66,7 +65,7 @@ public class ObjAttributeInfoDialog extends CayenneController implements TreeSel
 	private Object lastObjectType;
 
 	public ObjAttributeInfoDialog(ProjectController projectController, int row, ObjAttributeTableModel model) {
-		super();
+		super(Application.getInstance().getFrameController());
 		this.view = new ObjAttributeInfoDialogView(projectController);
 		this.projectController = projectController;
 		this.model = model;
@@ -101,7 +100,7 @@ public class ObjAttributeInfoDialog extends CayenneController implements TreeSel
 	private void initController(ObjAttribute attr) {
 
 		for (String embeddableName : embeddableNames) {
-			((DefaultComboBoxModel) view.getTypeComboBox().getModel()).addElement(embeddableName);
+			((DefaultComboBoxModel<String>) view.getTypeComboBox().getModel()).addElement(embeddableName);
 		}
 
 		this.attribute = attr;

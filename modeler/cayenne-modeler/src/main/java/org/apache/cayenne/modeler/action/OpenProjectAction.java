@@ -30,12 +30,6 @@ import org.apache.cayenne.swing.control.FileMenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import java.awt.Toolkit;
@@ -45,10 +39,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OpenProjectAction extends ProjectAction {
 

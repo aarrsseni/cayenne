@@ -359,7 +359,7 @@ public class SelectQueryOrderingTab extends JPanel implements PropertyChangeList
 
             switch (column) {
                 case 1:
-                    if (((Boolean) value).booleanValue()) {
+                    if ((Boolean) value) {
                         ordering.setAscending();
                     }
                     else {
@@ -367,7 +367,7 @@ public class SelectQueryOrderingTab extends JPanel implements PropertyChangeList
                     }
                     break;
                 case 2:
-                    if (((Boolean) value).booleanValue()) {
+                    if ((Boolean) value) {
                         ordering.setCaseInsensitive();
                     }
                     else {

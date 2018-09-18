@@ -21,7 +21,18 @@ package org.apache.cayenne.modeler.action;
 import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.EmptyConfigurationNodeVisitor;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.Embeddable;
+import org.apache.cayenne.map.EmbeddableAttribute;
+import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.Procedure;
+import org.apache.cayenne.map.ProcedureParameter;
+import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
 import org.apache.cayenne.modeler.util.CayenneAction;
@@ -29,8 +40,8 @@ import org.apache.cayenne.modeler.util.CayenneTransferable;
 import org.apache.cayenne.util.XMLEncoder;
 import org.apache.cayenne.util.XMLSerializable;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -114,7 +125,7 @@ public class CopyAction extends CayenneAction {
             return false;
         }
 
-        if (object instanceof DataMap
+        return object instanceof DataMap
                 || object instanceof QueryDescriptor
                 || object instanceof DbEntity
                 || object instanceof ObjEntity
@@ -126,10 +137,7 @@ public class CopyAction extends CayenneAction {
                 || object instanceof ObjRelationship
                 || object instanceof ObjCallbackMethod
                 || object instanceof Procedure
-                || object instanceof ProcedureParameter) {
-            return true;
-        }
+                || object instanceof ProcedureParameter;
 
-        return false;
     }
 }

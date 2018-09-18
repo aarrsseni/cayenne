@@ -36,6 +36,7 @@ public class AddIncludeTableAction extends TreeManipulationAction {
 
     public AddIncludeTableAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         insertableNodeClass = IncludeTable.class;
     }
 

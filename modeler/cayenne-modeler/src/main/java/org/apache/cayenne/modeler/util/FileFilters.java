@@ -19,8 +19,8 @@
 
 package org.apache.cayenne.modeler.util;
 
-import java.io.File;
 import javax.swing.filechooser.FileFilter;
+import java.io.File;
 
 /**
  * A collection of common file filters used by CayenneModeler JFileChoosers.
@@ -209,19 +209,14 @@ public class FileFilters {
          */
         public boolean accept(File f) {
             if (f.isDirectory()) {
-                if (f.getName().endsWith(EOModelFileFilter.EOM_SUFFIX)
-                        && new File(f, EOModelFileFilter.EOM_INDEX).exists()) {
-
-                    return true;
-                }
+                return f.getName().endsWith(EOModelFileFilter.EOM_SUFFIX)
+                        && new File(f, EOModelFileFilter.EOM_INDEX).exists();
             }
             else if (f.isFile()) {
                 File parent = f.getParentFile();
-                if (parent != null
+                return parent != null
                         && parent.getName().endsWith(EOModelFileFilter.EOM_SUFFIX)
-                        && EOModelFileFilter.EOM_INDEX.equals(f.getName())) {
-                    return true;
-                }
+                        && EOModelFileFilter.EOM_INDEX.equals(f.getName());
             }
 
             return false;

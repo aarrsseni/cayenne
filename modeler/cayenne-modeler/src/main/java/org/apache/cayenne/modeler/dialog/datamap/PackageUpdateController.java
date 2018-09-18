@@ -21,20 +21,21 @@ package org.apache.cayenne.modeler.dialog.datamap;
 
 import org.apache.cayenne.configuration.event.ObjAttributeEvent;
 import org.apache.cayenne.configuration.event.ObjEntityEvent;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.Embeddable;
+import org.apache.cayenne.map.EmbeddedAttribute;
+import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.event.EmbeddableEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.util.Util;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.WindowConstants;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  */

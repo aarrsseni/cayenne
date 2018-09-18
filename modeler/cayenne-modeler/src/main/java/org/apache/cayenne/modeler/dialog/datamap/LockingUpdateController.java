@@ -26,11 +26,12 @@ import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
 
-import java.awt.*;
+import java.awt.Component;
 
 public class LockingUpdateController extends CayenneController {
 
@@ -39,7 +40,7 @@ public class LockingUpdateController extends CayenneController {
     protected ProjectController projectController;
 
     public LockingUpdateController(ProjectController projectController, DataMap dataMap) {
-        super();
+        super(Application.getInstance().getFrameController());
         this.projectController = projectController;
         this.dataMap = dataMap;
     }

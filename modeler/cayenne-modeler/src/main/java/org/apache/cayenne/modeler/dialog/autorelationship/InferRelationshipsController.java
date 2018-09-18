@@ -37,8 +37,9 @@ import org.apache.cayenne.swing.BindingBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import java.awt.Component;
 
 public class InferRelationshipsController extends InferRelationshipsControllerBase {
 

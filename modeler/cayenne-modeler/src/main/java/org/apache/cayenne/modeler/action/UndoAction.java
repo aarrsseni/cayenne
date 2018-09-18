@@ -22,8 +22,8 @@ import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -43,7 +43,7 @@ public class UndoAction extends CayenneAction {
     
     public UndoAction() {
         super(getActionName());
-        setAlwaysOn(true);
+        setEnabled(false);
     }
     
     @Override

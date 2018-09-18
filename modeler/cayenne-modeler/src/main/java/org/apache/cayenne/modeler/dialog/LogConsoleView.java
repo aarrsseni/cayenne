@@ -18,13 +18,12 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog;
 
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
-
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.ModelerUtil;
 import org.apache.cayenne.swing.components.TopBorder;
 
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 
 /**

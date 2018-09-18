@@ -31,6 +31,7 @@ public class AddExcludeProcedureAction extends AddPatternParamAction {
 
     public AddExcludeProcedureAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         insertableNodeClass = ExcludeProcedure.class;
     }
 

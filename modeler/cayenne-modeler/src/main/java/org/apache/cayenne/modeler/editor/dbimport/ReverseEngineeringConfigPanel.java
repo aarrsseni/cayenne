@@ -28,7 +28,11 @@ import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.util.NameGeneratorPreferences;
 import org.apache.cayenne.modeler.util.TextAdapter;
 
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.util.Vector;
 
 /**

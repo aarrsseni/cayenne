@@ -32,7 +32,8 @@ import org.apache.cayenne.modeler.util.combo.AutoCompletion;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
 
 abstract class BaseQueryMainTab extends JPanel {
     protected ProjectController mediator;

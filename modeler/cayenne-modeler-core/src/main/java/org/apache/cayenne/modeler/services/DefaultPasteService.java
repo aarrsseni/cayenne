@@ -21,14 +21,12 @@ package org.apache.cayenne.modeler.services;
 import com.google.inject.Inject;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.configuration.event.QueryEvent;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.ObjCallbackMethod;
 import org.apache.cayenne.modeler.event.CallbackMethodEvent;
-import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.query.Query;
 
 import java.util.HashMap;
@@ -58,7 +56,8 @@ public class DefaultPasteService implements PasteService {
     public RelationshipService relationshipService;
     @Inject
     public ProcedureParameterService procedureParameterService;
-
+    @Inject
+    public QueryService queryService;
     @Override
     public void paste(Object where, Object content) {
         paste(where, content, (DataChannelDescriptor) projectController
@@ -248,7 +247,7 @@ public class DefaultPasteService implements PasteService {
                 query.setDataMap(dataMap);
 
                 dataMap.addQueryDescriptor(query);
-                fireQueryEvent(this, mediator, dataMap, query);
+                queryService.fireQueryEvent(this, mediator, dataChannelDescriptor, dataMap, query);
             } else if (content instanceof Procedure) {
                 // paste Procedure to DataMap
                 Procedure procedure = (Procedure) content;
@@ -404,14 +403,5 @@ public class DefaultPasteService implements PasteService {
         if (ns instanceof EntityResolver) {
             ((EntityResolver) ns).refreshMappingCache();
         }
-    }
-
-    //TODO REMOVE WHEN Query wil be a service!!!
-    private void fireQueryEvent(Object src, ProjectController mediator,
-                                DataMap dataMap, QueryDescriptor query) {
-        mediator.fireEvent(new QueryEvent(src, query, MapEvent.ADD,
-                dataMap));
-        mediator.fireEvent(new QueryDisplayEvent(src, query,
-                dataMap, (DataChannelDescriptor)mediator.getProject().getRootNode()));
     }
 }

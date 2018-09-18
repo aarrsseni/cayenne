@@ -21,20 +21,6 @@ package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
 import org.apache.cayenne.modeler.services.EntitySyncService;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.event.ObjEntityEvent;
-import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
-import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.event.MapEvent;
-import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.dialog.objentity.EntitySyncController;
-import org.apache.cayenne.modeler.services.DbEntityService;
-import org.apache.cayenne.modeler.undo.DbEntitySyncUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.KeyStroke;

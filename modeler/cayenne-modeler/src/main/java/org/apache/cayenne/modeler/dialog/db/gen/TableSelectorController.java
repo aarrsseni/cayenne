@@ -224,7 +224,7 @@ public class TableSelectorController extends CayenneController {
         permanentlyExcludedCount = excludedTables.size();
         selectableTablesList.clear();
         for (DbEntity table : tables) {
-            if (false == excludedTables.containsKey(table.getName())) {
+            if (!excludedTables.containsKey(table.getName())) {
                 selectableTablesList.add(table);
             }
         }

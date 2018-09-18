@@ -29,8 +29,10 @@ import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import java.awt.Font;
 
 public class PKCustomSequenceGeneratorPanel extends PKGeneratorPanel {
 

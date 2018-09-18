@@ -31,6 +31,7 @@ public class AddExcludeColumnAction extends AddPatternParamAction {
 
     public AddExcludeColumnAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         insertableNodeClass = ExcludeColumn.class;
     }
 

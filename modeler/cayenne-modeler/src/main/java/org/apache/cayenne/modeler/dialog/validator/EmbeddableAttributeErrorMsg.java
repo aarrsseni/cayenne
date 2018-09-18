@@ -27,7 +27,7 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.EmbeddableAttributeDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 public class EmbeddableAttributeErrorMsg extends ValidationDisplayHandler {
 

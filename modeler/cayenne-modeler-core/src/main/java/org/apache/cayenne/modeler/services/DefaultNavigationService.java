@@ -21,7 +21,16 @@ package org.apache.cayenne.modeler.services;
 import com.google.inject.Inject;
 import org.apache.cayenne.modeler.ControllerState;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
+import org.apache.cayenne.modeler.event.DataNodeDisplayEvent;
+import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.DisplayEvent;
+import org.apache.cayenne.modeler.event.DomainDisplayEvent;
+import org.apache.cayenne.modeler.event.EmbeddableDisplayEvent;
+import org.apache.cayenne.modeler.event.EntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
+import org.apache.cayenne.modeler.event.ProcedureDisplayEvent;
+import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 
 /**
  * @since 4.1

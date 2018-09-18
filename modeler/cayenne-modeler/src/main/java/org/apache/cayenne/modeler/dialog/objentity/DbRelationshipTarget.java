@@ -28,12 +28,19 @@ import javax.swing.WindowConstants;
 
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.CellRenderers;
 import org.apache.cayenne.modeler.util.Comparators;
 
-public class DbRelationshipTarget extends CayenneController {
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DbRelationshipTarget extends CayenneController{
 
     private DbEntity source1;
     private DbEntity source2;
@@ -48,7 +55,7 @@ public class DbRelationshipTarget extends CayenneController {
     protected boolean savePressed;
 
     public DbRelationshipTarget(ProjectController mediator, DbEntity source1, DbEntity source2) {
-        super(mediator);
+        super(Application.getInstance().getFrameController());
         view = new DbRelationshipTargetView(source1, source2);
         initController();
         view.getSource1Button().setSelected(true);
@@ -60,6 +67,8 @@ public class DbRelationshipTarget extends CayenneController {
 
         EntityResolver resolver = mediator.getEntityResolver();
         this.relTargets = new ArrayList<>(resolver.getDbEntities());
+        relTargets.sort(Comparators.getNamedObjectComparator());
+        this.relTargets = new ArrayList<>(source1.getDataMap().getDbEntities());
         relTargets.sort(Comparators.getNamedObjectComparator());
 
         DbEntity[] dbEntities = relTargets.toArray(new DbEntity[0]);

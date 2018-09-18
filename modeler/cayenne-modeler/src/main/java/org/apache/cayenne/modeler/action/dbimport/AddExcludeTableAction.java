@@ -31,6 +31,7 @@ public class AddExcludeTableAction extends AddPatternParamAction {
 
     public AddExcludeTableAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         insertableNodeClass = ExcludeTable.class;
     }
 

@@ -19,7 +19,11 @@
 
 package org.apache.cayenne.modeler.editor.dbimport;
 
-import org.apache.cayenne.dbsync.reverse.dbimport.*;
+import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
+import org.apache.cayenne.dbsync.reverse.dbimport.IncludeProcedure;
+import org.apache.cayenne.dbsync.reverse.dbimport.IncludeTable;
+import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
+import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
 import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
 import org.apache.cayenne.dbsync.reverse.dbimport.IncludeColumn;
 import org.apache.cayenne.dbsync.reverse.dbimport.IncludeProcedure;

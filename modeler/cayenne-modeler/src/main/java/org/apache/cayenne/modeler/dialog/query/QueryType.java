@@ -18,10 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.query;
 
-import java.awt.Component;
-
-import javax.swing.WindowConstants;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.QueryEvent;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
@@ -34,6 +30,10 @@ import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.undo.CreateQueryUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneController;
 
+import javax.swing.WindowConstants;
+import java.awt.Component;
+
+
 public class QueryType extends CayenneController{
 
     protected ProjectController projectController;
@@ -44,7 +44,7 @@ public class QueryType extends CayenneController{
     protected String type;
 
     public QueryType(ProjectController projectController, DataMap root) {
-        super();
+        super(Application.getInstance().getFrameController());
 
         view = new QueryTypeView();
         initController();

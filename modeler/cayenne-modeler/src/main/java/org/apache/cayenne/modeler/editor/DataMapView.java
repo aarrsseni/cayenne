@@ -29,8 +29,6 @@ import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.datamap.*;
-import org.apache.cayenne.modeler.event.DataMapDisplayEvent;
-import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.services.DataMapService;
 import org.apache.cayenne.modeler.util.CellRenderers;
@@ -42,12 +40,14 @@ import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
 import java.util.Arrays;
 
 /**

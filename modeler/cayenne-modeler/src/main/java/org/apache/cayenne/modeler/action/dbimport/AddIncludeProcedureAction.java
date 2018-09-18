@@ -31,6 +31,7 @@ public class AddIncludeProcedureAction extends AddPatternParamAction {
 
     public AddIncludeProcedureAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         insertableNodeClass = IncludeProcedure.class;
     }
 

@@ -18,32 +18,23 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.editor.datanode;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.configuration.PasswordEncoding;
 import org.apache.cayenne.conn.DataSourceInfo;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.util.JTextFieldUndoable;
 
-import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.*;
+import java.awt.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class PasswordEncoderView extends JPanel {
 
-    protected JComboBox passwordEncoder;
-    protected JComboBox passwordLocation;
+    protected JComboBox<String> passwordEncoder;
+    protected JComboBox<String> passwordLocation;
     protected JTextField passwordKey;
     protected JTextField passwordSource;
     protected JLabel passwordSourceLabel;
@@ -53,7 +44,7 @@ public class PasswordEncoderView extends JPanel {
     private static final String PASSWORD_MODEL = "Cayenne Model";
     private static final String PASSWORD_URL = "URL (file:, http:, etc)";
 
-    private static final Object[] PASSWORD_LOCATIONS = new Object[] {
+    private static final String[] PASSWORD_LOCATIONS = new String[] {
             DataSourceInfo.PASSWORD_LOCATION_MODEL,
             DataSourceInfo.PASSWORD_LOCATION_CLASSPATH,
             DataSourceInfo.PASSWORD_LOCATION_EXECUTABLE,
@@ -98,14 +89,14 @@ public class PasswordEncoderView extends JPanel {
         this.passwordKey = new JTextFieldUndoable();
 
         // init combo box choices
-        passwordEncoder.setModel(new DefaultComboBoxModel(
+        passwordEncoder.setModel(new DefaultComboBoxModel<>(
                 PasswordEncoding.standardEncoders));
         passwordEncoder.setEditable(true);
 
         passwordLocation = Application.getWidgetFactory().createUndoableComboBox();
         passwordLocation.setRenderer(new PasswordLocationRenderer());
 
-        DefaultComboBoxModel passwordLocationModel = new DefaultComboBoxModel(
+        DefaultComboBoxModel<String> passwordLocationModel = new DefaultComboBoxModel<>(
                 PASSWORD_LOCATIONS);
 
         passwordLocation.setModel(passwordLocationModel);
@@ -154,7 +145,7 @@ public class PasswordEncoderView extends JPanel {
     /**
      * @return the passwordLocation
      */
-    public JComboBox getPasswordLocation() {
+    public JComboBox<String> getPasswordLocation() {
         return passwordLocation;
     }
 

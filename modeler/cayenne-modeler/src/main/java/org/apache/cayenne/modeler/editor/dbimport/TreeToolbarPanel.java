@@ -19,7 +19,15 @@
 
 package org.apache.cayenne.modeler.editor.dbimport;
 
-import org.apache.cayenne.dbsync.reverse.dbimport.*;
+import org.apache.cayenne.dbsync.reverse.dbimport.Catalog;
+import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeColumn;
+import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeProcedure;
+import org.apache.cayenne.dbsync.reverse.dbimport.ExcludeTable;
+import org.apache.cayenne.dbsync.reverse.dbimport.IncludeColumn;
+import org.apache.cayenne.dbsync.reverse.dbimport.IncludeProcedure;
+import org.apache.cayenne.dbsync.reverse.dbimport.IncludeTable;
+import org.apache.cayenne.dbsync.reverse.dbimport.ReverseEngineering;
+import org.apache.cayenne.dbsync.reverse.dbimport.Schema;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.action.GetDbConnectionAction;
@@ -39,7 +47,8 @@ import org.apache.cayenne.modeler.action.GetDbConnectionAction;
 import org.apache.cayenne.modeler.action.dbimport.*;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,10 +93,7 @@ class TreeToolbarPanel extends JToolBar {
 
     private boolean isLabelSelected() {
         DbImportTreeNode selectedNode = reverseEngineeringTree.getSelectedNode();
-        if (selectedNode.getUserObject().getClass() == String.class) {
-            return true;
-        }
-        return false;
+        return selectedNode.getUserObject().getClass() == String.class;
     }
 
     void lockButtons() {

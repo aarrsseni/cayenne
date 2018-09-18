@@ -31,6 +31,7 @@ public class AddIncludeColumnAction extends AddPatternParamAction {
 
     public AddIncludeColumnAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         insertableNodeClass = IncludeColumn.class;
     }
 

@@ -22,7 +22,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.ProcessUpgradesEvent;
 import org.apache.cayenne.modeler.event.listener.ProcessUpgradesListener;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 /**
  * @since 4.1

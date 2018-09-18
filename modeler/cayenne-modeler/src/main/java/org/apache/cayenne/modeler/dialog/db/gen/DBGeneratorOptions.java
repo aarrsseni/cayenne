@@ -23,6 +23,7 @@ import org.apache.cayenne.access.DbGenerator;
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.log.NoopJdbcEventLogger;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ValidationResultBrowser;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
@@ -35,10 +36,13 @@ import org.apache.cayenne.swing.BindingBuilder;
 import org.apache.cayenne.swing.ObjectBinding;
 import org.apache.cayenne.validation.ValidationResult;
 
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.Component;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -69,7 +73,7 @@ public class DBGeneratorOptions extends CayenneController {
     protected DbService dbService;
 
     public DBGeneratorOptions(ProjectController projectController, String title, Collection<DataMap> dataMaps) {
-        super();
+        super(Application.getInstance().getFrameController());
 
         this.projectController = projectController;
 

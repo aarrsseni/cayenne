@@ -23,7 +23,7 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.ObjEntityAttributePanel;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityAttributePanel;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 public class CopyAttributeRelationshipAction extends CopyAction implements MultipleObjectsAction {
 

@@ -87,9 +87,7 @@ public class DefaultProjectService implements ProjectService {
         List<File> arr = ModelerPreferences.getLastProjFiles();
         // Add proj path to the preferences
         // Prevent duplicate entries.
-        if (arr.contains(file)) {
-            arr.remove(file);
-        }
+        arr.remove(file);
 
         arr.add(0, file);
         while (arr.size() > ModelerPreferences.LAST_PROJ_FILES_SIZE) {

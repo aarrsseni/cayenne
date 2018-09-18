@@ -21,7 +21,8 @@ package org.apache.cayenne.modeler.dialog;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import java.util.prefs.Preferences;
 
 /**

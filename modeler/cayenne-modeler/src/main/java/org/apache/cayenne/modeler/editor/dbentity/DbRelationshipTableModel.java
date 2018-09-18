@@ -30,7 +30,7 @@ import org.apache.cayenne.modeler.util.CayenneTableModel;
 import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import java.util.ArrayList;
 import java.util.Collection;
 

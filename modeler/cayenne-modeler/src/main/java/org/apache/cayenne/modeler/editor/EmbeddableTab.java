@@ -20,15 +20,6 @@ package org.apache.cayenne.modeler.editor;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import java.awt.BorderLayout;
-import java.util.Collection;
-import java.util.Iterator;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.ObjAttributeEvent;
 import org.apache.cayenne.map.DataMap;
@@ -49,8 +40,11 @@ import org.apache.cayenne.project.extension.info.ObjectInfo;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import java.awt.BorderLayout;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -160,20 +154,18 @@ public class EmbeddableTab extends JPanel implements EmbeddableDisplayListener {
                         .iterator();
 
                 while (ent.hasNext()) {
-                    
+
                     Collection<ObjAttribute> attr = ent.next().getAttributes();
-                    Iterator<ObjAttribute> attrIt = attr.iterator();
-                    
-                    while (attrIt.hasNext()) {
-                        ObjAttribute atribute = attrIt.next();
-                        if (atribute.getType()==null || atribute.getType().equals(oldName)) {
+
+                    for (ObjAttribute atribute : attr) {
+                        if (atribute.getType() == null || atribute.getType().equals(oldName)) {
                             atribute.setType(newClassName);
                             ObjAttributeEvent ev = new ObjAttributeEvent(this, atribute, atribute
                                     .getEntity());
                             mediator.fireEvent(ev);
                         }
                     }
-                    
+
                 }
             }
 

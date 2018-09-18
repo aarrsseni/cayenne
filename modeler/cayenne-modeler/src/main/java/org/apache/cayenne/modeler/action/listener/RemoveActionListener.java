@@ -20,13 +20,56 @@ package org.apache.cayenne.modeler.action.listener;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.Embeddable;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.Procedure;
+import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.CayenneModelerController;
-import org.apache.cayenne.modeler.event.*;
-import org.apache.cayenne.modeler.event.listener.*;
-import org.apache.cayenne.modeler.services.*;
-import org.apache.cayenne.modeler.undo.*;
+import org.apache.cayenne.modeler.event.RemoveCallbackMethodEvent;
+import org.apache.cayenne.modeler.event.RemoveDataMapEvent;
+import org.apache.cayenne.modeler.event.RemoveDataMapFromDataNodeEvent;
+import org.apache.cayenne.modeler.event.RemoveDataNodeEvent;
+import org.apache.cayenne.modeler.event.RemoveDbAttributesEvent;
+import org.apache.cayenne.modeler.event.RemoveDbEntityEvent;
+import org.apache.cayenne.modeler.event.RemoveDbRelationshipsEvent;
+import org.apache.cayenne.modeler.event.RemoveEmbeddableAttributeEvent;
+import org.apache.cayenne.modeler.event.RemoveEmbeddableEvent;
+import org.apache.cayenne.modeler.event.RemoveObjAttributesEvent;
+import org.apache.cayenne.modeler.event.RemoveObjEntityEvent;
+import org.apache.cayenne.modeler.event.RemoveObjRelationshipsEvent;
+import org.apache.cayenne.modeler.event.RemovePathsEvent;
+import org.apache.cayenne.modeler.event.RemoveProcedureEvent;
+import org.apache.cayenne.modeler.event.RemoveQueryEvent;
+import org.apache.cayenne.modeler.event.listener.RemoveCallbackMethodListener;
+import org.apache.cayenne.modeler.event.listener.RemoveDataMapFromDataNodeListener;
+import org.apache.cayenne.modeler.event.listener.RemoveDataMapListener;
+import org.apache.cayenne.modeler.event.listener.RemoveDataNodeListener;
+import org.apache.cayenne.modeler.event.listener.RemoveDbAttributesListener;
+import org.apache.cayenne.modeler.event.listener.RemoveDbEntityListener;
+import org.apache.cayenne.modeler.event.listener.RemoveDbRelationshipsListener;
+import org.apache.cayenne.modeler.event.listener.RemoveEmbeddableAttributeListener;
+import org.apache.cayenne.modeler.event.listener.RemoveEmbeddableListener;
+import org.apache.cayenne.modeler.event.listener.RemoveObjAttributesListener;
+import org.apache.cayenne.modeler.event.listener.RemoveObjEntityListener;
+import org.apache.cayenne.modeler.event.listener.RemoveObjRelationshipsListener;
+import org.apache.cayenne.modeler.event.listener.RemovePathsListener;
+import org.apache.cayenne.modeler.event.listener.RemoveProcedureListener;
+import org.apache.cayenne.modeler.event.listener.RemoveQueryListener;
+import org.apache.cayenne.modeler.services.DataMapService;
+import org.apache.cayenne.modeler.services.DbEntityService;
+import org.apache.cayenne.modeler.services.EmbeddableService;
+import org.apache.cayenne.modeler.services.NodeService;
+import org.apache.cayenne.modeler.services.ObjEntityService;
+import org.apache.cayenne.modeler.services.ProcedureService;
+import org.apache.cayenne.modeler.services.QueryService;
+import org.apache.cayenne.modeler.undo.RemoveAttributeUndoableEdit;
+import org.apache.cayenne.modeler.undo.RemoveCallbackMethodUndoableEdit;
+import org.apache.cayenne.modeler.undo.RemoveCompoundUndoableEdit;
+import org.apache.cayenne.modeler.undo.RemoveRelationshipUndoableEdit;
+import org.apache.cayenne.modeler.undo.RemoveUndoableEdit;
 
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoableEdit;
@@ -115,7 +158,7 @@ public class RemoveActionListener implements RemoveObjEntityListener, RemoveDbEn
         UndoableEdit undo = null;
 
         if (object instanceof DataMap) {
-            if (parentObject != null && parentObject instanceof DataNodeDescriptor) {
+            if (parentObject instanceof DataNodeDescriptor) {
                 undo = new RemoveUndoableEdit(Application.getInstance(), (DataNodeDescriptor) parentObject, (DataMap) object);
                 cayenneModelerController.getProjectController().getBootiqueInjector()
                         .getInstance(DataMapService.class).removeDataMapFromDataNode((DataNodeDescriptor) parentObject, (DataMap) object);

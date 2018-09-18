@@ -35,7 +35,7 @@ import java.awt.FlowLayout;
 public class DataSourceCreatorView extends JDialog {
 
     protected JTextField dataSourceName;
-    protected JComboBox adapters;
+    protected JComboBox<String> adapters;
     protected JButton okButton;
     protected JButton cancelButton;
 
@@ -43,7 +43,7 @@ public class DataSourceCreatorView extends JDialog {
         super(owner);
         
         this.dataSourceName = new JTextField();
-        this.adapters = new JComboBox();
+        this.adapters = new JComboBox<>();
         this.okButton = new JButton("Create");
         this.cancelButton = new JButton("Cancel");
 
@@ -70,7 +70,7 @@ public class DataSourceCreatorView extends JDialog {
         setTitle("Create New Local DataSource");
     }
 
-    public JComboBox getAdapters() {
+    public JComboBox<String> getAdapters() {
         return adapters;
     }
 

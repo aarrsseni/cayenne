@@ -25,8 +25,11 @@ import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.DbAdapterInfo;
 import org.apache.cayenne.swing.BindingBuilder;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import java.awt.Component;
 import java.util.Map;
 
 /**
@@ -45,7 +48,7 @@ public class DataSourceCreator extends CayenneController {
                 .getWindowAncestor(parent.getView()));
         this.dataSources = parent.getDataSources();
 
-        DefaultComboBoxModel model = new DefaultComboBoxModel(DbAdapterInfo
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(DbAdapterInfo
                 .getStandardAdapters());
         model.insertElementAt(NO_ADAPTER, 0);
         this.view.getAdapters().setModel(model);

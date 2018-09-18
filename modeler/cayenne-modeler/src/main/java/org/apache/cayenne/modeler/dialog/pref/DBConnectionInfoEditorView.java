@@ -19,18 +19,13 @@
 
 package org.apache.cayenne.modeler.dialog.pref;
 
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * A generic panel for entering DataSource information.
@@ -38,7 +33,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class DBConnectionInfoEditorView extends JPanel {
 
-    protected JComboBox adapters;
+    protected JComboBox<String> adapters;
     protected JTextField driver;
     protected JTextField url;
     protected JTextField userName;
@@ -49,7 +44,7 @@ public class DBConnectionInfoEditorView extends JPanel {
     protected DefaultFormBuilder builder;
 
     public DBConnectionInfoEditorView() {
-        adapters = new JComboBox();
+        adapters = new JComboBox<>();
         adapters.setEditable(true);
 
         driver = new JTextField();
@@ -73,7 +68,7 @@ public class DBConnectionInfoEditorView extends JPanel {
         this.add(builder.getPanel(), BorderLayout.CENTER);
     }
 
-    public JComboBox getAdapters() {
+    public JComboBox<String> getAdapters() {
         return adapters;
     }
 

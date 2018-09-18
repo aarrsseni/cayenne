@@ -27,7 +27,8 @@ import org.apache.cayenne.modeler.CayenneModelerFrame;
 import org.apache.cayenne.modeler.editor.EditorView;
 import org.apache.cayenne.query.SQLTemplate;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JTabbedPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;

@@ -39,6 +39,7 @@ public class EditNodeAction extends TreeManipulationAction {
 
     public EditNodeAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
     }
 
     public String getIconName() {

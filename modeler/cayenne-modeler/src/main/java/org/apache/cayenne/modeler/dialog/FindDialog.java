@@ -25,8 +25,6 @@ import org.apache.cayenne.modeler.util.CayenneController;
 import javax.swing.JDialog;
 import javax.swing.JTable;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

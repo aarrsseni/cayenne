@@ -21,34 +21,21 @@ package org.apache.cayenne.modeler.editor;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Insets;
-import java.util.Arrays;
-import java.util.EventObject;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.exp.Expression;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.action.*;
+import org.apache.cayenne.modeler.action.ActionManager;
+import org.apache.cayenne.modeler.action.CreateAttributeAction;
+import org.apache.cayenne.modeler.action.CreateRelationshipAction;
+import org.apache.cayenne.modeler.action.ObjEntityCounterpartAction;
+import org.apache.cayenne.modeler.action.ObjEntitySyncAction;
 import org.apache.cayenne.modeler.dialog.objentity.ClassNameUpdater;
 import org.apache.cayenne.modeler.dialog.validator.DuplicatedAttributesDialog;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
@@ -65,12 +52,20 @@ import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Insets;
 import java.util.Arrays;
 import java.util.EventObject;
 import java.util.LinkedList;
@@ -238,12 +233,11 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
             ObjEntity entity = mediator.getCurrentState().getObjEntity();
             DbEntity dbEntity = (DbEntity) dbEntityCombo.getSelectedItem();
 
-
                 if (dbEntity != entity.getDbEntity()) {
                     entity.setDbEntity(dbEntity);
                     mediator.fireEvent(new ObjEntityEvent(this, entity));
                 }
-            }
+
         });
 
         superEntityCombo.addActionListener(e -> {
@@ -303,7 +297,7 @@ public class ObjEntityTab extends JPanel implements ObjEntityDisplayListener, Ex
                     mediator.fireEvent(new ObjEntityEvent(this, entity));
                     mediator.fireEvent(new ObjEntityDisplayEvent(this, entity, map, domain));
                 }
-            }
+
         });
 
         tableLabel.addActionListener(e -> {

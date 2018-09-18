@@ -31,7 +31,6 @@ import org.apache.cayenne.modeler.event.CreateDbEntityEvent;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @since 4.1
@@ -95,13 +94,7 @@ public class DefaultDbEntityService implements DbEntityService{
 
     @Override
     public void filterInheritedEntities(Collection<ObjEntity> entities) {
-        // entities.removeIf(c -> c.getSuperEntity() != null);
-        Iterator<ObjEntity> it = entities.iterator();
-        while(it.hasNext()) {
-            if(it.next().getSuperEntity() != null) {
-                it.remove();
-            }
-        }
+        entities.removeIf(objEntity -> objEntity.getSuperEntity() != null);
     }
 }
 

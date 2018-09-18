@@ -164,26 +164,34 @@ public class PasswordEncoderEditor extends CayenneController {
 
         String selectedItem = (String) view.getPasswordLocation().getSelectedItem();
 
-        if (selectedItem.equals(DataSourceInfo.PASSWORD_LOCATION_CLASSPATH))
-            updatePasswordElements(
-                    true,
-                    true,
-                    dsi.getPassword(),
-                    "Password Filename:",
-                    dsi.getPasswordSourceFilename());
-        else if (selectedItem.equals(DataSourceInfo.PASSWORD_LOCATION_EXECUTABLE))
-            updatePasswordElements(false, true, null, "Password Executable:", dsi
-                    .getPasswordSourceExecutable());
-        else if (selectedItem.equals(DataSourceInfo.PASSWORD_LOCATION_MODEL))
-            updatePasswordElements(
-                    true,
-                    false,
-                    dsi.getPassword(),
-                    "Password Source:",
-                    dsi.getPasswordSourceModel());
-        else if (selectedItem.equals(DataSourceInfo.PASSWORD_LOCATION_URL))
-            updatePasswordElements(false, true, null, "Password URL:", dsi
-                    .getPasswordSourceUrl());
+        if (selectedItem != null) {
+            switch (selectedItem) {
+                case DataSourceInfo.PASSWORD_LOCATION_CLASSPATH:
+                    updatePasswordElements(
+                            true,
+                            true,
+                            dsi.getPassword(),
+                            "Password Filename:",
+                            dsi.getPasswordSourceFilename());
+                    break;
+                case DataSourceInfo.PASSWORD_LOCATION_EXECUTABLE:
+                    updatePasswordElements(false, true, null, "Password Executable:", dsi
+                            .getPasswordSourceExecutable());
+                    break;
+                case DataSourceInfo.PASSWORD_LOCATION_MODEL:
+                    updatePasswordElements(
+                            true,
+                            false,
+                            dsi.getPassword(),
+                            "Password Source:",
+                            dsi.getPasswordSourceModel());
+                    break;
+                case DataSourceInfo.PASSWORD_LOCATION_URL:
+                    updatePasswordElements(false, true, null, "Password URL:", dsi
+                            .getPasswordSourceUrl());
+                    break;
+            }
+        }
     }
 
     public Component getView() {

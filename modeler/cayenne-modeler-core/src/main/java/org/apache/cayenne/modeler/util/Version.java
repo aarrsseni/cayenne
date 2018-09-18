@@ -70,15 +70,7 @@ public class Version implements Comparable<Object> {
             }
         }
 
-        if (versionParts.length < otherVersion.length) {
-            return -1;
-        }
-        else if (versionParts.length > otherVersion.length) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
+        return Integer.compare(versionParts.length, otherVersion.length);
     }
 
     public String getVersionString() {

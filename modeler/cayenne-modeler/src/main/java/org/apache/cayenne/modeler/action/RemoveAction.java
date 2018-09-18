@@ -23,14 +23,22 @@ import com.google.inject.Inject;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.Attribute;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.Embeddable;
+import org.apache.cayenne.map.EmbeddableAttribute;
+import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.map.Procedure;
+import org.apache.cayenne.map.ProcedureParameter;
+import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
 import org.apache.cayenne.modeler.services.RemoveService;
 import org.apache.cayenne.modeler.services.util.RemoveServiceStatus;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 

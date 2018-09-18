@@ -22,8 +22,8 @@ import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -38,8 +38,6 @@ public class RedoAction extends CayenneAction {
         super.setEnabled(b);
     }
 
-    
-
     @Override
     public boolean isAlwaysOn() {
         return false;
@@ -51,7 +49,7 @@ public class RedoAction extends CayenneAction {
     
     public RedoAction() {
         super(getActionName());
-        setEnabled(true);
+        setEnabled(false);
     }
     
     @Override

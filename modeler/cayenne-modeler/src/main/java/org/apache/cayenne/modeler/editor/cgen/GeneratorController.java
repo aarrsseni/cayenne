@@ -37,10 +37,10 @@ import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.pref.GeneralPreferences;
+import org.apache.cayenne.modeler.pref.BaseFileChooser;
 import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.pref.FSPath;
 import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
-import org.apache.cayenne.modeler.pref.BaseFileChooser;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.CodeValidationUtil;
 import org.apache.cayenne.modeler.util.TextAdapter;
@@ -364,35 +364,17 @@ public abstract class GeneratorController extends CayenneController {
      * Returns a predicate for default entity selection in a given mode.
      */
     Predicate getDefaultClassFilter() {
-        final ObjEntity selectedEntity = Application.getInstance().getFrameController().getProjectController()
-                .getCurrentState().getObjEntity();
+        return object -> {
+            if (object instanceof ObjEntity) {
+                return getParentController().getProblem(((ObjEntity) object).getName()) == null;
+            }
 
-        final Embeddable selectedEmbeddable = Application.getInstance().getFrameController().getProjectController()
-                .getCurrentState()
-                .getEmbeddable();
+            if (object instanceof Embeddable) {
+                return getParentController().getProblem(((Embeddable) object).getClassName()) == null;
+            }
 
-        if (selectedEntity != null) {
-            // select a single entity
-            final boolean hasProblem = getParentController().getProblem(selectedEntity.getName()) != null;
-            return object -> !hasProblem && object == selectedEntity;
-        } else if (selectedEmbeddable != null) {
-            // select a single embeddable
-            final boolean hasProblem = getParentController().getProblem(selectedEmbeddable.getClassName()) != null;
-            return object -> !hasProblem && object == selectedEmbeddable;
-        } else {
-            // select all entities
-            return object -> {
-                if (object instanceof ObjEntity) {
-                    return getParentController().getProblem(((ObjEntity) object).getName()) == null;
-                }
-
-                if (object instanceof Embeddable) {
-                    return getParentController().getProblem(((Embeddable) object).getClassName()) == null;
-                }
-
-                return false;
-            };
-        }
+            return false;
+        };
     }
 
     /**
@@ -406,8 +388,6 @@ public abstract class GeneratorController extends CayenneController {
         String currentDir = outputFolder.getComponent().getText();
 
         JFileChooser chooser = new JFileChooser();
-        BaseFileChooser baseFileChooser = new JFileChooserAdapter(chooser);
-
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
@@ -416,6 +396,7 @@ public abstract class GeneratorController extends CayenneController {
             chooser.setCurrentDirectory(new File(currentDir));
         } else {
             FSPath lastDir = Application.getInstance().getFrameController().getLastDirectory();
+            BaseFileChooser baseFileChooser = new JFileChooserAdapter(chooser);
             lastDir.updateChooser(baseFileChooser);
         }
 

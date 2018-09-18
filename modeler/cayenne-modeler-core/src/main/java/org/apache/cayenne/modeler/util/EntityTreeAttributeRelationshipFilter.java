@@ -26,10 +26,7 @@ import org.apache.cayenne.map.Relationship;
 public class EntityTreeAttributeRelationshipFilter implements EntityTreeFilter {
 
     public boolean attributeMatch(Object node, Attribute attr) {
-        if (!(node instanceof Attribute)) {
-            return true;
-        }
-        return false;
+        return !(node instanceof Attribute);
     }
 
     public boolean relationshipMatch(Object node, Relationship rel) {

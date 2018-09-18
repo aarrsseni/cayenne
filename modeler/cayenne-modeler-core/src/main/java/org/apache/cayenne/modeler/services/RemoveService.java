@@ -20,7 +20,15 @@ package org.apache.cayenne.modeler.services;
 
 import com.google.inject.Inject;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.event.*;
+import org.apache.cayenne.modeler.event.RemoveDataMapEvent;
+import org.apache.cayenne.modeler.event.RemoveDataMapFromDataNodeEvent;
+import org.apache.cayenne.modeler.event.RemoveDataNodeEvent;
+import org.apache.cayenne.modeler.event.RemoveDbEntityEvent;
+import org.apache.cayenne.modeler.event.RemoveEmbeddableEvent;
+import org.apache.cayenne.modeler.event.RemoveObjEntityEvent;
+import org.apache.cayenne.modeler.event.RemovePathsEvent;
+import org.apache.cayenne.modeler.event.RemoveProcedureEvent;
+import org.apache.cayenne.modeler.event.RemoveQueryEvent;
 import org.apache.cayenne.modeler.services.util.RemoveServiceStatus;
 
 /**

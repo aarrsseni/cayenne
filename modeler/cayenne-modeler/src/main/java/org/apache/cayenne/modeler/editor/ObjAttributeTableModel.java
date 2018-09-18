@@ -24,18 +24,32 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.event.ObjAttributeEvent;
 import org.apache.cayenne.configuration.event.ObjEntityEvent;
 import org.apache.cayenne.dba.TypesMapping;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.Attribute;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.EmbeddedAttribute;
+import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.editor.wrapper.ObjAttributeWrapper;
 import org.apache.cayenne.modeler.event.ObjAttributeDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
-import org.apache.cayenne.modeler.util.*;
+import org.apache.cayenne.modeler.util.CayenneTable;
+import org.apache.cayenne.modeler.util.CayenneTableModel;
+import org.apache.cayenne.modeler.util.CellEditorForAttributeTable;
+import org.apache.cayenne.modeler.util.ModelerUtil;
+import org.apache.cayenne.modeler.util.ProjectUtil;
 import org.apache.cayenne.project.extension.info.ObjectInfo;
 import org.apache.cayenne.util.Util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Model for the Object Entity attributes and for Obj to DB Attribute Mapping tables.
@@ -65,7 +79,7 @@ public class ObjAttributeTableModel extends CayenneTableModel<ObjAttributeWrappe
         this.dbEntity = entity.getDbEntity();
 
         // order using local comparator
-        Collections.sort(objectList, new AttributeComparator());
+        objectList.sort(new AttributeComparator());
     }
 
     private static List<ObjAttributeWrapper> wrapObjAttributes(Collection<ObjAttribute> attributes) {

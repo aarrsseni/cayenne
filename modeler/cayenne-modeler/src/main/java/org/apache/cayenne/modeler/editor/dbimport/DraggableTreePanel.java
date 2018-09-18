@@ -275,9 +275,8 @@ public class DraggableTreePanel extends JScrollPane {
     public TreeManipulationAction getActionByNodeType(Class nodeType) {
         Class actionClass = actions.get(nodeType);
         if (actionClass != null) {
-            TreeManipulationAction action = (TreeManipulationAction) Application.getInstance().
+            return (TreeManipulationAction) Application.getInstance().
                     getActionManager().getAction(actionClass);
-            return action;
         }
         return null;
     }

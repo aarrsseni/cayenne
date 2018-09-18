@@ -30,7 +30,7 @@ import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.validation.ValidationFailure;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 /**
  * DataDomain validation message.

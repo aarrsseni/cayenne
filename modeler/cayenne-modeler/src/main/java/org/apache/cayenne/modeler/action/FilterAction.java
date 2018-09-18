@@ -23,7 +23,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.datadomain.FilterDialog;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.*;
+import javax.swing.JButton;
 import java.awt.event.ActionEvent;
 
 public class FilterAction extends CayenneAction{

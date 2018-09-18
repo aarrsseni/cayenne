@@ -19,14 +19,96 @@
 
 package org.apache.cayenne.modeler;
 
-import com.google.inject.*;
+import com.google.inject.Binder;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import io.bootique.BQCoreModule;
 import org.apache.cayenne.configuration.ConfigurationNameMapper;
 import org.apache.cayenne.configuration.DefaultConfigurationNameMapper;
 import org.apache.cayenne.di.DIBootstrap;
-import org.apache.cayenne.modeler.action.*;
-import org.apache.cayenne.modeler.action.dbimport.*;
+import org.apache.cayenne.modeler.action.AboutAction;
+import org.apache.cayenne.modeler.action.ActionManager;
+import org.apache.cayenne.modeler.action.CollapseTreeAction;
+import org.apache.cayenne.modeler.action.ConfigurePreferencesAction;
+import org.apache.cayenne.modeler.action.CopyAction;
+import org.apache.cayenne.modeler.action.CopyAttributeAction;
+import org.apache.cayenne.modeler.action.CopyAttributeRelationshipAction;
+import org.apache.cayenne.modeler.action.CopyCallbackMethodAction;
+import org.apache.cayenne.modeler.action.CopyProcedureParameterAction;
+import org.apache.cayenne.modeler.action.CopyRelationshipAction;
+import org.apache.cayenne.modeler.action.CreateAttributeAction;
+import org.apache.cayenne.modeler.action.CreateCallbackMethodAction;
+import org.apache.cayenne.modeler.action.CreateDataMapAction;
+import org.apache.cayenne.modeler.action.CreateDbEntityAction;
+import org.apache.cayenne.modeler.action.CreateEmbeddableAction;
+import org.apache.cayenne.modeler.action.CreateNodeAction;
+import org.apache.cayenne.modeler.action.CreateObjEntityAction;
+import org.apache.cayenne.modeler.action.CreateObjEntityFromDbAction;
+import org.apache.cayenne.modeler.action.CreateProcedureAction;
+import org.apache.cayenne.modeler.action.CreateProcedureParameterAction;
+import org.apache.cayenne.modeler.action.CreateQueryAction;
+import org.apache.cayenne.modeler.action.CreateRelationshipAction;
+import org.apache.cayenne.modeler.action.CutAction;
+import org.apache.cayenne.modeler.action.CutAttributeAction;
+import org.apache.cayenne.modeler.action.CutAttributeRelationshipAction;
+import org.apache.cayenne.modeler.action.CutCallbackMethodAction;
+import org.apache.cayenne.modeler.action.CutProcedureParameterAction;
+import org.apache.cayenne.modeler.action.CutRelationshipAction;
+import org.apache.cayenne.modeler.action.DbEntityCounterpartAction;
+import org.apache.cayenne.modeler.action.DbEntitySyncAction;
+import org.apache.cayenne.modeler.action.DefaultActionManager;
+import org.apache.cayenne.modeler.action.DocumentationAction;
+import org.apache.cayenne.modeler.action.ExitAction;
+import org.apache.cayenne.modeler.action.FilterAction;
+import org.apache.cayenne.modeler.action.FindAction;
+import org.apache.cayenne.modeler.action.GenerateCodeAction;
+import org.apache.cayenne.modeler.action.GenerateDBAction;
+import org.apache.cayenne.modeler.action.GetDbConnectionAction;
+import org.apache.cayenne.modeler.action.ImportDataMapAction;
+import org.apache.cayenne.modeler.action.ImportEOModelAction;
+import org.apache.cayenne.modeler.action.InferRelationshipsAction;
+import org.apache.cayenne.modeler.action.LinkDataMapAction;
+import org.apache.cayenne.modeler.action.LinkDataMapsAction;
+import org.apache.cayenne.modeler.action.LoadDbSchemaAction;
+import org.apache.cayenne.modeler.action.MigrateAction;
+import org.apache.cayenne.modeler.action.NavigateBackwardAction;
+import org.apache.cayenne.modeler.action.NavigateForwardAction;
+import org.apache.cayenne.modeler.action.NewProjectAction;
+import org.apache.cayenne.modeler.action.ObjEntityCounterpartAction;
+import org.apache.cayenne.modeler.action.ObjEntitySyncAction;
+import org.apache.cayenne.modeler.action.OpenProjectAction;
+import org.apache.cayenne.modeler.action.PasteAction;
+import org.apache.cayenne.modeler.action.ProjectAction;
+import org.apache.cayenne.modeler.action.RedoAction;
+import org.apache.cayenne.modeler.action.RemoveAction;
+import org.apache.cayenne.modeler.action.RemoveAttributeAction;
+import org.apache.cayenne.modeler.action.RemoveAttributeRelationshipAction;
+import org.apache.cayenne.modeler.action.RemoveCallbackMethodAction;
+import org.apache.cayenne.modeler.action.RemoveProcedureParameterAction;
+import org.apache.cayenne.modeler.action.RemoveRelationshipAction;
+import org.apache.cayenne.modeler.action.ReverseEngineeringAction;
+import org.apache.cayenne.modeler.action.RevertAction;
+import org.apache.cayenne.modeler.action.SaveAction;
+import org.apache.cayenne.modeler.action.SaveAsAction;
+import org.apache.cayenne.modeler.action.ShowLogConsoleAction;
+import org.apache.cayenne.modeler.action.UndoAction;
+import org.apache.cayenne.modeler.action.ValidateAction;
+import org.apache.cayenne.modeler.action.dbimport.AddCatalogAction;
+import org.apache.cayenne.modeler.action.dbimport.AddExcludeColumnAction;
+import org.apache.cayenne.modeler.action.dbimport.AddExcludeProcedureAction;
+import org.apache.cayenne.modeler.action.dbimport.AddExcludeTableAction;
+import org.apache.cayenne.modeler.action.dbimport.AddIncludeColumnAction;
+import org.apache.cayenne.modeler.action.dbimport.AddIncludeProcedureAction;
+import org.apache.cayenne.modeler.action.dbimport.AddIncludeTableAction;
+import org.apache.cayenne.modeler.action.dbimport.AddSchemaAction;
+import org.apache.cayenne.modeler.action.dbimport.DeleteNodeAction;
+import org.apache.cayenne.modeler.action.dbimport.EditNodeAction;
+import org.apache.cayenne.modeler.action.dbimport.MoveImportNodeAction;
+import org.apache.cayenne.modeler.action.dbimport.MoveInvertNodeAction;
+import org.apache.cayenne.modeler.action.dbimport.ReverseEngineeringToolMenuAction;
 import org.apache.cayenne.modeler.graph.action.ShowGraphEntityAction;
 import org.apache.cayenne.modeler.init.CayenneModelerModule;
 import org.apache.cayenne.modeler.pref.CoreDataSourceFactory;
@@ -35,7 +117,7 @@ import org.apache.cayenne.modeler.pref.DefaultCoreDataSourceFactory;
 import org.apache.cayenne.modeler.pref.DefaultCoreDbAdapterFactory;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.*;
+import javax.swing.Action;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +133,7 @@ public class CayenneModelerUi implements com.google.inject.Module{
         return Multibinder.newSetBinder(binder, type);
     }
 
-    public static void setModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
+    private static void setModuleClass(Binder binder, org.apache.cayenne.di.Module moduleClass) {
         contributeModuleClass(binder).addBinding().to(moduleClass.getClass());
     }
 
@@ -60,7 +142,7 @@ public class CayenneModelerUi implements com.google.inject.Module{
         return Multibinder.newSetBinder(binder, type);
     }
 
-    public static void setActionClass(Binder binder, CayenneAction actionClass) {
+    private static void setActionClass(Binder binder, CayenneAction actionClass) {
         contributeActionClass(binder).addBinding().to(actionClass.getClass());
     }
 

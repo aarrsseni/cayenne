@@ -20,20 +20,19 @@
 
 package org.apache.cayenne.modeler.dialog.pref;
 
-import java.awt.Component;
+import org.apache.cayenne.modeler.util.CayenneController;
+import org.apache.cayenne.swing.BindingBuilder;
+import org.apache.cayenne.swing.ObjectBinding;
+import org.apache.cayenne.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
-
-import javax.swing.DefaultComboBoxModel;
-
-import org.apache.cayenne.modeler.util.CayenneController;
-import org.apache.cayenne.swing.BindingBuilder;
-import org.apache.cayenne.swing.ObjectBinding;
-import org.apache.cayenne.util.Util;
 
 /**
  * A controller for stream encoding picker component.
@@ -75,8 +74,8 @@ public class EncodingSelector extends CayenneController {
         // init static models...
         this.systemEncoding = detectPlatformEncoding();
 
-        Vector allEncodings = supportedEncodings(systemEncoding);
-        view.getEncodingChoices().setModel(new DefaultComboBoxModel(allEncodings));
+        Vector<String> allEncodings = supportedEncodings(systemEncoding);
+        view.getEncodingChoices().setModel(new DefaultComboBoxModel<String>(allEncodings));
         view.getDefaultEncodingLabel().setText("Default (" + systemEncoding + ")");
         view.getDefaultEncoding().setSelected(true);
 
@@ -108,12 +107,12 @@ public class EncodingSelector extends CayenneController {
      * with a default platform charset. See Javadocs for java.nio.charset.Charset for the
      * list of "standard" charsets.
      */
-    protected Vector supportedEncodings(String platformEncoding) {
+    protected Vector<String> supportedEncodings(String platformEncoding) {
         String[] defaultCharsets = new String[] {
                 "US-ASCII", "ISO-8859-1", "UTF-8", "UTF-16BE", "UTF-16LE", "UTF-16"
         };
 
-        Vector charsets = new Vector(Arrays.asList(defaultCharsets));
+        Vector<String> charsets = new Vector<>(Arrays.asList(defaultCharsets));
         if (!charsets.contains(platformEncoding)) {
             charsets.add(platformEncoding);
         }

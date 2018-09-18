@@ -51,7 +51,6 @@ public class CayenneModelerModule implements Module {
         binder.bind(Application.class).toProviderInstance(() -> applicationProvider.get());
         binder.bind(WidgetFactory.class).to(DefaultWidgetFactory.class);
         binder.bind(HandlerFactory.class).to(ExtensionAwareHandlerFactory.class);
-//        binder.bind(DataChannelMetaData.class).to(DefaultDataChannelMetaData.class);
         binder.bind(XMLReader.class).toProviderInstance(new XMLReaderProvider(true)).withoutScope();
 
         ProjectModule.contributeExtensions(binder)

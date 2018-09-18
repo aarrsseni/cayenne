@@ -19,7 +19,11 @@
 package org.apache.cayenne.modeler.services;
 
 import com.google.inject.Inject;
-import org.apache.cayenne.configuration.*;
+import org.apache.cayenne.configuration.ConfigurationNameMapper;
+import org.apache.cayenne.configuration.ConfigurationNode;
+import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.DataMapLoader;
+import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.event.DataMapEvent;
 import org.apache.cayenne.configuration.event.DataNodeEvent;
 import org.apache.cayenne.dbsync.naming.NameBuilder;

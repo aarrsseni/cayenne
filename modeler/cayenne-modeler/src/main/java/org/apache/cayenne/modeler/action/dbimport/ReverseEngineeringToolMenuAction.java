@@ -24,7 +24,7 @@ import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 
 /**

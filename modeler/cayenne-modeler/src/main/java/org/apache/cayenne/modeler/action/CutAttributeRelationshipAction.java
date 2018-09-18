@@ -23,7 +23,7 @@ import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.modeler.editor.ObjEntityAttributePanel;
 import org.apache.cayenne.modeler.editor.dbentity.DbEntityAttributePanel;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.awt.event.ActionEvent;
 
 

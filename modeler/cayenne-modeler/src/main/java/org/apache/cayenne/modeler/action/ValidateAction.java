@@ -26,8 +26,8 @@ import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.project.validation.ProjectValidator;
 import org.apache.cayenne.validation.ValidationResult;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 

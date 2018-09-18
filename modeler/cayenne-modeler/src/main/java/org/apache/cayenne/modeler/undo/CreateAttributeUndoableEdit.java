@@ -19,7 +19,11 @@
 package org.apache.cayenne.modeler.undo;
 
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.modeler.event.DbEntityDisplayEvent;
 import org.apache.cayenne.modeler.event.ObjEntityDisplayEvent;
 import org.apache.cayenne.modeler.services.AttributeService;

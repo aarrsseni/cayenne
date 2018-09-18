@@ -30,8 +30,9 @@ import org.apache.cayenne.modeler.util.FileFilters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -73,7 +74,7 @@ public class ImportDataMapAction extends CayenneAction {
         } catch (Exception ex) {
             logObj.info("Error importing DataMap.", ex);
             JOptionPane.showMessageDialog(Application.getFrame(), "Error reading DataMap: " + ex.getMessage(),
-                    "Can't Open DataMap", JOptionPane.OK_OPTION);
+                    "Can't Open DataMap", JOptionPane.ERROR_MESSAGE);
         }
     }
 

@@ -19,8 +19,8 @@
 
 package org.apache.cayenne.modeler.dialog.pref;
 
-import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
 import org.apache.cayenne.modeler.pref.BaseFileChooser;
+import org.apache.cayenne.modeler.pref.adapter.JFileChooserAdapter;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.FileFilters;
 import org.apache.cayenne.pref.CayennePreferenceEditor;
@@ -31,9 +31,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;

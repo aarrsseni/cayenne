@@ -18,17 +18,16 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.objentity;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.modeler.util.MultiColumnBrowser;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.TreePath;
-
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.modeler.util.MultiColumnBrowser;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Multi-column browser for obj relationships
@@ -109,7 +108,7 @@ public class ObjRelationshipPathBrowser extends MultiColumnBrowser {
             Object selectedNode = panel.getSelectedValue();
 
             // ignore unselected
-            if (selectedNode != null && selectedNode instanceof DbRelationship) {
+            if (selectedNode instanceof DbRelationship) {
                 updateFromModel(selectedNode, columns.indexOf(panel));
             }
         }

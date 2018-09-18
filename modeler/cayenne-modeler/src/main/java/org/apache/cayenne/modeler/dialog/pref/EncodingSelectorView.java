@@ -19,16 +19,11 @@
 
 package org.apache.cayenne.modeler.dialog.pref;
 
-import java.awt.BorderLayout;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A panel for file encoding selection.
@@ -38,13 +33,13 @@ public class EncodingSelectorView extends JPanel {
 
     protected JRadioButton defaultEncoding;
     protected JRadioButton otherEncoding;
-    protected JComboBox encodingChoices;
+    protected JComboBox<String> encodingChoices;
     protected JLabel defaultEncodingLabel;
 
     public EncodingSelectorView() {
         this.defaultEncoding = new JRadioButton();
         this.otherEncoding = new JRadioButton();
-        this.encodingChoices = new JComboBox();
+        this.encodingChoices = new JComboBox<>();
         this.defaultEncodingLabel = new JLabel();
 
         ButtonGroup group = new ButtonGroup();
@@ -69,7 +64,7 @@ public class EncodingSelectorView extends JPanel {
         return defaultEncodingLabel;
     }
 
-    public JComboBox getEncodingChoices() {
+    public JComboBox<String> getEncodingChoices() {
         return encodingChoices;
     }
 

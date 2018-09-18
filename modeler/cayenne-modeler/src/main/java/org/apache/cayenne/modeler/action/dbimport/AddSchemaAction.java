@@ -37,6 +37,7 @@ public class AddSchemaAction extends TreeManipulationAction {
 
     public AddSchemaAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
         insertableNodeClass = Schema.class;
     }
 

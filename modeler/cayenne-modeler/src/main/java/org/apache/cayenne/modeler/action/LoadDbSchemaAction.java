@@ -32,7 +32,7 @@ import org.apache.cayenne.modeler.pref.DataMapDefaults;
 import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
@@ -53,6 +53,7 @@ public class LoadDbSchemaAction extends CayenneAction {
 
     public LoadDbSchemaAction() {
         super(ACTION_NAME);
+        setAlwaysOn(true);
     }
 
     public String getIconName() {
@@ -80,7 +81,7 @@ public class LoadDbSchemaAction extends CayenneAction {
                     if (!connectWizard.startupAction()) {
                         return;
                     }
-                    connectionInfo = connectWizard.getConnectionInfo();
+                    connectionInfo = dbService.getDbConnectionInfo();
                     saveConnectionInfo();
                 } else {
                     connectionInfo = getConnectionInfoFromPreferences();
