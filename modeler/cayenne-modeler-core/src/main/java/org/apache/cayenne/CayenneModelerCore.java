@@ -33,11 +33,13 @@ import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoaderContext;
 import org.apache.cayenne.modeler.services.AttributeService;
 import org.apache.cayenne.modeler.services.CallbackMethodService;
+import org.apache.cayenne.modeler.services.CgenValidationService;
 import org.apache.cayenne.modeler.services.DataMapService;
 import org.apache.cayenne.modeler.services.DbEntityService;
 import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.services.DefaultAttributeService;
 import org.apache.cayenne.modeler.services.DefaultCallbackMethodService;
+import org.apache.cayenne.modeler.services.DefaultCgenValidationService;
 import org.apache.cayenne.modeler.services.DefaultDataMapService;
 import org.apache.cayenne.modeler.services.DefaultDbEntityService;
 import org.apache.cayenne.modeler.services.DefaultDbService;
@@ -123,13 +125,14 @@ public class CayenneModelerCore implements Module{
         binder.bind(CallbackMethodService.class).to(DefaultCallbackMethodService.class);
         binder.bind(QueryService.class).to(DefaultQueryService.class);
         binder.bind(GenerateDbService.class).to(DefaultGenerateDbService.class);
-        binder.bind(GenerateCodeService.class).to(DefaultGenerateCodeService.class);
+        binder.bind(GenerateCodeService.class).to(DefaultGenerateCodeService.class).in(Singleton.class);
         binder.bind(SaveService.class).to(DefaultSaveService.class);
         binder.bind(EOModelService.class).to(DefaultEOModelService.class);
         binder.bind(DbService.class).to(DefaultDbService.class).in(Singleton.class);
         binder.bind(NavigationService.class).to(DefaultNavigationService.class);
         binder.bind(ReverseEngineeringService.class).to(DefaultReverseEngineeringService.class);
         binder.bind(DbLoaderContext.class).in(Singleton.class);
+        binder.bind(CgenValidationService.class).to(DefaultCgenValidationService.class);
 
         contributeModuleClass(binder).addBinding().to(ProjectModule.class);
 

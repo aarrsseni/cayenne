@@ -114,7 +114,9 @@ public class ClassesTabController extends CayenneController {
         else if (selectedCount == getParentController().getClasses().size()) {
             ((CodeGeneratorPane)parent.getView()).getCheckAll().setSelected(true);
         }
-        getParentController().updateSelectedEntities();
+        getParentController()
+                .generateCodeService
+                .updateSelectedEntities(getParentController().classes);
     }
 
     /**
@@ -124,7 +126,9 @@ public class ClassesTabController extends CayenneController {
     public void checkAllAction() {
         if (getParentController().updateSelection(((CodeGeneratorPane)parent.getView()).getCheckAll().isSelected() ? o -> true : o -> false)) {
             tableBinding.updateView();
-            getParentController().updateSelectedEntities();
+            getParentController()
+                    .generateCodeService
+                    .updateSelectedEntities(getParentController().classes);
             if(((CodeGeneratorPane)parent.getView()).getCheckAll().isSelected()) {
                 getParentController().enableGenerateButton(true);
             } else {

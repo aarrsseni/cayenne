@@ -119,7 +119,7 @@ public class CgenTabController extends GeneratorsTabController {
 
     public void showConfig(DataMap dataMap) {
         if (dataMap != null) {
-            projectController.fireDataMapDisplayEvent(new DataMapDisplayEvent(this.getView(), dataMap, dataMap.getDataChannelDescriptor()));
+            projectController.fireEvent(new DataMapDisplayEvent(this.getView(), dataMap, dataMap.getDataChannelDescriptor()));
         }
     }
 }

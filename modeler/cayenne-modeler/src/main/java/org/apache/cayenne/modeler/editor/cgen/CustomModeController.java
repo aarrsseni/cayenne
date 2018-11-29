@@ -24,6 +24,7 @@ import org.apache.cayenne.gen.ClassGenerationAction;
 import org.apache.cayenne.modeler.CodeTemplateManager;
 import org.apache.cayenne.modeler.dialog.cgen.TemplateDialog;
 import org.apache.cayenne.modeler.dialog.pref.PreferenceDialog;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.swing.BindingBuilder;
 
 import javax.swing.DefaultComboBoxModel;
@@ -136,35 +137,35 @@ public class CustomModeController extends GeneratorController {
             }
             initForm(cgenConfiguration);
             if(!getParentController().isInitFromModel()) {
-                getParentController().getProjectController().setDirty(true);
+                getParentController().getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
             }
         });
 
         view.getOverwrite().addActionListener(val -> {
             cgenConfiguration.setOverwrite(view.getOverwrite().isSelected());
             if(!getParentController().isInitFromModel()) {
-                getParentController().getProjectController().setDirty(true);
+                getParentController().getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
             }
         });
 
         view.getCreatePropertyNames().addActionListener(val -> {
             cgenConfiguration.setCreatePropertyNames(view.getCreatePropertyNames().isSelected());
             if(!getParentController().isInitFromModel()) {
-                getParentController().getProjectController().setDirty(true);
+                getParentController().getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
             }
         });
 
         view.getUsePackagePath().addActionListener(val -> {
             cgenConfiguration.setUsePkgPath(view.getUsePackagePath().isSelected());
             if(!getParentController().isInitFromModel()) {
-                getParentController().getProjectController().setDirty(true);
+                getParentController().getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
             }
         });
 
         view.getPkProperties().addActionListener(val -> {
             cgenConfiguration.setCreatePKProperties(view.getPkProperties().isSelected());
             if(!getParentController().isInitFromModel()) {
-                getParentController().getProjectController().setDirty(true);
+                getParentController().getProjectController().fireEvent(new ProjectDirtyEvent(this, true));
             }
         });
     }

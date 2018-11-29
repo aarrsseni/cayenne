@@ -20,10 +20,8 @@
 package org.apache.cayenne.modeler.action;
 
 import com.google.inject.Inject;
-import org.apache.cayenne.modeler.services.GenerateCodeService;
-
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
@@ -33,7 +31,7 @@ import java.awt.event.ActionEvent;
 public class GenerateCodeAction extends CayenneAction {
 
     @Inject
-    public GenerateCodeService generateCodeService;
+    private ProjectController projectController;
 
     public static String getActionName() {
         return "Generate Classes";
@@ -48,6 +46,6 @@ public class GenerateCodeAction extends CayenneAction {
     }
 
     public void performAction(ActionEvent e) {
-        getProjectController().fireDomainDisplayEvent(new DomainDisplayEvent(this, (DataChannelDescriptor) getProjectController().getProject().getRootNode()));
+        projectController.fireEvent(new DomainDisplayEvent(this, (DataChannelDescriptor) projectController.getProject().getRootNode()));
     }
 }

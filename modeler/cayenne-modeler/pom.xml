@@ -62,18 +62,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-cgen</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.cayenne</groupId>
-			<artifactId>cayenne-dbsync</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.apache.cayenne.modeler</groupId>
 			<artifactId>cayenne-wocompat</artifactId>
 			<version>${project.version}</version>

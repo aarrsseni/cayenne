@@ -49,7 +49,7 @@ public class LoadDbSchemaAction extends CayenneAction {
     private DraggableTreePanel draggableTreePanel;
 
     @Inject
-    DbService dbService;
+    private DbService dbService;
 
     public LoadDbSchemaAction() {
         super(ACTION_NAME);
@@ -89,17 +89,17 @@ public class LoadDbSchemaAction extends CayenneAction {
 
                 if (tablePath != null) {
                     ReverseEngineering databaseReverseEngineering = new DatabaseSchemaLoader()
-                            .loadColumns(connectionInfo, getApplication().getClassLoadingService(), tablePath);
+                            .load(dbService, connectionInfo);
                     draggableTreePanel.getSourceTree().updateTableColumns(databaseReverseEngineering);
                 } else {
                     ReverseEngineering databaseReverseEngineering = new DatabaseSchemaLoader()
-                            .load(connectionInfo, getApplication().getClassLoadingService());
+                            .load(dbService, connectionInfo);
                     draggableTreePanel.getSourceTree()
                             .setEnabled(true);
                     draggableTreePanel.getSourceTree()
                             .translateReverseEngineeringToTree(databaseReverseEngineering, true);
                     draggableTreePanel
-                            .bindReverseEngineeringToDatamap(getProjectController().getCurrentDataMap(), databaseReverseEngineering);
+                            .bindReverseEngineeringToDatamap(getProjectController().getCurrentState().getDataMap(), databaseReverseEngineering);
                     ((DbImportModel) draggableTreePanel.getSourceTree().getModel()).reload();
                 }
 

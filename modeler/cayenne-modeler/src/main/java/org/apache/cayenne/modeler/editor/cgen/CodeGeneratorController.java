@@ -22,23 +22,20 @@ package org.apache.cayenne.modeler.editor.cgen;
 import org.apache.cayenne.configuration.event.DataMapEvent;
 import org.apache.cayenne.configuration.event.DataMapListener;
 import org.apache.cayenne.gen.CgenConfiguration;
-import org.apache.cayenne.gen.ClassGenerationAction;
-import org.apache.cayenne.gen.ClientClassGenerationAction;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.event.EmbeddableEvent;
 import org.apache.cayenne.map.event.EmbeddableListener;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.ObjEntityListener;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.modeler.dialog.ErrorDebugDialog;
+import org.apache.cayenne.modeler.action.CgenAction;
 import org.apache.cayenne.modeler.editor.DbImportController;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.swing.BindingBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.swing.JOptionPane;
 import java.awt.Component;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -49,10 +46,6 @@ import java.util.function.Predicate;
  * A controller for the class generator dialog.
  */
 public class CodeGeneratorController extends CodeGeneratorControllerBase implements ObjEntityListener, EmbeddableListener, DataMapListener {
-    /**
-     * Logger to print stack traces
-     */
-    private static Logger logObj = LoggerFactory.getLogger(ErrorDebugDialog.class);
 
     protected CodeGeneratorPane view;
 
@@ -75,7 +68,7 @@ public class CodeGeneratorController extends CodeGeneratorControllerBase impleme
         classesSelectedAction();
         CgenConfiguration cgenConfiguration = createConfiguration();
         GeneratorController modeController = prevGeneratorController.get(dataMap) != null ? prevGeneratorController.get(dataMap) : cgenConfiguration.isClient() ?
-                generatorSelector.getClientGeneratorController() : isDefaultConfig(cgenConfiguration) ?
+                generatorSelector.getClientGeneratorController() : generateCodeService.isDefaultConfig(cgenConfiguration) ?
                 generatorSelector.getStandartController() : generatorSelector.getCustomModeController();
         prevGeneratorController.put(dataMap, modeController);
         generatorSelector.setSelectedController(modeController);
@@ -84,19 +77,10 @@ public class CodeGeneratorController extends CodeGeneratorControllerBase impleme
         validate(modeController);
     }
 
-    private boolean isDefaultConfig(CgenConfiguration cgenConfiguration) {
-        return cgenConfiguration.isMakePairs() && cgenConfiguration.isUsePkgPath() && !cgenConfiguration.isOverwrite() &&
-                !cgenConfiguration.isCreatePKProperties() && !cgenConfiguration.isCreatePropertyNames() &&
-                cgenConfiguration.getOutputPattern().equals("*.java") &&
-                cgenConfiguration.getTemplate().equals(ClassGenerationAction.SUBCLASS_TEMPLATE) &&
-                cgenConfiguration.getSuperTemplate().equals(ClassGenerationAction.SUPERCLASS_TEMPLATE);
-
-    }
-
     private void initListeners(){
-        projectController.addObjEntityListener(this);
-        projectController.addEmbeddableListener(this);
-        projectController.addDataMapListener(this);
+        projectController.getEventController().addListener(ObjEntityListener.class, this);
+        projectController.getEventController().addListener(EmbeddableListener.class, this);
+        projectController.getEventController().addListener(DataMapListener.class, this);
     }
 
     @Override
@@ -131,28 +115,13 @@ public class CodeGeneratorController extends CodeGeneratorControllerBase impleme
 
     public void classesSelectedAction() {
         if(!isInitFromModel()) {
-            getProjectController().setDirty(true);
+            projectController.fireEvent(new ProjectDirtyEvent(this, true));
         }
     }
 
     public void generateAction() {
         CgenConfiguration cgenConfiguration = createConfiguration();
-        ClassGenerationAction generator = cgenConfiguration.isClient() ?
-                new ClientClassGenerationAction(cgenConfiguration) :
-                new ClassGenerationAction(cgenConfiguration);
-
-        try {
-            generator.prepareArtifacts();
-            generator.execute();
-            JOptionPane.showMessageDialog(
-                    this.getView(),
-                    "Class generation finished");
-        } catch (Exception e) {
-            logObj.error("Error generating classes", e);
-            JOptionPane.showMessageDialog(
-                    this.getView(),
-                    "Error generating classes - " + e.getMessage());
-        }
+        Application.getInstance().getActionManager().getAction(CgenAction.class).performAction(cgenConfiguration);
     }
 
     public ConcurrentMap<DataMap, GeneratorController> getPrevGeneratorController() {
@@ -173,35 +142,28 @@ public class CodeGeneratorController extends CodeGeneratorControllerBase impleme
 
     @Override
     public void objEntityRemoved(EntityEvent e) {
-        super.removeFromSelectedEntities((ObjEntity) e.getEntity());
-        DataMap map = e.getEntity().getDataMap();
-        CgenConfiguration cgenConfiguration = projectController.getApplication().getMetaData().get(map, CgenConfiguration.class);
-        if(cgenConfiguration != null) {
-            cgenConfiguration.getEntities().remove(e.getEntity().getName());
-        }
+       generateCodeService.removeEntity((ObjEntity) e.getEntity());
     }
 
     @Override
-    public void embeddableChanged(EmbeddableEvent e, DataMap map) {}
+    public void embeddableChanged(EmbeddableEvent e) {}
 
     @Override
-    public void embeddableAdded(EmbeddableEvent e, DataMap map) {
+    public void embeddableAdded(EmbeddableEvent e) {
         super.addEmbeddable(e.getEmbeddable().getDataMap(), e.getEmbeddable());
     }
 
     @Override
-    public void embeddableRemoved(EmbeddableEvent e, DataMap map) {
-        super.removeFromSelectedEmbeddables(e.getEmbeddable());
-        CgenConfiguration cgenConfiguration = projectController.getApplication().getMetaData().get(map, CgenConfiguration.class);
-        if(cgenConfiguration != null) {
-            cgenConfiguration.getEmbeddables().remove(e.getEmbeddable().getClassName());
-        }
+    public void embeddableRemoved(EmbeddableEvent e) {
+        generateCodeService.removeEmbeddable(e.getEmbeddable());
     }
 
     @Override
     public void dataMapChanged(DataMapEvent e) {
         if(e.getSource() instanceof DbImportController) {
-            CgenConfiguration cgenConfiguration = getCurrentConfiguration();
+            CgenConfiguration cgenConfiguration = projectController
+                    .getGenerateCodeService()
+                    .getCurrentConfiguration();
             if(cgenConfiguration != null) {
                 for(ObjEntity objEntity : e.getDataMap().getObjEntities()) {
                     if(!cgenConfiguration.getExcludeEntityArtifacts().contains(objEntity.getName())) {

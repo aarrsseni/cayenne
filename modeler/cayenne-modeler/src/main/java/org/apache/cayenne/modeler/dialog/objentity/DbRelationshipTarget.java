@@ -18,14 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.objentity;
 
-import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
-import javax.swing.WindowConstants;
-
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.modeler.Application;
@@ -34,6 +26,7 @@ import org.apache.cayenne.modeler.util.CayenneController;
 import org.apache.cayenne.modeler.util.CellRenderers;
 import org.apache.cayenne.modeler.util.Comparators;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 import java.awt.Component;
@@ -61,7 +54,6 @@ public class DbRelationshipTarget extends CayenneController{
         view.getSource1Button().setSelected(true);
         view.getToManyCheckBox().setSelected(false);
         setSource(source1, true);
-        this.mediator = mediator;
         this.source1 = source1;
         this.source2 = source2;
 
@@ -74,7 +66,7 @@ public class DbRelationshipTarget extends CayenneController{
         DbEntity[] dbEntities = relTargets.toArray(new DbEntity[0]);
 
         DefaultComboBoxModel<DbEntity> dbModel = new DefaultComboBoxModel<>(dbEntities);
-        view.targetCombo.setRenderer(CellRenderers.entityListRendererWithIcons(mediator.getCurrentDataMap()));
+        view.targetCombo.setRenderer(CellRenderers.entityListRendererWithIcons(mediator.getCurrentState().getDataMap()));
         view.targetCombo.removeAllItems();
         view.targetCombo.setModel(dbModel);
     }

@@ -48,7 +48,7 @@ public class DbImportTabController extends GeneratorsTabController {
         Application.getInstance().getFrameController().getDbImportController().setGlobalImport(true);
         ReverseEngineeringAction reverseEngineeringAction = Application.getInstance().getActionManager().getAction(ReverseEngineeringAction.class);
         for(DataMap dataMap : dataMaps) {
-            projectController.setCurrentDataMap(dataMap);
+            projectController.getCurrentState().setMap(dataMap);
             reverseEngineeringAction.performAction();
         }
     }
@@ -56,7 +56,7 @@ public class DbImportTabController extends GeneratorsTabController {
     @Override
     public void showConfig(DataMap dataMap) {
         if (dataMap != null) {
-            projectController.fireDataMapDisplayEvent(new DataMapDisplayEvent(this.getView(), dataMap, dataMap.getDataChannelDescriptor()));
+            projectController.fireEvent(new DataMapDisplayEvent(this.getView(), dataMap, dataMap.getDataChannelDescriptor()));
         }
     }
 }

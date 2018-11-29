@@ -59,7 +59,7 @@ final public class LoadDataMapTask extends LongRunningTask {
         } catch (Exception e) {
             processException(e, "Error importing database schema.");
         }
-        ProjectUtil.cleanObjMappings(context.getDataMap());
+           ProjectUtil.cleanObjMappings(context.getDataMap());
     }
 
     private DbImportAction createAction() {

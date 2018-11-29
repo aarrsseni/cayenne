@@ -18,9 +18,50 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.services;
 
+import org.apache.cayenne.gen.CgenConfiguration;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.Embeddable;
+import org.apache.cayenne.map.ObjEntity;
+
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @since 4.1
  */
 public interface GenerateCodeService {
     void generateCode();
+
+    boolean isDefaultConfig(CgenConfiguration cgenConfiguration);
+
+    void updateArtifactGenerationMode(Object classObj, boolean selected);
+
+    CgenConfiguration getCurrentConfiguration();
+
+    void loadEntity(ObjEntity objEntity);
+
+    void loadEmbeddable(String embeddable);
+
+    CgenValidationService getCgenValidationService();
+
+    void initCollections();
+
+    Set<String> getSelectedEntities();
+
+    Set<String> getSelectedEmbeddables();
+
+    Set<String> isDataMapSelected();
+
+    void removeEntity(ObjEntity objEntity);
+
+    void removeEmbeddable(Embeddable embeddable);
+
+    CgenConfiguration getConfiguration(List<Object> classes);
+
+    CgenConfiguration createConfiguration(Path basePath, List<Object> classes);
+
+    void updateSelectedEntities(List<Object> classes);
+
+    List<Object> prepareClasses(DataMap dataMap);
 }

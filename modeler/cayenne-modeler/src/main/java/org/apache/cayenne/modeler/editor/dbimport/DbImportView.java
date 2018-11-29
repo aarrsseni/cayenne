@@ -28,7 +28,9 @@ import org.apache.cayenne.modeler.action.LoadDbSchemaAction;
 import org.apache.cayenne.modeler.action.ReverseEngineeringAction;
 import org.apache.cayenne.modeler.dialog.db.load.DbImportTreeNode;
 import org.apache.cayenne.modeler.dialog.db.load.TransferableNode;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.event.ReverseEngineeringEvent;
+import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
 import org.apache.cayenne.modeler.event.listener.ReverseEngineeringListener;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.ModelerUtil;
@@ -71,12 +73,13 @@ public class DbImportView extends JPanel implements ReverseEngineeringListener {
         this.projectController = projectController;
         initFormElements();
         buildForm();
+        initListeners();
         draggableTreePanel.getSourceTree().repaint();
     }
 
     private void initListeners() {
         projectController.getEventController().addListener(ReverseEngineeringListener.class, this);
-        projectController.getEventController().addDataMapDisplayListener(e -> {
+        projectController.getEventController().addListener(DataMapDisplayListener.class, e -> {
             DataMap map = e.getDataMap();
             treePanel.getReverseEngineeringTree().stopEditing();
             if (map != null) {
@@ -114,23 +117,12 @@ public class DbImportView extends JPanel implements ReverseEngineeringListener {
         JLabel importLabel = new JLabel("Database Import Configuration");
         importLabel.setBorder(new EmptyBorder(0, 5, 0,0));
         reverseEngineeringHeaderBuilder.append(importLabel);
-        reverseEngineeringHeaderBuilder.append("Import Configuration");
-        ReverseEngineeringAction reverseEngineeringAction = Application.getInstance().getActionManager().
-                getAction(ReverseEngineeringAction.class);
-//        reverseEngineeringAction.setView(this);
-        CayenneAction.CayenneToolbarButton reverseEngineeringButton = (CayenneAction.CayenneToolbarButton)
-                reverseEngineeringAction.buildButton(0);
-        reverseEngineeringButton.setShowingText(true);
-        reverseEngineeringButton.setText("Run Import");
-        reverseEngineeringHeaderBuilder.append(reverseEngineeringButton);
         builder.append(reverseEngineeringHeaderBuilder.getPanel());
 
         DefaultFormBuilder databaseHeaderBuilder = new DefaultFormBuilder(headerLayout);
         JLabel schemaLabel = new JLabel("Database Schema");
         schemaLabel.setBorder(new EmptyBorder(0, 5, 0,0));
         databaseHeaderBuilder.append(schemaLabel);
-        LoadDbSchemaAction loadDbSchemaAction = projectController.getApplication().getActionManager().
-        databaseHeaderBuilder.append("Database Schema");
         LoadDbSchemaAction loadDbSchemaAction = Application.getInstance().getActionManager().
                 getAction(LoadDbSchemaAction.class);
         loadDbSchemaAction.setDraggableTreePanel(draggableTreePanel);
@@ -139,9 +131,8 @@ public class DbImportView extends JPanel implements ReverseEngineeringListener {
         loadDbSchemaButton.setText("Refresh DB Schema");
         treeToolbar.add(loadDbSchemaButton);
 
-        ReverseEngineeringAction reverseEngineeringAction = projectController.getApplication().getActionManager().
+        ReverseEngineeringAction reverseEngineeringAction = Application.getInstance().getActionManager().
                 getAction(ReverseEngineeringAction.class);
-        reverseEngineeringAction.setView(this);
         CayenneAction.CayenneToolbarButton reverseEngineeringButton = (CayenneAction.CayenneToolbarButton)
                 reverseEngineeringAction.buildButton(0);
         reverseEngineeringButton.setShowingText(true);
@@ -151,8 +142,6 @@ public class DbImportView extends JPanel implements ReverseEngineeringListener {
         reverseEngineeringButtonPanel.add(reverseEngineeringButton);
         treeToolbar.addSeparator();
         treeToolbar.add(reverseEngineeringButtonPanel);
-        loadDbSchemaButton.setEnabled(true);
-        databaseHeaderBuilder.append(loadDbSchemaButton);
 
         builder.append("");
         builder.append(databaseHeaderBuilder.getPanel());
@@ -230,23 +219,23 @@ public class DbImportView extends JPanel implements ReverseEngineeringListener {
     }
 
     public void initFromModel() {
-        DataMap map = projectController.getCurrentDataMap();
+        DataMap map = projectController.getCurrentState().getDataMap();
         treePanel.getReverseEngineeringTree().stopEditing();
         if (map != null) {
             treeToolbar.unlockButtons();
-            ReverseEngineering reverseEngineering = DbImportView.this.projectController.getApplication()
+            ReverseEngineering reverseEngineering = Application.getInstance()
                     .getMetaData().get(map, ReverseEngineering.class);
             if (reverseEngineering == null) {
                 reverseEngineering = new ReverseEngineering();
-                DbImportView.this.projectController.getApplication().getMetaData().add(map, reverseEngineering);
-                projectController.setDirty(true);
+                Application.getInstance().getMetaData().add(map, reverseEngineering);
+                projectController.fireEvent(new ProjectDirtyEvent(this, true));
             }
             configPanel.fillCheckboxes(reverseEngineering);
             configPanel.initializeTextFields(reverseEngineering);
             treePanel.updateTree();
             DbImportTreeNode root = draggableTreePanel.getSourceTree().getRootNode();
             root.removeAllChildren();
-            draggableTreePanel.updateTree(projectController.getCurrentDataMap());
+            draggableTreePanel.updateTree(projectController.getCurrentState().getDataMap());
             draggableTreePanel.getMoveButton().setEnabled(false);
             draggableTreePanel.getMoveInvertButton().setEnabled(false);
         }

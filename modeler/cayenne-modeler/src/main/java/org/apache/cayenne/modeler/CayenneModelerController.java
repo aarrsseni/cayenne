@@ -22,11 +22,9 @@ package org.apache.cayenne.modeler;
 import org.apache.cayenne.modeler.action.ExitAction;
 import org.apache.cayenne.modeler.action.OpenProjectAction;
 import org.apache.cayenne.modeler.dialog.validator.ValidatorDialog;
+import org.apache.cayenne.modeler.editor.DbImportController;
 import org.apache.cayenne.modeler.editor.EditorView;
 import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
-import org.apache.cayenne.modeler.editor.DbImportController;
-import org.apache.cayenne.modeler.init.platform.PlatformInitializer;
-import org.apache.cayenne.modeler.event.SaveFlagEvent;
 import org.apache.cayenne.modeler.event.RecentFileListEvent;
 import org.apache.cayenne.modeler.pref.ComponentGeometry;
 import org.apache.cayenne.modeler.pref.FSPath;
@@ -71,7 +69,6 @@ public class CayenneModelerController extends CayenneController {
 
 	private DbImportController dbImportController;
 
-    private SaveFlag enableToSave;
     private ProjectDirty enableToSave;
     private ProjectFileChangeTrackerDisplay fileProjectChangeTracker;
     private DomainSelectedChanges domainSelectedChanges;
@@ -90,7 +87,6 @@ public class CayenneModelerController extends CayenneController {
         application.getPlatformInitializer().setupMenus(frame);
 
         initHelpers();
-        this.projectController = new ProjectController(this);
         this.dbImportController = new DbImportController();
 
         this.modelerActionListener = new ModelerActionListener(this);

@@ -21,7 +21,6 @@ package org.apache.cayenne.modeler.event;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.modeler.event.listener.GenerateCodeListener;
 
-import java.util.Collection;
 import java.util.EventListener;
 import java.util.EventObject;
 
@@ -30,7 +29,7 @@ import java.util.EventObject;
  */
 public class GenerateCodeEvent extends EventObject{
 
-    private Collection<DataMap> dataMaps;
+    private DataMap dataMap;
 
     /**
      * Constructs a prototypical Event.
@@ -42,13 +41,13 @@ public class GenerateCodeEvent extends EventObject{
         super(source);
     }
 
-    public GenerateCodeEvent(Object source, Collection<DataMap> dataMaps) {
+    public GenerateCodeEvent(Object source, DataMap dataMap) {
         this(source);
-        this.dataMaps = dataMaps;
+        this.dataMap = dataMap;
     }
 
-    public Collection<DataMap> getDataMaps() {
-        return dataMaps;
+    public DataMap getDataMap() {
+        return dataMap;
     }
 
     public Class<? extends EventListener> getEventListener() {

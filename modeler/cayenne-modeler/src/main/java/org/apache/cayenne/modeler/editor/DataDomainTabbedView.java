@@ -28,14 +28,7 @@ import org.apache.cayenne.modeler.event.GraphDisplayEvent;
 import org.apache.cayenne.modeler.event.listener.DomainDisplayListener;
 import org.apache.cayenne.modeler.graph.DataDomainGraphTab;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import javax.swing.*;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -76,9 +69,6 @@ public class DataDomainTabbedView extends JTabbedPane
         JScrollPane domainView = new JScrollPane(new DataDomainView(mediator));
         addTab("Main", domainView);
 
-        addChangeListener(this);
-        mediator.addDomainDisplayListener(this);
-
         dbImportTabController = new DbImportTabController(mediator);
         dbImportView = new JScrollPane(dbImportTabController.getView());
         addTab("Db Import", dbImportView);
@@ -89,7 +79,9 @@ public class DataDomainTabbedView extends JTabbedPane
 
         graphTab = new DataDomainGraphTab(mediator);
         addTab("Graph", graphTab);
-        mediator.getEventController().addDomainDisplayListener(this);
+
+        addChangeListener(this);
+        mediator.getEventController().addListener(DomainDisplayListener.class, this);
     }
 
     public void stateChanged(ChangeEvent e) {

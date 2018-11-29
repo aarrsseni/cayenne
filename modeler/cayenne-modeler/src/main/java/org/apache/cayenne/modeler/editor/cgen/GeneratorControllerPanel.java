@@ -21,7 +21,9 @@ package org.apache.cayenne.modeler.editor.cgen;
 
 import org.apache.cayenne.gen.CgenConfiguration;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.validation.ValidationException;
 
@@ -46,7 +48,7 @@ public class GeneratorControllerPanel extends JPanel {
             protected void updateModel(String text) throws ValidationException {
                 getCgenByDataMap().setRelPath(text);
                 if(!codeGeneratorControllerBase.isInitFromModel()) {
-                    projectController.setDirty(true);
+                    projectController.fireEvent(new ProjectDirtyEvent(this, true));
                 }
             }
         };
@@ -62,7 +64,7 @@ public class GeneratorControllerPanel extends JPanel {
     }
 
     public CgenConfiguration getCgenByDataMap() {
-        DataMap dataMap = projectController.getCurrentDataMap();
-        return projectController.getApplication().getMetaData().get(dataMap, CgenConfiguration.class);
+        DataMap dataMap = projectController.getCurrentState().getDataMap();
+        return Application.getInstance().getMetaData().get(dataMap, CgenConfiguration.class);
     }
 }

@@ -31,6 +31,7 @@ import org.apache.cayenne.configuration.DefaultConfigurationNameMapper;
 import org.apache.cayenne.di.DIBootstrap;
 import org.apache.cayenne.modeler.action.AboutAction;
 import org.apache.cayenne.modeler.action.ActionManager;
+import org.apache.cayenne.modeler.action.CgenAction;
 import org.apache.cayenne.modeler.action.CollapseTreeAction;
 import org.apache.cayenne.modeler.action.ConfigurePreferencesAction;
 import org.apache.cayenne.modeler.action.CopyAction;
@@ -240,6 +241,7 @@ public class CayenneModelerUi implements com.google.inject.Module{
         setActionClass(binder, new DeleteNodeAction());
         setActionClass(binder, new GetDbConnectionAction());
         setActionClass(binder, new CreateObjEntityFromDbAction());
+        setActionClass(binder, new CgenAction());
     }
 
     @Provides

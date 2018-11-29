@@ -98,11 +98,6 @@ class DbImportNodeHandler {
             if (((DbImportTreeNode) reverseEngineeringTree.getRootNode().getChildAt(i)).
                     getUserObject().getClass() == Catalog.class) {
                 return dbNode.getUserObject().getClass() == Catalog.class;
-                if (dbNode.getUserObject().getClass() == Catalog.class || dbNode.getUserObject().getClass() == IncludeTable.class) {
-                    return true;
-                } else {
-                    return false;
-                }
             }
         }
         return true;

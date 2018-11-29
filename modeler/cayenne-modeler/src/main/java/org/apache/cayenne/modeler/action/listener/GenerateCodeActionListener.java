@@ -19,7 +19,7 @@
 package org.apache.cayenne.modeler.action.listener;
 
 import org.apache.cayenne.modeler.Application;
-import org.apache.cayenne.modeler.dialog.codegen.CodeGeneratorController;
+import org.apache.cayenne.modeler.editor.cgen.CodeGeneratorController;
 import org.apache.cayenne.modeler.event.GenerateCodeEvent;
 import org.apache.cayenne.modeler.event.listener.GenerateCodeListener;
 
@@ -27,8 +27,9 @@ import org.apache.cayenne.modeler.event.listener.GenerateCodeListener;
  * @since 4.1
  */
 public class GenerateCodeActionListener implements GenerateCodeListener{
+    
     @Override
     public void generateCode(GenerateCodeEvent e) {
-        new CodeGeneratorController(Application.getInstance().getFrameController(), e.getDataMaps()).startup();
+        new CodeGeneratorController(Application.getInstance().getFrameController(), Application.getInstance().getFrameController().getProjectController()).startup(e.getDataMap());
     }
 }

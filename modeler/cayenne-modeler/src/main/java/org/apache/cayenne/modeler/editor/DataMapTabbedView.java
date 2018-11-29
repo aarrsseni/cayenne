@@ -24,6 +24,7 @@ import org.apache.cayenne.modeler.editor.cgen.CodeGeneratorController;
 import org.apache.cayenne.modeler.editor.cgen.domain.CgenTab;
 import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.editor.dbimport.domain.DbImportTab;
+import org.apache.cayenne.modeler.event.listener.DataMapDisplayListener;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -71,12 +72,12 @@ public class DataMapTabbedView extends JTabbedPane{
 
         addChangeListener(tab -> {
             if(isCgenTabActive()) {
-                codeGeneratorController.startup(mediator.getCurrentDataMap());
+                codeGeneratorController.startup(mediator.getCurrentState().getDataMap());
             } else if(isDbImportTabActive()) {
                 dbImportView.initFromModel();
             }
         });
-        mediator.addDataMapDisplayListener(e -> {
+        mediator.getEventController().addListener(DataMapDisplayListener.class, e -> {
             if(e.getSource() instanceof CgenTab) {
                 setSelectedComponent(cgenView);
             } else if(e.getSource() instanceof DbImportTab) {

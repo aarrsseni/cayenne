@@ -19,12 +19,12 @@
 
 package org.apache.cayenne.modeler.action.dbimport;
 
+import com.google.inject.Inject;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.event.DomainDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
 
-import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 
 /**
@@ -33,7 +33,9 @@ import java.awt.event.ActionEvent;
 public class ReverseEngineeringToolMenuAction extends CayenneAction {
 
     private static final String ACTION_NAME = "Reengineer Database Schema";
-    private static final String DIALOG_TITLE = "Reverse Engineering";
+
+    @Inject
+    private ProjectController projectController;
 
     public ReverseEngineeringToolMenuAction() {
         super(ACTION_NAME);
@@ -41,6 +43,6 @@ public class ReverseEngineeringToolMenuAction extends CayenneAction {
 
     @Override
     public void performAction(ActionEvent e) {
-        getProjectController().fireDomainDisplayEvent(new DomainDisplayEvent(this, (DataChannelDescriptor) getProjectController().getProject().getRootNode()));
+        projectController.fireEvent(new DomainDisplayEvent(this, (DataChannelDescriptor) projectController.getProject().getRootNode()));
     }
 }

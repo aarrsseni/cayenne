@@ -24,13 +24,19 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.gen.CgenConfiguration;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.event.ProjectDirtyEvent;
 import org.apache.cayenne.modeler.util.ComboBoxAdapter;
 import org.apache.cayenne.modeler.util.TextAdapter;
 import org.apache.cayenne.swing.components.JCayenneCheckBox;
 import org.apache.cayenne.validation.ValidationException;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 
 /**
  * @since 4.1
@@ -58,7 +64,7 @@ public class CustomModePanel extends GeneratorControllerPanel {
                 cgenConfiguration.setSuperTemplate(Application.getInstance().getCodeTemplateManager().getTemplatePath(item,
                         cgenConfiguration.getDataMap().getConfigurationSource()));
                 if(!codeGeneratorControllerBase.isInitFromModel()) {
-                    projectController.setDirty(true);
+                    projectController.fireEvent(new ProjectDirtyEvent(this, true));
                 }
             }
         };
@@ -71,7 +77,7 @@ public class CustomModePanel extends GeneratorControllerPanel {
                 cgenConfiguration.setTemplate(Application.getInstance().getCodeTemplateManager().getTemplatePath(item,
                         cgenConfiguration.getDataMap().getConfigurationSource()));
                 if(!codeGeneratorControllerBase.isInitFromModel()) {
-                    projectController.setDirty(true);
+                    projectController.fireEvent(new ProjectDirtyEvent(this, true));
                 }
             }
         };
@@ -85,7 +91,7 @@ public class CustomModePanel extends GeneratorControllerPanel {
             protected void updateModel(String text) {
                 getCgenByDataMap().setOutputPattern(text);
                 if(!codeGeneratorControllerBase.isInitFromModel()) {
-                    projectController.setDirty(true);
+                    projectController.fireEvent(new ProjectDirtyEvent(this, true));
                 }
             }
         };

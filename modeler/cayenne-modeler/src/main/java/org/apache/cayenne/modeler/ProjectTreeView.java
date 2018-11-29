@@ -646,6 +646,8 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
                 .getDataDomainChildrenComparator());
         if(!Application.getInstance().getFrameController().getDbImportController().isGlobalImport()) {
             showNode(newMapNode);
+        } else {
+            setSelected(newMapNode);
         }
     }
 
@@ -818,6 +820,14 @@ public class ProjectTreeView extends JTree implements DomainDisplayListener,
         }
 
         setSelectionPath(path);
+    }
+
+    /** Makes node current, visible but not selected. */
+    private void setSelected(DefaultMutableTreeNode node) {
+        TreePath path = new TreePath(node.getPath());
+        if(!isVisible(path)) {
+            makeVisible(path);
+        }
     }
 
     protected void showNode(Object[] path) {

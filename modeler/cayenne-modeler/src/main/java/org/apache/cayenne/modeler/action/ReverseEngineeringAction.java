@@ -22,13 +22,10 @@ package org.apache.cayenne.modeler.action;
 import com.google.inject.Inject;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.dialog.db.DataSourceWizard;
-import org.apache.cayenne.modeler.dialog.db.DbActionOptionsDialog;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoadResultDialog;
 import org.apache.cayenne.modeler.dialog.db.load.DbLoaderContext;
 import org.apache.cayenne.modeler.dialog.db.load.LoadDataMapTask;
-import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.editor.DbImportController;
-import org.apache.cayenne.modeler.editor.dbimport.DbImportView;
 import org.apache.cayenne.modeler.pref.DBConnectionInfo;
 import org.apache.cayenne.modeler.services.DbService;
 import org.apache.cayenne.modeler.services.ReverseEngineeringService;
@@ -36,9 +33,6 @@ import org.apache.cayenne.modeler.util.CayenneAction;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 
@@ -76,12 +70,6 @@ public class ReverseEngineeringAction extends CayenneAction {
     }
 
     public void performAction() {
-//        final DbLoaderContext context = new DbLoaderContext(application.getMetaData());
-    /**
-     * Connects to DB and delegates processing to DbLoaderController, starting it asynchronously.
-     */
-    @Override
-    public void performAction(ActionEvent event) {
         DBConnectionInfo connectionInfo;
         if (!reverseEngineeringService.datamapPreferencesExist()) {
             DataSourceWizard connectWizard = new DataSourceWizard(getProjectController(), DIALOG_TITLE);
@@ -105,25 +93,14 @@ public class ReverseEngineeringAction extends CayenneAction {
             return;
         }
 
-        DbImportController dbImportController = Application.getInstance().getFrameController().getDbImportController();
+        DbImportController dbImportController = application.getFrameController().getDbImportController();
         DbLoadResultDialog dbLoadResultDialog = dbImportController.createDialog();
         if(!dbLoadResultDialog.isVisible()) {
             dbImportController.showDialog();
         }
 
-        if(!context.buildConfig(connectionInfo, view)) {
-        if(!context.buildConfig(connectionInfo)) {
-            try {
-                dbService.getConnection().close();
-            } catch (SQLException ignored) {}
-            return;
-        }
+        reverseEngineeringService.checkBuildConfig(connectionInfo);
 
-        runLoaderInThread(context, () -> {
-            application.getUndoManager().discardAllEdits();
-            try {
-                context.getConnection().close();
-            } catch (SQLException ignored) {}
         runLoaderInThread(context, () -> {
             application.getUndoManager().discardAllEdits();
             try {
@@ -138,34 +115,6 @@ public class ReverseEngineeringAction extends CayenneAction {
     @Override
     public void performAction(ActionEvent event) {
         performAction();
-    }
-
-    private DBConnectionInfo getConnectionInfoFromPreferences() {
-        DBConnectionInfo connectionInfo = new DBConnectionInfo();
-        DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentState().getDataMap());
-        connectionInfo.setDbAdapter(dataMapDefaults.getCurrentPreference().get(DB_ADAPTER_PROPERTY, null));
-        connectionInfo.setUrl(dataMapDefaults.getCurrentPreference().get(URL_PROPERTY, null));
-        connectionInfo.setUserName(dataMapDefaults.getCurrentPreference().get(USER_NAME_PROPERTY, null));
-        connectionInfo.setPassword(dataMapDefaults.getCurrentPreference().get(PASSWORD_PROPERTY, null));
-        connectionInfo.setJdbcDriver(dataMapDefaults.getCurrentPreference().get(JDBC_DRIVER_PROPERTY, null));
-        return connectionInfo;
-    }
-
-    private void saveConnectionInfo() {
-        DataMapDefaults dataMapDefaults = getProjectController().
-                getDataMapPreferences(getProjectController().getCurrentState().getDataMap());
-        dataMapDefaults.getCurrentPreference().put(DB_ADAPTER_PROPERTY, dbService.getDbConnectionInfo().getDbAdapter());
-        dataMapDefaults.getCurrentPreference().put(URL_PROPERTY, dbService.getDbConnectionInfo().getUrl());
-        dataMapDefaults.getCurrentPreference().put(USER_NAME_PROPERTY, dbService.getDbConnectionInfo().getUserName());
-        dataMapDefaults.getCurrentPreference().put(PASSWORD_PROPERTY, dbService.getDbConnectionInfo().getPassword());
-        dataMapDefaults.getCurrentPreference().put(JDBC_DRIVER_PROPERTY, dbService.getDbConnectionInfo().getJdbcDriver());
-    }
-
-    private boolean datamapPreferencesExist() {
-        DataMapDefaults dataMapDefaults = projectController.
-                getDataMapPreferences(projectController.getCurrentState().getDataMap());
-        return dataMapDefaults.getCurrentPreference().get(DB_ADAPTER_PROPERTY, null) != null;
     }
 
     private void runLoaderInThread(final DbLoaderContext context, final Runnable callback) {
