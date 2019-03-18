@@ -31,7 +31,6 @@ import org.apache.cayenne.Persistent;
 import org.apache.cayenne.dba.PkGenerator;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EntitySorter;
 import org.apache.cayenne.map.ObjAttribute;
@@ -183,11 +182,11 @@ class DataDomainInsertBucket extends DataDomainSyncBucket {
                 continue;
             }
 
-            for (DbJoin join : dbRel.getJoins()) {
-                if (attribute.getName().equals(join.getSourceName())) {
-                    return true;
-                }
+            if(!dbRel.getJoin()
+                    .accept(dbJoin -> !attribute.getName().equals(dbJoin.getSourceName()))) {
+                return true;
             }
+
         }
 
         return false;

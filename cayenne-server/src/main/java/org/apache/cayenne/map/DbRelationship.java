@@ -19,12 +19,6 @@
 
 package org.apache.cayenne.map;
 
-import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
-import org.apache.cayenne.util.Util;
-import org.apache.cayenne.util.XMLEncoder;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.configuration.ConfigurationNode;
+import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
+import org.apache.cayenne.util.Util;
+import org.apache.cayenne.util.XMLEncoder;
+
 /**
  * A DbRelationship is a descriptor of a database inter-table relationship based
  * on one or more primary key/foreign key pairs.
@@ -40,7 +40,7 @@ import java.util.function.Function;
 public class DbRelationship extends Relationship implements ConfigurationNode {
 
     // The columns through which the join is implemented.
-    protected List<DbJoin> joins = new ArrayList<>(2);
+    private EquiJoin joins;
 
     // Is relationship from source to target points to dependent primary
     // key (primary key column of destination table that is also a FK to the
@@ -85,7 +85,7 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
         encoder.attribute("toDependentPK", isToDependentPK() && isValidForDepPk());
         encoder.attribute("toMany", isToMany());
 
-        encoder.nested(getJoins(), delegate);
+        encoder.nested(joins.getJoins(), delegate);
 
         delegate.visitDbRelationship(this);
         encoder.end();
@@ -127,15 +127,15 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
     }
 
     private Collection<DbAttribute> mapJoinsToAttributes(Function<DbJoin, DbAttribute> mapper) {
-        if (joins.size() == 0) {
+        if (joins.getJoins().size() == 0) {
             return Collections.emptyList();
         }
         // fast path for common case
-        if(joins.size() == 1) {
-            return Collections.singletonList(mapper.apply(joins.get(0)));
+        if(joins.getJoins().size() == 1) {
+            return Collections.singletonList(mapper.apply(joins.getJoins().get(0)));
         }
-        Collection<DbAttribute> result = new ArrayList<>(joins.size());
-        for(DbJoin join : joins) {
+        Collection<DbAttribute> result = new ArrayList<>(joins.getJoins().size());
+        for(DbJoin join : joins.getJoins()) {
             result.add(mapper.apply(join));
         }
         return result;
@@ -160,13 +160,13 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
         // a PK...
         // on the other hand, these can still be two independent entities...
 
-        if (isToDependentPK() && !toMany && joins.size() == targetEntity.getPrimaryKeys().size()) {
+        if (isToDependentPK() && !toMany && joins.getJoins().size() == targetEntity.getPrimaryKeys().size()) {
             reverse.setToMany(false);
         } else {
             reverse.setToMany(!toMany);
         }
 
-        for (DbJoin join : joins) {
+        for (DbJoin join : joins.getJoins()) {
             DbJoin reverseJoin = join.createReverseJoin();
             reverseJoin.setRelationship(reverse);
             reverse.addJoin(reverseJoin);
@@ -190,7 +190,7 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
         Entity src = this.getSourceEntity();
 
         // special case - relationship to self with no joins...
-        if (target == src && joins.size() == 0) {
+        if (target == src && joins.getJoins().size() == 0) {
             return null;
         }
 
@@ -201,20 +201,15 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
             }
 
             List<DbJoin> otherJoins = rel.getJoins();
-            if (otherJoins.size() != joins.size()) {
+            if (otherJoins.size() != joins.getJoins().size()) {
                 continue;
             }
 
-            boolean joinsMatch = true;
-            for (DbJoin join : otherJoins) {
-                // flip join and try to find similar
+            boolean joinsMatch = rel.getJoin().accept(join -> {
                 testJoin.setSourceName(join.getTargetName());
                 testJoin.setTargetName(join.getSourceName());
-                if (!joins.contains(testJoin)) {
-                    joinsMatch = false;
-                    break;
-                }
-            }
+                return joins.getJoins().contains(testJoin);
+            });
 
             if (joinsMatch) {
                 return rel;
@@ -231,36 +226,34 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
      * @since 1.1
      */
     public boolean isToPK() {
-        for (DbJoin join : getJoins()) {
-
+        return joins.accept(join -> {
             DbAttribute target = join.getTarget();
             if (target == null) {
                 return false;
             }
 
-            if (!target.isPrimaryKey()) {
-                return false;
-            }
-        }
-
-        return true;
+            return target.isPrimaryKey();
+        });
     }
 
     /**
      * @since 3.0
      */
     public boolean isFromPK() {
-        for (DbJoin join : getJoins()) {
+        boolean sourceNotNull = joins.accept(join -> {
             DbAttribute source = join.getSource();
-            if (source == null) {
-                return false;
-            }
-
-            if (source.isPrimaryKey()) {
-                return true;
-            }
+            return source != null;
+        });
+        if(!sourceNotNull) {
+            return false;
         }
-
+        boolean pkNotFound = joins.accept(join -> {
+            DbAttribute source = join.getSource();
+            return !source.isPrimaryKey();
+        });
+        if(!pkNotFound) {
+            return true;
+        }
         return false;
     }
 
@@ -308,20 +301,16 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
      */
     public boolean isValidForDepPk() {
         // handle case with no joins
-        if (getJoins().size() == 0) {
+        if (joins.getJoins().size() == 0) {
             return false;
         }
 
-        for (DbJoin join : getJoins()) {
+        return joins.accept(join -> {
             DbAttribute target = join.getTarget();
             DbAttribute source = join.getSource();
 
-            if (target != null && !target.isPrimaryKey() || source != null && !source.isPrimaryKey()) {
-                return false;
-            }
-        }
-
-        return true;
+            return (target == null || target.isPrimaryKey()) && (source == null || source.isPrimaryKey());
+        });
     }
 
     /**
@@ -329,7 +318,7 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
      * modifications of the list will affect this relationship.
      */
     public List<DbJoin> getJoins() {
-        return joins;
+        return joins.getJoins();
     }
 
     /**
@@ -338,24 +327,36 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
      * @since 1.1
      */
     public void addJoin(DbJoin join) {
+        if(joins == null) {
+            joins = new EquiJoin();
+        }
         if (join != null) {
-            joins.add(join);
+            joins.getJoins().add(join);
+        }
+    }
+
+    public void addJoin(Exception expression) {
+        if(joins == null) {
+            //TODO create expression join if need
+        }
+        if(expression != null) {
+            //TODO add to expression join
         }
     }
 
     public void removeJoin(DbJoin join) {
-        joins.remove(join);
+        joins.getJoins().remove(join);
     }
 
     public void removeAllJoins() {
-        joins.clear();
+        joins.getJoins().clear();
     }
 
     public void setJoins(Collection<DbJoin> newJoins) {
         this.removeAllJoins();
 
         if (newJoins != null) {
-            joins.addAll(newJoins);
+            joins.getJoins().addAll(newJoins);
         }
     }
 
@@ -374,12 +375,12 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
 
         Map<String, Object> idMap;
 
-        int numJoins = joins.size();
+        int numJoins = joins.getJoins().size();
         int foundNulls = 0;
 
         // optimize for the most common single column join
         if (numJoins == 1) {
-            DbJoin join = joins.get(0);
+            DbJoin join = joins.getJoins().get(0);
             Object val = srcSnapshot.get(join.getSourceName());
             if (val == null) {
                 foundNulls++;
@@ -391,7 +392,7 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
         // handle generic case: numJoins > 1
         else {
             idMap = new HashMap<>(numJoins * 2);
-            for (DbJoin join : joins) {
+            for (DbJoin join : joins.getJoins()) {
                 DbAttribute source = join.getSource();
                 Object val = srcSnapshot.get(join.getSourceName());
 
@@ -426,18 +427,18 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
      * toOne.
      */
     private Map<String, Object> srcSnapshotWithTargetSnapshot(Map<String, Object> targetSnapshot) {
-        int len = joins.size();
+        int len = joins.getJoins().size();
 
         // optimize for the most common single column join
         if (len == 1) {
-            DbJoin join = joins.get(0);
+            DbJoin join = joins.getJoins().get(0);
             Object val = targetSnapshot.get(join.getTargetName());
             return Collections.singletonMap(join.getSourceName(), val);
         }
 
         // general case
         Map<String, Object> idMap = new HashMap<>(len * 2);
-        for (DbJoin join : joins) {
+        for (DbJoin join : joins.getJoins()) {
             Object val = targetSnapshot.get(join.getTargetName());
             idMap.put(join.getSourceName(), val);
         }
@@ -483,13 +484,8 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
 
     @Override
     public boolean isMandatory() {
-        for (DbJoin join : getJoins()) {
-            if (join.getSource().isMandatory()) {
-                return true;
-            }
-        }
-
-        return false;
+        boolean mandatoryNotFound = joins.accept(join -> !join.getSource().isMandatory());
+        return !mandatoryNotFound;
     }
 
     // a join used for comparison
@@ -524,7 +520,7 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
         res.append(toMany ? "toMany" : "toOne ");
 
         String sourceEntityName = getSourceEntityName();
-        for (DbJoin join : joins) {
+        for (DbJoin join : joins.getJoins()) {
             res.append(" (").append(sourceEntityName).append(".").append(join.getSourceName()).append(", ")
                     .append(targetEntityName).append(".").append(join.getTargetName()).append(")");
         }
@@ -536,5 +532,14 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
             return null;
         }
         return this.sourceEntity.name;
+    }
+
+    //TODO change to Joins
+    public void setJoins(Joins joins) {
+        this.joins = (EquiJoin) joins;
+    }
+
+    public Joins getJoin() {
+        return joins;
     }
 }

@@ -27,7 +27,6 @@ import org.apache.cayenne.dbsync.reverse.filters.FiltersConfig;
 import org.apache.cayenne.dbsync.reverse.filters.PatternFilter;
 import org.apache.cayenne.dbsync.reverse.filters.TableFilter;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 
 class DbRelationshipDictionary extends MergerDictionary<DbRelationship> {
@@ -98,13 +97,14 @@ class DbRelationshipDictionary extends MergerDictionary<DbRelationship> {
 
         private void build() {
             TreeSet<String> joins = new TreeSet<>();
-            for(DbJoin join : relationship.getJoins()) {
+            relationship.getJoin().accept(join -> {
                 joins.add(
                         (join.getSource() == null ? "~" : join.getSource().getName()) + "." + join.getSourceName()
-                        + ">" +
-                        (join.getTarget() == null ? "~" : join.getTarget().getName()) + "." + join.getTargetName()
+                                + ">" +
+                                (join.getTarget() == null ? "~" : join.getTarget().getName()) + "." + join.getTargetName()
                 );
-            }
+                return true;
+            });
             joinSignature = joins.toArray(new String[0]);
         }
     }

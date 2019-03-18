@@ -18,6 +18,10 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge.factory;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.dba.QuotingStrategy;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
@@ -30,11 +34,7 @@ import org.apache.cayenne.dbsync.merge.token.db.SetGeneratedFlagToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetNotNullToDb;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
-
-import java.util.Collections;
-import java.util.List;
 
 public class IngresMergerTokenFactory extends DefaultMergerTokenFactory {
 
@@ -98,18 +98,19 @@ public class IngresMergerTokenFactory extends DefaultMergerTokenFactory {
                     buf.append(context.quotedIdentifier(rel.getSourceEntity(), name));
                     buf.append(" FOREIGN KEY (");
 
-                    boolean first = true;
-                    for (DbJoin join : rel.getJoins()) {
-                        if (!first) {
+                    final AtomicBoolean first = new AtomicBoolean(true);
+                    rel.getJoin().accept(join -> {
+                        if (!first.get()) {
                             buf.append(", ");
                             refBuf.append(", ");
                         } else {
-                            first = false;
+                            first.set(false);
                         }
 
                         buf.append(context.quotedSourceName(join));
                         refBuf.append(context.quotedTargetName(join));
-                    }
+                        return true;
+                    });
 
                     buf.append(") REFERENCES ");
                     buf.append(context.quotedFullyQualifiedName((DbEntity) rel.getTargetEntity()));

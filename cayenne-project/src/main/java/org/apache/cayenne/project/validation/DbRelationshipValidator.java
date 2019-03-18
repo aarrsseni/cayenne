@@ -18,17 +18,16 @@
  ****************************************************************/
 package org.apache.cayenne.project.validation;
 
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.util.Util;
-import org.apache.cayenne.validation.ValidationResult;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.util.Util;
+import org.apache.cayenne.validation.ValidationResult;
 
 class DbRelationshipValidator extends ConfigurationNodeValidator {
 
@@ -48,7 +47,7 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
                     toString(relationship));
         } else {
             // validate joins
-            for (DbJoin join : relationship.getJoins()) {
+            relationship.getJoin().accept(join -> {
                 if (join.getSource() == null && join.getTarget() == null) {
                     addFailure(
                             validationResult,
@@ -68,7 +67,8 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
                             "DbRelationship '%s' has a join with no target attribute selected",
                             toString(relationship));
                 }
-            }
+                return true;
+            });
         }
 
         if(!relationship.isToPK()) {
@@ -124,7 +124,7 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
     }
 
     private void checkTypesOfAttributesInRelationship(DbRelationship relationship, ValidationResult validationResult) {
-        for (DbJoin join: relationship.getJoins()) {
+        relationship.getJoin().accept(join -> {
             if (join.getSource() != null && join.getTarget() != null
                     && join.getSource().getType() != join.getTarget().getType()) {
                 addFailure(
@@ -133,7 +133,8 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
                         "Attributes '%s' and '%s' have different types in a relationship '%s'",
                         join.getSourceName(), join.getTargetName(), relationship.getName());
             }
-        }
+            return true;
+        });
     }
 
     private void checkOnGeneratedStrategyConflict(DbRelationship relationship, ValidationResult validationResult) {
@@ -190,9 +191,10 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
 
     private String getJoins(DbRelationship relationship) {
         List<String> joins = new ArrayList<>();
-        for (DbJoin join : relationship.getJoins()) {
+        relationship.getJoin().accept(join -> {
             joins.add("[source=" + join.getSourceName() + ",target=" + join.getTargetName() + "]");
-        }
+            return true;
+        });
         Collections.sort(joins);
 
         return Util.join(joins, ",");

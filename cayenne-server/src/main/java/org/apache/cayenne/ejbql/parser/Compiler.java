@@ -18,13 +18,20 @@
  ****************************************************************/
 package org.apache.cayenne.ejbql.parser;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.cayenne.ejbql.EJBQLBaseVisitor;
 import org.apache.cayenne.ejbql.EJBQLCompiledExpression;
 import org.apache.cayenne.ejbql.EJBQLException;
 import org.apache.cayenne.ejbql.EJBQLExpression;
 import org.apache.cayenne.ejbql.EJBQLExpressionVisitor;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.EntityResolver;
@@ -40,14 +47,6 @@ import org.apache.cayenne.reflect.PropertyDescriptor;
 import org.apache.cayenne.reflect.PropertyVisitor;
 import org.apache.cayenne.reflect.ToManyProperty;
 import org.apache.cayenne.reflect.ToOneProperty;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Produces an {@link EJBQLCompiledExpression} out of an EJBQL expression tree.
@@ -263,14 +262,15 @@ class Compiler {
                 ObjRelationship rel = property.getRelationship();
                 DbRelationship dbRel = rel.getDbRelationships().get(0);
 
-                for (DbJoin join : dbRel.getJoins()) {
+                dbRel.getJoin().accept(join -> {
                     DbAttribute src = join.getSource();
                     if (src.isForeignKey() && visited.add(src.getName())) {
                         compiledResult.addDbField("fetch." + prefix + "." + src.getName(), prefix
                                 + "."
                                 + src.getName());
                     }
-                }
+                    return true;
+                });
 
                 return true;
             }
@@ -339,12 +339,13 @@ class Compiler {
                 ObjRelationship rel = property.getRelationship();
                 DbRelationship dbRel = rel.getDbRelationships().get(0);
 
-                for (DbJoin join : dbRel.getJoins()) {
+                dbRel.getJoin().accept(join -> {
                     DbAttribute src = join.getSource();
                     if (src.isForeignKey() && visited.add(src.getName())) {
                         entityResult.addDbField(src.getName(), prefix + index[0]++);
                     }
-                }
+                    return true;
+                });
 
                 return true;
             }

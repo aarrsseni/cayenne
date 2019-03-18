@@ -19,35 +19,17 @@
 
 package org.apache.cayenne.modeler.util;
 
-import org.apache.cayenne.configuration.DataChannelDescriptor;
-import org.apache.cayenne.configuration.DataNodeDescriptor;
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.map.MappingNamespace;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.map.Relationship;
-import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.modeler.ProjectController;
-import org.apache.cayenne.util.Util;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import org.apache.cayenne.configuration.DataChannelDescriptor;
+import org.apache.cayenne.configuration.DataNodeDescriptor;
+import org.apache.cayenne.map.*;
+import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.util.Util;
 
 /**
  * Provides utility methods to perform various manipulations with project objects.
@@ -344,13 +326,9 @@ public class ProjectUtil {
             return false;
         }
 
-        for (DbJoin join : relationship.getJoins()) {
-            if (join.getSource() == attribute) {
-                return true;
-            }
-        }
-
-        return false;
+        boolean sourceAttrNotFound = relationship.getJoin()
+                .accept(join -> join.getSource() != attribute);
+        return !sourceAttrNotFound;
     }
 
     /**
@@ -363,13 +341,9 @@ public class ProjectUtil {
             return false;
         }
 
-        for (DbJoin join : relationship.getJoins()) {
-            if (join.getTarget() == attribute) {
-                return true;
-            }
-        }
-
-        return false;
+        boolean targetAttrNotFound = relationship.getJoin()
+                .accept(join -> join.getTarget() != attribute);
+        return !targetAttrNotFound;
     }
 
     /**

@@ -19,6 +19,15 @@
 
 package org.apache.cayenne.ashwood;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.DataRow;
 import org.apache.cayenne.ObjectContext;
@@ -31,7 +40,6 @@ import org.apache.cayenne.ashwood.graph.MapDigraph;
 import org.apache.cayenne.ashwood.graph.StrongConnection;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.EntitySorter;
@@ -39,14 +47,6 @@ import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.query.ObjectIdQuery;
 import org.apache.cayenne.reflect.ClassDescriptor;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implements dependency sorting algorithms for ObjEntities, DbEntities and
@@ -113,20 +113,20 @@ public class AshwoodEntitySorter implements EntitySorter {
 			for (DbRelationship candidate : destination.getRelationships()) {
 				if ((!candidate.isToMany() && !candidate.isToDependentPK()) || candidate.isToMasterPK()) {
 					DbEntity origin = candidate.getTargetEntity();
-					boolean newReflexive = destination.equals(origin);
+					final AtomicBoolean newReflexive = new AtomicBoolean(destination.equals(origin));
 
-					for (DbJoin join : candidate.getJoins()) {
+					candidate.getJoin().accept(join -> {
 						DbAttribute targetAttribute = join.getTarget();
 						if (targetAttribute.isPrimaryKey()) {
 
-							if (newReflexive) {
+							if (newReflexive.get()) {
 								List<DbRelationship> reflexiveRels = reflexiveDbEntities.get(destination);
 								if (reflexiveRels == null) {
 									reflexiveRels = new ArrayList<>(1);
 									reflexiveDbEntities.put(destination, reflexiveRels);
 								}
 								reflexiveRels.add(candidate);
-								newReflexive = false;
+								newReflexive.set(false);
 							}
 
 							List<DbAttribute> fks = referentialDigraph.getArc(origin, destination);
@@ -137,7 +137,8 @@ public class AshwoodEntitySorter implements EntitySorter {
 
 							fks.add(targetAttribute);
 						}
-					}
+						return true;
+					});
 				}
 			}
 

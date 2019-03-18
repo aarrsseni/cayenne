@@ -18,16 +18,14 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.naming;
 
+import java.util.Locale;
+import java.util.Objects;
+
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.util.Util;
 import org.jvnet.inflector.Noun;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 /**
  * The default strategy for converting DB-layer to Object-layer names.
@@ -101,22 +99,21 @@ public class DefaultObjectNameGenerator implements ObjectNameGenerator {
         DbRelationship first = relationshipChain[0];
         DbRelationship last = relationshipChain[relationshipChain.length - 1];
 
-        List<DbJoin> joins = first.getJoins();
-        if (joins.isEmpty()) {
-            // In case, when uses EditRelationship button, relationship doesn't exist => it doesn't have joins
-            // and just return targetName
+        final StringBuilder fkColNameBuilder = new StringBuilder();
+        boolean isEmpty = first.getJoin().accept(join -> {
+            fkColNameBuilder.append(join.getSourceName());
+            return false;
+        });
+
+        if(isEmpty) {
             return stemmed(last.getTargetEntityName());
         }
-
-        DbJoin join1 = joins.get(0);
 
         // TODO: multi-join relationships
 
         // return the name of the FK column sans ID
-        String fkColName = join1.getSourceName();
-        if (fkColName == null) {
-            return stemmed(last.getTargetEntityName());
-        } else if (fkColName.toUpperCase().endsWith("_ID") && fkColName.length() > 3) {
+        String fkColName = fkColNameBuilder.toString();
+        if (fkColName.toUpperCase().endsWith("_ID") && fkColName.length() > 3) {
             return fkColName.substring(0, fkColName.length() - 3);
         } else if (fkColName.toUpperCase().endsWith("ID") && fkColName.length() > 2) {
             return fkColName.substring(0, fkColName.length() - 2);

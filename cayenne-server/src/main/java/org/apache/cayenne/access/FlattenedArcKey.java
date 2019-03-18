@@ -19,6 +19,13 @@
 
 package org.apache.cayenne.access;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.DataRow;
 import org.apache.cayenne.ObjectId;
@@ -29,20 +36,12 @@ import org.apache.cayenne.dba.QuotingStrategy;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.util.HashCodeBuilder;
 import org.apache.cayenne.util.Util;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A holder of flattened relationship modification data.
@@ -315,13 +314,15 @@ final class FlattenedArcKey {
 		Map<String, ?> destinationId = id2.getSourceId().getIdSnapshot();
 
 		Map<String, Object> snapshot = new HashMap<>(sourceId.size() + destinationId.size(), 1);
-		for (DbJoin join : firstDbRel.getJoins()) {
+		firstDbRel.getJoin().accept(join -> {
 			snapshot.put(join.getTargetName(), sourceId.get(join.getSourceName()));
-		}
+			return true;
+		});
 
-		for (DbJoin join : secondDbRel.getJoins()) {
+		secondDbRel.getJoin().accept(join -> {
 			snapshot.put(join.getSourceName(), destinationId.get(join.getTargetName()));
-		}
+			return true;
+		});
 
 		return snapshot;
 	}
@@ -337,23 +338,22 @@ final class FlattenedArcKey {
 		DbRelationship firstDbRel = relList.get(0);
 		DbRelationship secondDbRel = relList.get(1);
 
-		List<DbJoin> fromSourceJoins = firstDbRel.getJoins();
-		List<DbJoin> toTargetJoins = secondDbRel.getJoins();
-
-		Map<String, Object> snapshot = new HashMap<>(fromSourceJoins.size() + toTargetJoins.size(), 1);
+		Map<String, Object> snapshot = new HashMap<>();
 
 		// here ordering of ids is determined by 'relationship', so use id1, id2
 		// instead of orderedIds
-
-		for (DbJoin join : fromSourceJoins) {
+		firstDbRel.getJoin().accept(join -> {
 			Object value = new PropagatedValueFactory(id1.getSourceId(), join.getSourceName());
 			snapshot.put(join.getTargetName(), value);
-		}
+			return true;
+		});
 
-		for (DbJoin join : toTargetJoins) {
+		secondDbRel.getJoin().accept(join -> {
 			Object value = new PropagatedValueFactory(id2.getSourceId(), join.getTargetName());
 			snapshot.put(join.getSourceName(), value);
-		}
+			return true;
+		});
+
 
 		return snapshot;
 	}

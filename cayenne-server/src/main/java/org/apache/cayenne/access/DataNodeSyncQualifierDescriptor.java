@@ -28,7 +28,6 @@ import java.util.function.Function;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.ObjectId;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
@@ -95,17 +94,18 @@ class DataNodeSyncQualifierDescriptor {
 			DbRelationship masterDependentDbRel = descriptor.getPathFromMaster().get(0);
 
 			if (masterDependentDbRel != null) {
-				for (final DbJoin dbAttrPair : masterDependentDbRel.getJoins()) {
-					DbAttribute dbAttribute = dbAttrPair.getTarget();
+				masterDependentDbRel.getJoin().accept(join -> {
+					DbAttribute dbAttribute = join.getTarget();
 					if (!attributes.contains(dbAttribute)) {
 
 						attributes.add(dbAttribute);
 						valueTransformers.add(input -> {
-                            ObjectId id = (ObjectId) input.getNodeId();
-                            return id.getIdSnapshot().get(dbAttrPair.getTargetName());
-                        });
-                    }
-                }
+							ObjectId id = (ObjectId) input.getNodeId();
+							return id.getIdSnapshot().get(join.getTargetName());
+						});
+					}
+					return true;
+				});
             }
         }
 
@@ -131,20 +131,20 @@ class DataNodeSyncQualifierDescriptor {
 					// only care about the first DbRelationship
 					DbRelationship dbRelationship = relationship.getDbRelationships().get(0);
 
-					for (final DbJoin dbAttrPair : dbRelationship.getJoins()) {
-						DbAttribute dbAttribute = dbAttrPair.getSource();
+					dbRelationship.getJoin().accept(join -> {
+						DbAttribute dbAttribute = join.getSource();
 
 						// relationship transformers override attribute transformers for meaningful FK's...
 						// why meaningful FKs can go out of sync is another story (CAY-595)
 						int index = attributes.indexOf(dbAttribute);
 						if (index >= 0 && !dbAttribute.isForeignKey()) {
-							continue;
+							return true;
 						}
 
 						Function<ObjectDiff, Object> transformer = input -> {
-                            ObjectId targetId = input.getArcSnapshotValue(relationship.getName());
-                            return targetId != null ? targetId.getIdSnapshot().get(dbAttrPair.getTargetName()) : null;
-                        };
+							ObjectId targetId = input.getArcSnapshotValue(relationship.getName());
+							return targetId != null ? targetId.getIdSnapshot().get(join.getTargetName()) : null;
+						};
 
 						if (index < 0) {
 							attributes.add(dbAttribute);
@@ -152,7 +152,8 @@ class DataNodeSyncQualifierDescriptor {
 						} else {
 							valueTransformers.set(index, transformer);
 						}
-					}
+						return true;
+					});
 				}
 			}
 		}

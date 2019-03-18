@@ -19,6 +19,17 @@
 
 package org.apache.cayenne.access;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.DataRow;
 import org.apache.cayenne.ObjectContext;
@@ -49,16 +60,6 @@ import org.apache.cayenne.reflect.LifecycleCallbackRegistry;
 import org.apache.cayenne.util.GenericResponse;
 import org.apache.cayenne.util.ListResponse;
 import org.apache.cayenne.util.Util;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Performs query routing and execution. During execution phase intercepts
@@ -236,7 +237,13 @@ class DataDomainQueryAction implements QueryRouter, OperationObserver {
             // FK pointing to a unique field that is a 'fake' PK (CAY-1755)...
             // It is not sufficient to generate target ObjectId.
             DbEntity targetEntity = dbRelationship.getTargetEntity();
-            if (dbRelationship.getJoins().size() < targetEntity.getPrimaryKeys().size()) {
+
+            AtomicInteger joinSize = new AtomicInteger(0);
+            dbRelationship.getJoin().accept(join -> {
+                joinSize.incrementAndGet();
+                return true;
+            });
+            if (joinSize.get() < targetEntity.getPrimaryKeys().size()) {
                 return !DONE;
             }
 

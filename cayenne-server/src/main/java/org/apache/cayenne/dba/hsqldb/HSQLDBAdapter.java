@@ -19,6 +19,13 @@
 
 package org.apache.cayenne.dba.hsqldb;
 
+import java.sql.Types;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.sqlbuilder.sqltree.Node;
@@ -35,17 +42,10 @@ import org.apache.cayenne.dba.JdbcAdapter;
 import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLAction;
 import org.apache.cayenne.resource.ResourceLocator;
-
-import java.sql.Types;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * DbAdapter implementation for the <a href="http://hsqldb.sourceforge.net/">
@@ -198,18 +198,19 @@ public class HSQLDBAdapter extends JdbcAdapter {
 		buf.append(quotingStrategy.quotedIdentifier(sourceEntity, sourceEntity.getSchema(), name));
 		buf.append(" FOREIGN KEY (");
 
-		boolean first = true;
-		for (DbJoin join : rel.getJoins()) {
-			if (!first) {
+		final AtomicBoolean first = new AtomicBoolean(true);
+		rel.getJoin().accept(join -> {
+			if (!first.get()) {
 				buf.append(", ");
 				refBuf.append(", ");
 			} else {
-				first = false;
+				first.set(false);
 			}
 
 			buf.append(quotingStrategy.quotedSourceName(join));
 			refBuf.append(quotingStrategy.quotedTargetName(join));
-		}
+			return true;
+		});
 
 		buf.append(") REFERENCES ");
 		buf.append(dstName);
