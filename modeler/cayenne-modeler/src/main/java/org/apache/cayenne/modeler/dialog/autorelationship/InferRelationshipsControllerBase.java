@@ -18,14 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.autorelationship;
 
-import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.modeler.util.CayenneController;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,6 +25,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.DbJoin;
+import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.modeler.util.CayenneController;
 
 public class InferRelationshipsControllerBase extends CayenneController {
 
@@ -107,11 +107,11 @@ public class InferRelationshipsControllerBase extends CayenneController {
     public void createReversRelationship(DbEntity eSourse, DbEntity eTarget) {
         InferredRelationship myir = new InferredRelationship();
         for (DbRelationship relationship : eSourse.getRelationships()) {
-            for (DbJoin join : relationship.getJoins()) {
-                if (((DbEntity) join.getSource().getEntity()).equals(eSourse)
-                        && ((DbEntity) join.getTarget().getEntity()).equals(eTarget)) {
-                    return;
-                }
+            boolean joinNotFound = relationship.getJoin()
+                    .accept(join -> !join.getSource().getEntity().equals(eSourse)
+                            || !join.getTarget().getEntity().equals(eTarget));
+            if(!joinNotFound) {
+                return;
             }
         }
         myir.setSource(eSourse);

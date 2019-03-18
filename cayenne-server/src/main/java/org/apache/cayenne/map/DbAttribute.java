@@ -174,13 +174,17 @@ public class DbAttribute extends Attribute implements ConfigurationNode {
         }
 
         for (DbRelationship relationship : getEntity().getRelationships()) {
-            for (DbJoin join : relationship.getJoins()) {
-                if (name.equals(join.getSourceName())) {
-                    DbAttribute target = join.getTarget();
-                    if (target != null && target.isPrimaryKey()) {
+
+            boolean fkNotFound = relationship.getJoin()
+                    .accept(join -> {
+                        if (name.equals(join.getSourceName())) {
+                            DbAttribute target = join.getTarget();
+                            return target == null || !target.isPrimaryKey();
+                        }
                         return true;
-                    }
-                }
+                    });
+            if(!fkNotFound) {
+                return true;
             }
         }
 

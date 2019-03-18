@@ -19,6 +19,14 @@
 
 package org.apache.cayenne.dbsync.merge.context;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.dbsync.filter.NameFilter;
 import org.apache.cayenne.dbsync.naming.NameBuilder;
@@ -26,7 +34,6 @@ import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjAttribute;
@@ -37,14 +44,6 @@ import org.apache.cayenne.util.DeleteRuleUpdater;
 import org.apache.cayenne.util.EntityMergeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implements methods for entity merging.
@@ -366,11 +365,13 @@ public class EntityMergeSupport {
 
     private boolean isFK(DbAttribute dbAttribute, Collection<DbRelationship> collection, boolean source) {
         for (DbRelationship rel : collection) {
-            for (DbJoin join : rel.getJoins()) {
-                DbAttribute joinAttribute = source ? join.getSource() : join.getTarget();
-                if (joinAttribute == dbAttribute) {
-                    return true;
-                }
+            boolean fkNotFound = rel.getJoin()
+                    .accept(join -> {
+                        DbAttribute joinAttribute = source ? join.getSource() : join.getTarget();
+                        return joinAttribute != dbAttribute;
+                    });
+            if(!fkNotFound) {
+                return true;
             }
         }
 

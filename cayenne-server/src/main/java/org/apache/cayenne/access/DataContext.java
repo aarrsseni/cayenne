@@ -49,12 +49,16 @@ import org.apache.cayenne.graph.ChildDiffLoader;
 import org.apache.cayenne.graph.CompoundDiff;
 import org.apache.cayenne.graph.GraphDiff;
 import org.apache.cayenne.graph.GraphManager;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.query.*;
+import org.apache.cayenne.query.EntityResultSegment;
+import org.apache.cayenne.query.MappedExec;
+import org.apache.cayenne.query.MappedSelect;
+import org.apache.cayenne.query.Query;
+import org.apache.cayenne.query.QueryMetadata;
+import org.apache.cayenne.query.Select;
 import org.apache.cayenne.reflect.AttributeProperty;
 import org.apache.cayenne.reflect.ClassDescriptor;
 import org.apache.cayenne.reflect.PropertyVisitor;
@@ -353,10 +357,11 @@ public class DataContext extends BaseContext {
                     }
 
                     DbRelationship dbRel = rel.getDbRelationships().get(0);
-                    for (DbJoin join : dbRel.getJoins()) {
-                        String key = join.getSourceName();
+                    dbRel.getJoin().accept(dbJoin -> {
+                        String key = dbJoin.getSourceName();
                         snapshot.put(key, storedSnapshot.get(key));
-                    }
+                        return true;
+                    });
 
                     return true;
                 }

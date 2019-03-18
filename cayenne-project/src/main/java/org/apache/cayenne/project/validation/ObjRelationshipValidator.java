@@ -18,17 +18,15 @@
  ****************************************************************/
 package org.apache.cayenne.project.validation;
 
+import java.util.List;
+
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.DeleteRule;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationResult;
-
-import java.util.Iterator;
-import java.util.List;
 
 class ObjRelationshipValidator extends ConfigurationNodeValidator {
 
@@ -104,17 +102,12 @@ class ObjRelationshipValidator extends ConfigurationNodeValidator {
             ObjRelationship inverse = relationship.getReverseRelationship();
             if (inverse != null) {
                 DbRelationship firstRel = inverse.getDbRelationships().get(0);
-                Iterator<DbJoin> attributePairIterator = firstRel.getJoins().iterator();
+
                 // by default, the relation will be check for mandatory.
-                boolean check = true;
-                while (attributePairIterator.hasNext()) {
-                    DbJoin pair = attributePairIterator.next();
-                    if (!pair.getSource().isMandatory()) {
-                        // a field of the fk can be nullable, cancel the check.
-                        check = false;
-                        break;
-                    }
-                }
+                boolean check = firstRel.getJoin().accept(join -> {
+                    // a field of the fk can be nullable, cancel the check.
+                    return join.getSource().isMandatory();
+                });
 
                 if (check) {
                     addFailure(

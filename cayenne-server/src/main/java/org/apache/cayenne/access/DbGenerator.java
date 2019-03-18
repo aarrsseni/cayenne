@@ -19,25 +19,6 @@
 
 package org.apache.cayenne.access;
 
-import org.apache.cayenne.ashwood.AshwoodEntitySorter;
-import org.apache.cayenne.conn.DataSourceInfo;
-import org.apache.cayenne.datasource.DriverDataSource;
-import org.apache.cayenne.dba.DbAdapter;
-import org.apache.cayenne.dba.PkGenerator;
-import org.apache.cayenne.dba.TypesMapping;
-import org.apache.cayenne.log.JdbcEventLogger;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.EntityResolver;
-import org.apache.cayenne.map.EntitySorter;
-import org.apache.cayenne.validation.SimpleValidationFailure;
-import org.apache.cayenne.validation.ValidationResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Driver;
@@ -51,6 +32,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+
+import org.apache.cayenne.ashwood.AshwoodEntitySorter;
+import org.apache.cayenne.conn.DataSourceInfo;
+import org.apache.cayenne.datasource.DriverDataSource;
+import org.apache.cayenne.dba.DbAdapter;
+import org.apache.cayenne.dba.PkGenerator;
+import org.apache.cayenne.dba.TypesMapping;
+import org.apache.cayenne.log.JdbcEventLogger;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.map.EntitySorter;
+import org.apache.cayenne.validation.SimpleValidationFailure;
+import org.apache.cayenne.validation.ValidationResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class that generates database schema based on Cayenne mapping. It is
@@ -543,9 +542,10 @@ public class DbGenerator {
 				// supposedly all source attributes of the relationship
 				// to master entity must be a part of primary key,
 				// so
-				for (DbJoin join : nextRelationship.getJoins()) {
+				nextRelationship.getJoin().accept(join -> {
 					pkAttributes.remove(join.getSource());
-				}
+					return true;
+				});
 			}
 
 			// primary key is needed only if at least one of the primary key

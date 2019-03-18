@@ -19,13 +19,16 @@
 
 package org.apache.cayenne.dbsync.merge.token.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.cayenne.dbsync.merge.context.MergerContext;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.util.Util;
 
 public class AddRelationshipToModel extends AbstractToModelToken.Entity {
 
@@ -41,20 +44,19 @@ public class AddRelationshipToModel extends AbstractToModelToken.Entity {
 
     public static String getTokenValue(DbRelationship rel) {
         String attributes = "";
-        if (rel.getJoins().size() == 1) {
-            attributes = rel.getJoins().get(0).getTargetName();
+        List<String> joinList = new ArrayList<>();
+        rel.getJoin().accept(join -> {
+            joinList.add(join.getTargetName());
+            return true;
+        });
+
+        if(joinList.isEmpty()) {
+            attributes = "{}";
+        } else if(joinList.size() == 1) {
+            attributes = joinList.get(0);
         } else {
-            for (DbJoin dbJoin : rel.getJoins()) {
-                attributes += dbJoin.getTargetName() + COMMA_SEPARATOR;
-            }
-
-            if(attributes.isEmpty()) {
-                attributes = "{}";
-            } else {
-                attributes = "{" + attributes.substring(0, attributes.length() - COMMA_SEPARATOR_LENGTH) + "}";
-            }
+            attributes = "{" + Util.join(joinList, COMMA_SEPARATOR) + "}";
         }
-
         return rel.getName() + " " + rel.getSourceEntity().getName() + "->" + rel.getTargetEntityName() + "." + attributes;
     }
 

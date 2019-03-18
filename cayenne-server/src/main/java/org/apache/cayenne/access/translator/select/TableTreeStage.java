@@ -19,13 +19,10 @@
 
 package org.apache.cayenne.access.translator.select;
 
-import java.util.List;
-
 import org.apache.cayenne.access.sqlbuilder.ExpressionNodeBuilder;
 import org.apache.cayenne.access.sqlbuilder.JoinNodeBuilder;
 import org.apache.cayenne.access.sqlbuilder.NodeBuilder;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbJoin;
 
 import static org.apache.cayenne.access.sqlbuilder.SQLBuilder.*;
 
@@ -57,22 +54,21 @@ class TableTreeStage implements TranslationStage {
     }
 
     private NodeBuilder getJoinExpression(TranslatorContext context, TableTreeNode node) {
-        List<DbJoin> joins = node.getRelationship().getJoins();
-
-        ExpressionNodeBuilder expressionNodeBuilder = null;
+        final ExpressionNodeBuilder[] expressionNodeBuilder = {null};
         String sourceAlias = context.getTableTree().aliasForPath(node.getAttributePath().getParent());
-        for (DbJoin dbJoin : joins) {
-            DbAttribute src = dbJoin.getSource();
-            DbAttribute dst = dbJoin.getTarget();
+        node.getRelationship().getJoin().accept(join -> {
+            DbAttribute src = join.getSource();
+            DbAttribute dst = join.getTarget();
             ExpressionNodeBuilder joinExp = table(sourceAlias).column(src)
                     .eq(table(node.getTableAlias()).column(dst));
 
-            if (expressionNodeBuilder != null) {
-                expressionNodeBuilder = expressionNodeBuilder.and(joinExp);
+            if (expressionNodeBuilder[0] != null) {
+                expressionNodeBuilder[0] = expressionNodeBuilder[0].and(joinExp);
             } else {
-                expressionNodeBuilder = joinExp;
+                expressionNodeBuilder[0] = joinExp;
             }
-        }
+            return true;
+        });
 
         return expressionNodeBuilder;
     }

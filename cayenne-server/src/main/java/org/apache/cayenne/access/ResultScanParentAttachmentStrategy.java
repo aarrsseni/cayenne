@@ -18,16 +18,16 @@
  ****************************************************************/
 package org.apache.cayenne.access;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.cayenne.DataRow;
 import org.apache.cayenne.Persistent;
 import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Locates parents by checking for the child PK in the parent DataRow under FK.
@@ -88,7 +88,7 @@ class ResultScanParentAttachmentStrategy implements ParentAttachmentStrategy {
             key = row.get(joins[0].getTargetName());
         }
 
-        List<Persistent> parents = (List<Persistent>) partitionByChild.get(key);
+        List<Persistent> parents = partitionByChild.get(key);
         if (parents != null) {
             for (Persistent parent : parents) {
                 node.linkToParent(object, parent);
@@ -132,11 +132,8 @@ class ResultScanParentAttachmentStrategy implements ParentAttachmentStrategy {
                 key = row.get(joins[0].getSourceName());
             }
 
-            List<Persistent> parents = partitionByChild.get(key);
-            if (parents == null) {
-                parents = new ArrayList<>();
-                partitionByChild.put(key, parents);
-            }
+            List<Persistent> parents = partitionByChild
+                    .computeIfAbsent(key, k -> new ArrayList<>());
 
             parents.add(objects.get(i));
         }

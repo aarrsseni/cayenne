@@ -23,6 +23,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cayenne.dbsync.naming.NameBuilder;
 import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
@@ -31,7 +32,6 @@ import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.util.EqualsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,16 +127,24 @@ public class RelationshipLoader extends AbstractLoader {
 
         // this can be because of filtered out columns, so next check can be excessive,
         // but still better to check everything here too, so we can assert that added relationship is valid.
-        if(relationship.getJoins().isEmpty()) {
+        AtomicInteger relationshipJoinSize = new AtomicInteger(0);
+        relationship.getJoin().accept(join -> {
+            relationshipJoinSize.incrementAndGet();
+            return true;
+        });
+        if(relationshipJoinSize.get() == 0) {
             return;
         }
 
         // check that all join attributes are included
-        for(DbJoin join : relationship.getJoins()) {
-            if(!sourceTableFilter.getIncludeTableColumnFilter(entity.getName()).isIncluded(join.getSourceName()) ||
-                    !targetTableFilter.getIncludeTableColumnFilter(relationship.getTargetEntityName()).isIncluded(join.getTargetName())) {
-                return;
-            }
+        boolean filterFound = relationship.getJoin()
+                .accept(join -> sourceTableFilter.getIncludeTableColumnFilter(entity.getName())
+                        .isIncluded(join.getSourceName()) &&
+                        targetTableFilter.getIncludeTableColumnFilter(relationship.getTargetEntityName())
+                                .isIncluded(join.getTargetName()));
+
+        if(!filterFound) {
+            return;
         }
 
         // add relationship if delegate permit it
@@ -146,17 +154,17 @@ public class RelationshipLoader extends AbstractLoader {
     }
 
     private boolean isToMany(boolean toDependentPK, DbEntity fkEntity, DbRelationship forwardRelationship) {
-        return !toDependentPK || fkEntity.getPrimaryKeys().size() != forwardRelationship.getJoins().size();
+        AtomicInteger forwardRelationshipJoinSize = new AtomicInteger(0);
+        forwardRelationship.getJoin().accept(join -> {
+            forwardRelationshipJoinSize.incrementAndGet();
+            return true;
+        });
+        return !toDependentPK || fkEntity.getPrimaryKeys().size() != forwardRelationshipJoinSize.get();
     }
 
     private boolean isToDependentPK(DbRelationship forwardRelationship) {
-        for (DbJoin dbJoin : forwardRelationship.getJoins()) {
-            if (!dbJoin.getTarget().isPrimaryKey()) {
-                return false;
-            }
-        }
-
-        return true;
+        return forwardRelationship.getJoin()
+                .accept(join -> join.getTarget().isPrimaryKey());
     }
 
     private void createAndAppendJoins(Set<ExportedKey> exportedKeys, DbEntity pkEntity, DbEntity fkEntity,
@@ -187,10 +195,11 @@ public class RelationshipLoader extends AbstractLoader {
 
     private void addJoin(DbRelationship relationship, String sourceName, String targetName){
 
-        for (DbJoin join : relationship.getJoins()) {
-            if (join.getSourceName().equals(sourceName) && join.getTargetName().equals(targetName)) {
-                return;
-            }
+        boolean joinNotFound = relationship.getJoin()
+                .accept(join -> !join.getSourceName().equals(sourceName) ||
+                        !join.getTargetName().equals(targetName));
+        if(!joinNotFound) {
+            return;
         }
 
         relationship.addJoin(new DbJoin(relationship, sourceName, targetName));

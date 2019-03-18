@@ -19,18 +19,17 @@
 
 package org.apache.cayenne.dbsync.merge.token.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.cayenne.dbsync.merge.context.MergerContext;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A {@link MergerToken} to remove a {@link DbAttribute} from a {@link DbEntity}.
@@ -55,11 +54,12 @@ public class DropColumnToModel extends AbstractToModelToken.EntityAndColumn {
         List<DbRelationship> dbRelationships = new ArrayList<>(getEntity()
                 .getRelationships());
         for (DbRelationship dbRelationship : dbRelationships) {
-            for (DbJoin join : dbRelationship.getJoins()) {
+            dbRelationship.getJoin().accept(join -> {
                 if (join.getSource() == getColumn() || join.getTarget() == getColumn()) {
                     remove(mergerContext.getDelegate(), dbRelationship, true);
                 }
-            }
+                return true;
+            });
         }
 
         // remove ObjAttribute mapped to same column

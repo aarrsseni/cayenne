@@ -18,6 +18,13 @@
  ****************************************************************/
 package org.apache.cayenne.access.translator.ejbql;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.cayenne.ObjectId;
 import org.apache.cayenne.Persistent;
 import org.apache.cayenne.dba.QuotingStrategy;
@@ -40,19 +47,12 @@ import org.apache.cayenne.ejbql.parser.Node;
 import org.apache.cayenne.ejbql.parser.SimpleNode;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.reflect.AttributeProperty;
 import org.apache.cayenne.reflect.ClassDescriptor;
 import org.apache.cayenne.reflect.PropertyDescriptor;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.apache.cayenne.util.Util;
 
 /**
  * @since 3.0
@@ -190,17 +190,16 @@ public class EJBQLConditionTranslator extends EJBQLBaseVisitor {
         context.append(" WHERE");
 
         DbRelationship correlatedJoinRelationship = context.getIncomingRelationships(new EJBQLTableId(id)).get(0);
-        Iterator<DbJoin> it = correlatedJoinRelationship.getJoins().iterator();
-        while (it.hasNext()) {
-            DbJoin join = it.next();
-            context.append(' ').append(subqueryRootAlias).append('.').append(join.getTargetName()).append(" = ");
-            context.append(correlatedTableAlias).append('.').append(quoter.quotedSourceName(join));
 
-            if (it.hasNext()) {
-                context.append(" AND");
-            }
-        }
-
+        final List<String> stringList = new ArrayList<>();
+        String finalSubqueryRootAlias = subqueryRootAlias;
+        correlatedJoinRelationship.getJoin().accept(join -> {
+            String builtString = " " + finalSubqueryRootAlias + '.' + join.getTargetName() + " = " +
+                    correlatedTableAlias + '.' + quoter.quotedSourceName(join);
+            stringList.add(builtString);
+            return true;
+        });
+        context.append(Util.join(stringList, " AND"));
         context.append(")");
 
         return false;
@@ -273,11 +272,13 @@ public class EJBQLConditionTranslator extends EJBQLBaseVisitor {
 
         DbRelationship correlatedJoinRelationship = context.getIncomingRelationships(new EJBQLTableId(id)).get(0);
 
-        for (DbJoin join : correlatedJoinRelationship.getJoins()) {
-            context.append(' ').append(subqueryRootAlias).append('.').append(join.getTargetName()).append(" = ");
+        String finalSubqueryRootAlias = subqueryRootAlias;
+        correlatedJoinRelationship.getJoin().accept(join -> {
+            context.append(' ').append(finalSubqueryRootAlias).append('.').append(join.getTargetName()).append(" = ");
             context.append(correlatedTableAlias).append('.').append(quoter.quotedSourceName(join));
             context.append(" AND");
-        }
+            return true;
+        });
 
         // translate subquery_root_id = LHS_of_memberof
         EJBQLEquals equals = new EJBQLEquals(-1);
@@ -321,16 +322,15 @@ public class EJBQLConditionTranslator extends EJBQLBaseVisitor {
 
             context.append(" ON (");
 
-            List<DbJoin> joins = dbRelationship.getJoins();
-            Iterator<DbJoin> it = joins.iterator();
-            while (it.hasNext()) {
-                DbJoin join = it.next();
-                context.append(' ').append(subqueryTargetAlias).append('.').append(join.getTargetName()).append(" = ");
-                context.append(subquerySourceAlias).append('.').append(join.getSourceName());
-                if (it.hasNext()) {
-                    context.append(" AND");
-                }
-            }
+            final List<String> stringList = new ArrayList<>();
+            dbRelationship.getJoin().accept(join -> {
+                String resultStr = " " + subqueryTargetAlias + '.' + join.getTargetName() + " = " +
+                        subquerySourceAlias + '.' + join.getSourceName();
+                stringList.add(resultStr);
+                return true;
+            });
+
+            context.append(Util.join(stringList, " AND"));
             context.append(" )");
             subqueryRootAlias = subquerySourceAlias;
 

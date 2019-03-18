@@ -19,6 +19,16 @@
 
 package org.apache.cayenne.dba;
 
+import java.net.URL;
+import java.sql.PreparedStatement;
+import java.sql.Types;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.sqlbuilder.sqltree.Node;
@@ -26,8 +36,8 @@ import org.apache.cayenne.access.translator.ParameterBinding;
 import org.apache.cayenne.access.translator.batch.BatchTranslatorFactory;
 import org.apache.cayenne.access.translator.ejbql.EJBQLTranslatorFactory;
 import org.apache.cayenne.access.translator.ejbql.JdbcEJBQLTranslatorFactory;
-import org.apache.cayenne.access.translator.select.SelectTranslator;
 import org.apache.cayenne.access.translator.select.DefaultSelectTranslator;
+import org.apache.cayenne.access.translator.select.SelectTranslator;
 import org.apache.cayenne.access.types.ExtendedType;
 import org.apache.cayenne.access.types.ExtendedTypeFactory;
 import org.apache.cayenne.access.types.ExtendedTypeMap;
@@ -39,7 +49,6 @@ import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.log.JdbcEventLogger;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.query.FluentSelect;
@@ -50,15 +59,6 @@ import org.apache.cayenne.resource.Resource;
 import org.apache.cayenne.resource.ResourceLocator;
 import org.apache.cayenne.util.Util;
 
-import java.net.URL;
-import java.sql.PreparedStatement;
-import java.sql.Types;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * A generic DbAdapter implementation. Can be used as a default adapter or as a
@@ -455,18 +455,16 @@ public class JdbcAdapter implements DbAdapter {
         buf.append(quotingStrategy.quotedFullyQualifiedName(source));
         buf.append(" ADD FOREIGN KEY (");
 
-        boolean first = true;
-
-        // sort joins in the order PK are set in target, to avoid errors on some DBs
         List<DbJoin> joins = rel.getJoins();
         if(rel.isToPK()) {
             List<DbAttribute> pks = rel.getTargetEntity().getPrimaryKeys();
             joins.sort(Comparator.comparingInt(join -> pks.indexOf(join.getTarget())));
         }
 
-        for (DbJoin join : joins) {
-            if (first) {
-                first = false;
+        final AtomicBoolean first = new AtomicBoolean(true);
+        rel.getJoin().accept(join -> {
+            if (first.get()) {
+                first.set(false);
             } else {
                 buf.append(", ");
                 refBuf.append(", ");
@@ -474,7 +472,8 @@ public class JdbcAdapter implements DbAdapter {
 
             buf.append(quotingStrategy.quotedSourceName(join));
             refBuf.append(quotingStrategy.quotedTargetName(join));
-        }
+            return true;
+        });
 
         buf.append(") REFERENCES ");
 

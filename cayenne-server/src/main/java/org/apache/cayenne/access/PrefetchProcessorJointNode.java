@@ -19,6 +19,15 @@
 
 package org.apache.cayenne.access;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.DataRow;
 import org.apache.cayenne.Persistent;
@@ -27,7 +36,6 @@ import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.exp.parser.ASTPath;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
@@ -38,15 +46,6 @@ import org.apache.cayenne.reflect.ClassDescriptor;
 import org.apache.cayenne.reflect.PropertyVisitor;
 import org.apache.cayenne.reflect.ToManyProperty;
 import org.apache.cayenne.reflect.ToOneProperty;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * A specialized PrefetchTreeNode used for joint prefetch resolving.
@@ -187,10 +186,11 @@ class PrefetchProcessorJointNode extends PrefetchProcessorNode {
                     .getRelationship()
                     .getDbRelationships()
                     .get(0);
-            for (final DbJoin join : r.getJoins()) {
+            r.getJoin().accept(join -> {
                 appendColumn(targetSource, join.getTargetName(), prefix
                         + join.getTargetName());
-            }
+                return true;
+            });
         }
 
         ClassDescriptor descriptor = resolver.getDescriptor();

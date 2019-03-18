@@ -435,14 +435,15 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
                     // handle all of the relationships / joins that use the
                     // changed attribute
                     for (DbRelationship rel : ent.getRelationships()) {
-                        for (DbJoin join : rel.getJoins()) {
+                        rel.getJoin().accept(join -> {
                             if (join.getSource() == dbAttribute) {
                                 join.setSourceName(newName);
                             }
                             if (join.getTarget() == dbAttribute) {
                                 join.setTargetName(newName);
                             }
-                        }
+                            return true;
+                        });
                     }
                 }
             }

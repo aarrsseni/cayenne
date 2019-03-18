@@ -25,7 +25,6 @@ import org.apache.cayenne.DataRow;
 import org.apache.cayenne.ObjectId;
 import org.apache.cayenne.PersistenceState;
 import org.apache.cayenne.Persistent;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjRelationship;
@@ -219,13 +218,8 @@ class DataRowUtils {
     }
 
     static boolean hasFK(DbRelationship relationship, Map<String, Object> snapshot) {
-        for (final DbJoin join : relationship.getJoins()) {
-            if (!snapshot.containsKey(join.getSourceName())) {
-                return false;
-            }
-        }
-
-        return true;
+        return relationship.getJoin()
+                .accept(join -> snapshot.containsKey(join.getSourceName()));
     }
 
     /**

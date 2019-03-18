@@ -104,7 +104,7 @@ public class RelationshipUndoableEdit extends CayenneUndoableEdit {
 		rel.setToMany(dbRelationship.isToMany());
 		rel.setTargetEntityName(dbRelationship.getTargetEntityName());
 		rel.setSourceEntity(dbRelationship.getSourceEntity());
-		rel.setJoins(rel.getJoins());
+		rel.setJoins(((DbRelationship)dbRelationship).getJoin());
 		return rel;
 	}
 

@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.cayenne.access.translator.ejbql;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,11 +32,11 @@ import org.apache.cayenne.ejbql.EJBQLExpression;
 import org.apache.cayenne.ejbql.EJBQLParserFactory;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.query.EntityResultSegment;
 import org.apache.cayenne.util.CayenneMapEntry;
+import org.apache.cayenne.util.Util;
 
 /**
  * Handles appending joins to the content buffer at a marked position.
@@ -183,32 +184,20 @@ public class EJBQLJoinAppender {
         context.append(" ON (");
         QuotingStrategy quoter = context.getQuotingStrategy();
 
-        Iterator<DbJoin> it = incomingDB.getJoins().iterator();
-        if (it.hasNext()) {
-            DbJoin dbJoin = it.next();
-            context
-                    .append(sourceAlias)
-                    .append('.')
-                    .append(quoter.quotedSourceName(dbJoin))
-                    .append(" = ")
-                    .append(targetAlias)
-                    .append('.')
-                    .append(quoter.quotedTargetName(dbJoin));
-        }
+        List<String> stringList = new ArrayList<>();
+        incomingDB.getJoin().accept(join -> {
+            String builtString = sourceAlias +
+                    '.' +
+                    quoter.quotedSourceName(join) +
+                    " = " +
+                    targetAlias +
+                    '.' +
+                    quoter.quotedTargetName(join);
+            stringList.add(builtString);
+            return true;
+        });
 
-        while (it.hasNext()) {
-            context.append(" AND ");
-            DbJoin dbJoin = it.next();
-            context
-                    .append(sourceAlias)
-                    .append('.')
-                    .append(quoter.quotedSourceName(dbJoin))
-                    .append(" = ")
-                    .append(targetAlias)
-                    .append('.')
-                    .append(quoter.quotedTargetName(dbJoin));
-        }
-
+        context.append(Util.join(stringList, " AND "));
         context.append(")");
     }
 

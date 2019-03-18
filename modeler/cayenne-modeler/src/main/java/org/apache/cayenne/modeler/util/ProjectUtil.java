@@ -342,13 +342,9 @@ public class ProjectUtil {
             return false;
         }
 
-        for (DbJoin join : relationship.getJoins()) {
-            if (join.getSource() == attribute) {
-                return true;
-            }
-        }
-
-        return false;
+        boolean sourceAttrNotFound = relationship.getJoin()
+                .accept(join -> join.getSource() != attribute);
+        return !sourceAttrNotFound;
     }
 
     /**
@@ -361,13 +357,9 @@ public class ProjectUtil {
             return false;
         }
 
-        for (DbJoin join : relationship.getJoins()) {
-            if (join.getTarget() == attribute) {
-                return true;
-            }
-        }
-
-        return false;
+        boolean targetAttrNotFound = relationship.getJoin()
+                .accept(join -> join.getTarget() != attribute);
+        return !targetAttrNotFound;
     }
 
     /**

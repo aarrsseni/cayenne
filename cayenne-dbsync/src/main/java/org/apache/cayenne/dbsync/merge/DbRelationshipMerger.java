@@ -28,7 +28,6 @@ import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.dbsync.reverse.filters.FiltersConfig;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
 import org.apache.cayenne.map.DbRelationship;
 
 /**
@@ -78,7 +77,7 @@ public class DbRelationshipMerger extends AbstractMerger<DbEntity, DbRelationshi
         imported.setSourceEntity(originalDbEntity);
 
         // manipulate the joins to match the DbAttributes in the model
-        for (DbJoin join : imported.getJoins()) {
+        imported.getJoin().accept(join -> {
             DbAttribute sourceAttr = findDbAttribute(originalDbEntity, join.getSourceName());
             if (sourceAttr != null) {
                 join.setSourceName(sourceAttr.getName());
@@ -87,7 +86,9 @@ public class DbRelationshipMerger extends AbstractMerger<DbEntity, DbRelationshi
             if (targetAttr != null) {
                 join.setTargetName(targetAttr.getName());
             }
-        }
+            return true;
+        });
+
         // Add all relationships. Tokens will decide whether or not to execute
         MergerToken token = getTokenFactory().createDropRelationshipToDb(originalDbEntity, imported);
         return Collections.singleton(token);
