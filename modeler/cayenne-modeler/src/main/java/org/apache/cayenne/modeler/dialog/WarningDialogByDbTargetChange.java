@@ -28,7 +28,8 @@ import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
 import java.util.Collection;
 
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.modeler.Application;
@@ -48,9 +49,14 @@ public class WarningDialogByDbTargetChange {
           - the user doesn't agree and wanna return back.
     */
 
-    public static boolean showWarningDialog(ProjectController mediator, DbRelationship relationship) {
-
+    public static boolean showWarningDialog(ProjectController mediator, DbEntity srcEntity, String relationshipName) {
         int result;
+        DbRelationship relationship = srcEntity.getRelationship(relationshipName);
+        if(relationship == null) {
+            result = JOptionPane.showConfirmDialog(Application.getFrame(), "All joins will be dropped.",
+                    "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            return (result == JOptionPane.OK_OPTION);
+        }
         Collection<ObjRelationship> objRelationshipsForDbRelationship = ProjectUtil
                 .findObjRelationshipsForDbRelationship(mediator, relationship);
         Collection<ObjAttribute> fObjAttributesForDbRelationship = ProjectUtil

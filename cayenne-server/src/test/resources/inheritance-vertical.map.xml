@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.inheritance_vertical"/>
 	<db-entity name="IV1_ROOT">
 		<db-attribute name="DISCRIMINATOR" type="VARCHAR" length="10"/>
@@ -117,7 +117,7 @@
 		<obj-attribute name="attr1" type="java.lang.String" db-attribute-path="impl.ATTR1"/>
 		<obj-attribute name="attr2" type="java.lang.String" db-attribute-path="impl.ATTR2"/>
 	</obj-entity>
-	<obj-entity name="IvImplWithLock" superEntityName="IvBaseWithLock" className="org.apache.cayenne.testdo.inheritance_vertical.IvImplWithLock" lock-type="optimistic">
+	<obj-entity name="IvImplWithLock" superEntityName="IvBaseWithLock" className="org.apache.cayenne.testdo.inheritance_vertical.IvImplWithLock">
 		<qualifier><![CDATA[type = "I"]]></qualifier>
 		<obj-attribute name="attr1" type="java.lang.String" db-attribute-path="impl.ATTR1"/>
 	</obj-entity>
@@ -149,90 +149,125 @@
 		<qualifier><![CDATA[discriminator = "IvSub3"]]></qualifier>
 		<pre-persist method-name="onPrePersist"/>
 	</obj-entity>
-	<db-relationship name="sub1" source="IV1_ROOT" target="IV1_SUB1" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="root" source="IV1_SUB1" target="IV1_ROOT">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="sub1" source="IV2_ROOT" target="IV2_SUB1" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="root" source="IV2_SUB1" target="IV2_ROOT">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="x" source="IV2_SUB1" target="IV2_X">
-		<db-attribute-pair source="X_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="sub1" source="IV2_X" target="IV2_SUB1" toMany="true">
-		<db-attribute-pair source="ID" target="X_ID"/>
-	</db-relationship>
-	<db-relationship name="children" source="IV_ABSTRACT" target="IV_ABSTRACT" toMany="true">
-		<db-attribute-pair source="ID" target="PARENT_ID"/>
-	</db-relationship>
-	<db-relationship name="concrete" source="IV_ABSTRACT" target="IV_CONCRETE" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="parent" source="IV_ABSTRACT" target="IV_ABSTRACT">
-		<db-attribute-pair source="PARENT_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="impl" source="IV_BASE" target="IV_IMPL" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="impl" source="IV_BASE_WITH_LOCK" target="IV_IMPL_WITH_LOCK" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="abstract" source="IV_CONCRETE" target="IV_ABSTRACT">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="base" source="IV_IMPL" target="IV_BASE">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="other1" source="IV_IMPL" target="IV_OTHER">
-		<db-attribute-pair source="OTHER1_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="other2" source="IV_IMPL" target="IV_OTHER">
-		<db-attribute-pair source="OTHER2_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="base" source="IV_IMPL_WITH_LOCK" target="IV_BASE_WITH_LOCK">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="other1" source="IV_IMPL_WITH_LOCK" target="IV_OTHER">
-		<db-attribute-pair source="OTHER1_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="impls" source="IV_OTHER" target="IV_IMPL" toMany="true">
-		<db-attribute-pair source="ID" target="OTHER_ID"/>
-	</db-relationship>
-	<db-relationship name="implsWithLock" source="IV_OTHER" target="IV_IMPL_WITH_LOCK" toMany="true">
-		<db-attribute-pair source="ID" target="OTHER_ID"/>
-	</db-relationship>
-	<db-relationship name="ivSub3s" source="IV_ROOT" target="IV_SUB3" toMany="true">
-		<db-attribute-pair source="ID" target="IV_ROOT_ID"/>
-	</db-relationship>
-	<db-relationship name="sub1" source="IV_ROOT" target="IV_SUB1" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="sub2" source="IV_ROOT" target="IV_SUB2" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="sub3" source="IV_ROOT" target="IV_SUB3" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="master" source="IV_SUB1" target="IV_ROOT">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="sub1Sub1" source="IV_SUB1" target="IV_SUB1_SUB1" toDependentPK="true">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="master" source="IV_SUB1_SUB1" target="IV_SUB1">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="master" source="IV_SUB2" target="IV_ROOT">
-		<db-attribute-pair source="ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="ivRoot1" source="IV_SUB3" target="IV_ROOT">
-		<db-attribute-pair source="IV_ROOT_ID" target="ID"/>
-	</db-relationship>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV1_ROOT" name="sub1"/>
+		<right entity="IV1_SUB1" name="root"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV2_ROOT" name="sub1"/>
+		<right entity="IV2_SUB1" name="root"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="IV2_SUB1" name="x"/>
+		<right entity="IV2_X" name="sub1"/>
+		<db-join-condition>
+			<column-pair left="X_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="IV_ABSTRACT" name="children"/>
+		<right entity="IV_ABSTRACT" name="parent"/>
+		<db-join-condition>
+			<column-pair left="ID" right="PARENT_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV_ABSTRACT" name="concrete"/>
+		<right entity="IV_CONCRETE" name="abstract"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV_BASE" name="impl"/>
+		<right entity="IV_IMPL" name="base"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV_BASE_WITH_LOCK" name="impl"/>
+		<right entity="IV_IMPL_WITH_LOCK" name="base"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="NONE">
+		<left entity="IV_IMPL" name="other1"/>
+		<right entity="IV_OTHER"/>
+		<db-join-condition>
+			<column-pair left="OTHER1_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="NONE">
+		<left entity="IV_IMPL" name="other2"/>
+		<right entity="IV_OTHER"/>
+		<db-join-condition>
+			<column-pair left="OTHER2_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="IV_IMPL"/>
+		<right entity="IV_OTHER" name="impls"/>
+		<db-join-condition>
+			<column-pair left="OTHER_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="NONE">
+		<left entity="IV_IMPL_WITH_LOCK" name="other1"/>
+		<right entity="IV_OTHER"/>
+		<db-join-condition>
+			<column-pair left="OTHER1_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="IV_IMPL_WITH_LOCK"/>
+		<right entity="IV_OTHER" name="implsWithLock"/>
+		<db-join-condition>
+			<column-pair left="OTHER_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="IV_ROOT" name="ivSub3s"/>
+		<right entity="IV_SUB3" name="ivRoot1"/>
+		<db-join-condition>
+			<column-pair left="ID" right="IV_ROOT_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV_ROOT" name="sub1"/>
+		<right entity="IV_SUB1" name="master"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV_ROOT" name="sub2"/>
+		<right entity="IV_SUB2" name="master"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV_ROOT" name="sub3"/>
+		<right entity="IV_SUB3"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="IV_SUB1" name="sub1Sub1"/>
+		<right entity="IV_SUB1_SUB1" name="master"/>
+		<db-join-condition>
+			<column-pair left="ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="x" source="Iv2Sub1" target="Iv2X" deleteRule="Nullify" db-relationship-path="sub1.x"/>
 	<obj-relationship name="children" source="IvConcrete" target="IvConcrete" deleteRule="Deny" db-relationship-path="children"/>
 	<obj-relationship name="parent" source="IvConcrete" target="IvConcrete" deleteRule="Nullify" db-relationship-path="parent"/>

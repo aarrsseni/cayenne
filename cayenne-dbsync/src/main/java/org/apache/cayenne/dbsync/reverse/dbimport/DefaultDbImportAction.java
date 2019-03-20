@@ -199,7 +199,9 @@ public class DefaultDbImportAction implements DbImportAction {
             hasChanges = true;
             targetDataMap = newTargetDataMap(config);
         }
-        this.loadedDataMap = targetDataMap;
+        DataMap finalTargetDataMap = targetDataMap;
+        finalTargetDataMap.getDbJoinList().forEach(dbJoin -> dbJoin.compile(finalTargetDataMap));
+        this.loadedDataMap = finalTargetDataMap;
 
         // In that moment our data map fills with sorce map
         // transform source DataMap before merging

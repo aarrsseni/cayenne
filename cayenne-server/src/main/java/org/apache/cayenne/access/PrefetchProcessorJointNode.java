@@ -36,9 +36,10 @@ import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.exp.parser.ASTPath;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.PrefetchTreeNode;
 import org.apache.cayenne.reflect.ArcProperty;
 import org.apache.cayenne.reflect.AttributeProperty;
@@ -186,10 +187,27 @@ class PrefetchProcessorJointNode extends PrefetchProcessorNode {
                     .getRelationship()
                     .getDbRelationships()
                     .get(0);
-            r.getJoin().accept(join -> {
-                appendColumn(targetSource, join.getTargetName(), prefix
-                        + join.getTargetName());
-                return true;
+            r.accept(new DirectionalJoinVisitor<Void>() {
+
+                private void appendColumns(DbAttribute source, DbAttribute target) {
+                    appendColumn(targetSource, target.getName(), prefix
+                            + target.getName());
+                }
+
+                @Override
+                public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                    int length = source.length;
+                    for(int i = 0; i < length; i++) {
+                        appendColumns(source[i], target[i]);
+                    }
+                    return null;
+                }
+
+                @Override
+                public Void visit(DbAttribute source, DbAttribute target) {
+                    appendColumns(source, target);
+                    return null;
+                }
             });
         }
 

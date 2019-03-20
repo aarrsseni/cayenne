@@ -18,11 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.configuration;
 
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.resource.Resource;
-import org.apache.cayenne.util.XMLEncoder;
-import org.apache.cayenne.util.XMLSerializable;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +25,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.MappingCache;
+import org.apache.cayenne.resource.Resource;
+import org.apache.cayenne.util.XMLEncoder;
+import org.apache.cayenne.util.XMLSerializable;
 
 /**
  * A descriptor of a DataChannel normally loaded from XML configuration.
@@ -43,8 +44,8 @@ public class DataChannelDescriptor implements ConfigurationNode, Serializable, X
 	/**
 	 * The namespace in which the data map XML file will be created.
 	 */
-	public static final String SCHEMA_XSD = "http://cayenne.apache.org/schema/10/domain";
-	public static final String SCHEMA_XSD_LOCATION = "https://cayenne.apache.org/schema/10/domain.xsd";
+	public static final String SCHEMA_XSD = "http://cayenne.apache.org/schema/11/domain";
+	public static final String SCHEMA_XSD_LOCATION = "https://cayenne.apache.org/schema/11/domain.xsd";
 
 	protected String name;
 	protected Map<String, String> properties;
@@ -52,6 +53,8 @@ public class DataChannelDescriptor implements ConfigurationNode, Serializable, X
 	protected Collection<DataNodeDescriptor> nodeDescriptors;
 	protected transient Resource configurationSource;
 	protected String defaultNodeName;
+
+	private transient MappingCache mappingCache;
 
 	public DataChannelDescriptor() {
 		properties = new HashMap<>();
@@ -157,5 +160,13 @@ public class DataChannelDescriptor implements ConfigurationNode, Serializable, X
 
 	public void setDefaultNodeName(String defaultDataNodeName) {
 		this.defaultNodeName = defaultDataNodeName;
+	}
+
+	public void setMappingCache(MappingCache mappingCache) {
+		this.mappingCache = mappingCache;
+	}
+
+	public MappingCache getMappingCache() {
+		return mappingCache;
 	}
 }

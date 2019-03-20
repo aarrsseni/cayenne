@@ -100,9 +100,8 @@ public class DbImportIT extends BaseTaskIT {
         assertTrue(dataMap.exists());
 
         // Check few lines from reverse engineering output
-        assertTrue(result.getOutput().contains("Table: APP.PAINTING"));
-        assertTrue(result.getOutput().contains("Db Relationship : toOne  (EXHIBIT.GALLERY_ID, GALLERY.GALLERY_ID)"));
-        assertTrue(result.getOutput().contains("Db Relationship : toMany (GALLERY.GALLERY_ID, PAINTING.GALLERY_ID)"));
+        assertTrue(result.getOutput().contains("DbJoin : ONE_TO_MANY (GALLERY.GALLERY_ID, PAINTING.GALLERY_ID)"));
+        assertTrue(result.getOutput().contains("DbJoin : MANY_TO_ONE (EXHIBIT.GALLERY_ID, GALLERY.GALLERY_ID)"));
         assertTrue(result.getOutput().contains("Create Table         ARTIST"));
         assertFalse(result.getOutput().contains("Create Table         PAINTING1"));
         assertTrue(result.getOutput().contains("Skip relation: '.APP.ARTIST.ARTIST_ID <- .APP.PAINTING1.ARTIST_ID # 1'"));
@@ -149,8 +148,8 @@ public class DbImportIT extends BaseTaskIT {
 
         // Check few lines from reverse engineering output
         assertTrue(result.getOutput().contains("Table: APP.PAINTING"));
-        assertTrue(result.getOutput().contains("Db Relationship : toOne  (EXHIBIT.GALLERY_ID, GALLERY.GALLERY_ID)"));
-        assertTrue(result.getOutput().contains("Db Relationship : toMany (GALLERY.GALLERY_ID, PAINTING.GALLERY_ID)"));
+        assertTrue(result.getOutput().contains("DbJoin : MANY_TO_ONE (EXHIBIT.GALLERY_ID, GALLERY.GALLERY_ID)"));
+        assertTrue(result.getOutput().contains("DbJoin : ONE_TO_MANY (GALLERY.GALLERY_ID, PAINTING.GALLERY_ID)"));
         assertTrue(result.getOutput().contains("Create Table         ARTIST"));
         assertFalse(result.getOutput().contains("Create Table         PAINTING1"));
         assertTrue(result.getOutput().contains("Skip relation: '.APP.ARTIST.ARTIST_ID <- .APP.PAINTING1.ARTIST_ID # 1'"));

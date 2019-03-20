@@ -34,12 +34,13 @@ import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.util.DeleteRuleUpdater;
 import org.apache.cayenne.util.EntityMergeListener;
 import org.slf4j.Logger;
@@ -363,14 +364,32 @@ public class EntityMergeSupport {
         return !isFK(dbAttribute, incomingRels, false);
     }
 
-    private boolean isFK(DbAttribute dbAttribute, Collection<DbRelationship> collection, boolean source) {
+    private boolean isFK(DbAttribute dbAttribute, Collection<DbRelationship> collection, boolean sourceFlag) {
         for (DbRelationship rel : collection) {
-            boolean fkNotFound = rel.getJoin()
-                    .accept(join -> {
-                        DbAttribute joinAttribute = source ? join.getSource() : join.getTarget();
-                        return joinAttribute != dbAttribute;
-                    });
-            if(!fkNotFound) {
+            boolean fkFound = rel.accept(new DirectionalJoinVisitor<Boolean>() {
+
+                private boolean isFk(DbAttribute source, DbAttribute target) {
+                    DbAttribute joinAttribute = sourceFlag ? source : target;
+                    return joinAttribute == dbAttribute;
+                }
+
+                @Override
+                public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                    int length = source.length;
+                    for(int i = 0; i < length; i++) {
+                        if(isFk(source[i], target[i])) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public Boolean visit(DbAttribute source, DbAttribute target) {
+                    return isFk(source, target);
+                }
+            });
+            if(fkFound) {
                 return true;
             }
         }
@@ -399,7 +418,8 @@ public class EntityMergeSupport {
     private boolean objRelationshipHasDbRelationship(ObjRelationship objRelationship, DbRelationship dbRelationship) {
         for(DbRelationship relationship : objRelationship.getDbRelationships()) {
 
-            if(relationship.getSourceEntityName().equals(dbRelationship.getSourceEntityName())
+            if(relationship.getSourceEntity().getName()
+                    .equals(dbRelationship.getSourceEntity().getName())
                     && relationship.getTargetEntityName().equals(dbRelationship.getTargetEntityName())
                     && isSameAttributes(relationship.getSourceAttributes(), dbRelationship.getSourceAttributes())
                     && isSameAttributes(relationship.getTargetAttributes(), dbRelationship.getTargetAttributes())) {

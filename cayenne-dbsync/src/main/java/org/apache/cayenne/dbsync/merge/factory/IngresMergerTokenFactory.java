@@ -20,21 +20,24 @@ package org.apache.cayenne.dbsync.merge.factory;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.dba.QuotingStrategy;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
-import org.apache.cayenne.dbsync.merge.token.db.AddRelationshipToDb;
+import org.apache.cayenne.dbsync.merge.token.db.AddJoinToDb;
 import org.apache.cayenne.dbsync.merge.token.db.DropColumnToDb;
-import org.apache.cayenne.dbsync.merge.token.db.DropRelationshipToDb;
+import org.apache.cayenne.dbsync.merge.token.db.DropJoinToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetAllowNullToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetColumnTypeToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetGeneratedFlagToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetNotNullToDb;
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.JoinVisitor;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 
 public class IngresMergerTokenFactory extends DefaultMergerTokenFactory {
 
@@ -76,56 +79,82 @@ public class IngresMergerTokenFactory extends DefaultMergerTokenFactory {
     }
 
     @Override
-    public MergerToken createAddRelationshipToDb(DbEntity entity, final DbRelationship rel) {
-        return new AddRelationshipToDb(entity, rel) {
+    public MergerToken createAddJoinToDb(DbJoin join) {
+        return new AddJoinToDb(join) {
             @Override
             public List<String> createSql(DbAdapter adapter) {
-                if (!rel.isToMany() && rel.isToPK() && !rel.isToDependentPK()) {
+                RelationshipDirection direction = AddJoinToDb.getRelationshipDirection(join);
+                DataMap dataMap = join.getDataMap();
+                DbEntity source = dataMap.getDbEntity(join.getDbEntities()[direction.ordinal()]);
+                QuotingStrategy context = adapter.getQuotingStrategy();
+                StringBuilder buf = new StringBuilder();
+                StringBuilder refBuf = new StringBuilder();
 
-                    DbEntity source = (DbEntity) rel.getSourceEntity();
-                    QuotingStrategy context = adapter.getQuotingStrategy();
-                    StringBuilder buf = new StringBuilder();
-                    StringBuilder refBuf = new StringBuilder();
-
-                    buf.append("ALTER TABLE ");
-                    buf.append(context.quotedFullyQualifiedName(source));
+                buf.append("ALTER TABLE ");
+                buf.append(context.quotedFullyQualifiedName(source));
 
                     // requires the ADD CONSTRAINT statement
-                    buf.append(" ADD CONSTRAINT ");
-                    String name = "U_" + rel.getSourceEntity().getName() + "_"
-                            + (long) (System.currentTimeMillis() / (Math.random() * 100000));
+                buf.append(" ADD CONSTRAINT ");
+                String name = "U_" + source.getName() + "_"
+                        + (long) (System.currentTimeMillis() / (Math.random() * 100000));
 
-                    buf.append(context.quotedIdentifier(rel.getSourceEntity(), name));
-                    buf.append(" FOREIGN KEY (");
+                buf.append(context.quotedIdentifier(source, name));
+                buf.append(" FOREIGN KEY (");
 
-                    final AtomicBoolean first = new AtomicBoolean(true);
-                    rel.getJoin().accept(join -> {
-                        if (!first.get()) {
-                            buf.append(", ");
-                            refBuf.append(", ");
+                join.getDbJoinCondition().accept(new JoinVisitor<Void>() {
+
+                    private void append(ColumnPair columnPair) {
+                        if(direction == RelationshipDirection.LEFT) {
+                            buf.append(context
+                                    .quotedIdentifier(dataMap,
+                                            columnPair.getLeft()));
+                            refBuf.append(context
+                                    .quotedIdentifier(dataMap,
+                                            columnPair.getRight()));
                         } else {
-                            first.set(false);
-                        }
-
-                        buf.append(context.quotedSourceName(join));
-                        refBuf.append(context.quotedTargetName(join));
-                        return true;
-                    });
-
-                    buf.append(") REFERENCES ");
-                    buf.append(context.quotedFullyQualifiedName((DbEntity) rel.getTargetEntity()));
-                    buf.append(" (");
-                    buf.append(refBuf.toString());
-                    buf.append(')');
-
-                    // also make sure we delete dependent FKs
-                    buf.append(" ON DELETE CASCADE");
-
-                    return Collections.singletonList(buf.toString());
+                        buf.append(context
+                                .quotedIdentifier(dataMap,
+                                        columnPair.getRight()));
+                        refBuf.append(context
+                                .quotedIdentifier(dataMap,
+                                        columnPair.getLeft()));
+                    }
                 }
 
-                return Collections.emptyList();
+                @Override
+                public Void visit(ColumnPair columnPair) {
+                    append(columnPair);
+                    return null;
+                    }
 
+                    @Override
+                    public Void visit(ColumnPair[] columnPairs) {
+                        boolean first = true;
+                        for(ColumnPair columnPair : columnPairs) {
+                            if (!first) {
+                                buf.append(", ");
+                                refBuf.append(", ");
+                            } else {
+                                first = false;
+                            }
+                            append(columnPair);
+                        }
+                        return null;
+                    }
+                });
+                buf.append(") REFERENCES ");
+                DbEntity targetEntity = dataMap
+                        .getDbEntity(
+                                join.getDbEntities()[direction.getOppositeDirection().ordinal()]);
+                buf.append(context.quotedFullyQualifiedName(targetEntity));
+                buf.append(" (");
+                buf.append(refBuf.toString());
+                buf.append(')');
+
+                // also make sure we delete dependent FKs
+                buf.append(" ON DELETE CASCADE");
+
+                return Collections.singletonList(buf.toString());
             }
         };
     }
@@ -197,9 +226,8 @@ public class IngresMergerTokenFactory extends DefaultMergerTokenFactory {
     }
 
     @Override
-    public MergerToken createDropRelationshipToDb(final DbEntity entity, DbRelationship rel) {
-
-        return new DropRelationshipToDb(entity, rel) {
+    public MergerToken createDropJoinToDb(DbJoin dbJoin) {
+        return new DropJoinToDb(dbJoin) {
 
             @Override
             public List<String> createSql(DbAdapter adapter) {
@@ -208,16 +236,20 @@ public class IngresMergerTokenFactory extends DefaultMergerTokenFactory {
                 if (fkName == null) {
                     return Collections.emptyList();
                 }
-                
+                RelationshipDirection direction = AddJoinToDb.getRelationshipDirection(dbJoin);
+                DataMap dataMap = dbJoin.getDataMap();
+                DbEntity entity = dataMap.getDbEntity(
+                        dbJoin.getDbEntities()[direction.ordinal()]);
                 StringBuilder buf = new StringBuilder();
                 buf.append("ALTER TABLE ");
-                buf.append(adapter.getQuotingStrategy().quotedFullyQualifiedName(getEntity()));
+                buf.append(adapter.getQuotingStrategy().quotedFullyQualifiedName(entity));
                 buf.append(" DROP CONSTRAINT ");
                 buf.append(fkName);
                 buf.append(" CASCADE ");
 
                 return Collections.singletonList(buf.toString());
             }
+
         };
     }
 

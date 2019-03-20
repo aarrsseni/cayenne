@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 
 /**
  * Interface that describes result of path translation

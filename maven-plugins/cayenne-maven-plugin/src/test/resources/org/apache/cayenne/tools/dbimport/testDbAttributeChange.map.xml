@@ -17,25 +17,24 @@
   ~  specific language governing permissions and limitations
   ~  under the License.
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-          project-version="10">
-
+          xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+          project-version="11">
+    <db-entity name="CHILD" schema="SCHEMA_01">
+        <db-attribute name="COL4" type="VARCHAR" length="25"/>
+        <db-attribute name="COL5" type="DATE" length="10"/>
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+        <db-attribute name="col1" type="INTEGER"/>
+        <db-attribute name="col2" type="DECIMAL" length="10" scale="2"/>
+        <db-attribute name="parent_id" type="CHAR" length="25"/>
+    </db-entity>
     <db-entity name="parent" schema="SCHEMA_01">
         <db-attribute name="COL2" type="CHAR" length="25"/>
         <db-attribute name="COL3" type="DECIMAL" length="10" scale="2"/>
         <db-attribute name="COL4" type="VARCHAR" length="25"/>
         <db-attribute name="COL5" type="DATE" length="10"/>
         <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
-    </db-entity>
-    <db-entity name="CHILD" schema="SCHEMA_01">
-        <db-attribute name="col1" type="INTEGER"/>
-        <db-attribute name="col2" type="DECIMAL" length="10" scale="2"/>
-        <db-attribute name="COL4" type="VARCHAR" length="25"/>
-        <db-attribute name="COL5" type="DATE" length="10"/>
-        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
-        <db-attribute name="parent_id" type="CHAR" length="25"/>
     </db-entity>
     <obj-entity name="Child" className="Child" dbEntityName="CHILD">
         <obj-attribute name="col3" type="java.math.BigDecimal" db-attribute-path="COL3"/>
@@ -49,14 +48,13 @@
         <obj-attribute name="col4" type="java.lang.String" db-attribute-path="COL4"/>
         <obj-attribute name="col5" type="java.util.Date" db-attribute-path="COL5"/>
     </obj-entity>
-
-    <db-relationship name="parent" source="CHILD" target="parent">
-        <db-attribute-pair source="parent_id" target="ID"/>
-    </db-relationship>
-    <db-relationship name="children" source="parent" target="CHILD" toMany="true">
-        <db-attribute-pair source="ID" target="parent_id"/>
-    </db-relationship>
-
+    <db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+        <left entity="CHILD" name="parent"/>
+        <right entity="parent" name="children"/>
+        <db-join-condition>
+            <column-pair left="parent_id" right="ID"/>
+        </db-join-condition>
+    </db-join>
     <obj-relationship name="parent" source="Child" target="Parent" deleteRule="Nullify" db-relationship-path="parent"/>
     <obj-relationship name="children" source="Parent" target="Child" deleteRule="Deny" db-relationship-path="children"/>
 </data-map>

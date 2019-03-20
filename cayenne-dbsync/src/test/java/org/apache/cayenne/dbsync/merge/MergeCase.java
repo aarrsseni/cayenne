@@ -18,6 +18,13 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.configuration.server.ServerRuntime;
@@ -26,8 +33,8 @@ import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.dbsync.merge.context.MergerContext;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactoryProvider;
-import org.apache.cayenne.dbsync.merge.token.db.AbstractToDbToken;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
+import org.apache.cayenne.dbsync.merge.token.db.AbstractToDbToken;
 import org.apache.cayenne.dbsync.merge.token.db.SetColumnTypeToDb;
 import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
 import org.apache.cayenne.dbsync.naming.NoStemStemmer;
@@ -48,16 +55,9 @@ import org.apache.cayenne.unit.UnitDbAdapter;
 import org.apache.cayenne.unit.di.server.CayenneProjects;
 import org.apache.cayenne.unit.di.server.ServerCaseDataSourceFactory;
 import org.apache.cayenne.unit.di.server.UseServerRuntime;
-import org.slf4j.Logger;
 import org.junit.Before;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -112,7 +112,8 @@ public abstract class MergeCase extends DbSyncCase {
     protected List<MergerToken> createMergeTokens(String tableFilterInclude) {
 
         FiltersConfig filters = FiltersConfig.create(null, null,
-                TableFilter.include(tableFilterInclude), PatternFilter.INCLUDE_NOTHING);
+                TableFilter.include(tableFilterInclude),
+                PatternFilter.INCLUDE_NOTHING);
 
         DbLoaderConfiguration loaderConfiguration = new DbLoaderConfiguration();
         loaderConfiguration.setFiltersConfig(filters);

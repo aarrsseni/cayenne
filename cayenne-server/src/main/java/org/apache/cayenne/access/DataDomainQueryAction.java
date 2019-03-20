@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.DataRow;
@@ -40,11 +39,13 @@ import org.apache.cayenne.ResultIterator;
 import org.apache.cayenne.cache.QueryCache;
 import org.apache.cayenne.cache.QueryCacheEntryFactory;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EntityInheritanceTree;
 import org.apache.cayenne.map.LifecycleEvent;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.EntityResultSegment;
 import org.apache.cayenne.query.ObjectIdQuery;
 import org.apache.cayenne.query.PrefetchSelectQuery;
@@ -238,12 +239,19 @@ class DataDomainQueryAction implements QueryRouter, OperationObserver {
             // It is not sufficient to generate target ObjectId.
             DbEntity targetEntity = dbRelationship.getTargetEntity();
 
-            AtomicInteger joinSize = new AtomicInteger(0);
-            dbRelationship.getJoin().accept(join -> {
-                joinSize.incrementAndGet();
-                return true;
+            int joinSize = dbRelationship.accept(new DirectionalJoinVisitor<Integer>() {
+                @Override
+                public Integer visit(DbAttribute[] source, DbAttribute[] target) {
+                    return source.length;
+                }
+
+                @Override
+                public Integer visit(DbAttribute source, DbAttribute target) {
+                    return 1;
+                }
             });
-            if (joinSize.get() < targetEntity.getPrimaryKeys().size()) {
+
+            if (joinSize < targetEntity.getPrimaryKeys().size()) {
                 return !DONE;
             }
 

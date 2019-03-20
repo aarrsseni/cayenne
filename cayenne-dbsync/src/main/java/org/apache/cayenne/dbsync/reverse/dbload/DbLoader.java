@@ -18,10 +18,6 @@
  */
 package org.apache.cayenne.dbsync.reverse.dbload;
 
-import org.apache.cayenne.dba.DbAdapter;
-import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
-import org.apache.cayenne.map.DataMap;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -29,6 +25,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import org.apache.cayenne.dba.DbAdapter;
+import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
+import org.apache.cayenne.map.DataMap;
 
 /**
  * Loads DB schema into a DataMap, creating DbEntities and Procedures. Consists of a list of specialized loaders that
@@ -66,7 +66,8 @@ public class DbLoader {
         loaders.add(new AttributeLoader(adapter, config, delegate));
         loaders.add(new PrimaryKeyLoader(config, delegate));
         loaders.add(new ExportedKeyLoader(config, delegate));
-        loaders.add(new RelationshipLoader(config, delegate, nameGenerator));
+        loaders.add(new DbJoinLoader(config, delegate, nameGenerator));
+//        loaders.add(new RelationshipLoader(config, delegate, nameGenerator));
         loaders.add(new ProcedureLoader(adapter, config, delegate));
         loaders.add(new ProcedureColumnLoader(adapter, config, delegate));
     }

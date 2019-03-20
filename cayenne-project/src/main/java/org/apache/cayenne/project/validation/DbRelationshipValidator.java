@@ -25,7 +25,8 @@ import java.util.List;
 
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationResult;
 
@@ -39,35 +40,46 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
                     relationship,
                     "DbRelationship '%s' has no target entity",
                     toString(relationship));
-        } else if (relationship.getJoins().isEmpty()) {
-            addFailure(
-                    validationResult,
-                    relationship,
-                    "DbRelationship '%s' has no joins",
-                    toString(relationship));
-        } else {
+        }  else {
             // validate joins
-            relationship.getJoin().accept(join -> {
-                if (join.getSource() == null && join.getTarget() == null) {
-                    addFailure(
-                            validationResult,
-                            relationship,
-                            "DbRelationship '%s' has a join with no source and target attributes selected",
-                            toString(relationship));
-                } else if (join.getSource() == null) {
-                    addFailure(
-                            validationResult,
-                            relationship,
-                            "DbRelationship '%s' has a join with no source attribute selected",
-                            toString(relationship));
-                } else if (join.getTarget() == null) {
-                    addFailure(
-                            validationResult,
-                            relationship,
-                            "DbRelationship '%s' has a join with no target attribute selected",
-                            toString(relationship));
+            relationship.accept(new DirectionalJoinVisitor<Void>() {
+
+                private void validate(DbAttribute source, DbAttribute target) {
+                    if (source == null && target == null) {
+                        addFailure(
+                                validationResult,
+                                relationship,
+                                "DbRelationship '%s' has a join with no source and target attributes selected",
+                                DbRelationshipValidator.this.toString(relationship));
+                    } else if (source == null) {
+                        addFailure(
+                                validationResult,
+                                relationship,
+                                "DbRelationship '%s' has a join with no source attribute selected",
+                                DbRelationshipValidator.this.toString(relationship));
+                    } else if (target == null) {
+                        addFailure(
+                                validationResult,
+                                relationship,
+                                "DbRelationship '%s' has a join with no target attribute selected",
+                                DbRelationshipValidator.this.toString(relationship));
+                    }
                 }
-                return true;
+
+                @Override
+                public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                    int length = source.length;
+                    for(int i = 0; i < length; i++) {
+                        validate(source[i], target[i]);
+                    }
+                    return null;
+                }
+
+                @Override
+                public Void visit(DbAttribute source, DbAttribute target) {
+                    validate(source, target);
+                    return null;
+                }
             });
         }
 
@@ -124,16 +136,33 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
     }
 
     private void checkTypesOfAttributesInRelationship(DbRelationship relationship, ValidationResult validationResult) {
-        relationship.getJoin().accept(join -> {
-            if (join.getSource() != null && join.getTarget() != null
-                    && join.getSource().getType() != join.getTarget().getType()) {
-                addFailure(
-                        validationResult,
-                        relationship,
-                        "Attributes '%s' and '%s' have different types in a relationship '%s'",
-                        join.getSourceName(), join.getTargetName(), relationship.getName());
+        relationship.accept(new DirectionalJoinVisitor<Void>() {
+
+            private void validate(DbAttribute source, DbAttribute target) {
+                if (source != null && target != null
+                        && source.getType() != target.getType()) {
+                    addFailure(
+                            validationResult,
+                            relationship,
+                            "Attributes '%s' and '%s' have different types in a relationship '%s'",
+                            source.getName(), target.getName(), relationship.getName());
+                }
             }
-            return true;
+
+            @Override
+            public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                int length = source.length;
+                for(int i = 0; i < length; i++) {
+                    validate(source[i], target[i]);
+                }
+                return null;
+            }
+
+            @Override
+            public Void visit(DbAttribute source, DbAttribute target) {
+                validate(source, target);
+                return null;
+            }
         });
     }
 
@@ -178,7 +207,8 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
                     if (dbRelationshipPath.equals(comparisonDbRelationshipPath)) {
                         addFailure(validationResult,
                                    relationship,
-                                   "DbEntity '%s' contains a duplicate DbRelationship mapping ('%s' -> '%s')",
+                                   "DbEntity '%s' contains a " +
+                                           "duplicate DbRelationship mapping ('%s' -> '%s')",
                                    entity.getName(),
                                    relationship.getName(),
                                    dbRelationshipPath);
@@ -190,13 +220,25 @@ class DbRelationshipValidator extends ConfigurationNodeValidator {
     }
 
     private String getJoins(DbRelationship relationship) {
-        List<String> joins = new ArrayList<>();
-        relationship.getJoin().accept(join -> {
-            joins.add("[source=" + join.getSourceName() + ",target=" + join.getTargetName() + "]");
-            return true;
-        });
-        Collections.sort(joins);
+        List<String> joins = relationship.accept(new DirectionalJoinVisitor<List<String>>() {
+            @Override
+            public List<String> visit(DbAttribute[] source, DbAttribute[] target) {
+                int length = source.length;
+                List<String> joins = new ArrayList<>(length);
+                for(int i = 0; i < length; i++) {
+                    joins.add("[source=" + source[i].getName() + ",target=" + target[i].getName() + "]");
+                }
+                return joins;
+            }
 
+            @Override
+            public List<String> visit(DbAttribute source, DbAttribute target) {
+                return Collections
+                        .singletonList("[source=" + source.getName() + ",target=" + target.getName() + "]");
+            }
+        });
+
+        Collections.sort(joins);
         return Util.join(joins, ",");
     }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.relationships"/>
 	<db-entity name="FK_OF_DIFFERENT_TYPE">
 		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
@@ -32,30 +32,34 @@
 	<obj-entity name="RelationshipHelper" className="org.apache.cayenne.testdo.relationships.RelationshipHelper" dbEntityName="RELATIONSHIP_HELPER">
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
 	</obj-entity>
-	<db-relationship name="relationshipHelper" source="FK_OF_DIFFERENT_TYPE" target="RELATIONSHIP_HELPER">
-		<db-attribute-pair source="RELATIONSHIP_HELPER_FK" target="RELATIONSHIP_HELPER_ID"/>
-	</db-relationship>
-	<db-relationship name="toRelationshipHelper" source="MEANINGFUL_FK" target="RELATIONSHIP_HELPER">
-		<db-attribute-pair source="RELATIONSHIP_HELPER_ID" target="RELATIONSHIP_HELPER_ID"/>
-	</db-relationship>
-	<db-relationship name="children" source="REFLEXIVE_AND_TO_ONE" target="REFLEXIVE_AND_TO_ONE" toMany="true">
-		<db-attribute-pair source="REFLEXIVE_AND_TO_ONE_ID" target="PARENT_ID"/>
-	</db-relationship>
-	<db-relationship name="toHelper" source="REFLEXIVE_AND_TO_ONE" target="RELATIONSHIP_HELPER">
-		<db-attribute-pair source="RELATIONSHIP_HELPER_ID" target="RELATIONSHIP_HELPER_ID"/>
-	</db-relationship>
-	<db-relationship name="toParent" source="REFLEXIVE_AND_TO_ONE" target="REFLEXIVE_AND_TO_ONE">
-		<db-attribute-pair source="PARENT_ID" target="REFLEXIVE_AND_TO_ONE_ID"/>
-	</db-relationship>
-	<db-relationship name="fksOfDifferentType" source="RELATIONSHIP_HELPER" target="FK_OF_DIFFERENT_TYPE" toMany="true">
-		<db-attribute-pair source="RELATIONSHIP_HELPER_ID" target="RELATIONSHIP_HELPER_FK"/>
-	</db-relationship>
-	<db-relationship name="meanigfulFKs" source="RELATIONSHIP_HELPER" target="MEANINGFUL_FK" toMany="true">
-		<db-attribute-pair source="RELATIONSHIP_HELPER_ID" target="RELATIONSHIP_HELPER_ID"/>
-	</db-relationship>
-	<db-relationship name="reflexiveAndToOneArray" source="RELATIONSHIP_HELPER" target="REFLEXIVE_AND_TO_ONE" toMany="true">
-		<db-attribute-pair source="RELATIONSHIP_HELPER_ID" target="RELATIONSHIP_HELPER_ID"/>
-	</db-relationship>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="FK_OF_DIFFERENT_TYPE" name="relationshipHelper"/>
+		<right entity="RELATIONSHIP_HELPER" name="fksOfDifferentType"/>
+		<db-join-condition>
+			<column-pair left="RELATIONSHIP_HELPER_FK" right="RELATIONSHIP_HELPER_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="MEANINGFUL_FK" name="toRelationshipHelper"/>
+		<right entity="RELATIONSHIP_HELPER" name="meanigfulFKs"/>
+		<db-join-condition>
+			<column-pair left="RELATIONSHIP_HELPER_ID" right="RELATIONSHIP_HELPER_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="REFLEXIVE_AND_TO_ONE" name="children"/>
+		<right entity="REFLEXIVE_AND_TO_ONE" name="toParent"/>
+		<db-join-condition>
+			<column-pair left="REFLEXIVE_AND_TO_ONE_ID" right="PARENT_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="REFLEXIVE_AND_TO_ONE" name="toHelper"/>
+		<right entity="RELATIONSHIP_HELPER" name="reflexiveAndToOneArray"/>
+		<db-join-condition>
+			<column-pair left="RELATIONSHIP_HELPER_ID" right="RELATIONSHIP_HELPER_ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="relationshipHelper" source="FkOfDifferentType" target="RelationshipHelper" db-relationship-path="relationshipHelper"/>
 	<obj-relationship name="toRelationshipHelper" source="MeaningfulFK" target="RelationshipHelper" db-relationship-path="toRelationshipHelper"/>
 	<obj-relationship name="children" source="ReflexiveAndToOne" target="ReflexiveAndToOne" db-relationship-path="children"/>

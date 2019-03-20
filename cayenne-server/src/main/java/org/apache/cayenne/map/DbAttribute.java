@@ -24,6 +24,8 @@ import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.map.event.AttributeEvent;
 import org.apache.cayenne.map.event.DbAttributeListener;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.util.XMLEncoder;
 
 /**
@@ -175,15 +177,29 @@ public class DbAttribute extends Attribute implements ConfigurationNode {
 
         for (DbRelationship relationship : getEntity().getRelationships()) {
 
-            boolean fkNotFound = relationship.getJoin()
-                    .accept(join -> {
-                        if (name.equals(join.getSourceName())) {
-                            DbAttribute target = join.getTarget();
-                            return target == null || !target.isPrimaryKey();
+            boolean isForeignKey = relationship.accept(new DirectionalJoinVisitor<Boolean>() {
+                @Override
+                public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                    int length = source.length;
+                    for (int i = 0; i < length; i++) {
+                        if (name.equals(source[i].getName())) {
+                            if (target[i] != null && target[i].isPrimaryKey()) {
+                                return true;
+                            }
                         }
-                        return true;
-                    });
-            if(!fkNotFound) {
+                    }
+                    return false;
+                }
+
+                @Override
+                public Boolean visit(DbAttribute source, DbAttribute target) {
+                    if (name.equals(source.getName())) {
+                        return target != null && target.isPrimaryKey();
+                    }
+                    return false;
+                }
+            });
+            if(isForeignKey) {
                 return true;
             }
         }

@@ -28,15 +28,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EmbeddedAttribute;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.reflect.PropertyUtils;
 import org.apache.cayenne.validation.BeanValidationFailure;
 import org.apache.cayenne.validation.ValidationFailure;
@@ -573,28 +573,48 @@ public abstract class BaseDataObject extends PersistentObject implements DataObj
             // attributes, see if we have a target object set
             // relationship will be validated only if all db path has mandatory
             // db relationships
-            AtomicBoolean validate = new AtomicBoolean(true);
+            boolean validate = true;
             for (DbRelationship dbRelationship : dbRels) {
                 Map<String, ValidationFailure> finalFailedDbAttributes = failedDbAttributes;
-                dbRelationship.getJoin()
-                        .accept(dbJoin -> {
-                            DbAttribute source = dbJoin.getSource();
-                            if (source.isMandatory()) {
-                                // clear attribute failures...
-                                if (finalFailedDbAttributes != null && !finalFailedDbAttributes.isEmpty()) {
-                                    finalFailedDbAttributes.remove(source.getName());
-                                }
-                            } else {
-                                // do not validate if the relation is based on
-                                // multiple keys with some that can be nullable.
-                                validate.set(false);
+                boolean needToValidate = dbRelationship.accept(new DirectionalJoinVisitor<Boolean>() {
+
+                    private boolean needToValidate(DbAttribute attribute) {
+                        if (attribute.isMandatory()) {
+                            // clear attribute failures...
+                            if (finalFailedDbAttributes != null && !finalFailedDbAttributes.isEmpty()) {
+                                finalFailedDbAttributes.remove(attribute.getName());
                             }
-                            return true;
-                        });
+                        } else {
+                            // do not validate if the relation is based on
+                            // multiple keys with some that can be nullable.
+                            return false;
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                        for(DbAttribute src : source) {
+                            if(!needToValidate(src)) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public Boolean visit(DbAttribute source, DbAttribute target) {
+                        return needToValidate(source);
+                    }
+                });
+
+                if(!needToValidate) {
+                    validate = false;
+                }
                 failedDbAttributes = finalFailedDbAttributes;
             }
 
-            if (validate.get()) {
+            if (validate) {
                 Object value = this.readPropertyDirectly(relationship.getName());
                 ValidationFailure failure = BeanValidationFailure.validateNotNull(this, relationship.getName(), value);
 

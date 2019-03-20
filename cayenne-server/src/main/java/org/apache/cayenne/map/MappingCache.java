@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @since 4.0
  */
-class MappingCache implements MappingNamespace {
+public class MappingCache implements MappingNamespace {
 
     private static final ObjEntity OBJ_DUPLICATE_MARKER = new ObjEntity();
 
@@ -49,7 +49,7 @@ class MappingCache implements MappingNamespace {
     protected Map<String, Procedure> procedures;
     protected Map<String, EntityInheritanceTree> entityInheritanceCache;
 
-    MappingCache(Collection<DataMap> maps) {
+    public MappingCache(Collection<DataMap> maps) {
 
         this.maps = maps;
 
@@ -323,5 +323,26 @@ class MappingCache implements MappingNamespace {
         }
 
         return c;
+    }
+
+    public Collection<DataMap> getMaps() {
+        return maps;
+    }
+
+    public MappingCache mergeMappingCache(MappingCache mappingCache) {
+        for(DataMap dataMap : mappingCache.maps) {
+            if(!maps.contains(dataMap)) {
+                maps.add(dataMap);
+            }
+        }
+        queryDesriptors.putAll(mappingCache.queryDesriptors);
+        embeddables.putAll(mappingCache.embeddables);
+        results.putAll(mappingCache.results);
+        dbEntities.putAll(mappingCache.dbEntities);
+        objEntities.putAll(mappingCache.objEntities);
+        objEntitiesByClassName.putAll(mappingCache.objEntitiesByClassName);
+        procedures.putAll(mappingCache.procedures);
+        entityInheritanceCache.putAll(mappingCache.entityInheritanceCache);
+        return this;
     }
 }

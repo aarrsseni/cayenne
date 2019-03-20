@@ -18,6 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.dba;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.function.Function;
+
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.sqlbuilder.sqltree.Node;
 import org.apache.cayenne.access.translator.ParameterBinding;
@@ -26,17 +31,14 @@ import org.apache.cayenne.access.translator.select.SelectTranslator;
 import org.apache.cayenne.access.types.ExtendedTypeMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.query.FluentSelect;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLAction;
 import org.apache.cayenne.query.SelectQuery;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.function.Function;
 
 /**
  * A Cayenne extension point that abstracts the differences between specifics of
@@ -135,6 +137,8 @@ public interface DbAdapter {
 	 * for the relationship, or null if foreign keys are not supported.
 	 */
 	String createFkConstraint(DbRelationship rel);
+
+	String createFkConstraint(DbJoin dbJoin, RelationshipDirection direction);
 
 	/**
 	 * Returns an array of RDBMS types that can be used with JDBC

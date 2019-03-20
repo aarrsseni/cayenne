@@ -18,6 +18,12 @@
  ****************************************************************/
 package org.apache.cayenne.dba.sqlite;
 
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.function.Function;
+
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.sqlbuilder.sqltree.Node;
 import org.apache.cayenne.access.types.ExtendedType;
@@ -30,16 +36,12 @@ import org.apache.cayenne.dba.JdbcAdapter;
 import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLAction;
 import org.apache.cayenne.resource.ResourceLocator;
-
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * A SQLite database adapter that works with Zentus JDBC driver. See
@@ -95,6 +97,11 @@ public class SQLiteAdapter extends JdbcAdapter {
 
     @Override
     public String createFkConstraint(DbRelationship rel) {
+        return null;
+    }
+
+    @Override
+    public String createFkConstraint(DbJoin dbJoin, RelationshipDirection direction) {
         return null;
     }
 

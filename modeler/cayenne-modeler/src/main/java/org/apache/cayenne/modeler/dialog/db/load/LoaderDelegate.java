@@ -21,10 +21,12 @@ package org.apache.cayenne.modeler.dialog.db.load;
 
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.dbsync.reverse.dbload.DefaultDbLoaderDelegate;
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.modeler.Application;
 
 final class LoaderDelegate extends DefaultDbLoaderDelegate {
@@ -57,9 +59,14 @@ final class LoaderDelegate extends DefaultDbLoaderDelegate {
     }
 
     @Override
-    public boolean dbRelationshipLoaded(DbEntity entity, DbRelationship relationship) {
+    public boolean dbJoinLoaded(DbJoin dbJoin) {
         checkCanceled();
-        context.setStatusNote("Load relationship: '" + entity.getName() + "'; '" + relationship.getName() + "'...");
+        DataMap dataMap = dbJoin.getDataMap();
+        int index = RelationshipDirection.LEFT.ordinal();
+        DbEntity srcEntity = dataMap.getDbEntity(dbJoin.getDbEntities()[index]);
+        String name = dbJoin.getNames()[index];
+        context.setStatusNote("Load db-join: '" + srcEntity.getName() + "'; '" +
+                name + "'...");
         return true;
     }
 

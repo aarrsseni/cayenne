@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.event.RelationshipEvent;
 import org.apache.cayenne.modeler.Application;
@@ -122,11 +122,11 @@ public class DbRelationshipTableModel extends CayenneTableModel<DbRelationship> 
     }
 
     private String getComment(DbRelationship rel) {
-        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), rel, ObjectInfo.COMMENT);
+        return ObjectInfo.getFromMetaData(mediator.getApplication().getMetaData(), rel.getDbJoin(), ObjectInfo.COMMENT);
     }
 
     private void setComment(String newVal, DbRelationship rel) {
-        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), rel, ObjectInfo.COMMENT, newVal);
+        ObjectInfo.putToMetaData(mediator.getApplication().getMetaData(), rel.getDbJoin(), ObjectInfo.COMMENT, newVal);
     }
 
     public void setUpdatedValueAt(Object aValue, int row, int column) {

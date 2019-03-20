@@ -29,13 +29,13 @@ import org.apache.cayenne.ejbql.EJBQLException;
 import org.apache.cayenne.ejbql.EJBQLExpression;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.reflect.ClassDescriptor;
 
 /**
@@ -255,31 +255,35 @@ public abstract class EJBQLPathTranslator extends EJBQLBaseVisitor {
 			// match FK against the target object
 
 			DbRelationship dbRelationship = chooseDbRelationship(relationship);
-			DbEntity table = (DbEntity) dbRelationship.getSourceEntity();
+			DbEntity table = dbRelationship.getSourceEntity();
 
 			String alias = this.lastAlias != null ? lastAlias : context.getTableAlias(idPath, context
 					.getQuotingStrategy().quotedFullyQualifiedName(table));
 
-			List<DbJoin> joins = dbRelationship.getJoins();
+			dbRelationship.accept(new DirectionalJoinVisitor<Void>() {
+				@Override
+				public Void visit(DbAttribute[] source, DbAttribute[] target) {
+					int length = source.length;
+					Map<String, String> multiColumnMatch = new HashMap<>(length + 2);
+					for(int i = 0; i < length; i++) {
+						String column = isUsingAliases() ? alias + "." + source[i].getName() : source[i].getName();
 
-			if (joins.size() == 1) {
-				DbJoin join = joins.get(0);
-				context.append(' ');
-				if (isUsingAliases()) {
-					context.append(alias).append('.');
-				}
-				context.append(context.getQuotingStrategy().quotedName(join.getSource()));
-			} else {
-				Map<String, String> multiColumnMatch = new HashMap<>(joins.size() + 2);
-
-				for (DbJoin join : joins) {
-					String column = isUsingAliases() ? alias + "." + join.getSourceName() : join.getSourceName();
-
-					multiColumnMatch.put(join.getTargetName(), column);
+						multiColumnMatch.put(target[i].getName(), column);
+					}
+					appendMultiColumnPath(EJBQLMultiColumnOperand.getPathOperand(context, multiColumnMatch));
+					return null;
 				}
 
-				appendMultiColumnPath(EJBQLMultiColumnOperand.getPathOperand(context, multiColumnMatch));
-			}
+				@Override
+				public Void visit(DbAttribute source, DbAttribute target) {
+					context.append(' ');
+					if (isUsingAliases()) {
+						context.append(alias).append('.');
+					}
+					context.append(context.getQuotingStrategy().quotedName(source));
+					return null;
+				}
+			});
 		}
 	}
 

@@ -19,11 +19,8 @@
 
 package org.apache.cayenne.modeler.util;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;

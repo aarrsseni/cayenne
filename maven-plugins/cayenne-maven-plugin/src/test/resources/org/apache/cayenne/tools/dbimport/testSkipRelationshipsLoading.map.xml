@@ -17,10 +17,10 @@
   specific language governing permissions and limitations
   under the License.
   -->
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+          project-version="11">
     <property name="defaultPackage" value="com.my.home"/>
     <db-entity name="A" schema="APP">
         <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
@@ -32,24 +32,23 @@
     <db-entity name="B" schema="APP">
         <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
     </db-entity>
-    <obj-entity name="A" className="A" dbEntityName="A">
-    </obj-entity>
-    <obj-entity name="AB" className="AB" dbEntityName="A_B">
-    </obj-entity>
-    <obj-entity name="B" className="B" dbEntityName="B">
-    </obj-entity>
-    <db-relationship name="aBArray" source="A" target="A_B" toMany="true">
-        <db-attribute-pair source="ID" target="A_ID"/>
-    </db-relationship>
-    <db-relationship name="toA" source="A_B" target="A">
-        <db-attribute-pair source="A_ID" target="ID"/>
-    </db-relationship>
-    <db-relationship name="toB" source="A_B" target="B">
-        <db-attribute-pair source="B_ID" target="ID"/>
-    </db-relationship>
-    <db-relationship name="aBArray" source="B" target="A_B" toMany="true">
-        <db-attribute-pair source="ID" target="B_ID"/>
-    </db-relationship>
+    <obj-entity name="A" className="A" dbEntityName="A"/>
+    <obj-entity name="AB" className="AB" dbEntityName="A_B"/>
+    <obj-entity name="B" className="B" dbEntityName="B"/>
+    <db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+        <left entity="A" name="aBArray"/>
+        <right entity="A_B" name="toA"/>
+        <db-join-condition>
+            <column-pair left="ID" right="A_ID"/>
+        </db-join-condition>
+    </db-join>
+    <db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+        <left entity="A_B" name="toB"/>
+        <right entity="B" name="aBArray"/>
+        <db-join-condition>
+            <column-pair left="B_ID" right="ID"/>
+        </db-join-condition>
+    </db-join>
     <obj-relationship name="toA" source="AB" target="A" deleteRule="Nullify" db-relationship-path="toA"/>
     <obj-relationship name="aBArray" source="B" target="AB" deleteRule="Deny" db-relationship-path="aBArray"/>
 </data-map>

@@ -28,10 +28,11 @@ import java.util.function.Function;
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.ObjectId;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 
 /**
  * Builds update qualifier snapshots, including optimistic locking.
@@ -96,17 +97,32 @@ class DataNodeSyncQualifierDescriptor {
 			DbRelationship masterDependentDbRel = descriptor.getPathFromMaster().get(0);
 
 			if (masterDependentDbRel != null) {
-				masterDependentDbRel.getJoin().accept(join -> {
-					DbAttribute dbAttribute = join.getTarget();
-					if (!attributes.contains(dbAttribute)) {
+				masterDependentDbRel.accept(new DirectionalJoinVisitor<Void>() {
 
-						attributes.add(dbAttribute);
-						valueTransformers.add(input -> {
-							ObjectId id = (ObjectId) input.getNodeId();
-							return id.getIdSnapshot().get(join.getTargetName());
-						});
+					private void build(DbAttribute target) {
+						if (!attributes.contains(target)) {
+
+							attributes.add(target);
+							valueTransformers.add(input -> {
+								ObjectId id = (ObjectId) input.getNodeId();
+								return id.getIdSnapshot().get(target.getName());
+							});
+						}
 					}
-					return true;
+
+					@Override
+					public Void visit(DbAttribute[] source, DbAttribute[] target) {
+						for(DbAttribute attr : target) {
+							build(attr);
+						}
+						return null;
+					}
+
+					@Override
+					public Void visit(DbAttribute source, DbAttribute target) {
+						build(target);
+						return null;
+					}
 				});
             }
         }
@@ -133,28 +149,44 @@ class DataNodeSyncQualifierDescriptor {
 					// only care about the first DbRelationship
 					DbRelationship dbRelationship = relationship.getDbRelationships().get(0);
 
-					dbRelationship.getJoin().accept(join -> {
-						DbAttribute dbAttribute = join.getSource();
+					dbRelationship.accept(new DirectionalJoinVisitor<Void>() {
 
-						// relationship transformers override attribute transformers for meaningful FK's...
-						// why meaningful FKs can go out of sync is another story (CAY-595)
-						int index = attributes.indexOf(dbAttribute);
-						if (index >= 0 && !dbAttribute.isForeignKey()) {
-							return true;
+						private void build(DbAttribute source, DbAttribute target) {
+
+							// relationship transformers override attribute transformers for meaningful FK's...
+							// why meaningful FKs can go out of sync is another story (CAY-595)
+							int index = attributes.indexOf(source);
+							if (index >= 0 && !source.isForeignKey()) {
+								return;
+							}
+
+							Function<ObjectDiff, Object> transformer = input -> {
+								ObjectId targetId = input.getArcSnapshotValue(relationship.getName());
+								return targetId != null ? targetId.getIdSnapshot().get(target.getName()) : null;
+							};
+
+							if (index < 0) {
+								attributes.add(source);
+								valueTransformers.add(transformer);
+							} else {
+								valueTransformers.set(index, transformer);
+							}
 						}
 
-						Function<ObjectDiff, Object> transformer = input -> {
-							ObjectId targetId = input.getArcSnapshotValue(relationship.getName());
-							return targetId != null ? targetId.getIdSnapshot().get(join.getTargetName()) : null;
-						};
-
-						if (index < 0) {
-							attributes.add(dbAttribute);
-							valueTransformers.add(transformer);
-						} else {
-							valueTransformers.set(index, transformer);
+						@Override
+						public Void visit(DbAttribute[] source, DbAttribute[] target) {
+							int length = source.length;
+							for(int i = 0; i < length; i++) {
+								build(source[i], target[i]);
+							}
+							return null;
 						}
-						return true;
+
+						@Override
+						public Void visit(DbAttribute source, DbAttribute target) {
+							build(source, target);
+							return null;
+						}
 					});
 				}
 			}

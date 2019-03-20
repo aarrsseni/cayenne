@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.relationships_to_many_fk"/>
 	<db-entity name="TO_MANY_FKDEP">
 		<db-attribute name="DEP_ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
@@ -29,18 +29,20 @@
 	<obj-entity name="ToManyRoot2" className="org.apache.cayenne.testdo.relationships_to_many_fk.ToManyRoot2" dbEntityName="TO_MANY_ROOT2">
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
 	</obj-entity>
-	<db-relationship name="root" source="TO_MANY_FKDEP" target="TO_MANY_FKROOT">
-		<db-attribute-pair source="DEP_ID" target="FK_ID"/>
-	</db-relationship>
-	<db-relationship name="root2" source="TO_MANY_FKDEP" target="TO_MANY_ROOT2">
-		<db-attribute-pair source="OTHER_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="deps" source="TO_MANY_FKROOT" target="TO_MANY_FKDEP" toMany="true">
-		<db-attribute-pair source="FK_ID" target="DEP_ID"/>
-	</db-relationship>
-	<db-relationship name="deps" source="TO_MANY_ROOT2" target="TO_MANY_FKDEP" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="OTHER_ID"/>
-	</db-relationship>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="TO_MANY_FKDEP" name="root"/>
+		<right entity="TO_MANY_FKROOT" name="deps"/>
+		<db-join-condition>
+			<column-pair left="DEP_ID" right="FK_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="RIGHT">
+		<left entity="TO_MANY_FKDEP" name="root2"/>
+		<right entity="TO_MANY_ROOT2" name="deps"/>
+		<db-join-condition>
+			<column-pair left="OTHER_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="root" source="ToManyFkDep" target="ToManyFkRoot" db-relationship-path="root"/>
 	<obj-relationship name="root2" source="ToManyFkDep" target="ToManyRoot2" db-relationship-path="root2"/>
 	<obj-relationship name="deps" source="ToManyFkRoot" target="ToManyFkDep" db-relationship-path="deps"/>

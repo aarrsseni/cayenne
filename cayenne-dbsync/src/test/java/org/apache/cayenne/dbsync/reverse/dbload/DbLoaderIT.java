@@ -19,7 +19,8 @@
 
 package org.apache.cayenne.dbsync.reverse.dbload;
 
-import org.apache.cayenne.configuration.server.ServerRuntime;
+import java.sql.Connection;
+
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
 import org.apache.cayenne.dbsync.naming.NoStemStemmer;
@@ -27,8 +28,7 @@ import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.unit.UnitDbAdapter;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.unit.di.server.CayenneProjects;
 import org.apache.cayenne.unit.di.server.ServerCase;
 import org.apache.cayenne.unit.di.server.ServerCaseDataSourceFactory;
@@ -36,8 +36,6 @@ import org.apache.cayenne.unit.di.server.UseServerRuntime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.sql.Connection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -53,16 +51,10 @@ public class DbLoaderIT extends ServerCase {
     private static final DbLoaderConfiguration CONFIG = new DbLoaderConfiguration();
 
     @Inject
-    private ServerRuntime runtime;
-
-    @Inject
     private DbAdapter adapter;
 
     @Inject
     private ServerCaseDataSourceFactory dataSourceFactory;
-
-    @Inject
-    private UnitDbAdapter accessStackAdapter;
 
     private Connection connection;
 
@@ -96,6 +88,8 @@ public class DbLoaderIT extends ServerCase {
         assertFalse(date.isMandatory());
 
         // DbRelationship
+        loaded.getDbJoinList().forEach(dbJoin -> dbJoin.compile(loaded));
+
         assertEquals(4, artist.getRelationships().size());
 
         DbRelationship exhibits = artist.getRelationship("artistExhibits");

@@ -18,27 +18,23 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.action;
 
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Pattern;
+
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.dbsync.reverse.dbload.DbRelationshipDetected;
-import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.DetectedDbEntity;
-import org.apache.cayenne.map.EJBQLQueryDescriptor;
-import org.apache.cayenne.map.Embeddable;
-import org.apache.cayenne.map.EmbeddableAttribute;
-import org.apache.cayenne.map.Entity;
-import org.apache.cayenne.map.ObjAttribute;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.Procedure;
-import org.apache.cayenne.map.ProcedureParameter;
-import org.apache.cayenne.map.ProcedureQueryDescriptor;
-import org.apache.cayenne.map.Relationship;
-import org.apache.cayenne.map.SQLTemplateDescriptor;
-import org.apache.cayenne.map.SelectQueryDescriptor;
+import org.apache.cayenne.map.*;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.CayenneModelerFrame;
 import org.apache.cayenne.modeler.ProjectTreeModel;
@@ -54,21 +50,6 @@ import org.apache.cayenne.modeler.event.ProcedureParameterDisplayEvent;
 import org.apache.cayenne.modeler.event.QueryDisplayEvent;
 import org.apache.cayenne.modeler.event.RelationshipDisplayEvent;
 import org.apache.cayenne.modeler.util.CayenneAction;
-import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.query.SQLTemplate;
-
-import javax.swing.JTextField;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.regex.Pattern;
 
 public class FindAction extends CayenneAction {
 

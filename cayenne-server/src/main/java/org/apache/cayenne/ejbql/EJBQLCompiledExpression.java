@@ -20,7 +20,7 @@ package org.apache.cayenne.ejbql;
 
 import java.util.List;
 
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.SQLResult;
 import org.apache.cayenne.query.PrefetchTreeNode;
 import org.apache.cayenne.reflect.ClassDescriptor;

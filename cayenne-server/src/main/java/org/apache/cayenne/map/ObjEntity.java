@@ -19,20 +19,6 @@
 
 package org.apache.cayenne.map;
 
-import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
-import org.apache.cayenne.dba.TypesMapping;
-import org.apache.cayenne.di.AdhocObjectFactory;
-import org.apache.cayenne.exp.Expression;
-import org.apache.cayenne.exp.ExpressionException;
-import org.apache.cayenne.exp.ExpressionFactory;
-import org.apache.cayenne.map.event.EntityEvent;
-import org.apache.cayenne.map.event.ObjEntityListener;
-import org.apache.cayenne.util.CayenneMapEntry;
-import org.apache.cayenne.util.Util;
-import org.apache.cayenne.util.XMLEncoder;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +30,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
+
+import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.configuration.ConfigurationNode;
+import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
+import org.apache.cayenne.dba.TypesMapping;
+import org.apache.cayenne.di.AdhocObjectFactory;
+import org.apache.cayenne.exp.Expression;
+import org.apache.cayenne.exp.ExpressionException;
+import org.apache.cayenne.exp.ExpressionFactory;
+import org.apache.cayenne.map.event.EntityEvent;
+import org.apache.cayenne.map.event.ObjEntityListener;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.util.CayenneMapEntry;
+import org.apache.cayenne.util.Util;
+import org.apache.cayenne.util.XMLEncoder;
 
 /**
  * ObjEntity is a mapping descriptor for a DataObject Java class. It contains

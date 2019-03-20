@@ -26,7 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 
 public class ObjAttributePathBrowser extends ObjRelationshipPathBrowser {
 

@@ -18,22 +18,30 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.autorelationship;
 
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
-
+import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
 import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.map.event.RelationshipEvent;
-import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinCondition;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ClassLoadingService;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ErrorDebugDialog;
+import org.apache.cayenne.modeler.map.relationship.DbJoinModel;
 import org.apache.cayenne.modeler.undo.CreateRelationshipUndoableEdit;
 import org.apache.cayenne.modeler.undo.InferRelationshipsUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneController;
@@ -149,7 +157,7 @@ public class InferRelationshipsController extends InferRelationshipsControllerBa
                     .getInstance()
                     .addToLastUsedStrategies(strategyClass);
             view.getStrategyCombo().setModel(
-                    new DefaultComboBoxModel(NameGeneratorPreferences
+                    new DefaultComboBoxModel<>(NameGeneratorPreferences
                             .getInstance()
                             .getLastUsedStrategies()));
 
@@ -181,29 +189,81 @@ public class InferRelationshipsController extends InferRelationshipsControllerBa
                 .getProjectController();
         
         InferRelationshipsUndoableEdit undoableEdit = new InferRelationshipsUndoableEdit();
-        
-        for (InferredRelationship temp : selectedEntities) {
-            DbRelationship rel = new DbRelationship(uniqueRelName(temp.getSource(), temp
-                    .getName()));
+        for(DbJoinModel dbJoinModel : buildJoins(selectedEntities)) {
+            DbJoin dbJoin = dbJoinModel.buildJoin();
+            dataMap.addJoin(dbJoin);
+            dbJoin.compile(dataMap);
+            DbRelationship rel = dbJoin.getRelationhsip();
 
-            RelationshipEvent e = new RelationshipEvent(Application.getFrame(), rel, temp
-                    .getSource(), MapEvent.ADD);
+            RelationshipEvent e = new RelationshipEvent(Application.getFrame(), rel,
+                    rel.getSourceEntity(), MapEvent.ADD);
             mediator.fireDbRelationshipEvent(e);
 
-            rel.setSourceEntity(temp.getSource());
-            rel.setTargetEntityName(temp.getTarget());
-            DbJoin join = new DbJoin(rel, temp.getJoinSource().getName(), temp
-                    .getJoinTarget()
-                    .getName());
-            rel.addJoin(join);
-            rel.setToMany(temp.isToMany());
-            temp.getSource().addRelationship(rel);
-            
-            undoableEdit.addEdit(new CreateRelationshipUndoableEdit(temp.getSource(), new DbRelationship[] { rel }));
+            undoableEdit.addEdit(new CreateRelationshipUndoableEdit(rel.getSourceEntity(), new DbRelationship[] { rel }));
         }
         JOptionPane.showMessageDialog(this.getView(), getSelectedEntitiesSize()
                 + " relationships generated");
         view.dispose();
+    }
+
+    private List<DbJoinModel> buildJoins(Set<InferredRelationship> inferredRelationships) {
+        Set<InferredRelationship> relationships = new HashSet<>(inferredRelationships);
+        return inferredRelationships.stream()
+                .map(temp -> {
+                    if(!relationships.contains(temp)) {
+                        return null;
+                    }
+                    relationships.remove(temp);
+                    DbJoinCondition pairCondition = new SinglePairCondition(
+                            new ColumnPair(temp.getJoinSource().getName(),
+                                    temp.getJoinTarget().getName()));
+                    InferredRelationship tempReverseRel = findReverseRelationship(relationships, temp);
+                    if(tempReverseRel != null) {
+                        relationships.remove(tempReverseRel);
+                    }
+                    return buildJoinModel(temp, tempReverseRel, pairCondition);
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    private InferredRelationship findReverseRelationship(Set<InferredRelationship> relationships,
+                                                         InferredRelationship temp) {
+        for(InferredRelationship targetTemp : relationships) {
+            if(isRelationshipReverse(temp, targetTemp)) {
+                return targetTemp;
+            }
+        }
+        return null;
+    }
+
+    private boolean isRelationshipReverse(InferredRelationship rel1, InferredRelationship rel2) {
+        return rel1.getSource().equals(rel2.getTarget()) &&
+                rel1.getTarget().equals(rel2.getSource()) &&
+                rel1.getJoinSource().equals(rel2.getJoinTarget()) &&
+                rel1.getJoinTarget().equals(rel2.getJoinSource());
+    }
+
+    private DbJoinModel buildJoinModel(InferredRelationship temp,
+                                       InferredRelationship targetTemp,
+                                       DbJoinCondition condition) {
+        if(temp == null) {
+            return null;
+        }
+        String targetRelName = null;
+        boolean targetToMany = false;
+        if(targetTemp != null) {
+            targetRelName = uniqueRelName(targetTemp.getSource(),
+                    targetTemp.getName());
+            targetToMany = targetTemp.isToMany();
+        }
+        DbJoinModel dbJoinModel = new DbJoinModel();
+        dbJoinModel.setDbEntities(new DbEntity[]{temp.getSource(), temp.getTarget()});
+        dbJoinModel.setNames(new String[]{uniqueRelName(temp.getSource(), temp.getName()), targetRelName});
+        dbJoinModel.setToMany(new boolean[]{temp.isToMany(), targetToMany});
+        dbJoinModel.setDbJoinCondition(condition);
+        dbJoinModel.setDataMap(dataMap);
+        return dbJoinModel;
     }
 
     private String uniqueRelName(Entity entity, String preferredName) {

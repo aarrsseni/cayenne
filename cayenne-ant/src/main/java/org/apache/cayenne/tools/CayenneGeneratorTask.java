@@ -118,7 +118,7 @@ public class CayenneGeneratorTask extends CayenneTask {
             Thread.currentThread().setContextClassLoader(CayenneGeneratorTask.class.getClassLoader());
 
             DataMap dataMap = loadAction.getMainDataMap();
-
+            dataMap.getDbJoinList().forEach(dbJoin -> dbJoin.compile(dataMap));
             ClassGenerationAction generatorAction = createGenerator(dataMap);
             CayenneGeneratorEntityFilterAction filterEntityAction = new CayenneGeneratorEntityFilterAction();
             filterEntityAction.setNameFilter(NamePatternMatcher.build(logger, includeEntitiesPattern, excludeEntitiesPattern));

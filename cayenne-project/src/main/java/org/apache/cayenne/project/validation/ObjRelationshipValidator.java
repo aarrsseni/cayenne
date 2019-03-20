@@ -20,11 +20,13 @@ package org.apache.cayenne.project.validation;
 
 import java.util.List;
 
+import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.DeleteRule;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.validation.ValidationResult;
 
@@ -104,9 +106,21 @@ class ObjRelationshipValidator extends ConfigurationNodeValidator {
                 DbRelationship firstRel = inverse.getDbRelationships().get(0);
 
                 // by default, the relation will be check for mandatory.
-                boolean check = firstRel.getJoin().accept(join -> {
-                    // a field of the fk can be nullable, cancel the check.
-                    return join.getSource().isMandatory();
+                boolean check = firstRel.accept(new DirectionalJoinVisitor<Boolean>() {
+                    @Override
+                    public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                        for(DbAttribute src : source) {
+                            if(!src.isMandatory()) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public Boolean visit(DbAttribute source, DbAttribute target) {
+                        return source.isMandatory();
+                    }
                 });
 
                 if (check) {

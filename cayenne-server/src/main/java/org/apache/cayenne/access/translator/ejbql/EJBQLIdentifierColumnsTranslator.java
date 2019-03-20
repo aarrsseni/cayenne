@@ -31,11 +31,12 @@ import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.PathComponent;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.PrefetchTreeNode;
 import org.apache.cayenne.reflect.ArcProperty;
 import org.apache.cayenne.reflect.AttributeProperty;
@@ -128,10 +129,26 @@ class EJBQLIdentifierColumnsTranslator extends EJBQLBaseVisitor {
                 ObjRelationship rel = property.getRelationship();
                 DbRelationship dbRel = rel.getDbRelationships().get(0);
 
-                dbRel.getJoin().accept(join -> {
-                    DbAttribute src = join.getSource();
-                    appendColumn(idVar, null, src, fields);
-                    return true;
+                dbRel.accept(new DirectionalJoinVisitor<Void>() {
+
+                    private void append(DbAttribute source, DbAttribute target) {
+                        appendColumn(idVar, null, source, fields);
+                    }
+
+                    @Override
+                    public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                        int length = source.length;
+                        for(int i = 0; i < length; i++) {
+                            append(source[i], target[i]);
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public Void visit(DbAttribute source, DbAttribute target) {
+                        append(source, target);
+                        return null;
+                    }
                 });
             }
         };

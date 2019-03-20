@@ -21,7 +21,8 @@ package org.apache.cayenne.configuration;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.map.ObjAttribute;
@@ -64,6 +65,10 @@ public abstract class BaseConfigurationNodeVisitor<T> implements
 
     public T visitDbRelationship(DbRelationship relationship) {
         throw new UnsupportedOperationException("Not implemented for DbRelationship");
+    }
+
+    public T visitDbJoin(DbJoin dbJoin) {
+        throw new UnsupportedOperationException("Not implemented for DbJoin");
     }
 
     public T visitEmbeddable(Embeddable embeddable) {

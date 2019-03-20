@@ -20,7 +20,7 @@
 package org.apache.cayenne.modeler.util;
 
 import org.apache.cayenne.map.Attribute;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Relationship;
 
 public class EntityTreeRelationshipFilter implements EntityTreeFilter {

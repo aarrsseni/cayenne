@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.cayenne.ejbql.EJBQLCompiledExpression;
 import org.apache.cayenne.ejbql.EJBQLExpression;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.SQLResult;
 import org.apache.cayenne.query.PrefetchTreeNode;

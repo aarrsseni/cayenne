@@ -36,8 +36,9 @@ import org.apache.cayenne.dba.QuotingStrategy;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.util.HashCodeBuilder;
@@ -316,19 +317,13 @@ final class FlattenedArcKey {
 		Map<String, ?> destinationId = id2.getSourceId().getIdSnapshot();
 
 		Map<String, Object> snapshot = new HashMap<>(sourceId.size() + destinationId.size(), 1);
-		firstDbRel.getJoin().accept(join -> {
-			snapshot.put(join.getTargetName(), sourceId.get(join.getSourceName()));
-			return true;
-		});
+		firstDbRel.accept(new AddToSnapshotDirectionalJoinVisitor(snapshot, sourceId, true));
 
-		secondDbRel.getJoin().accept(join -> {
-			snapshot.put(join.getSourceName(), destinationId.get(join.getTargetName()));
-			return true;
-		});
-
+		secondDbRel.accept(new AddToSnapshotDirectionalJoinVisitor(snapshot, destinationId, false));
+		
 		return snapshot;
 	}
-
+	
 	private Map<String, Object> lazyJoinSnapshot() {
 
 		List<DbRelationship> relList = relationship.getDbRelationships();
@@ -344,19 +339,85 @@ final class FlattenedArcKey {
 
 		// here ordering of ids is determined by 'relationship', so use id1, id2
 		// instead of orderedIds
-		firstDbRel.getJoin().accept(join -> {
-			Object value = new PropagatedValueFactory(id1.getSourceId(), join.getSourceName());
-			snapshot.put(join.getTargetName(), value);
-			return true;
-		});
-
-		secondDbRel.getJoin().accept(join -> {
-			Object value = new PropagatedValueFactory(id2.getSourceId(), join.getTargetName());
-			snapshot.put(join.getSourceName(), value);
-			return true;
-		});
-
+		firstDbRel.accept(new LazySnapshotDirectionalJoinVisitor(snapshot, id1, true));
+		secondDbRel.accept(new LazySnapshotDirectionalJoinVisitor(snapshot, id2, false));
 
 		return snapshot;
+	}
+
+	private static class AddToSnapshotDirectionalJoinVisitor implements DirectionalJoinVisitor<Void> {
+
+		private final Map<String, Object> snapshot;
+		private final Map<String, ?> destinationId;
+		boolean reverse;
+
+		public AddToSnapshotDirectionalJoinVisitor(Map<String, Object> snapshot,
+												   Map<String, ?> destinationId,
+												   boolean reverse) {
+			this.snapshot = snapshot;
+			this.destinationId = destinationId;
+			this.reverse = reverse;
+		}
+
+		private void addToSnapshot(DbAttribute source, DbAttribute target) {
+			if(reverse) {
+				snapshot.put(target.getName(), destinationId.get(source.getName()));
+			} else {
+				snapshot.put(source.getName(), destinationId.get(target.getName()));
+			}
+		}
+
+		@Override
+		public Void visit(DbAttribute[] source, DbAttribute[] target) {
+			int length = source.length;
+			for(int i = 0; i < length; i++) {
+				addToSnapshot(source[i], target[i]);
+			}
+			return null;
+		}
+
+		@Override
+		public Void visit(DbAttribute source, DbAttribute target) {
+			addToSnapshot(source, target);
+			return null;
+		}
+	}
+
+	private class LazySnapshotDirectionalJoinVisitor implements DirectionalJoinVisitor<Void> {
+
+		private final Map<String, Object> snapshot;
+		private final DbArcId arcId;
+		private final boolean reverse;
+
+		public LazySnapshotDirectionalJoinVisitor(Map<String, Object> snapshot, DbArcId arcId, boolean reverse) {
+			this.snapshot = snapshot;
+			this.arcId = arcId;
+			this.reverse = reverse;
+		}
+
+		private void addToSnapshot(DbAttribute source, DbAttribute target) {
+			if(reverse) {
+				Object value = new PropagatedValueFactory(arcId.getSourceId(), source.getName());
+				snapshot.put(target.getName(), value);
+			} else {
+				Object value = new PropagatedValueFactory(arcId.getSourceId(), target.getName());
+				snapshot.put(source.getName(), value);
+			}
+		}
+
+		@Override
+		public Void visit(DbAttribute[] source, DbAttribute[] target) {
+			int length = source.length;
+			for(int i = 0; i < length; i++) {
+				addToSnapshot(source[i], target[i]);
+			}
+			return null;
+		}
+
+		@Override
+		public Void visit(DbAttribute source, DbAttribute target) {
+			addToSnapshot(source, target);
+			return null;
+		}
 	}
 }

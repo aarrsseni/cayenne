@@ -19,7 +19,7 @@
 package org.apache.cayenne.access;
 
 import org.apache.cayenne.ObjectId;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

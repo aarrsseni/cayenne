@@ -27,9 +27,10 @@ import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 
 /**
  * A {@link MergerToken} to remove a {@link DbAttribute} from a {@link DbEntity}.
@@ -54,11 +55,28 @@ public class DropColumnToModel extends AbstractToModelToken.EntityAndColumn {
         List<DbRelationship> dbRelationships = new ArrayList<>(getEntity()
                 .getRelationships());
         for (DbRelationship dbRelationship : dbRelationships) {
-            dbRelationship.getJoin().accept(join -> {
-                if (join.getSource() == getColumn() || join.getTarget() == getColumn()) {
-                    remove(mergerContext.getDelegate(), dbRelationship, true);
+            dbRelationship.accept(new DirectionalJoinVisitor<Void>() {
+
+                private void removeAttrs(DbAttribute source, DbAttribute target) {
+                    if (source == getColumn() || target == getColumn()) {
+                        remove(mergerContext.getDelegate(), dbRelationship.getDbJoin());
+                    }
                 }
-                return true;
+
+                @Override
+                public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                    int length = source.length;
+                    for(int i = 0; i < length; i++) {
+                        removeAttrs(source[i], target[i]);
+                    }
+                    return null;
+                }
+
+                @Override
+                public Void visit(DbAttribute source, DbAttribute target) {
+                    removeAttrs(source, target);
+                    return null;
+                }
             });
         }
 

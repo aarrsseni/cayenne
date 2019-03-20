@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.init;
 
+import org.apache.cayenne.configuration.DataMapLoader;
 import org.apache.cayenne.configuration.xml.DataChannelMetaData;
 import org.apache.cayenne.configuration.xml.DefaultDataChannelMetaData;
 import org.apache.cayenne.configuration.xml.HandlerFactory;
@@ -29,6 +30,7 @@ import org.apache.cayenne.gen.xml.CgenExtension;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.action.ActionManager;
 import org.apache.cayenne.modeler.action.DefaultActionManager;
+import org.apache.cayenne.modeler.configuration.xml.XMLDataMapModelerLoader;
 import org.apache.cayenne.modeler.graph.extension.GraphExtension;
 import org.apache.cayenne.modeler.init.platform.GenericPlatformInitializer;
 import org.apache.cayenne.modeler.init.platform.PlatformInitializer;
@@ -53,6 +55,7 @@ public class CayenneModelerModule implements Module {
         binder.bind(HandlerFactory.class).to(ExtensionAwareHandlerFactory.class);
         binder.bind(DataChannelMetaData.class).to(DefaultDataChannelMetaData.class);
         binder.bind(XMLReader.class).toProviderInstance(new XMLReaderProvider(true)).withoutScope();
+        binder.bind(DataMapLoader.class).to(XMLDataMapModelerLoader.class);
 
         ProjectModule.contributeExtensions(binder)
                 .add(InfoExtension.class)

@@ -19,6 +19,9 @@
 
 package org.apache.cayenne.dbsync.reverse.dbimport;
 
+import java.net.URL;
+import java.util.ArrayList;
+
 import org.apache.cayenne.configuration.ConfigurationNameMapper;
 import org.apache.cayenne.configuration.ConfigurationTree;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
@@ -48,10 +51,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.XMLReader;
 
-import java.net.URL;
-import java.util.ArrayList;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ManyToManyCandidateEntityTest {
 

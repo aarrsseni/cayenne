@@ -26,7 +26,6 @@ import org.apache.cayenne.configuration.xml.DataChannelMetaData;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.map.ObjAttribute;
@@ -35,6 +34,8 @@ import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
 import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.project.extension.BaseSaverDelegate;
 import org.apache.cayenne.util.Util;
 
@@ -109,7 +110,12 @@ class InfoSaverDelegate extends BaseSaverDelegate {
 
     @Override
     public Void visitDbRelationship(DbRelationship relationship) {
-        return printComment(relationship);
+        return printComment(relationship.getDbJoin());
+    }
+
+    @Override
+    public Void visitDbJoin(DbJoin dbJoin) {
+        return printComment(dbJoin);
     }
 
     @Override

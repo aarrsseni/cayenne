@@ -24,7 +24,8 @@ import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.map.ObjAttribute;
@@ -113,5 +114,10 @@ class NormalizationVisitor implements ConfigurationNodeVisitor<String> {
     @Override
     public String visitQuery(QueryDescriptor query) {
         return baseName;
+    }
+
+    @Override
+    public String visitDbJoin(DbJoin dbJoin) {
+        return NameUtil.uncapitalize(baseName);
     }
 }

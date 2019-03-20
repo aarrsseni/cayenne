@@ -32,7 +32,7 @@ import org.apache.cayenne.map.CallbackMap;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.map.Entity;
@@ -61,7 +61,6 @@ import org.apache.cayenne.modeler.undo.RemoveRelationshipUndoableEdit;
 import org.apache.cayenne.modeler.undo.RemoveUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
 import org.apache.cayenne.modeler.util.ProjectUtil;
-import org.apache.cayenne.query.Query;
 import org.apache.cayenne.map.QueryDescriptor;
 
 import javax.swing.KeyStroke;
@@ -73,7 +72,6 @@ import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Removes currently selected object from the project. This can be Domain, DataNode,

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
+          project-version="10">
+    <db-entity name="ARTIST">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+    </db-entity>
+    <db-entity name="PAINTING">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+        <db-attribute name="ARTIST_ID" type="INTEGER" length="10"/>
+    </db-entity>
+    <db-entity name="TEST1">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+    </db-entity>
+    <db-entity name="TEST2">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+        <db-attribute name="TEST1_ID" type="INTEGER" length="10"/>
+    </db-entity>
+    <db-entity name="TEST3">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+    </db-entity>
+    <db-entity name="TEST4">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+        <db-attribute name="TEST3_ID" type="INTEGER" length="10"/>
+    </db-entity>
+    <db-entity name="TEST5">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+    </db-entity>
+    <db-entity name="TEST6">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+        <db-attribute name="TEST5_ID" type="INTEGER" length="10"/>
+    </db-entity>
+    <db-entity name="TEST7">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+    </db-entity>
+    <db-entity name="TEST8">
+        <db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
+        <db-attribute name="TEST7_ID" type="INTEGER" length="10"/>
+    </db-entity>
+    <db-relationship name="paintings" source="ARTIST" target="PAINTING" toMany="true">
+        <db-attribute-pair source="ID" target="ARTIST_ID"/>
+    </db-relationship>
+    <db-relationship name="toArtist" source="PAINTING" target="ARTIST">
+        <db-attribute-pair source="ARTIST_ID" target="ID"/>
+    </db-relationship>
+    <db-relationship name="test2" source="TEST1" target="TEST2" toMany="true" toDependentPK="true">
+        <db-attribute-pair source="ID" target="TEST1_ID"/>
+    </db-relationship>
+    <db-relationship name="test1" source="TEST2" target="TEST1" toMany="true">
+        <db-attribute-pair source="TEST1_ID" target="ID"/>
+    </db-relationship>
+    <db-relationship name="test4" source="TEST3" target="TEST4">
+        <db-attribute-pair source="ID" target="TEST3_ID"/>
+    </db-relationship>
+    <db-relationship name="test3" source="TEST4" target="TEST3" toMany="true" toDependentPK="true">
+        <db-attribute-pair source="TEST3_ID" target="ID"/>
+    </db-relationship>
+    <db-relationship name="test6" source="TEST5" target="TEST6">
+        <db-attribute-pair source="ID" target="TEST5_ID"/>
+    </db-relationship>
+    <db-relationship name="test5" source="TEST6" target="TEST5">
+        <db-attribute-pair source="TEST5_ID" target="ID"/>
+    </db-relationship>
+    <db-relationship name="test8" source="TEST7" target="TEST8" toMany="true">
+        <db-attribute-pair source="ID" target="TEST7_ID"/>
+        <db-attribute-pair source="ID" target="TEST7_ID"/>
+    </db-relationship>
+</data-map>

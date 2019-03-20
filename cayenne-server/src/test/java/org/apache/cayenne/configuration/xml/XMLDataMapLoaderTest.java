@@ -18,6 +18,8 @@
  ****************************************************************/
 package org.apache.cayenne.configuration.xml;
 
+import java.net.URL;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.ConfigurationNameMapper;
 import org.apache.cayenne.configuration.DataMapLoader;
@@ -36,8 +38,6 @@ import org.apache.cayenne.resource.URLResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.XMLReader;
-
-import java.net.URL;
 
 import static org.junit.Assert.*;
 
@@ -96,6 +96,7 @@ public class XMLDataMapLoaderTest {
     public void loadFullDataMap() {
         URL url = getClass().getResource("testConfigMap4.map.xml");
         DataMap map = loader.load(new URLResource(url));
+        map.getDbJoinList().forEach(dbJoin -> dbJoin.compile(map));
 
         assertNotNull(map);
         assertEquals("testConfigMap4", map.getName());

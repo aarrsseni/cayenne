@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.rop.protostuff.persistent"/>
 	<property name="clientSupported" value="true"/>
 	<property name="defaultClientPackage" value="org.apache.cayenne.rop.protostuff.persistent"/>
@@ -31,12 +31,13 @@
 	<obj-entity name="MtTable2" className="org.apache.cayenne.rop.protostuff.persistent.MtTable2" clientClassName="org.apache.cayenne.rop.protostuff.persistent.ClientMtTable2" dbEntityName="MT_TABLE2">
 		<obj-attribute name="globalAttribute" type="java.lang.String" db-attribute-path="GLOBAL_ATTRIBUTE"/>
 	</obj-entity>
-	<db-relationship name="table2Array" source="MT_TABLE1" target="MT_TABLE2" toMany="true">
-		<db-attribute-pair source="TABLE1_ID" target="TABLE1_ID"/>
-	</db-relationship>
-	<db-relationship name="table1" source="MT_TABLE2" target="MT_TABLE1">
-		<db-attribute-pair source="TABLE1_ID" target="TABLE1_ID"/>
-	</db-relationship>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="MT_TABLE1" name="table2Array"/>
+		<right entity="MT_TABLE2" name="table1"/>
+		<db-join-condition>
+			<column-pair left="TABLE1_ID" right="TABLE1_ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="table2Array" source="MtTable1" target="MtTable2" deleteRule="Deny" db-relationship-path="table2Array"/>
 	<obj-relationship name="table1" source="MtTable2" target="MtTable1" deleteRule="Nullify" db-relationship-path="table1"/>
 </data-map>

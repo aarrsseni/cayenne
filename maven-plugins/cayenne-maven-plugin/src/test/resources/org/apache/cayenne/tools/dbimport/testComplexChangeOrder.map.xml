@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements.  See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership.  The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License.  You may obtain a copy of the License at
-
-	https://www.apache.org/licenses/LICENSE-2.0
-
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied.  See the License for the
-	specific language governing permissions and limitations
-	under the License.
--->
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~   Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-          project-version="10">
+          xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+          project-version="11">
     <property name="defaultSchema" value="SCHEMA_01"/>
-
-
     <db-entity name="ADDRESS" schema="SCHEMA_01">
         <db-attribute name="addressString" type="VARCHAR" length="250"/>
         <db-attribute name="id" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
@@ -37,8 +35,6 @@
     <db-entity name="PARENT" schema="SCHEMA_01">
         <db-attribute name="id" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
     </db-entity>
-
-
     <obj-entity name="Address" className="Address" dbEntityName="ADDRESS">
         <obj-attribute name="addrStr" type="java.lang.String" db-attribute-path="addressString"/>
     </obj-entity>
@@ -46,19 +42,14 @@
         <obj-attribute name="id" type="java.lang.Integer" db-attribute-path="id"/>
         <obj-attribute name="name" type="java.lang.String"/>
     </obj-entity>
-    <obj-entity name="Parent" className="Parent" dbEntityName="PARENT">
-    </obj-entity>
-
-
-    <db-relationship name="parent" source="CHILD" target="PARENT">
-        <db-attribute-pair source="parent_id" target="id"/>
-    </db-relationship>
-    <db-relationship name="children" source="PARENT" target="CHILD" toMany="true">
-        <db-attribute-pair source="id" target="parent_id"/>
-    </db-relationship>
-
-
+    <obj-entity name="Parent" className="Parent" dbEntityName="PARENT"/>
+    <db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+        <left entity="CHILD" name="parent"/>
+        <right entity="PARENT" name="children"/>
+        <db-join-condition>
+            <column-pair left="parent_id" right="id"/>
+        </db-join-condition>
+    </db-join>
     <obj-relationship name="parent" source="Child" target="Parent" deleteRule="Nullify" db-relationship-path="parent"/>
     <obj-relationship name="children" source="Parent" target="Child" deleteRule="Deny" db-relationship-path="children"/>
 </data-map>
-

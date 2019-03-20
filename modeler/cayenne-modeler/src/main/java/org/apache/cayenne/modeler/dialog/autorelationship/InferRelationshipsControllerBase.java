@@ -30,8 +30,16 @@ import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoinCondition;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
+import org.apache.cayenne.modeler.map.relationship.DbJoinMutable;
+import org.apache.cayenne.modeler.map.relationship.DbJoinMutableBuilder;
 import org.apache.cayenne.modeler.util.CayenneController;
 
 public class InferRelationshipsControllerBase extends CayenneController {
@@ -107,10 +115,32 @@ public class InferRelationshipsControllerBase extends CayenneController {
     public void createReversRelationship(DbEntity eSourse, DbEntity eTarget) {
         InferredRelationship myir = new InferredRelationship();
         for (DbRelationship relationship : eSourse.getRelationships()) {
-            boolean joinNotFound = relationship.getJoin()
-                    .accept(join -> !join.getSource().getEntity().equals(eSourse)
-                            || !join.getTarget().getEntity().equals(eTarget));
-            if(!joinNotFound) {
+
+            boolean joinFound = relationship.accept(new DirectionalJoinVisitor<Boolean>() {
+
+                private boolean joinFound(DbAttribute source, DbAttribute target) {
+                    return source.getEntity().equals(eSourse)
+                            && target.getEntity().equals(eTarget);
+                }
+
+                @Override
+                public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                    int length = source.length;
+                    for(int i = 0; i < length; i++) {
+                        if(joinFound(source[i], target[i])) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public Boolean visit(DbAttribute source, DbAttribute target) {
+                    return joinFound(source, target);
+                }
+            });
+
+            if(joinFound) {
                 return;
             }
         }
@@ -196,27 +226,37 @@ public class InferRelationshipsControllerBase extends CayenneController {
 
     protected void createNames() {
 
-
         for (InferredRelationship myir : inferredRelationships) {
+            DbJoinMutableBuilder dbJoinBuilder = new DbJoinMutableBuilder();
+            dbJoinBuilder
+                    .names(new String[]{"tempName" + EntityResolver.incrementer.getAndIncrement(), null})
+                    .toManySemantics(ToManySemantics.getSemantics(myir.isToMany(), false))
+                    .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                    .dataMap(dataMap);
 
-            DbRelationship localRelationship = new DbRelationship();
-            localRelationship.setToMany(myir.isToMany());
-
+            DbJoinCondition dbJoinCondition;
             if (myir.getJoinSource().isPrimaryKey()) {
 
-                localRelationship.addJoin(
-                        new DbJoin(localRelationship, myir.getJoinSource().getName(), myir.getJoinTarget().getName())
-                );
-                localRelationship.setSourceEntity(myir.getSource());
-                localRelationship.setTargetEntityName(myir.getTarget().getName());
+                dbJoinCondition =
+                        new SinglePairCondition(
+                                new ColumnPair(myir.getJoinSource().getName(), myir.getJoinTarget().getName()));
+                dbJoinBuilder.entities(new String[]{myir.getSource().getName(), myir.getTarget().getName()});
             } else {
-                localRelationship.addJoin(
-                        new DbJoin(localRelationship, myir.getJoinTarget().getName(), myir.getJoinSource().getName())
-                );
-                localRelationship.setSourceEntity(myir.getTarget());
-                localRelationship.setTargetEntityName(myir.getSource().getName());
+                dbJoinCondition =
+                        new SinglePairCondition(
+                                new ColumnPair(myir.getJoinTarget().getName(), myir.getJoinSource().getName()));
+                dbJoinBuilder.entities(new String[]{myir.getTarget().getName(), myir.getSource().getName()});
             }
+            dbJoinBuilder.condition(dbJoinCondition);
 
+            DbJoinMutable dbJoin = dbJoinBuilder.build();
+            dbJoin.compile(dataMap);
+
+            DbRelationship localRelationship = dbJoin.getRelationhsip();
+            localRelationship.getSourceEntity()
+                    .removeRelationship(localRelationship.getName());
+            localRelationship.getTargetEntity()
+                    .removeRelationship(localRelationship.getReverseRelationship().getName());
             myir.setName(strategy.relationshipName(localRelationship));
         }
     }

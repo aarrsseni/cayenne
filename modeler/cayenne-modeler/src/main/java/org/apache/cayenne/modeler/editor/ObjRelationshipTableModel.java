@@ -21,6 +21,7 @@ package org.apache.cayenne.modeler.editor;
 
 import org.apache.cayenne.map.*;
 import org.apache.cayenne.map.event.RelationshipEvent;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.util.CayenneTableModel;
 import org.apache.cayenne.modeler.util.ProjectUtil;

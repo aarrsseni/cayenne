@@ -37,7 +37,7 @@ public class DataMapHandler extends NamespaceAwareNestedTagHandler {
     private static final String PROPERTY_TAG         = "property";
     private static final String DB_ENTITY_TAG        = "db-entity";
     private static final String OBJ_ENTITY_TAG       = "obj-entity";
-    private static final String DB_RELATIONSHIP_TAG  = "db-relationship";
+    private static final String DB_JOIN_TAG = "db-join";
     private static final String OBJ_RELATIONSHIP_TAG = "obj-relationship";
     private static final String EMBEDDABLE_TAG       = "embeddable";
     private static final String PROCEDURE_TAG        = "procedure";
@@ -86,8 +86,8 @@ public class DataMapHandler extends NamespaceAwareNestedTagHandler {
                 case OBJ_ENTITY_TAG:
                     return new ObjEntityHandler(this, dataMap);
 
-                case DB_RELATIONSHIP_TAG:
-                    return new DbRelationshipHandler(this, dataMap);
+                case DB_JOIN_TAG:
+                    return new DbJoinHandler(this, dataMap);
 
                 case OBJ_RELATIONSHIP_TAG:
                     return new ObjRelationshipHandler(this, dataMap);

@@ -41,10 +41,15 @@ import org.apache.cayenne.dba.JdbcAdapter;
 import org.apache.cayenne.dba.PkGenerator;
 import org.apache.cayenne.dba.TypesMapping;
 import org.apache.cayenne.di.Inject;
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
+import org.apache.cayenne.map.relationship.JoinVisitor;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.resource.ResourceLocator;
 
 /**
@@ -224,21 +229,68 @@ public class OpenBaseAdapter extends JdbcAdapter {
         // TODO: doesn't seem like OpenBase supports compound joins...
         // need to doublecheck that
 
-        int joinsLen = rel.getJoins().size();
-        if (joinsLen == 0) {
-            throw new CayenneRuntimeException("Relationship has no joins: %s", rel.getName());
-        } else if (joinsLen > 1) {
-            // ignore extra joins
-        }
+        rel.accept(new DirectionalJoinVisitor<Void>() {
+            @Override
+            public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                //ignore extra joins
+                return null;
+            }
 
-        DbJoin join = rel.getJoins().get(0);
+            @Override
+            public Void visit(DbAttribute source, DbAttribute target) {
+                buf.append("INSERT INTO _SYS_RELATIONSHIP (").append("dest_table, dest_column, source_table, source_column, ")
+                        .append("block_delete, cascade_delete, one_to_many, operator, relationshipName").append(") VALUES ('")
+                        .append(sourceEntity.getFullyQualifiedName()).append("', '").append(source.getName())
+                        .append("', '").append(targetEntity.getFullyQualifiedName()).append("', '")
+                        .append(target.getName()).append("', 0, 0, ").append(toMany).append(", '=', '")
+                        .append(rel.getName()).append("')");
+                return null;
+            }
+        });
+        return buf.toString();
+    }
 
-        buf.append("INSERT INTO _SYS_RELATIONSHIP (").append("dest_table, dest_column, source_table, source_column, ")
-                .append("block_delete, cascade_delete, one_to_many, operator, relationshipName").append(") VALUES ('")
-                .append(sourceEntity.getFullyQualifiedName()).append("', '").append(join.getSourceName())
-                .append("', '").append(targetEntity.getFullyQualifiedName()).append("', '")
-                .append(join.getTargetName()).append("', 0, 0, ").append(toMany).append(", '=', '")
-                .append(rel.getName()).append("')");
+    @Override
+    public String createFkConstraint(DbJoin dbJoin, RelationshipDirection direction) {
+        StringBuilder buf = new StringBuilder();
+
+        // OpendBase Specifics is that we need to create a constraint going
+        // from destination to source for this to work...
+        DataMap dataMap = dbJoin.getDataMap();
+        DbEntity sourceEntity = dataMap
+                .getDbEntity(dbJoin.getDbEntities()[direction.ordinal()]);
+        DbEntity targetEntity = dataMap
+                .getDbEntity(dbJoin.getDbEntities()[direction.getOppositeDirection().ordinal()]);
+
+        dbJoin.getDbJoinCondition().accept(new JoinVisitor<Void>() {
+            @Override
+            public Void visit(ColumnPair columnPair) {
+                String source, target;
+                if(direction == RelationshipDirection.LEFT) {
+                    source = columnPair.getLeft();
+                    target = columnPair.getRight();
+                } else {
+                    source = columnPair.getRight();
+                    target = columnPair.getLeft();
+                }
+
+                buf.append("INSERT INTO _SYS_RELATIONSHIP (").append("dest_table, dest_column, source_table, source_column, ")
+                        .append("block_delete, cascade_delete, one_to_many, operator, relationshipName").append(") VALUES ('")
+                        .append(sourceEntity.getFullyQualifiedName()).append("', '").append(source)
+                        .append("', '").append(targetEntity.getFullyQualifiedName()).append("', '")
+                        .append(target).append("', 0, 0, ")
+                        .append(dbJoin.getToManySemantics().isToMany(direction))
+                        .append(", '=', '")
+                        .append(dbJoin.getNames()[direction.ordinal()]).append("')");
+                return null;
+            }
+
+            @Override
+            public Void visit(ColumnPair[] columnPairs) {
+                //ignore extra joins
+                return null;
+            }
+        });
 
         return buf.toString();
     }

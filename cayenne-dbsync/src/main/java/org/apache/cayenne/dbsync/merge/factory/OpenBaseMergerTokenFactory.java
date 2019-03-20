@@ -18,21 +18,25 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge.factory;
 
-import org.apache.cayenne.dba.DbAdapter;
-import org.apache.cayenne.dbsync.merge.token.MergerToken;
-import org.apache.cayenne.dbsync.merge.token.db.CreateTableToDb;
-import org.apache.cayenne.dbsync.merge.token.db.DropRelationshipToDb;
-import org.apache.cayenne.dbsync.merge.token.db.SetAllowNullToDb;
-import org.apache.cayenne.dbsync.merge.token.db.SetColumnTypeToDb;
-import org.apache.cayenne.dbsync.merge.token.db.SetNotNullToDb;
-import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.cayenne.dba.DbAdapter;
+import org.apache.cayenne.dbsync.merge.token.MergerToken;
+import org.apache.cayenne.dbsync.merge.token.db.AddJoinToDb;
+import org.apache.cayenne.dbsync.merge.token.db.CreateTableToDb;
+import org.apache.cayenne.dbsync.merge.token.db.DropJoinToDb;
+import org.apache.cayenne.dbsync.merge.token.db.SetAllowNullToDb;
+import org.apache.cayenne.dbsync.merge.token.db.SetColumnTypeToDb;
+import org.apache.cayenne.dbsync.merge.token.db.SetNotNullToDb;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.JoinVisitor;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 
 public class OpenBaseMergerTokenFactory extends DefaultMergerTokenFactory {
 
@@ -55,35 +59,54 @@ public class OpenBaseMergerTokenFactory extends DefaultMergerTokenFactory {
     }
 
     @Override
-    public MergerToken createDropRelationshipToDb(
-            final DbEntity entity,
-            final DbRelationship rel) {
-        return new DropRelationshipToDb(entity, rel) {
-
+    public MergerToken createDropJoinToDb(DbJoin dbJoin) {
+        return new DropJoinToDb(dbJoin) {
             @Override
             public List<String> createSql(DbAdapter adapter) {
-
 
                 // FK_NAME form jdbc metadata seem to be wrong. It contain a column name
                 // and not the 'relationshipName'
                 // TODO: tell openbase developer mail list
 
-                DbEntity source = getEntity();
-                DbEntity dest = rel.getTargetEntity();
+                RelationshipDirection direction = AddJoinToDb.getRelationshipDirection(dbJoin);
+                DataMap dataMap = dbJoin.getDataMap();
+                DbEntity source = dataMap.getDbEntity(
+                        dbJoin.getDbEntities()[direction.ordinal()]);
+                DbEntity dest = dataMap
+                        .getDbEntity(
+                                dbJoin.getDbEntities()[direction.getOppositeDirection().ordinal()]);
 
                 // only use the first. See adapter
                 // TODO: can we be sure this is the first and same as used by the adapter?
-                DbJoin join = rel.getJoins().get(0);
+                return dbJoin.getDbJoinCondition().accept(new JoinVisitor<List<String>>() {
 
-                // see comment in adapter for why source and dest is switched around..
+                    private List<String> buildList(ColumnPair columnPair) {
+                        if(direction == RelationshipDirection.LEFT) {
+                            return Collections.singletonList("delete from _SYS_RELATIONSHIP where "
+                                    + " source_table = '" + dest.getFullyQualifiedName() + "'"
+                                    + " and source_column = '" + columnPair.getRight() + "'"
+                                    + " and dest_table = '" + source.getFullyQualifiedName() + "'"
+                                    + " and dest_column = '" + columnPair.getLeft() + "'");
+                        } else {
+                            return Collections.singletonList("delete from _SYS_RELATIONSHIP where "
+                                    + " source_table = '" + dest.getFullyQualifiedName() + "'"
+                                    + " and source_column = '" + columnPair.getLeft() + "'"
+                                    + " and dest_table = '" + source.getFullyQualifiedName() + "'"
+                                    + " and dest_column = '" +  columnPair.getRight() + "'");
+                        }
+                    }
 
-                return Collections.singletonList("delete from _SYS_RELATIONSHIP where "
-                        + " source_table = '" + dest.getFullyQualifiedName() + "'"
-                        + " and source_column = '" + join.getTargetName() + "'"
-                        + " and dest_table = '" + source.getFullyQualifiedName() + "'"
-                        + " and dest_column = '" + join.getSourceName() + "'");
+                    @Override
+                    public List<String> visit(ColumnPair columnPair) {
+                        return buildList(columnPair);
+                    }
+
+                    @Override
+                    public List<String> visit(ColumnPair[] columnPairs) {
+                        return buildList(columnPairs[0]);
+                    }
+                });
             }
-
         };
     }
 

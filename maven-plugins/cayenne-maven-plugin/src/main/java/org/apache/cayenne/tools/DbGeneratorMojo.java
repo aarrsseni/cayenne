@@ -19,33 +19,33 @@
 
 package org.apache.cayenne.tools;
 
+import java.io.File;
+import java.sql.Driver;
+
 import org.apache.cayenne.access.DbGenerator;
 import org.apache.cayenne.configuration.DataMapLoader;
 import org.apache.cayenne.datasource.DriverDataSource;
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.dba.JdbcAdapter;
 import org.apache.cayenne.dbsync.DbSyncModule;
+import org.apache.cayenne.dbsync.reverse.configuration.ToolsModule;
 import org.apache.cayenne.di.AdhocObjectFactory;
 import org.apache.cayenne.di.ClassLoaderManager;
 import org.apache.cayenne.di.DIBootstrap;
 import org.apache.cayenne.di.Injector;
 import org.apache.cayenne.log.NoopJdbcEventLogger;
 import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.dbsync.reverse.configuration.ToolsModule;
 import org.apache.cayenne.resource.URLResource;
 import org.apache.cayenne.util.Util;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
-import org.slf4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-
-import java.io.File;
-import java.sql.Driver;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
 
 /**
  * Maven mojo that generates database schema based on Cayenne mapping.
@@ -142,6 +142,7 @@ public class DbGeneratorMojo extends AbstractMojo {
 
             // Load the data map and run the db generator.
             DataMap dataMap = loadDataMap(injector);
+            dataMap.getDbJoinList().forEach(dbJoin -> dbJoin.compile(dataMap));
             DbGenerator generator = new DbGenerator(adapterInst, dataMap, NoopJdbcEventLogger.getInstance());
             generator.setShouldCreateFKConstraints(createFK);
             generator.setShouldCreatePKSupport(createPK);

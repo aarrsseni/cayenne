@@ -24,7 +24,8 @@ import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.map.ObjAttribute;
@@ -96,6 +97,11 @@ class DefaultBaseNameVisitor implements ConfigurationNodeVisitor<String> {
 
     @Override
     public String visitDbRelationship(DbRelationship relationship) {
+        return "untitledRel";
+    }
+
+    @Override
+    public String visitDbJoin(DbJoin dbJoin) {
         return "untitledRel";
     }
 

@@ -22,56 +22,54 @@ package org.apache.cayenne.modeler.dialog;
 import java.util.ArrayList;
 
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.ColumnPair;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.map.relationship.DbJoinModel;
 import org.apache.cayenne.modeler.util.CayenneTableModel;
 
 /** Model for editing DbAttributePair-s. Changes in the join attributes
  *  don't take place until commit() is called. Creation of the new
  *  DbAttributes is not allowed - user should choose from the existing ones.
 */
-public class DbJoinTableModel extends CayenneTableModel<DbJoin> {
+public class ColumnPairsTableModel extends CayenneTableModel<ColumnPair> {
 
     // Columns
     static final int SOURCE = 0;
     static final int TARGET = 1;
 
-    protected DbRelationship relationship;
     protected DbEntity source;
     protected DbEntity target;
+    private DbJoinModel dbJoinModel;
 
     /** Is the table editable. */
     private boolean editable;
 
-    public DbJoinTableModel(
-        DbRelationship relationship,
+    public ColumnPairsTableModel(
+        DbJoinModel dbJoinModel,
         ProjectController mediator,
         Object src) {
-
-        super(mediator, src, new ArrayList<>(relationship.getJoins()));
-        this.relationship = relationship;
-        this.source = relationship.getSourceEntity();
-        this.target = relationship.getTargetEntity();
+        super(mediator, src, new ArrayList<>(dbJoinModel.getColumnPairs()));
+        this.dbJoinModel = dbJoinModel;
+        this.source = dbJoinModel.getLeftEntity();
+        this.target = dbJoinModel.getRightEntity();
     }
 
-    public DbJoinTableModel(
-        DbRelationship relationship,
+    public ColumnPairsTableModel(
+        DbJoinModel dbJoinModel,
         ProjectController mediator,
         Object src,
         boolean editable) {
-
-        this(relationship, mediator, src);
+        this(dbJoinModel, mediator, src);
         this.editable = editable;
     }
 
     public Class getElementsClass() {
-        return DbJoin.class;
+        return ColumnPair.class;
     }
 
     /** Mode new attribute pairs from list to the DbRelationship. */
     public void commit() {
-        relationship.setJoins(getObjectList());
+        dbJoinModel.setColumnPairs(getObjectList());
     }
 
     /**
@@ -87,40 +85,39 @@ public class DbJoinTableModel extends CayenneTableModel<DbJoin> {
 
     public String getColumnName(int column) {
         if (column == SOURCE)
-            return relationship.getSourceEntity().getName();
+            return dbJoinModel.getLeftEntity().getName();
         else if (column == TARGET)
-            return relationship.getTargetEntity().getName();
+            return dbJoinModel.getRightEntity().getName();
         else
             return "";
     }
 
-    public DbJoin getJoin(int row) {
+    public ColumnPair getColumnPair(int row) {
         return (row >= 0 && row < objectList.size())
             ? objectList.get(row)
             : null;
     }
 
     public Object getValueAt(int row, int column) {
-        DbJoin join = getJoin(row);
-        if (join == null) {
+        ColumnPair columnPair = getColumnPair(row);
+        if (columnPair == null) {
             return null;
         }
 
         if (column == SOURCE) {
-            return join.getSourceName();
+            return columnPair.getLeft();
         }
         else if (column == TARGET) {
-            return join.getTargetName();
+            return columnPair.getRight();
         }
         else {
             return null;
         }
-
     }
 
     public void setUpdatedValueAt(Object aValue, int row, int column) {
-        DbJoin join = getJoin(row);
-        if (join == null) {
+        ColumnPair columnPair = getColumnPair(row);
+        if (columnPair == null) {
             return;
         }
 
@@ -130,25 +127,25 @@ public class DbJoinTableModel extends CayenneTableModel<DbJoin> {
                 value = null;
             }
 
-            join.setSourceName(value);
+            columnPair.setLeft(value);
         }
         else if (column == TARGET) {
             if (target == null || target.getAttribute(value) == null) {
                 value = null;
             }
 
-            join.setTargetName(value);
+            columnPair.setRight(value);
         }
-        
+
         fireTableRowsUpdated(row, row);
     }
 
     public boolean isCellEditable(int row, int col) {
         if (col == SOURCE) {
-            return relationship.getSourceEntity() != null && editable;
+            return dbJoinModel.getLeftEntity() != null && editable;
         }
         else if (col == TARGET) {
-            return relationship.getTargetEntity() != null && editable;
+            return dbJoinModel.getRightEntity() != null && editable;
         }
 
         return false;

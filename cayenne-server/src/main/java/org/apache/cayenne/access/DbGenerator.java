@@ -43,9 +43,10 @@ import org.apache.cayenne.log.JdbcEventLogger;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.EntitySorter;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.validation.SimpleValidationFailure;
 import org.apache.cayenne.validation.ValidationResult;
 import org.slf4j.Logger;
@@ -386,7 +387,6 @@ public class DbGenerator {
 			// and if this is not a dependent PK
 
 			// create UNIQUE CONSTRAINT on FK if reverse relationship is to-one
-
 			if (rel.isToPK() && !rel.isToDependentPK()) {
 
 				if (getAdapter().supportsUniqueConstraints()) {
@@ -542,9 +542,20 @@ public class DbGenerator {
 				// supposedly all source attributes of the relationship
 				// to master entity must be a part of primary key,
 				// so
-				nextRelationship.getJoin().accept(join -> {
-					pkAttributes.remove(join.getSource());
-					return true;
+				nextRelationship.accept(new DirectionalJoinVisitor<Void>() {
+					@Override
+					public Void visit(DbAttribute[] source, DbAttribute[] target) {
+						for(DbAttribute src : source) {
+							pkAttributes.remove(src);
+						}
+						return null;
+					}
+
+					@Override
+					public Void visit(DbAttribute source, DbAttribute target) {
+						pkAttributes.remove(source);
+						return null;
+					}
 				});
 			}
 

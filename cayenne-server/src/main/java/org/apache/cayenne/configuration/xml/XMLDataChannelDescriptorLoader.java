@@ -18,6 +18,14 @@
  ****************************************************************/
 package org.apache.cayenne.configuration.xml;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.cayenne.ConfigurationException;
 import org.apache.cayenne.configuration.ConfigurationNameMapper;
 import org.apache.cayenne.configuration.ConfigurationTree;
@@ -28,19 +36,12 @@ import org.apache.cayenne.di.AdhocObjectFactory;
 import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.di.Provider;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.MappingCache;
 import org.apache.cayenne.resource.Resource;
-import org.apache.cayenne.util.Util;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Arrays;
 
 /**
  * @since 3.1
@@ -53,7 +54,7 @@ public class XMLDataChannelDescriptorLoader implements DataChannelDescriptorLoad
 	/**
 	 * Versions of project XML files that this loader can read.
 	 */
-	static final String[] SUPPORTED_PROJECT_VERSIONS = {"10"};
+	static final String[] SUPPORTED_PROJECT_VERSIONS = {"11"};
 	static {
 		Arrays.sort(SUPPORTED_PROJECT_VERSIONS);
 	}
@@ -146,6 +147,14 @@ public class XMLDataChannelDescriptorLoader implements DataChannelDescriptorLoad
 			InputSource input = new InputSource(in);
 			input.setSystemId(configurationURL.toString());
 			parser.parse(input);
+
+			Collection<DataMap> dataMaps = descriptor.getDataMaps();
+			MappingCache mappingCache = new MappingCache(dataMaps);
+			descriptor.setMappingCache(mappingCache);
+			dataMaps.forEach(dataMap -> dataMap.setNamespace(mappingCache));
+			dataMaps.forEach(dataMap ->
+					dataMap.getDbJoinList().forEach(dbJoin ->
+							dbJoin.compile(dataMap)));
 
             loaderContext.dataChannelLoaded(descriptor);
 		} catch (Exception e) {

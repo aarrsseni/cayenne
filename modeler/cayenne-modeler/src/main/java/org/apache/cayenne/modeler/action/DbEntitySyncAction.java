@@ -19,27 +19,29 @@
 
 package org.apache.cayenne.modeler.action;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
 import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.objentity.EntitySyncController;
 import org.apache.cayenne.modeler.undo.DbEntitySyncUndoableEdit;
 import org.apache.cayenne.modeler.util.CayenneAction;
-
-import javax.swing.KeyStroke;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Action that synchronizes all ObjEntities with the current state of the
@@ -159,6 +161,21 @@ public class DbEntitySyncAction extends CayenneAction {
 
 			// keep manually set relationship name
 			return last.getName();
+		}
+
+		@Override
+		public String relationshipName(DbJoin dbJoin, RelationshipDirection direction) {
+			if (dbJoin == null) {
+				return super.relationshipName(dbJoin, direction);
+			}
+			String name = dbJoin.getNames()[direction.ordinal()];
+			// must be in sync with DefaultBaseNameVisitor.visitDbRelationship
+			if (name.startsWith("untitledRel")) {
+				return super.relationshipName(dbJoin, direction);
+			}
+
+			// keep manually set relationship name
+			return name;
 		}
 	}
 }

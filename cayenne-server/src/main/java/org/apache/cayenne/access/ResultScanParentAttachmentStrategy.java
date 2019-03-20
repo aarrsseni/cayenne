@@ -25,9 +25,10 @@ import java.util.Map;
 
 import org.apache.cayenne.DataRow;
 import org.apache.cayenne.Persistent;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 
 /**
  * Locates parents by checking for the child PK in the parent DataRow under FK.
@@ -35,7 +36,7 @@ import org.apache.cayenne.map.ObjRelationship;
 class ResultScanParentAttachmentStrategy implements ParentAttachmentStrategy {
 
     private PrefetchProcessorNode parentNode;
-    private DbJoin[] joins;
+    private DbRelationship currRelationship;
     private PrefetchProcessorNode node;
 
     // TODO: the ivar below makes this strategy STATEFUL and non-reusable. If we need a
@@ -61,8 +62,7 @@ class ResultScanParentAttachmentStrategy implements ParentAttachmentStrategy {
                     "ResultScanParentAttachmentStrategy does not work for flattened relationships");
         }
 
-        joins = dbRelationships.get(0).getJoins().toArray(
-                new DbJoin[dbRelationships.get(0).getJoins().size()]);
+        currRelationship = dbRelationships.get(0);
 
     }
 
@@ -72,21 +72,7 @@ class ResultScanParentAttachmentStrategy implements ParentAttachmentStrategy {
             indexParents();
         }
 
-        Object key;
-
-        if (joins.length > 1) {
-
-            List<Object> values = new ArrayList<>(joins.length);
-
-            for (int j = 0; j < joins.length; j++) {
-                values.add(row.get(joins[j].getTargetName()));
-            }
-
-            key = values;
-        }
-        else {
-            key = row.get(joins[0].getTargetName());
-        }
+        Object key = currRelationship.accept(new ScanParentsDirectionalJoinVisitor(row, true));
 
         List<Persistent> parents = partitionByChild.get(key);
         if (parents != null) {
@@ -116,26 +102,41 @@ class ResultScanParentAttachmentStrategy implements ParentAttachmentStrategy {
 
             DataRow row = rows.get(i);
 
-            Object key;
-
-            if (joins.length > 1) {
-
-                List<Object> values = new ArrayList<>(joins.length);
-
-                for (int j = 0; j < joins.length; j++) {
-                    values.add(row.get(joins[j].getSourceName()));
-                }
-
-                key = values;
-            }
-            else {
-                key = row.get(joins[0].getSourceName());
-            }
-
+            Object key = currRelationship.accept(new ScanParentsDirectionalJoinVisitor(row, false));
+            
             List<Persistent> parents = partitionByChild
                     .computeIfAbsent(key, k -> new ArrayList<>());
 
             parents.add(objects.get(i));
+        }
+    }
+
+    private static class ScanParentsDirectionalJoinVisitor implements DirectionalJoinVisitor<Object> {
+
+        private final DataRow row;
+        private final boolean reverse;
+
+        public ScanParentsDirectionalJoinVisitor(DataRow row, boolean reverse) {
+            this.row = row;
+            this.reverse = reverse;
+        }
+
+        @Override
+        public Object visit(DbAttribute[] source, DbAttribute[] target) {
+            List<Object> values = new ArrayList<>(target.length);
+
+            for(DbAttribute attribute : reverse ? target : source) {
+                values.add(row.get(attribute.getName()));
+            }
+
+            return values;
+        }
+
+        @Override
+        public Object visit(DbAttribute source, DbAttribute target) {
+            return reverse ?
+                    row.get(target.getName()) :
+                    row.get(source.getName());
         }
     }
 }

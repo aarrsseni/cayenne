@@ -18,10 +18,17 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.naming;
 
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,14 +39,32 @@ public class DefaultObjectNameGeneratorTest {
 
     private DbRelationship makeRelationship(String srcEntity, String srcKey, String targetEntity, String targetKey,
                                             boolean toMany) {
+        DataMap dataMap = new DataMap();
+        DbEntity e1 = new DbEntity(srcEntity);
+        DbAttribute a1 = new DbAttribute(srcKey);
+        e1.addAttribute(a1);
+        DbAttribute a2 = new DbAttribute(targetKey);
+        if(!srcEntity.equals(targetEntity)) {
+            DbEntity e2 = new DbEntity(targetEntity);
+            e2.addAttribute(a2);
+            dataMap.addDbEntity(e2);
+        } else {
+            e1.addAttribute(a2);
+        }
 
-        DbRelationship relationship = new DbRelationship();
-        relationship.addJoin(new DbJoin(relationship, srcKey, targetKey));
-        relationship.setToMany(toMany);
-        relationship.setSourceEntity(new DbEntity(srcEntity));
-        relationship.setTargetEntityName(targetEntity);
+        dataMap.addDbEntity(e1);
 
-        return relationship;
+        DbJoin dbJoin = new DbJoinBuilder()
+                .entities(new String[]{e1.getName(), targetEntity})
+                .names(new String[]{"X", null})
+                .toManySemantics(toMany ? ToManySemantics.ONE_TO_MANY :
+                        ToManySemantics.MANY_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair(srcKey, targetKey)))
+                .dataMap(dataMap)
+                .build();
+        dbJoin.compile(dataMap);
+        return dbJoin.getRelationhsip();
     }
 
     @Test
@@ -62,6 +87,34 @@ public class DefaultObjectNameGeneratorTest {
 
         DbRelationship r6 = makeRelationship("person", "id", "address", "person_id", true);
         assertEquals("addresses", generator.relationshipName(r6));
+    }
+
+    @Test
+    public void testDbJoinName_LowerCase_Inderscores() {
+        DbJoin dbJoin = new DbJoinBuilder()
+                .names(new String[]{"temp", "temp1"})
+                .entities(new String[]{"painting", "artist"})
+                .toManySemantics(ToManySemantics.MANY_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("artist_id", "artist_id")))
+                .dataMap(new DataMap())
+                .build();
+        assertEquals("artist", generator.relationshipName(dbJoin, RelationshipDirection.LEFT));
+        assertEquals("paintings", generator.relationshipName(dbJoin, RelationshipDirection.RIGHT));
+    }
+
+    @Test
+    public void testDbJoinName_UpperCase_Underscores() {
+        DbJoin dbJoin = new DbJoinBuilder()
+                .names(new String[]{"temp", "temp1"})
+                .entities(new String[]{"PAINTING", "ARTIST"})
+                .toManySemantics(ToManySemantics.MANY_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("ARTIST_ID", "ARTIST_ID")))
+                .dataMap(new DataMap())
+                .build();
+        assertEquals("artist", generator.relationshipName(dbJoin, RelationshipDirection.LEFT));
+        assertEquals("paintings", generator.relationshipName(dbJoin, RelationshipDirection.RIGHT));
     }
 
     @Test

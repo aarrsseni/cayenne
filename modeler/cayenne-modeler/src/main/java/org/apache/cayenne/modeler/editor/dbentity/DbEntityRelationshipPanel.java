@@ -42,7 +42,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.event.DbEntityListener;
 import org.apache.cayenne.map.event.DbRelationshipListener;

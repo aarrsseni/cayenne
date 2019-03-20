@@ -33,7 +33,6 @@ import org.apache.cayenne.map.Attribute;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.DetectedDbEntity;
 
 class DbEntityMerger extends AbstractMerger<DataMap, DbEntity> {
@@ -87,9 +86,9 @@ class DbEntityMerger extends AbstractMerger<DataMap, DbEntity> {
         // add entity
         tokens.add(getTokenFactory().createCreateTableToDb(original));
         // add it's relationships
-        for (DbRelationship rel : original.getRelationships()) {
-            tokens.add(getTokenFactory().createAddRelationshipToDb(original, rel));
-        }
+//        for (DbRelationship rel : original.getRelationships()) {
+//            tokens.add(getTokenFactory().createAddRelationshipToDb(original, rel));
+//        }
         return tokens;
     }
 

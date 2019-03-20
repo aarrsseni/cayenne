@@ -19,15 +19,26 @@
 
 package org.apache.cayenne.map;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
-import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataMapLoader;
-import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.configuration.EmptyConfigurationNodeVisitor;
 import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.exp.ExpressionException;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbJoinCondition;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.apache.cayenne.resource.URLResource;
 import org.apache.cayenne.testdo.inheritance_vertical.Iv2Sub1;
 import org.apache.cayenne.unit.di.server.CayenneProjects;
@@ -38,19 +49,7 @@ import org.apache.cayenne.util.XMLEncoder;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 @UseServerRuntime(CayenneProjects.TESTMAP_PROJECT)
 public class ObjRelationshipIT extends ServerCase {
@@ -64,9 +63,11 @@ public class ObjRelationshipIT extends ServerCase {
     private DbEntity paintingDbEntity;
     private DbEntity galleryDBEntity;
 
+    private EntityResolver resolver;
+
     @Before
     public void setUp() throws Exception {
-        EntityResolver resolver = runtime.getDataDomain().getEntityResolver();
+        resolver = runtime.getDataDomain().getEntityResolver();
 
         artistDBEntity = resolver.getDbEntity("ARTIST");
         artistExhibitDBEntity = resolver.getDbEntity("ARTIST_EXHIBIT");
@@ -203,12 +204,31 @@ public class ObjRelationshipIT extends ServerCase {
         map.addDbEntity(dbEntity2);
         map.addDbEntity(dbEntity3);
         entity.setDbEntityName("TEST1");
-        DbRelationship dummyR = new DbRelationship("dummy");
-        dummyR.setTargetEntityName("TEST2");
-        dummyR.setSourceEntity(dbEntity1);
-        DbRelationship pathR = new DbRelationship("path");
-        pathR.setTargetEntityName("TEST3");
-        pathR.setSourceEntity(dbEntity2);
+
+        DbJoinCondition condition1 = new SinglePairCondition(new ColumnPair("ID", "ID"));
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .condition(condition1)
+                .entities(new String[]{"TEST1", "TEST2"})
+                .names(new String[]{"dummy", null})
+                .toManySemantics(ToManySemantics.ONE_TO_MANY)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .dataMap(map)
+                .build();
+        dbJoin1.compile(map);
+        DbRelationship dummyR = dbJoin1.getRelationhsip();
+
+        DbJoinCondition condition2 = new SinglePairCondition(new ColumnPair("ID", "ID"));
+        DbJoin dbJoin2 = new DbJoinBuilder()
+                .condition(condition2)
+                .entities(new String[]{"TEST2", "TEST3"})
+                .names(new String[]{"path", null})
+                .toManySemantics(ToManySemantics.ONE_TO_MANY)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .dataMap(map)
+                .build();
+        dbJoin2.compile(map);
+        DbRelationship pathR = dbJoin2.getRelationhsip();
+
         dbEntity1.addRelationship(dummyR);
         dbEntity2.addRelationship(pathR);
 
@@ -284,14 +304,30 @@ public class ObjRelationshipIT extends ServerCase {
         map.addDbEntity(dbEntity2);
         map.addDbEntity(dbEntity3);
         entity.setDbEntityName("TEST1");
-        DbRelationship dummyR = new DbRelationship("dummy");
-        dummyR.setTargetEntityName("TEST2");
-        dummyR.setSourceEntity(dbEntity1);
-        DbRelationship pathR = new DbRelationship("path");
-        pathR.setTargetEntityName("TEST3");
-        pathR.setSourceEntity(dbEntity2);
-        dbEntity1.addRelationship(dummyR);
-        dbEntity2.addRelationship(pathR);
+
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .entities(new String[] {"TEST1", "TEST2"})
+                .names(new String[]{"dummy", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("ID", "ID")))
+                .dataMap(map)
+                .build();
+        dbJoin1.compile(map);
+
+        DbRelationship dummyR = dbJoin1.getRelationhsip();
+
+        DbJoin dbJoin2 = new DbJoinBuilder()
+                .entities(new String[]{"TEST2", "TEST3"})
+                .names(new String[]{"path", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("ID", "ID")))
+                .dataMap(map)
+                .build();
+        dbJoin2.compile(map);
+
+        DbRelationship pathR = dbJoin2.getRelationhsip();
 
         ObjRelationship relationship = new ObjRelationship();
         relationship.setSourceEntity(entity);
@@ -391,16 +427,29 @@ public class ObjRelationshipIT extends ServerCase {
 
     @Test
     public void testFlattenedRelationship() {
-        DbRelationship r1 = new DbRelationship("X");
-        DbRelationship r2 = new DbRelationship("Y");
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .entities(new String[]{artistDBEntity.getName(), artistExhibitDBEntity.getName()})
+                .names(new String[]{"X", null})
+                .toManySemantics(ToManySemantics.ONE_TO_MANY)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("ARTIST_ID", "ARTIST_ID")))
+                .dataMap(artistDBEntity.getDataMap())
+                .build();
+        dbJoin1.compile(resolver);
 
-        r1.setSourceEntity(artistDBEntity);
-        r1.setTargetEntityName(artistExhibitDBEntity);
-        r1.setToMany(true);
+        DbRelationship r1 = dbJoin1.getRelationhsip();
 
-        r2.setSourceEntity(artistExhibitDBEntity);
-        r2.setTargetEntityName(exhibitDBEntity);
-        r2.setToMany(false);
+        DbJoin dbJoin2 = new DbJoinBuilder()
+                .entities(new String[]{artistExhibitDBEntity.getName(), exhibitDBEntity.getName()})
+                .names(new String[]{"Y", null})
+                .toManySemantics(ToManySemantics.MANY_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("EXHIBIT_ID", "EXHIBIT_ID")))
+                .dataMap(artistExhibitDBEntity.getDataMap())
+                .build();
+
+        dbJoin2.compile(resolver);
+        DbRelationship r2 = dbJoin2.getRelationhsip();
 
         ObjRelationship relationship = new ObjRelationship();
         relationship.addDbRelationship(r1);
@@ -431,6 +480,7 @@ public class ObjRelationshipIT extends ServerCase {
         URL url = getClass().getClassLoader().getResource("inheritance-vertical.map.xml");
         DataMap dataMap = loader.load(new URLResource(url));
         EntityResolver resolver = new EntityResolver(Collections.singleton(dataMap));
+        dataMap.getDbJoinList().forEach(dbJoin -> dbJoin.compile(resolver));
 
         ObjEntity iv2Sub1 = resolver.getObjEntity(Iv2Sub1.class);
         ObjRelationship x = iv2Sub1.getRelationship(Iv2Sub1.X.getName());
@@ -443,19 +493,38 @@ public class ObjRelationshipIT extends ServerCase {
         // Readonly is a flattened relationship that isn't over a single
         // many->many link
         // table
-        DbRelationship r1 = new DbRelationship("X");
-        DbRelationship r2 = new DbRelationship("Y");
-        DbRelationship r3 = new DbRelationship("Z");
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .entities(new String[]{artistDBEntity.getName(), artistExhibitDBEntity.getName()})
+                .names(new String[]{"X", null})
+                .toManySemantics(ToManySemantics.ONE_TO_MANY)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("ARTIST_ID", "ARTIST_ID")))
+                .dataMap(artistDBEntity.getDataMap())
+                .build();
+        dbJoin1.compile(resolver);
+        DbRelationship r1 = dbJoin1.getRelationhsip();
 
-        r1.setSourceEntity(artistDBEntity);
-        r1.setTargetEntityName(artistExhibitDBEntity);
-        r1.setToMany(true);
-        r2.setSourceEntity(artistExhibitDBEntity);
-        r2.setTargetEntityName(exhibitDBEntity);
-        r2.setToMany(false);
-        r3.setSourceEntity(exhibitDBEntity);
-        r3.setTargetEntityName(galleryDBEntity);
-        r3.setToMany(false);
+        DbJoin dbJoin2 = new DbJoinBuilder()
+                .entities(new String[]{artistExhibitDBEntity.getName(), exhibitDBEntity.getName()})
+                .names(new String[]{"Y", null})
+                .toManySemantics(ToManySemantics.MANY_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("EXHIBIT_ID", "EXHIBIT_ID")))
+                .dataMap(artistExhibitDBEntity.getDataMap())
+                .build();
+        dbJoin2.compile(resolver);
+        DbRelationship r2 = dbJoin2.getRelationhsip();
+
+        DbJoin dbJoin3 = new DbJoinBuilder()
+                .entities(new String[]{exhibitDBEntity.getName(), galleryDBEntity.getName()})
+                .names(new String[]{"Z", null})
+                .toManySemantics(ToManySemantics.MANY_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("GALLERY_ID", "GALLERY_ID")))
+                .dataMap(exhibitDBEntity.getDataMap())
+                .build();
+        dbJoin3.compile(resolver);
+        DbRelationship r3 = dbJoin3.getRelationhsip();
 
         ObjRelationship relationship = new ObjRelationship();
         relationship.addDbRelationship(r1);
@@ -473,22 +542,34 @@ public class ObjRelationshipIT extends ServerCase {
     // sequence is "incorrect" (or rather, unsupported)
     @Test
     public void testIncorrectSequenceReadOnlyRelationship() {
-        DbRelationship r1 = new DbRelationship("X");
-        DbRelationship r2 = new DbRelationship("Y");
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .entities(new String[]{artistDBEntity.getName(), paintingDbEntity.getName()})
+                .names(new String[]{"X", null})
+                .toManySemantics(ToManySemantics.ONE_TO_MANY)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("ARTIST_ID", "ARTIST_ID")))
+                .dataMap(artistDBEntity.getDataMap())
+                .build();
 
-        r1.setSourceEntity(artistDBEntity);
-        r1.setTargetEntityName(paintingDbEntity);
-        r1.setToMany(true);
-        r2.setSourceEntity(paintingDbEntity);
-        r2.setTargetEntityName(galleryDBEntity);
-        r2.setToMany(false);
+        dbJoin1.compile(resolver);
+        DbRelationship r1 = dbJoin1.getRelationhsip();
+
+        DbJoin dbJoin2 = new DbJoinBuilder()
+                .entities(new String[]{paintingDbEntity.getName(), galleryDBEntity.getName()})
+                .names(new String[]{"Y", null})
+                .toManySemantics(ToManySemantics.MANY_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("GALLERY_ID", "GALLERY_ID")))
+                .dataMap(paintingDbEntity.getDataMap())
+                .build();
+        dbJoin2.compile(resolver);
+        DbRelationship r2 = dbJoin2.getRelationhsip();
 
         ObjRelationship relationship = new ObjRelationship();
         relationship.addDbRelationship(r1);
         relationship.addDbRelationship(r2);
 
         assertTrue(relationship.isFlattened());
-        assertTrue(relationship.isReadOnly());
         assertTrue(relationship.isToMany());
     }
 

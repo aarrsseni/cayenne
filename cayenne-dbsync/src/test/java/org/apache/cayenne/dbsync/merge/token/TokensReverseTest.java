@@ -19,16 +19,21 @@
 
 package org.apache.cayenne.dbsync.merge.token;
 
+import java.util.Collections;
+
 import org.apache.cayenne.dbsync.merge.factory.HSQLMergerTokenFactory;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Collections;
 
 import static org.apache.cayenne.dbsync.merge.builders.ObjectMother.dbAttr;
 import static org.apache.cayenne.dbsync.merge.builders.ObjectMother.dbEntity;
@@ -40,21 +45,36 @@ public class TokensReverseTest {
 
     @Test
     public void testReverses() {
+        DataMap dataMap = new DataMap();
+
         DbAttribute attr = dbAttr().build();
         DbEntity entity = dbEntity().attributes(attr).build();
-        DbRelationship rel = new DbRelationship("rel");
-        rel.setSourceEntity(entity);
-        rel.addJoin(new DbJoin(rel, attr.getName(), "dontKnow"));
+
+        DbAttribute targetAttr = dbAttr().build();
+        DbEntity targetEntity = dbEntity().attributes(targetAttr).build();
+
+        dataMap.addDbEntity(entity);
+        dataMap.addDbEntity(targetEntity);
+
+        DbJoin dbJoin = new DbJoinBuilder()
+                .entities(new String[]{entity.getName(), targetEntity.getName()})
+                .names(new String[]{"Test", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair(attr.getName(), targetAttr.getName())))
+                .dataMap(dataMap)
+                .build();
+        dbJoin.compile(dataMap);
 
         testOneToOneReverse(factory().createAddColumnToDb(entity, attr));
         testOneToOneReverse(factory().createAddColumnToModel(entity, attr));
         testOneToOneReverse(factory().createDropColumnToDb(entity, attr));
         testOneToOneReverse(factory().createDropColumnToModel(entity, attr));
 
-        testOneToOneReverse(factory().createAddRelationshipToDb(entity, rel));
-        testOneToOneReverse(factory().createAddRelationshipToModel(entity, rel));
-        testOneToOneReverse(factory().createDropRelationshipToDb(entity, rel));
-        testOneToOneReverse(factory().createDropRelationshipToModel(entity, rel));
+        testOneToOneReverse(factory().createAddJoinToDb(dbJoin));
+        testOneToOneReverse(factory().createAddJoinToModel(dbJoin));
+        testOneToOneReverse(factory().createDropJoinToDb(dbJoin));
+        testOneToOneReverse(factory().createAddJoinToModel(dbJoin));
 
         testOneToOneReverse(factory().createCreateTableToDb(entity));
         testOneToOneReverse(factory().createCreateTableToModel(entity));

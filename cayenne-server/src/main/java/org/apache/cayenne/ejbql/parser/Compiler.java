@@ -32,13 +32,14 @@ import org.apache.cayenne.ejbql.EJBQLException;
 import org.apache.cayenne.ejbql.EJBQLExpression;
 import org.apache.cayenne.ejbql.EJBQLExpressionVisitor;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.EntityResult;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.SQLResult;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.PrefetchTreeNode;
 import org.apache.cayenne.reflect.ArcProperty;
 import org.apache.cayenne.reflect.AttributeProperty;
@@ -262,14 +263,31 @@ class Compiler {
                 ObjRelationship rel = property.getRelationship();
                 DbRelationship dbRel = rel.getDbRelationships().get(0);
 
-                dbRel.getJoin().accept(join -> {
-                    DbAttribute src = join.getSource();
-                    if (src.isForeignKey() && visited.add(src.getName())) {
-                        compiledResult.addDbField("fetch." + prefix + "." + src.getName(), prefix
-                                + "."
-                                + src.getName());
+                dbRel.accept(new DirectionalJoinVisitor<Void>() {
+
+                    private void addField(DbAttribute source) {
+                        if (source.isForeignKey() && visited.add(source.getName())) {
+                            compiledResult.addDbField("fetch." + prefix + "." + source.getName(),
+                                    prefix
+                                    + "."
+                                    + source.getName());
+                        }
                     }
-                    return true;
+
+                    @Override
+                    public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                        int length = source.length;
+                        for(int i = 0; i < length; i++) {
+                            addField(source[i]);
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public Void visit(DbAttribute source, DbAttribute target) {
+                        addField(source);
+                        return null;
+                    }
                 });
 
                 return true;
@@ -339,12 +357,28 @@ class Compiler {
                 ObjRelationship rel = property.getRelationship();
                 DbRelationship dbRel = rel.getDbRelationships().get(0);
 
-                dbRel.getJoin().accept(join -> {
-                    DbAttribute src = join.getSource();
-                    if (src.isForeignKey() && visited.add(src.getName())) {
-                        entityResult.addDbField(src.getName(), prefix + index[0]++);
+                dbRel.accept(new DirectionalJoinVisitor<Void>() {
+
+                    private void addField(DbAttribute source) {
+                        if (source.isForeignKey() && visited.add(source.getName())) {
+                            entityResult.addDbField(source.getName(), prefix + index[0]++);
+                        }
                     }
-                    return true;
+
+                    @Override
+                    public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                        int length = source.length;
+                        for(int i = 0; i < length; i++) {
+                            addField(source[i]);
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public Void visit(DbAttribute source, DbAttribute target) {
+                        addField(source);
+                        return null;
+                    }
                 });
 
                 return true;

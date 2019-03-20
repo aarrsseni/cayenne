@@ -18,20 +18,19 @@
  ****************************************************************/
 package org.apache.cayenne.access.translator.ejbql;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.cayenne.ejbql.EJBQLBaseVisitor;
 import org.apache.cayenne.ejbql.EJBQLException;
 import org.apache.cayenne.ejbql.EJBQLExpression;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.reflect.ClassDescriptor;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public abstract class EJBQLDbPathTranslator extends EJBQLBaseVisitor {
 
@@ -180,7 +179,7 @@ public abstract class EJBQLDbPathTranslator extends EJBQLBaseVisitor {
 			// use an outer join for to-many matches
 			resolveJoin(false);
 
-			DbEntity table = (DbEntity) relationship.getTargetEntity();
+			DbEntity table = relationship.getTargetEntity();
 
 			String alias = this.lastAlias != null ? lastAlias : context.getTableAlias(idPath, context
 					.getQuotingStrategy().quotedFullyQualifiedName(table));
@@ -200,31 +199,34 @@ public abstract class EJBQLDbPathTranslator extends EJBQLBaseVisitor {
 		} else {
 			// match FK against the target object
 
-			DbEntity table = (DbEntity) relationship.getSourceEntity();
+			DbEntity table = relationship.getSourceEntity();
 
 			String alias = this.lastAlias != null ? lastAlias : context.getTableAlias(idPath, context
 					.getQuotingStrategy().quotedFullyQualifiedName(table));
 
-			List<DbJoin> joins = relationship.getJoins();
-
-			if (joins.size() == 1) {
-				DbJoin join = joins.get(0);
-				context.append(' ');
-				if (isUsingAliases()) {
-					context.append(alias).append('.');
-				}
-				context.append(context.getQuotingStrategy().quotedName(join.getSource()));
-			} else {
-				Map<String, String> multiColumnMatch = new HashMap<>(joins.size() + 2);
-
-				for (DbJoin join : joins) {
-					String column = isUsingAliases() ? alias + "." + join.getSourceName() : join.getSourceName();
-
-					multiColumnMatch.put(join.getTargetName(), column);
+			relationship.accept(new DirectionalJoinVisitor<Void>() {
+				@Override
+				public Void visit(DbAttribute[] source, DbAttribute[] target) {
+					int length = source.length;
+					Map<String, String> multiColumnMatch = new HashMap<>(length + 2);
+					for(int i = 0; i < length; i++) {
+						String column = isUsingAliases() ? alias + "." + source[i].getName() : source[i].getName();
+						multiColumnMatch.put(target[i].getName(), column);
+					}
+					appendMultiColumnPath(EJBQLMultiColumnOperand.getPathOperand(context, multiColumnMatch));
+					return null;
 				}
 
-				appendMultiColumnPath(EJBQLMultiColumnOperand.getPathOperand(context, multiColumnMatch));
-			}
+				@Override
+				public Void visit(DbAttribute source, DbAttribute target) {
+					context.append(' ');
+					if (isUsingAliases()) {
+						context.append(alias).append('.');
+					}
+					context.append(context.getQuotingStrategy().quotedName(source));
+					return null;
+				}
+			});
 		}
 	}
 

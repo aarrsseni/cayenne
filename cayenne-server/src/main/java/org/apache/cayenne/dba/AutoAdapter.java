@@ -19,6 +19,11 @@
 
 package org.apache.cayenne.dba;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.function.Function;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.sqlbuilder.sqltree.Node;
@@ -30,17 +35,14 @@ import org.apache.cayenne.di.Provider;
 import org.apache.cayenne.log.JdbcEventLogger;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.query.FluentSelect;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLAction;
 import org.apache.cayenne.query.SelectQuery;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.function.Function;
 
 /**
  * A DbAdapter that automatically detects the kind of database it is running on
@@ -172,6 +174,11 @@ public class AutoAdapter implements DbAdapter {
 	@Override
 	public String createFkConstraint(DbRelationship rel) {
 		return getAdapter().createFkConstraint(rel);
+	}
+
+	@Override
+	public String createFkConstraint(DbJoin dbJoin, RelationshipDirection direction) {
+		return getAdapter().createFkConstraint(dbJoin, direction);
 	}
 
 	@Override

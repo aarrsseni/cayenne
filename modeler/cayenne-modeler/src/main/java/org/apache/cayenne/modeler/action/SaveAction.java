@@ -19,13 +19,14 @@
 
 package org.apache.cayenne.modeler.action;
 
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
-import javax.swing.KeyStroke;
-
+import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.modeler.Application;
+import org.apache.cayenne.modeler.map.relationship.DbJoinMutable;
 import org.apache.cayenne.pref.RenamedPreferences;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.project.ProjectSaver;
@@ -65,6 +66,12 @@ public class SaveAction extends SaveAsAction {
 
         getProjectController().getFileChangeTracker().pauseWatching();
         ProjectSaver saver = getApplication().getInjector().getInstance(ProjectSaver.class);
+
+        ((DataChannelDescriptor) getProjectController().getProject().getRootNode())
+                .getDataMaps().forEach(dataMap ->
+                dataMap.getDbJoinList().forEach(dbJoin ->
+                        ((DbJoinMutable) dbJoin).mergeAndNormalize()));
+
         saver.save(p);
 
         RenamedPreferences.removeOldPreferences();

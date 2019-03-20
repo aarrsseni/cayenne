@@ -18,6 +18,17 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.reverse.dbimport;
 
+import javax.sql.DataSource;
+import java.io.File;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.configuration.DataChannelDescriptorLoader;
 import org.apache.cayenne.configuration.DataMapLoader;
@@ -34,7 +45,7 @@ import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactoryProvider;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.dbsync.merge.token.db.CreateTableToDb;
 import org.apache.cayenne.dbsync.merge.token.model.AddColumnToModel;
-import org.apache.cayenne.dbsync.merge.token.model.AddRelationshipToModel;
+import org.apache.cayenne.dbsync.merge.token.model.AddJoinToModel;
 import org.apache.cayenne.dbsync.merge.token.model.CreateTableToModel;
 import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
 import org.apache.cayenne.dbsync.naming.NoStemStemmer;
@@ -54,39 +65,18 @@ import org.apache.cayenne.project.extension.ProjectExtension;
 import org.apache.cayenne.resource.Resource;
 import org.apache.cayenne.resource.URLResource;
 import org.apache.cayenne.util.Util;
-import org.slf4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.sql.DataSource;
-import java.io.File;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import org.slf4j.Logger;
 
 import static java.util.Arrays.asList;
 import static org.apache.cayenne.dbsync.merge.builders.ObjectMother.dbAttr;
 import static org.apache.cayenne.dbsync.merge.builders.ObjectMother.dbEntity;
 import static org.apache.cayenne.dbsync.merge.builders.ObjectMother.objAttr;
 import static org.apache.cayenne.dbsync.merge.builders.ObjectMother.objEntity;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DefaultDbImportActionTest {
 
@@ -395,10 +385,10 @@ public class DefaultDbImportActionTest {
         assertFalse(projectFile.exists());
 
         Files.write(projectFile.toPath(), ("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<domain xmlns=\"http://cayenne.apache.org/schema/10/domain\"\n" +
+                "<domain xmlns=\"http://cayenne.apache.org/schema/11/domain\"\n" +
                 "\t xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                "\t xsi:schemaLocation=\"http://cayenne.apache.org/schema/10/domain https://cayenne.apache.org/schema/10/domain.xsd\"\n" +
-                "\t project-version=\"10\">\n" +
+                "\t xsi:schemaLocation=\"http://cayenne.apache.org/schema/11/domain https://cayenne.apache.org/schema/11/domain.xsd\"\n" +
+                "\t project-version=\"11\">\n" +
                 "</domain>").getBytes(Charset.forName("UTF-8")));
         assertTrue(projectFile.isFile());
 
@@ -440,10 +430,10 @@ public class DefaultDbImportActionTest {
         assertFalse(projectFile.exists());
 
         Files.write(projectFile.toPath(), ("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<domain xmlns=\"http://cayenne.apache.org/schema/10/domain\"\n" +
+                "<domain xmlns=\"http://cayenne.apache.org/schema/11/domain\"\n" +
                 "\t xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                "\t xsi:schemaLocation=\"http://cayenne.apache.org/schema/10/domain https://cayenne.apache.org/schema/10/domain.xsd\"\n" +
-                "\t project-version=\"10\">\n" +
+                "\t xsi:schemaLocation=\"http://cayenne.apache.org/schema/11/domain https://cayenne.apache.org/schema/11/domain.xsd\"\n" +
+                "\t project-version=\"11\">\n" +
                 "\t<map name=\"testSaveLoaded4\"/>\n" +
                 "</domain>").getBytes(Charset.forName("UTF-8")));
         assertTrue(projectFile.isFile());
@@ -459,10 +449,10 @@ public class DefaultDbImportActionTest {
         assertFalse(dataMapFile.exists());
 
         Files.write(dataMapFile.toPath(), ("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<data-map xmlns=\"http://cayenne.apache.org/schema/10/modelMap\"\n" +
+                "<data-map xmlns=\"http://cayenne.apache.org/schema/11/modelMap\"\n" +
                 "\t xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                "\t xsi:schemaLocation=\"http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd\"\n" +
-                "\t project-version=\"10\">\n" +
+                "\t xsi:schemaLocation=\"http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd\"\n" +
+                "\t project-version=\"11\">\n" +
                 "\t<db-entity name=\"test\">\n" +
                 "\t\t<db-attribute name=\"test\" type=\"INT\"/>\n" +
                 "\t</db-entity>\n" +
@@ -490,11 +480,11 @@ public class DefaultDbImportActionTest {
     public void testMergeTokensSorting() {
         LinkedList<MergerToken> tokens = new LinkedList<MergerToken>();
         tokens.add(new AddColumnToModel(null, null));
-        tokens.add(new AddRelationshipToModel(null, null));
+        tokens.add(new AddJoinToModel(null));
         tokens.add(new CreateTableToDb(null));
         tokens.add(new CreateTableToModel(null));
 
-        assertEquals(asList("CreateTableToDb", "CreateTableToModel", "AddColumnToModel", "AddRelationshipToModel"),
+        assertEquals(asList("CreateTableToDb", "CreateTableToModel", "AddColumnToModel", "AddJoinToModel"),
                 toClasses(DefaultDbImportAction.sort(tokens)));
     }
 

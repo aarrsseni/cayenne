@@ -247,6 +247,7 @@ public class CayenneGeneratorMojo extends AbstractMojo {
 			loaderAction.setAdditionalDataMapFiles(convertAdditionalDataMaps());
 
 			DataMap dataMap = loaderAction.getMainDataMap();
+			dataMap.getDbJoinList().forEach(dbJoin -> dbJoin.compile(dataMap));
 			ClassGenerationAction generator = createGenerator(dataMap);
 			CayenneGeneratorEntityFilterAction filterEntityAction = new CayenneGeneratorEntityFilterAction();
 			filterEntityAction.setNameFilter(NamePatternMatcher.build(logger, includeEntities, excludeEntities));

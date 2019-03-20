@@ -21,8 +21,9 @@ package org.apache.cayenne.access.translator.select;
 
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.JoinType;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 
 /**
  * @since 4.2
@@ -109,9 +110,20 @@ class DbPathProcessor extends PathProcessor<DbEntity> {
             }
         } else {
             String finalPath = path;
-            relationship.getJoin().accept(join -> {
-                addAttribute(finalPath, join.getSource());
-                return true;
+            relationship.accept(new DirectionalJoinVisitor<Void>() {
+                @Override
+                public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                    for(DbAttribute attribute : source) {
+                        addAttribute(finalPath, attribute);
+                    }
+                    return null;
+                }
+
+                @Override
+                public Void visit(DbAttribute source, DbAttribute target) {
+                    addAttribute(finalPath, source);
+                    return null;
+                }
             });
         }
     }

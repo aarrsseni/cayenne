@@ -20,7 +20,9 @@ package org.apache.cayenne.dbsync.naming;
 
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 
 /**
  * A strategy for creating names for object layer metadata artifacts based on their DB counterpart naming or structure.
@@ -50,5 +52,7 @@ public interface ObjectNameGenerator {
      * <p>Generated name can be used for DbRelationship itself (in which case the chain must have exactly one parameter).
      */
     String relationshipName(DbRelationship... relationshipChain);
+
+    String relationshipName(DbJoin dbJoin, RelationshipDirection relationshipDirection);
 
 }

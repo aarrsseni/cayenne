@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.unsupported_distinct_types"/>
 	<db-entity name="COMPOSITION">
 		<db-attribute name="BASE_ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
@@ -26,30 +26,34 @@
 	<obj-entity name="Product" className="org.apache.cayenne.testdo.unsupported_distinct_types.Product" dbEntityName="PRODUCT">
 		<obj-attribute name="longvarcharCol" type="java.lang.String" db-attribute-path="LONGVARCHAR_COL"/>
 	</obj-entity>
-	<db-relationship name="base" source="COMPOSITION" target="PRODUCT">
-		<db-attribute-pair source="BASE_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="contained" source="COMPOSITION" target="PRODUCT">
-		<db-attribute-pair source="CONTAINED_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="orderBy" source="CUSTOMER" target="ORDERS" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="CUSTOMER_ID"/>
-	</db-relationship>
-	<db-relationship name="order" source="ORDERS" target="PRODUCT">
-		<db-attribute-pair source="PRODUCT_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="orderBy" source="ORDERS" target="CUSTOMER">
-		<db-attribute-pair source="CUSTOMER_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="base" source="PRODUCT" target="COMPOSITION" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="BASE_ID"/>
-	</db-relationship>
-	<db-relationship name="contained" source="PRODUCT" target="COMPOSITION" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="CONTAINED_ID"/>
-	</db-relationship>
-	<db-relationship name="order" source="PRODUCT" target="ORDERS" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="PRODUCT_ID"/>
-	</db-relationship>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="RIGHT">
+		<left entity="COMPOSITION" name="base"/>
+		<right entity="PRODUCT" name="base"/>
+		<db-join-condition>
+			<column-pair left="BASE_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="RIGHT">
+		<left entity="COMPOSITION" name="contained"/>
+		<right entity="PRODUCT" name="contained"/>
+		<db-join-condition>
+			<column-pair left="CONTAINED_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
+		<left entity="CUSTOMER" name="orderBy"/>
+		<right entity="ORDERS" name="orderBy"/>
+		<db-join-condition>
+			<column-pair left="ID" right="CUSTOMER_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="RIGHT">
+		<left entity="ORDERS" name="order"/>
+		<right entity="PRODUCT" name="order"/>
+		<db-join-condition>
+			<column-pair left="PRODUCT_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="order" source="Customer" target="Product" deleteRule="Deny" db-relationship-path="orderBy.order"/>
 	<obj-relationship name="base" source="Product" target="Product" deleteRule="Deny" db-relationship-path="contained.base"/>
 	<obj-relationship name="contained" source="Product" target="Product" deleteRule="Deny" db-relationship-path="base.contained"/>

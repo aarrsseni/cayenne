@@ -25,7 +25,8 @@ import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EJBQLQueryDescriptor;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
@@ -123,6 +124,10 @@ public class DefaultProjectValidator implements ProjectValidator {
                 visitDbEntity(ent);
             }
 
+            for(DbJoin dbJoin : dataMap.getDbJoinList()) {
+                visitDbJoin(dbJoin);
+            }
+
             for (Procedure proc : dataMap.getProcedures()) {
                 visitProcedure(proc);
             }
@@ -151,14 +156,25 @@ public class DefaultProjectValidator implements ProjectValidator {
                 visitDbAttribute(attr);
             }
 
-            for (DbRelationship rel : entity.getRelationships()) {
-                visitDbRelationship(rel);
-            }
             return validationResult;
         }
 
         public ValidationResult visitDbRelationship(DbRelationship relationship) {
             dbRelValidator.validate(relationship, validationResult);
+            return validationResult;
+        }
+
+        @Override
+        public ValidationResult visitDbJoin(DbJoin dbJoin) {
+            DbRelationship forwardRelationship = dbJoin.getRelationhsip();
+            if(forwardRelationship == null) {
+                return null;
+            }
+            DbRelationship reverseRelationship = forwardRelationship.getReverseRelationship();
+            dbRelValidator.validate(forwardRelationship, validationResult);
+            if(!reverseRelationship.isRuntime()) {
+                dbRelValidator.validate(reverseRelationship, validationResult);
+            }
             return validationResult;
         }
 

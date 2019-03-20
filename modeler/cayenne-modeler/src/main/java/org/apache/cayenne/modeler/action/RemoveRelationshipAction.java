@@ -22,13 +22,15 @@ package org.apache.cayenne.modeler.action;
 import java.awt.event.ActionEvent;
 
 import org.apache.cayenne.configuration.ConfigurationNode;
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.map.event.RelationshipEvent;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.modeler.dialog.ConfirmRemoveDialog;
@@ -124,9 +126,13 @@ public class RemoveRelationshipAction extends RemoveAction implements
 
 	public void removeDbRelationships(DbEntity entity, DbRelationship[] rels) {
 		ProjectController mediator = getProjectController();
-
+		DataMap dataMap = mediator.getCurrentDataMap();
 		for(int i = 0; i < rels.length; i++) {
 			rels[i] = entity.getRelationship(rels[i].getName());
+			DbJoin dbJoin = rels[i].getDbJoin();
+			dataMap.getDbJoinList().remove(dbJoin);
+			DbRelationship reverseRelationship = rels[i].getReverseRelationship();
+			reverseRelationship.getSourceEntity().removeRelationship(reverseRelationship.getName());
 			entity.removeRelationship(rels[i].getName());
 
 			RelationshipEvent e = new RelationshipEvent(Application.getFrame(),

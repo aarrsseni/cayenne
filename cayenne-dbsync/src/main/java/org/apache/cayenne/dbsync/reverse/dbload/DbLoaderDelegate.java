@@ -20,8 +20,8 @@
 package org.apache.cayenne.dbsync.reverse.dbload;
 
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 
 /**
  * Defines API for progress tracking and altering the flow of reverse-engineering.
@@ -41,12 +41,11 @@ public interface DbLoaderDelegate {
     boolean dbRelationship(DbEntity entity);
 
     /**
-     * Called before relationship will be added into db-entity but after it was loaded from db
+     * Called before dbJoin will be added into db-entity but after it was loaded from db
      *
-     * @param entity
      * @return true in case you want add this relationship into entity
      * false otherwise
      */
-    boolean dbRelationshipLoaded(DbEntity entity, DbRelationship relationship);
+    boolean dbJoinLoaded(DbJoin dbJoin);
 
 }

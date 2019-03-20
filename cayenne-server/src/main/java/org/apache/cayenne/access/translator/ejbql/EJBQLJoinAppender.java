@@ -31,9 +31,11 @@ import org.apache.cayenne.ejbql.EJBQLException;
 import org.apache.cayenne.ejbql.EJBQLExpression;
 import org.apache.cayenne.ejbql.EJBQLParserFactory;
 import org.apache.cayenne.exp.Expression;
+import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.EntityResultSegment;
 import org.apache.cayenne.util.CayenneMapEntry;
 import org.apache.cayenne.util.Util;
@@ -132,7 +134,7 @@ public class EJBQLJoinAppender {
                             subquerySourceTableName,
                             subquerySourceTableName);
 
-                    String subqueryTargetTableName = quoter.quotedFullyQualifiedName(dbRelationship.getTargetEntity());
+                    String subqueryTargetTableName = quoter.quotedFullyQualifiedName((DbEntity) dbRelationship.getTargetEntity());
 
                     String subqueryTargetAlias;
                     if(i==joinRelationships.size()-1){
@@ -185,16 +187,33 @@ public class EJBQLJoinAppender {
         QuotingStrategy quoter = context.getQuotingStrategy();
 
         List<String> stringList = new ArrayList<>();
-        incomingDB.getJoin().accept(join -> {
-            String builtString = sourceAlias +
-                    '.' +
-                    quoter.quotedSourceName(join) +
-                    " = " +
-                    targetAlias +
-                    '.' +
-                    quoter.quotedTargetName(join);
-            stringList.add(builtString);
-            return true;
+        incomingDB.accept(new DirectionalJoinVisitor<Void>() {
+
+            private void buildString(DbAttribute source, DbAttribute target) {
+                String builtString = sourceAlias +
+                        '.' +
+                        quoter.quotedIdentifier(source.getEntity().getDataMap(), source.getName()) +
+                        " = " +
+                        targetAlias +
+                        '.' +
+                        quoter.quotedIdentifier(target.getEntity().getDataMap(), target.getName());
+                stringList.add(builtString);
+            }
+
+            @Override
+            public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                int length = source.length;
+                for(int i = 0; i < length; i++) {
+                    buildString(source[i], target[i]);
+                }
+                return null;
+            }
+
+            @Override
+            public Void visit(DbAttribute source, DbAttribute target) {
+                buildString(source, target);
+                return null;
+            }
         });
 
         context.append(Util.join(stringList, " AND "));

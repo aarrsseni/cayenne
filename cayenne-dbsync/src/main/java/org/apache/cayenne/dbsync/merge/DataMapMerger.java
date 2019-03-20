@@ -19,6 +19,11 @@
 
 package org.apache.cayenne.dbsync.merge;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
 import org.apache.cayenne.dbsync.merge.token.EmptyValueForNullProvider;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
@@ -29,12 +34,6 @@ import org.apache.cayenne.dbsync.reverse.filters.TableFilter;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Synchronization of data base store and Cayenne model.
@@ -60,7 +59,7 @@ public class DataMapMerger implements Merger<DataMap> {
         prepare(original, importedFromDb);
 
         createDbEntityMerger(original, importedFromDb);
-        createRelationshipMerger();
+        createJoinMerger(original, importedFromDb);
         createAttributeMerger();
 
         return createTokens();
@@ -93,13 +92,13 @@ public class DataMapMerger implements Merger<DataMap> {
         mergerList.add(dbAttributeMerger);
     }
 
-    private void createRelationshipMerger() {
-        ChainMerger<DbEntity, DbRelationship> dbRelationshipMerger = new ChainMerger<>(
-                tokenFactory,
-                new DbRelationshipMerger(tokenFactory, skipRelationshipsTokens, filters),
-                dbEntityMerger
-        );
-        mergerList.add(dbRelationshipMerger);
+    private void createJoinMerger(DataMap original, DataMap imported) {
+        DbJoinMerger dbJoinMerger = new DbJoinMerger(tokenFactory,
+                skipRelationshipsTokens,
+                filters,
+                original,
+                imported);
+        mergerList.add(dbJoinMerger);
     }
 
     public static Builder builder(MergerTokenFactory tokenFactory) {

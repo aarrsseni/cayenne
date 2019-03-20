@@ -18,20 +18,11 @@
  ****************************************************************/
 package org.apache.cayenne.modeler.dialog.autorelationship;
 
+import javax.swing.*;
+import java.awt.*;
+
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.util.NameGeneratorPreferences;
-
-import javax.swing.Box;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.FlowLayout;
 
 public class InferRelationshipsDialog extends JDialog {
     public static final int SELECT = 1;
@@ -43,7 +34,7 @@ public class InferRelationshipsDialog extends JDialog {
     protected JLabel entityCount;
     protected JLabel strategyLabel;
 
-    protected JComboBox strategyCombo;
+    protected JComboBox<String> strategyCombo;
 
     public InferRelationshipsDialog(Component entitySelectorPanel) {
         super(Application.getFrame());
@@ -54,7 +45,7 @@ public class InferRelationshipsDialog extends JDialog {
 
         getRootPane().setDefaultButton(generateButton);
 
-        this.strategyCombo = new JComboBox();
+        this.strategyCombo = new JComboBox<>();
         strategyCombo.setEditable(true);
         this.strategyLabel = new JLabel("Naming Strategy:  ");
 
@@ -80,7 +71,7 @@ public class InferRelationshipsDialog extends JDialog {
 
         this.choice = CANCEL;
 
-        strategyCombo.setModel(new DefaultComboBoxModel(
+        strategyCombo.setModel(new DefaultComboBoxModel<>(
                 NameGeneratorPreferences.getInstance().getLastUsedStrategies()));
 
         setTitle("Infer Relationships");
@@ -106,7 +97,7 @@ public class InferRelationshipsDialog extends JDialog {
         return entityCount;
     }
 
-    public JComboBox getStrategyCombo() {
+    public JComboBox<String> getStrategyCombo() {
         return strategyCombo;
     }
 }

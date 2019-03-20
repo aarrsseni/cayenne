@@ -20,7 +20,7 @@
 package org.apache.cayenne.dbsync.reverse.dbload;
 
 
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 
 /**
  * A subclass of {@link DbRelationship} to hold some extra runtime information.

@@ -18,6 +18,8 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge;
 
+import java.util.List;
+
 import org.apache.cayenne.dbsync.merge.builders.DbEntityBuilder;
 import org.apache.cayenne.dbsync.merge.factory.HSQLMergerTokenFactory;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
@@ -25,8 +27,6 @@ import org.apache.cayenne.dbsync.merge.token.db.SetColumnTypeToDb;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.apache.cayenne.dbsync.merge.builders.ObjectMother.dataMap;
 import static org.apache.cayenne.dbsync.merge.builders.ObjectMother.dbAttr;
@@ -248,7 +248,7 @@ public class DataMapMergerTest {
             dbEntity("table2").attributes(
                 dbAttr("attr01").typeInt().primaryKey(),
                 dbAttr("attr02").typeInt())
-        ).join("rel", "table1.attr01", "table2.attr01")
+        ).join("rel", null, "table1.attr01", "table2.attr01")
          .build();
 
         DataMap db = dataMap().with(
@@ -259,7 +259,7 @@ public class DataMapMergerTest {
             dbEntity("table2").attributes(
                 dbAttr("attr01").typeInt().primaryKey(),
                 dbAttr("attr02").typeInt())
-        )//.join("table1.attr01", "table2.attr01")
+        )
          .build();
 
 
@@ -267,9 +267,8 @@ public class DataMapMergerTest {
 
         assertEquals(1, tokens.size());
 
-        DbEntity entity = existing.getDbEntity("table1");
-        assertEquals(factory().createAddRelationshipToDb(entity, entity.getRelationship("rel")).getTokenValue(),
-                     tokens.get(0).getTokenValue());
+        assertEquals(factory().createAddJoinToDb(existing.getDbJoinList().get(0)).getTokenValue(),
+                tokens.get(0).getTokenValue());
     }
 
     @Test
@@ -283,8 +282,8 @@ public class DataMapMergerTest {
                 dbAttr("attr01").typeInt().primaryKey(),
                 dbAttr("attr02").typeInt().primaryKey(),
                 dbAttr("attr03").typeInt().primaryKey())
-        ).join("rel", "table1.attr01", "table2.attr01")
-         .join("rel1", "table1.attr01", "table2.attr03")
+        ).join("rel", null, "table1.attr01", "table2.attr01")
+         .join("rel1", null, "table1.attr01", "table2.attr03")
          .build();
 
         DataMap db = dataMap().with(
@@ -296,8 +295,8 @@ public class DataMapMergerTest {
                 dbAttr("attr01").typeInt().primaryKey(),
                 dbAttr("attr02").typeInt().primaryKey(),
                 dbAttr("attr03").typeInt().primaryKey())
-        ).join("rel", "table1.attr01", "table2.attr02")
-         .join("rel1", "table1.attr01", "table2.attr03")
+        ).join("rel", null, "table1.attr01", "table2.attr02")
+         .join("rel1", null, "table1.attr01", "table2.attr03")
          .build();
 
 
@@ -305,13 +304,11 @@ public class DataMapMergerTest {
 
         assertEquals(2, tokens.size());
 
-        DbEntity entity = existing.getDbEntity("table1");
-        assertEquals(factory().createDropRelationshipToDb(entity, entity.getRelationship("rel")).getTokenValue(),
-                     tokens.get(0).getTokenValue());
+        assertEquals(factory().createDropJoinToDb(existing.getDbJoinList().get(0)).getTokenValue(),
+                tokens.get(0).getTokenValue());
 
-        entity = db.getDbEntity("table1");
-        assertEquals(factory().createAddRelationshipToDb(entity, entity.getRelationship("rel")).getTokenValue(),
-                     tokens.get(0).getTokenValue());
+        assertEquals(factory().createAddJoinToDb(db.getDbJoinList().get(0)).getTokenValue(),
+                tokens.get(0).getTokenValue());
     }
 
     @Test
@@ -325,7 +322,8 @@ public class DataMapMergerTest {
                         dbAttr("attr01").typeInt().primaryKey(),
                         dbAttr("attr02").typeInt().primaryKey(),
                         dbAttr("attr03").typeInt().primaryKey())
-        ).join("rel", "TABLE1.attr01", "table2.attr01").build();
+        ).join("rel", null, "TABLE1.attr01", "table2.attr01")
+                .build();
 
         DataMap db = dataMap().with(
                 dbEntity("table1").attributes(
@@ -336,7 +334,8 @@ public class DataMapMergerTest {
                         dbAttr("attr01").typeInt().primaryKey(),
                         dbAttr("attr02").typeInt().primaryKey(),
                         dbAttr("attr03").typeInt().primaryKey())
-        ).join("rel", "table1.attr01", "table2.attr01").build();
+        ).join("rel", null, "table1.attr01", "table2.attr01")
+                .build();
 
 
         List<MergerToken> tokens = dbMerger().createMergeTokens(existing, db);
@@ -354,7 +353,8 @@ public class DataMapMergerTest {
                         dbAttr("attr01").typeInt().primaryKey(),
                         dbAttr("attr02").typeInt().primaryKey(),
                         dbAttr("attr03").typeInt().primaryKey())
-        ).join("rel", "table1.ATTR01", "table2.attr01").build();
+        ).join("rel", null, "table1.ATTR01", "table2.attr01")
+                .build();
 
         DataMap db = dataMap().with(
                 dbEntity("table1").attributes(
@@ -365,7 +365,8 @@ public class DataMapMergerTest {
                         dbAttr("attr01").typeInt().primaryKey(),
                         dbAttr("attr02").typeInt().primaryKey(),
                         dbAttr("attr03").typeInt().primaryKey())
-        ).join("rel", "table1.attr01", "table2.attr01").build();
+        ).join("rel", null, "table1.attr01", "table2.attr01")
+                .build();
 
 
         List<MergerToken> tokens = dbMerger().createMergeTokens(existing, db);
@@ -393,7 +394,7 @@ public class DataMapMergerTest {
             dbEntity("table2").attributes(
                 dbAttr("attr01").typeInt().primaryKey(),
                 dbAttr("attr02").typeInt())
-        ).join("rel", "table1.attr01", "table2.attr01")
+        ).join("rel", null, "table1.attr01", "table2.attr01")
          .build();
 
 
@@ -401,9 +402,9 @@ public class DataMapMergerTest {
 
         assertEquals(1, tokens.size());
 
-        DbEntity entity = db.getDbEntity("table1");
-        assertEquals(factory().createDropRelationshipToDb(entity, entity.getRelationship("rel")).getTokenValue(),
-                     tokens.get(0).getTokenValue());
+        assertEquals(factory()
+                .createDropJoinToDb(db.getDbJoinList().get(0)).getTokenValue(),
+                tokens.get(0).getTokenValue());
     }
 
     @Test

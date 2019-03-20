@@ -19,7 +19,7 @@
 package org.apache.cayenne.dbsync.reverse.dbload;
 
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
 import org.slf4j.Logger;
 
 /**
@@ -53,8 +53,8 @@ public class LoggingDbLoaderDelegate extends DefaultDbLoaderDelegate {
     }
 
     @Override
-    public boolean dbRelationshipLoaded(DbEntity entity, DbRelationship relationship) {
-        logger.info("    " + relationship);
+    public boolean dbJoinLoaded(DbJoin dbJoin) {
+        logger.info("    " + dbJoin);
 
         return true;
     }

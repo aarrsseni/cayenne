@@ -19,6 +19,15 @@
 
 package org.apache.cayenne.map;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.cayenne.ObjectId;
 import org.apache.cayenne.Persistent;
 import org.apache.cayenne.configuration.ConfigurationNode;
@@ -27,19 +36,13 @@ import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.event.DbEntityListener;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.ObjEntityListener;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.resource.Resource;
 import org.apache.cayenne.util.ToStringBuilder;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.util.XMLEncoder;
 import org.apache.cayenne.util.XMLSerializable;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static java.util.Collections.emptyList;
 
@@ -116,8 +119,8 @@ public class DataMap implements Serializable, ConfigurationNode, XMLSerializable
 	 * The namespace in which the data map XML file will be created. This is
 	 * also the URI to locate a copy of the schema document.
 	 */
-	public static final String SCHEMA_XSD = "http://cayenne.apache.org/schema/10/modelMap";
-    public static final String SCHEMA_XSD_LOCATION = "https://cayenne.apache.org/schema/10/modelMap.xsd";
+	public static final String SCHEMA_XSD = "http://cayenne.apache.org/schema/11/modelMap";
+    public static final String SCHEMA_XSD_LOCATION = "https://cayenne.apache.org/schema/11/modelMap.xsd";
 
 	protected String name;
 	protected String location;
@@ -142,6 +145,8 @@ public class DataMap implements Serializable, ConfigurationNode, XMLSerializable
     private Map<String, Procedure> procedureMap;
     private Map<String, QueryDescriptor> queryDescriptorMap;
     private Map<String, SQLResult> results;
+
+    private List<DbJoin> dbJoinList;
 
 	/**
 	 * @since 3.1
@@ -174,6 +179,7 @@ public class DataMap implements Serializable, ConfigurationNode, XMLSerializable
 		procedureMap = new HashMap<>();
 		queryDescriptorMap = new HashMap<>();
 		results = new HashMap<>();
+		dbJoinList = new ArrayList<>();
 		setName(mapName);
 		initWithProperties(properties);
 	}
@@ -334,10 +340,8 @@ public class DataMap implements Serializable, ConfigurationNode, XMLSerializable
 
 	// stores relationships for the map of entities
 	private void encodeDbRelationshipsAsXML(XMLEncoder encoder, ConfigurationNodeVisitor delegate) {
-		for (Entity entity : new TreeMap<>(getDbEntityMap()).values()) {
-			entity.getRelationships().stream().filter(r -> !r.isRuntime())
-					.forEach(r -> r.encodeAsXML(encoder, delegate));
-		}
+		dbJoinList.sort(DbJoin::compareTo);
+		dbJoinList.forEach(dbJoin -> dbJoin.encodeAsXML(encoder, delegate));
 	}
 
 	// stores relationships for the map of entities
@@ -821,6 +825,9 @@ public class DataMap implements Serializable, ConfigurationNode, XMLSerializable
 				for (Relationship rel : new ArrayList<>(dbEnt.getRelationships())) {
 					if (dbEntityName.equals(rel.getTargetEntityName())) {
 						dbEnt.removeRelationship(rel.getName());
+						rel.getTargetEntity()
+								.removeRelationship(rel.getReverseRelationship().getName());
+						dbJoinList.remove(((DbRelationship)rel).getDbJoin());
 					}
 				}
 			}
@@ -1269,4 +1276,11 @@ public class DataMap implements Serializable, ConfigurationNode, XMLSerializable
         return subObjectEntities;
     }
 
+	public void addJoin(DbJoin dbJoin) {
+    	dbJoinList.add(dbJoin);
+	}
+
+	public List<DbJoin> getDbJoinList() {
+    	return dbJoinList;
+	}
 }

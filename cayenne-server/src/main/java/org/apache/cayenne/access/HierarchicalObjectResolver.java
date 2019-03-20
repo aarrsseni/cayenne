@@ -20,6 +20,7 @@
 package org.apache.cayenne.access;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +31,10 @@ import org.apache.cayenne.DataRow;
 import org.apache.cayenne.Persistent;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.PrefetchProcessor;
 import org.apache.cayenne.query.PrefetchSelectQuery;
 import org.apache.cayenne.query.PrefetchTreeNode;
@@ -143,7 +145,7 @@ class HierarchicalObjectResolver {
             }
 
             int maxIdQualifierSize = context.getParentDataDomain().getMaxIdQualifierSize();
-            List<DbJoin> joins = lastDbRelationship.getJoins();
+            int joinsSize = getJoinsSize(lastDbRelationship);
 
             List<PrefetchSelectQuery<DataRow>> queries = new ArrayList<>();
             PrefetchSelectQuery<DataRow> currentQuery = null;
@@ -153,9 +155,9 @@ class HierarchicalObjectResolver {
             for (DataRow dataRow : parentDataRows) {
                 // handling too big qualifiers
                 if (currentQuery == null
-                        || (maxIdQualifierSize > 0 && qualifiersCount + joins.size() > maxIdQualifierSize)) {
+                        || (maxIdQualifierSize > 0 && qualifiersCount + joinsSize > maxIdQualifierSize)) {
 
-                    createDisjointByIdPrefetchQualifier(pathPrefix, currentQuery, joins, values);
+                    createDisjointByIdPrefetchQualifier(pathPrefix, currentQuery, lastDbRelationship, values);
 
                     currentQuery = new PrefetchSelectQuery<>(node.getPath(), relationship);
                     currentQuery.setFetchingDataRows(true);
@@ -164,18 +166,30 @@ class HierarchicalObjectResolver {
                     values = new HashSet<>();
                 }
 
-                List<Object> joinValues = new ArrayList<>(joins.size());
-                for (DbJoin join : joins) {
-                    Object targetValue = dataRow.get(join.getSourceName());
-                    joinValues.add(targetValue);
-                }
+                List<Object> joinValues = lastDbRelationship.accept(new DirectionalJoinVisitor<List<Object>>() {
+                    @Override
+                    public List<Object> visit(DbAttribute[] source, DbAttribute[] target) {
+                        List<Object> joinValues = new ArrayList<>(source.length);
+                        for(DbAttribute src : source) {
+                            Object targetValue = dataRow.get(src.getName());
+                            joinValues.add(targetValue);
+                        }
+                        return joinValues;
+                    }
+
+                    @Override
+                    public List<Object> visit(DbAttribute source, DbAttribute target) {
+                        Object targetValue = dataRow.get(source.getName());
+                        return Collections.singletonList(targetValue);
+                    }
+                });
 
                 if(values.add(joinValues)) {
-                    qualifiersCount += joins.size();
+                    qualifiersCount += joinsSize;
                 }
             }
             // add final part of values
-            createDisjointByIdPrefetchQualifier(pathPrefix, currentQuery, joins, values);
+            createDisjointByIdPrefetchQualifier(pathPrefix, currentQuery, lastDbRelationship, values);
 
             PrefetchTreeNode jointSubtree = node.cloneJointSubtree();
 
@@ -203,26 +217,56 @@ class HierarchicalObjectResolver {
             return true;
         }
 
+        private int getJoinsSize(DbRelationship dbRelationship) {
+            return dbRelationship.accept(new DirectionalJoinVisitor<Integer>() {
+                @Override
+                public Integer visit(DbAttribute[] source, DbAttribute[] target) {
+                    return source.length;
+                }
+
+                @Override
+                public Integer visit(DbAttribute source, DbAttribute target) {
+                    return 1;
+                }
+            });
+        }
+
         private void createDisjointByIdPrefetchQualifier(String pathPrefix, PrefetchSelectQuery currentQuery,
-                                                         List<DbJoin> joins, Set<List<Object>> values) {
-            Expression allJoinsQualifier;
+                                                         DbRelationship dbRelationship, Set<List<Object>> values) {
             if(currentQuery != null) {
                 Expression[] qualifiers = new Expression[values.size()];
                 int i = 0;
                 for(List<Object> joinValues : values) {
-                    allJoinsQualifier = null;
-                    for(int j=0; j<joins.size(); j++) {
-                        Expression joinQualifier = ExpressionFactory
-                                .matchDbExp(pathPrefix + joins.get(j).getTargetName(), joinValues.get(j));
-                        if (allJoinsQualifier == null) {
-                            allJoinsQualifier = joinQualifier;
-                        } else {
-                            allJoinsQualifier = allJoinsQualifier.andExp(joinQualifier);
-                        }
-                    }
-                    qualifiers[i++] = allJoinsQualifier;
-                }
+                    qualifiers[i++] = dbRelationship.accept(new DirectionalJoinVisitor<Expression>() {
 
+                        private Expression expression;
+
+                        private void build(DbAttribute source, DbAttribute target, int index) {
+                            Expression joinQualifier = ExpressionFactory
+                                    .matchDbExp(pathPrefix + target.getName(), joinValues.get(index));
+                            if (expression == null) {
+                                expression = joinQualifier;
+                            } else {
+                                expression = expression.andExp(joinQualifier);
+                            }
+                        }
+
+                        @Override
+                        public Expression visit(DbAttribute[] source, DbAttribute[] target) {
+                            int length = source.length;
+                            for(int i = 0; i < length; i++) {
+                                build(source[i], target[i], i);
+                            }
+                            return expression;
+                        }
+
+                        @Override
+                        public Expression visit(DbAttribute source, DbAttribute target) {
+                            build(source, target, 0);
+                            return expression;
+                        }
+                    });
+                }
                 currentQuery.orQualifier(ExpressionFactory.joinExp(Expression.OR, qualifiers));
             }
         }

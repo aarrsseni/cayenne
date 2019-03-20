@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.inheritance"/>
 	<db-entity name="BASE_ENTITY">
 		<db-attribute name="BASE_ENTITY_ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
@@ -24,18 +24,20 @@
 	<obj-entity name="SubEntity" superEntityName="BaseEntity" className="org.apache.cayenne.testdo.inheritance.SubEntity">
 		<qualifier><![CDATA[entityType = "sub"]]></qualifier>
 	</obj-entity>
-	<db-relationship name="directToSubEntities" source="BASE_ENTITY" target="DIRECT_TO_SUB_ENTITY">
-		<db-attribute-pair source="DIRECT_TO_SUB_ENTITY_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="relatedEntities" source="BASE_ENTITY" target="RELATED_ENTITY">
-		<db-attribute-pair source="RELATED_ENTITY_ID" target="RELATED_ENTITY_ID"/>
-	</db-relationship>
-	<db-relationship name="subEntity" source="DIRECT_TO_SUB_ENTITY" target="BASE_ENTITY" toMany="true">
-		<db-attribute-pair source="ID" target="DIRECT_TO_SUB_ENTITY_ID"/>
-	</db-relationship>
-	<db-relationship name="entities" source="RELATED_ENTITY" target="BASE_ENTITY" toMany="true">
-		<db-attribute-pair source="RELATED_ENTITY_ID" target="RELATED_ENTITY_ID"/>
-	</db-relationship>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="BASE_ENTITY" name="directToSubEntities"/>
+		<right entity="DIRECT_TO_SUB_ENTITY" name="subEntity"/>
+		<db-join-condition>
+			<column-pair left="DIRECT_TO_SUB_ENTITY_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="BASE_ENTITY" name="relatedEntities"/>
+		<right entity="RELATED_ENTITY" name="entities"/>
+		<db-join-condition>
+			<column-pair left="RELATED_ENTITY_ID" right="RELATED_ENTITY_ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="toDirectToSubEntity" source="BaseEntity" target="DirectToSubEntity" deleteRule="Nullify" db-relationship-path="directToSubEntities"/>
 	<obj-relationship name="toRelatedEntity" source="BaseEntity" target="RelatedEntity" deleteRule="Nullify" db-relationship-path="relatedEntities"/>
 	<obj-relationship name="subEntities" source="DirectToSubEntity" target="SubEntity" db-relationship-path="subEntity"/>

@@ -17,10 +17,10 @@
 	specific language governing permissions and limitations
 	under the License.
 -->
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-          project-version="10">
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<db-entity name="PICK_SCHEDULE" schema="APP">
 		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
 		<db-attribute name="OWNER_ID" type="INTEGER" length="10"/>
@@ -35,24 +35,25 @@
 	<obj-entity name="PickSchedule" className="PickSchedule" dbEntityName="PICK_SCHEDULE">
 		<obj-attribute name="ownerId" type="int" db-attribute-path="OWNER_ID"/>
 	</obj-entity>
-	<obj-entity name="Player" className="Player" dbEntityName="PLAYER">
-	</obj-entity>
-	<obj-entity name="PlayerInfo" className="PlayerInfo" dbEntityName="PLAYER_INFO">
-	</obj-entity>
-	<db-relationship name="selectedPlayer" source="PICK_SCHEDULE" target="PLAYER">
-		<db-attribute-pair source="SELECTED_PLAYER_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="pickSchedules" source="PLAYER" target="PICK_SCHEDULE" toMany="true">
-		<db-attribute-pair source="ID" target="SELECTED_PLAYER_ID"/>
-	</db-relationship>
-	<db-relationship name="playerInfo" source="PLAYER" target="PLAYER_INFO" toDependentPK="true">
-		<db-attribute-pair source="ID" target="PLAYER_ID"/>
-	</db-relationship>
-	<db-relationship name="player" source="PLAYER_INFO" target="PLAYER">
-		<db-attribute-pair source="PLAYER_ID" target="ID"/>
-	</db-relationship>
+	<obj-entity name="Player" className="Player" dbEntityName="PLAYER"/>
+	<obj-entity name="PlayerInfo" className="PlayerInfo" dbEntityName="PLAYER_INFO"/>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="PICK_SCHEDULE" name="selectedPlayer"/>
+		<right entity="PLAYER" name="pickSchedules"/>
+		<db-join-condition>
+			<column-pair left="SELECTED_PLAYER_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="PLAYER" name="playerInfo"/>
+		<right entity="PLAYER_INFO" name="player"/>
+		<db-join-condition>
+			<column-pair left="ID" right="PLAYER_ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="selectedPlayer" source="PickSchedule" target="Player" deleteRule="Nullify" db-relationship-path="selectedPlayer"/>
 	<obj-relationship name="pickSchedules" source="Player" target="PickSchedule" deleteRule="Deny" db-relationship-path="pickSchedules"/>
 	<obj-relationship name="playerInfo" source="Player" target="PlayerInfo" deleteRule="Nullify" db-relationship-path="playerInfo"/>
 	<obj-relationship name="player" source="PlayerInfo" target="Player" deleteRule="Nullify" db-relationship-path="player"/>
 </data-map>
+

@@ -24,8 +24,7 @@ import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.Entity;
+import org.apache.cayenne.map.relationship.DbJoin;
 
 /**
  * @since 4.0 this is a top-level class.
@@ -52,14 +51,12 @@ public class DefaultQuotingStrategy implements QuotingStrategy {
 
     @Override
     public String quotedSourceName(DbJoin join) {
-        DataMap dataMap = join.getSource().getEntity().getDataMap();
-        return quotedIdentifier(dataMap, join.getSourceName());
+        throw new UnsupportedOperationException("DefaultQuotingStrategy.quotedSourceName is deprecated since 4.2.");
     }
 
     @Override
     public String quotedTargetName(DbJoin join) {
-        DataMap dataMap = join.getTarget().getEntity().getDataMap();
-        return quotedIdentifier(dataMap, join.getTargetName());
+        throw new UnsupportedOperationException("DefaultQuotingStrategy.quotedTargetName is deprecated since 4.2.");
     }
 
     /**

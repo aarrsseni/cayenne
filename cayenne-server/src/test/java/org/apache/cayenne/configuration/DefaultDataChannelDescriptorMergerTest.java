@@ -18,14 +18,15 @@
  ****************************************************************/
 package org.apache.cayenne.configuration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.MappingCache;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DefaultDataChannelDescriptorMergerTest {
 
@@ -33,6 +34,7 @@ public class DefaultDataChannelDescriptorMergerTest {
     public void testSingleDescriptor() {
         DataChannelDescriptor descriptor = new DataChannelDescriptor();
         descriptor.setName("Zx");
+        descriptor.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DefaultDataChannelDescriptorMerger merger = new DefaultDataChannelDescriptorMerger();
 
@@ -45,9 +47,11 @@ public class DefaultDataChannelDescriptorMergerTest {
     public void testMerged_Name() {
         DataChannelDescriptor d1 = new DataChannelDescriptor();
         d1.setName("Zx");
+        d1.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DataChannelDescriptor d2 = new DataChannelDescriptor();
         d2.setName("Ym");
+        d2.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DefaultDataChannelDescriptorMerger merger = new DefaultDataChannelDescriptorMerger();
 
@@ -62,10 +66,12 @@ public class DefaultDataChannelDescriptorMergerTest {
         DataChannelDescriptor d1 = new DataChannelDescriptor();
         d1.getProperties().put("X", "1");
         d1.getProperties().put("Y", "2");
+        d1.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DataChannelDescriptor d2 = new DataChannelDescriptor();
         d2.getProperties().put("X", "3");
         d2.getProperties().put("Z", "4");
+        d2.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DefaultDataChannelDescriptorMerger merger = new DefaultDataChannelDescriptorMerger();
 
@@ -83,22 +89,30 @@ public class DefaultDataChannelDescriptorMergerTest {
         DataMap m12 = new DataMap("B");
         d1.getDataMaps().add(m11);
         d1.getDataMaps().add(m12);
+        List<DataMap> dataMaps = new ArrayList<>();
+        dataMaps.add(m11);
+        dataMaps.add(m12);
+        d1.setMappingCache(new MappingCache(dataMaps));
 
         DataChannelDescriptor d2 = new DataChannelDescriptor();
         d2.setName("Ym");
         DataMap m21 = new DataMap("C");
-        DataMap m22 = new DataMap("A");
         d2.getDataMaps().add(m21);
-        d2.getDataMaps().add(m22);
+        d2.getDataMaps().add(m11);
+        List<DataMap> dataMaps1 = new ArrayList<>();
+        dataMaps1.add(m21);
+        dataMaps1.add(m11);
+        d2.setMappingCache(new MappingCache(dataMaps1));
 
         DefaultDataChannelDescriptorMerger merger = new DefaultDataChannelDescriptorMerger();
 
         DataChannelDescriptor merged = merger.merge(d1, d2);
 
         assertEquals(3, merged.getDataMaps().size());
-        assertSame(m22, merged.getDataMap("A"));
+        assertSame(m11, merged.getDataMap("A"));
         assertSame(m12, merged.getDataMap("B"));
         assertSame(m21, merged.getDataMap("C"));
+        assertEquals(3, merged.getMappingCache().getMaps().size());
     }
 
     @Test
@@ -110,6 +124,7 @@ public class DefaultDataChannelDescriptorMergerTest {
         dn12.setAdapterType("Xa");
         d1.getNodeDescriptors().add(dn11);
         d1.getNodeDescriptors().add(dn12);
+        d1.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DataChannelDescriptor d2 = new DataChannelDescriptor();
         d2.setName("Ym");
@@ -118,6 +133,7 @@ public class DefaultDataChannelDescriptorMergerTest {
         DataNodeDescriptor dn22 = new DataNodeDescriptor("C");
         d2.getNodeDescriptors().add(dn21);
         d2.getNodeDescriptors().add(dn22);
+        d2.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DefaultDataChannelDescriptorMerger merger = new DefaultDataChannelDescriptorMerger();
 
@@ -149,6 +165,7 @@ public class DefaultDataChannelDescriptorMergerTest {
         dn11.getDataMapNames().add("MA");
         dn11.getDataMapNames().add("MB");
         d1.getNodeDescriptors().add(dn11);
+        d1.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DataChannelDescriptor d2 = new DataChannelDescriptor();
         d2.setName("Ym");
@@ -156,6 +173,7 @@ public class DefaultDataChannelDescriptorMergerTest {
         dn21.getDataMapNames().add("MA");
         dn21.getDataMapNames().add("MC");
         d2.getNodeDescriptors().add(dn21);
+        d2.setMappingCache(new MappingCache(Collections.emptyList()));
 
         DefaultDataChannelDescriptorMerger merger = new DefaultDataChannelDescriptorMerger();
 

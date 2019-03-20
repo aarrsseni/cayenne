@@ -31,10 +31,11 @@ import org.apache.cayenne.Persistent;
 import org.apache.cayenne.dba.PkGenerator;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EntitySorter;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.InsertBatchQuery;
 import org.apache.cayenne.query.Query;
 
@@ -184,11 +185,27 @@ class DataDomainInsertBucket extends DataDomainSyncBucket {
                 continue;
             }
 
-            if(!dbRel.getJoin()
-                    .accept(dbJoin -> !attribute.getName().equals(dbJoin.getSourceName()))) {
+            boolean isPropagated = dbRel.accept(new DirectionalJoinVisitor<Boolean>() {
+
+                @Override
+                public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                    for(DbAttribute attr : source) {
+                        if (attribute.getName().equals(attr.getName())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public Boolean visit(DbAttribute source, DbAttribute target) {
+                    return attribute.getName().equals(source.getName());
+                }
+            });
+
+            if(isPropagated) {
                 return true;
             }
-
         }
 
         return false;

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.JoinType;
 import org.apache.cayenne.util.Util;
 

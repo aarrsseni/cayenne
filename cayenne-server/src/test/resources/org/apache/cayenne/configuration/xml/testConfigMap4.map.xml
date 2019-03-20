@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+		  project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.testmap"/>
 	<property name="defaultCatalog" value="TEST_CATALOG"/>
 	<property name="defaultSuperclass" value="org.apache.cayenne.CayenneDataObject"/>
@@ -136,7 +136,7 @@
 		<obj-attribute name="galleryName" type="java.lang.String" db-attribute-path="GALLERY_NAME"/>
 	</obj-entity>
 	<obj-entity name="MeaningfulGeneratedColumnTestEntity" className="org.apache.cayenne.testdo.testmap.MeaningfulGeneratedColumnTestEntity" dbEntityName="GENERATED_COLUMN">
-		<obj-attribute name="generatedColumn" type="java.lang.Integer" db-attribute-path="GENERATED_COLUMN" />
+		<obj-attribute name="generatedColumn" type="java.lang.Integer" db-attribute-path="GENERATED_COLUMN"/>
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
 	</obj-entity>
 	<obj-entity name="NullTestEntity" className="org.apache.cayenne.testdo.testmap.NullTestEntity" dbEntityName="NULL_TEST">
@@ -171,66 +171,77 @@
 	<obj-entity name="SubPainting" superEntityName="Painting" abstract="true" serverOnly="true" className="org.apache.cayenne.testdo.testmap.SubPainting" lock-type="optimistic">
 		<attribute-override name="paintingTitle" db-attribute-path="PAINTING_TITLE"/>
 	</obj-entity>
-	<db-relationship name="artistGroupArray" source="ARTGROUP" target="ARTIST_GROUP" toMany="true">
-		<db-attribute-pair source="GROUP_ID" target="GROUP_ID"/>
-	</db-relationship>
-	<db-relationship name="toChildGroups" source="ARTGROUP" target="ARTGROUP" toMany="true">
-		<db-attribute-pair source="GROUP_ID" target="PARENT_GROUP_ID"/>
-	</db-relationship>
-	<db-relationship name="toParentGroup" source="ARTGROUP" target="ARTGROUP">
-		<db-attribute-pair source="PARENT_GROUP_ID" target="GROUP_ID"/>
-	</db-relationship>
-	<db-relationship name="artistExhibitArray" source="ARTIST" target="ARTIST_EXHIBIT" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="artistGroupArray" source="ARTIST" target="ARTIST_GROUP" toMany="true">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="paintingArray" source="ARTIST" target="PAINTING" toMany="true">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="toArtist" source="ARTIST_EXHIBIT" target="ARTIST">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="toExhibit" source="ARTIST_EXHIBIT" target="EXHIBIT">
-		<db-attribute-pair source="EXHIBIT_ID" target="EXHIBIT_ID"/>
-	</db-relationship>
-	<db-relationship name="toArtist" source="ARTIST_GROUP" target="ARTIST">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="toGroup" source="ARTIST_GROUP" target="ARTGROUP">
-		<db-attribute-pair source="GROUP_ID" target="GROUP_ID"/>
-	</db-relationship>
-	<db-relationship name="artistExhibitArray" source="EXHIBIT" target="ARTIST_EXHIBIT" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="EXHIBIT_ID" target="EXHIBIT_ID"/>
-	</db-relationship>
-	<db-relationship name="toGallery" source="EXHIBIT" target="GALLERY">
-		<db-attribute-pair source="GALLERY_ID" target="GALLERY_ID"/>
-	</db-relationship>
-	<db-relationship name="exhibitArray" source="GALLERY" target="EXHIBIT" toMany="true">
-		<db-attribute-pair source="GALLERY_ID" target="GALLERY_ID"/>
-	</db-relationship>
-	<db-relationship name="paintingArray" source="GALLERY" target="PAINTING" toMany="true">
-		<db-attribute-pair source="GALLERY_ID" target="GALLERY_ID"/>
-	</db-relationship>
-	<db-relationship name="toArtist" source="PAINTING" target="ARTIST">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="toGallery" source="PAINTING" target="GALLERY">
-		<db-attribute-pair source="GALLERY_ID" target="GALLERY_ID"/>
-	</db-relationship>
-	<db-relationship name="toPaintingInfo" source="PAINTING" target="PAINTING_INFO" toDependentPK="true">
-		<db-attribute-pair source="PAINTING_ID" target="PAINTING_ID"/>
-	</db-relationship>
-	<db-relationship name="toArtist" source="PAINTING1" target="ARTIST">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="painting" source="PAINTING_INFO" target="PAINTING">
-		<db-attribute-pair source="PAINTING_ID" target="PAINTING_ID"/>
-	</db-relationship>
-	<obj-relationship name="artistArray" source="ArtGroup" target="Artist" collection-type="java.util.Map" lock="true" deleteRule="Cascade" db-relationship-path="artistGroupArray.toArtist">
-		<info:property xmlns:info="http://cayenne.apache.org/schema/10/info" name="comment" value="artistGroupArray.toArtist"/>
-	</obj-relationship>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="ARTGROUP" name="artistGroupArray"/>
+		<right entity="ARTIST_GROUP" name="toGroup"/>
+		<db-join-condition>
+			<column-pair left="GROUP_ID" right="GROUP_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="ARTGROUP" name="toChildGroups"/>
+		<right entity="ARTGROUP" name="toParentGroup"/>
+		<db-join-condition>
+			<column-pair left="GROUP_ID" right="PARENT_GROUP_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
+		<left entity="ARTIST" name="artistExhibitArray"/>
+		<right entity="ARTIST_EXHIBIT" name="toArtist"/>
+		<db-join-condition>
+			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="ARTIST" name="artistGroupArray"/>
+		<right entity="ARTIST_GROUP" name="toArtist"/>
+		<db-join-condition>
+			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="ARTIST" name="paintingArray"/>
+		<right entity="PAINTING" name="toArtist"/>
+		<db-join-condition>
+			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="RIGHT">
+		<left entity="ARTIST_EXHIBIT" name="toExhibit"/>
+		<right entity="EXHIBIT" name="artistExhibitArray"/>
+		<db-join-condition>
+			<column-pair left="EXHIBIT_ID" right="EXHIBIT_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="EXHIBIT" name="toGallery"/>
+		<right entity="GALLERY" name="exhibitArray"/>
+		<db-join-condition>
+			<column-pair left="GALLERY_ID" right="GALLERY_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="GALLERY" name="paintingArray"/>
+		<right entity="PAINTING" name="toGallery"/>
+		<db-join-condition>
+			<column-pair left="GALLERY_ID" right="GALLERY_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="PAINTING" name="toPaintingInfo"/>
+		<right entity="PAINTING_INFO" name="painting"/>
+		<db-join-condition>
+			<column-pair left="PAINTING_ID" right="PAINTING_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="NONE">
+		<left entity="ARTIST"/>
+		<right entity="PAINTING1" name="toArtist"/>
+		<db-join-condition>
+			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
+		</db-join-condition>
+	</db-join>
+	<obj-relationship name="artistArray" source="ArtGroup" target="Artist" collection-type="java.util.Map" lock="true" deleteRule="Cascade" db-relationship-path="artistGroupArray.toArtist"/>
 	<obj-relationship name="childGroupsArray" source="ArtGroup" target="ArtGroup" deleteRule="Nullify" db-relationship-path="toChildGroups"/>
 	<obj-relationship name="toParentGroup" source="ArtGroup" target="ArtGroup" deleteRule="Nullify" db-relationship-path="toParentGroup"/>
 	<obj-relationship name="artistExhibitArray" source="Artist" target="ArtistExhibit" deleteRule="Cascade" db-relationship-path="artistExhibitArray"/>
@@ -256,20 +267,11 @@
 	<obj-relationship name="painting" source="PaintingInfo" target="Painting" deleteRule="Nullify" db-relationship-path="painting"/>
 	<obj-relationship name="paintingArray" source="ROArtist" target="Painting" deleteRule="Deny" db-relationship-path="paintingArray"/>
 	<obj-relationship name="toArtist" source="ROPainting" target="Artist" deleteRule="Nullify" db-relationship-path="toArtist"/>
-	<query name="EjbqlQueryTest" type="EJBQLQuery">
-		<property name="cayenne.GenericSelectQuery.cacheStrategy" value="SHARED_CACHE"/>
-		<property name="cayenne.GenericSelectQuery.fetchingDataRows" value="true"/>
-		<ejbql><![CDATA[select a from Artist a]]></ejbql>
-	</query>
 	<query name="NonSelectingQuery" type="SQLTemplate" root="data-map" root-name="testConfigMap4">
 		<property name="cayenne.SQLTemplate.columnNameCapitalization" value="UPPER"/>
 		<sql><![CDATA[INSERT INTO PAINTING (PAINTING_ID, PAINTING_TITLE, ESTIMATED_PRICE)
 VALUES (512, 'No Painting Like This', 12.5)]]></sql>
 		<sql adapter-class="org.apache.cayenne.dba.db2.DB2Adapter"><![CDATA[INSERT INTO PAINTING (PAINTING_ID, PAINTING_TITLE, ESTIMATED_PRICE) VALUES (512, 'No Painting Like This', 12.5)]]></sql>
-	</query>
-	<query name="ObjectQuery" type="SelectQuery" root="obj-entity" root-name="Painting">
-		<qualifier><![CDATA[toArtist = $artist]]></qualifier>
-		<ordering><![CDATA[paintingTitle]]></ordering>
 	</query>
 	<query name="ParameterizedNonSelectingQuery" type="SQLTemplate" root="data-map" root-name="testConfigMap4">
 		<sql><![CDATA[INSERT INTO PAINTING (PAINTING_ID, PAINTING_TITLE, ESTIMATED_PRICE)
@@ -280,11 +282,32 @@ VALUES (#bind($id), #bind($title), #bind($price))]]></sql>
 		<property name="cayenne.GenericSelectQuery.cacheStrategy" value="LOCAL_CACHE"/>
 		<qualifier><![CDATA[artistName like $name]]></qualifier>
 	</query>
+	<query name="ObjectQuery" type="SelectQuery" root="obj-entity" root-name="Painting">
+		<qualifier><![CDATA[toArtist = $artist]]></qualifier>
+		<ordering><![CDATA[paintingTitle]]></ordering>
+	</query>
+	<query name="QueryWithQualifier" type="SelectQuery" root="obj-entity" root-name="Artist">
+		<qualifier><![CDATA[artistName = $param1]]></qualifier>
+	</query>
+	<query name="SelectTestUpper" type="SQLTemplate" root="data-map" root-name="testConfigMap4">
+		<property name="cayenne.SQLTemplate.columnNameCapitalization" value="UPPER"/>
+		<property name="cayenne.GenericSelectQuery.fetchingDataRows" value="true"/>
+		<sql><![CDATA[select * from ARTIST]]></sql>
+	</query>
+	<query name="EjbqlQueryTest" type="EJBQLQuery">
+		<property name="cayenne.GenericSelectQuery.cacheStrategy" value="SHARED_CACHE"/>
+		<property name="cayenne.GenericSelectQuery.fetchingDataRows" value="true"/>
+		<ejbql><![CDATA[select a from Artist a]]></ejbql>
+	</query>
 	<query name="ParameterizedQueryWithSharedCache" type="SelectQuery" root="obj-entity" root-name="Artist">
 		<property name="cayenne.GenericSelectQuery.cacheStrategy" value="SHARED_CACHE"/>
 		<qualifier><![CDATA[artistName like $name]]></qualifier>
 	</query>
-	<query name="ProcedureQuery" type="ProcedureQuery" root="procedure" root-name="cayenne_tst_select_proc" result-entity="Artist"/>
+	<query name="SelectTestLower" type="SQLTemplate" root="data-map" root-name="testConfigMap4">
+		<property name="cayenne.SQLTemplate.columnNameCapitalization" value="LOWER"/>
+		<property name="cayenne.GenericSelectQuery.fetchingDataRows" value="true"/>
+		<sql><![CDATA[select * from ARTIST]]></sql>
+	</query>
 	<query name="QueryWithLocalCache" type="SelectQuery" root="obj-entity" root-name="Artist">
 		<property name="cayenne.GenericSelectQuery.cacheStrategy" value="LOCAL_CACHE"/>
 	</query>
@@ -292,23 +315,11 @@ VALUES (#bind($id), #bind($title), #bind($price))]]></sql>
 		<ordering descending="true" ignore-case="true"><![CDATA[artistName]]></ordering>
 		<ordering><![CDATA[dateOfBirth]]></ordering>
 	</query>
-	<query name="QueryWithPrefetch" type="SelectQuery" root="obj-entity" root-name="Gallery">
-		<prefetch>paintingArray</prefetch>
-	</query>
-	<query name="QueryWithQualifier" type="SelectQuery" root="obj-entity" root-name="Artist">
-		<qualifier><![CDATA[artistName = $param1]]></qualifier>
-	</query>
 	<query name="QueryWithSharedCache" type="SelectQuery" root="obj-entity" root-name="Artist">
 		<property name="cayenne.GenericSelectQuery.cacheStrategy" value="SHARED_CACHE"/>
 	</query>
-	<query name="SelectTestLower" type="SQLTemplate" root="data-map" root-name="testConfigMap4">
-		<property name="cayenne.SQLTemplate.columnNameCapitalization" value="LOWER"/>
-		<property name="cayenne.GenericSelectQuery.fetchingDataRows" value="true"/>
-		<sql><![CDATA[select * from ARTIST]]></sql>
+	<query name="QueryWithPrefetch" type="SelectQuery" root="obj-entity" root-name="Gallery">
+		<prefetch><![CDATA[paintingArray]]></prefetch>
 	</query>
-	<query name="SelectTestUpper" type="SQLTemplate" root="data-map" root-name="testConfigMap4">
-		<property name="cayenne.SQLTemplate.columnNameCapitalization" value="UPPER"/>
-		<property name="cayenne.GenericSelectQuery.fetchingDataRows" value="true"/>
-		<sql><![CDATA[select * from ARTIST]]></sql>
-	</query>
+	<query name="ProcedureQuery" type="ProcedureQuery" root="procedure" root-name="cayenne_tst_select_proc" result-entity="Artist"/>
 </data-map>

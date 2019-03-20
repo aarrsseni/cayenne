@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.relationships_flattened"/>
 	<db-entity name="COMPLEX_JOIN">
 		<db-attribute name="EXTRA_COLUMN" type="VARCHAR" length="50"/>
@@ -61,60 +61,69 @@
 	<obj-entity name="FlattenedTest5" className="org.apache.cayenne.testdo.relationships_flattened.FlattenedTest5" dbEntityName="FLATTENED_TEST_5">
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
 	</obj-entity>
-	<db-relationship name="toFT1" source="COMPLEX_JOIN" target="FLATTENED_TEST_1">
-		<db-attribute-pair source="FT1_FK" target="FT1_ID"/>
-	</db-relationship>
-	<db-relationship name="toFT3" source="COMPLEX_JOIN" target="FLATTENED_TEST_3">
-		<db-attribute-pair source="FT3_FK" target="FT3_ID"/>
-	</db-relationship>
-	<db-relationship name="toFT1" source="COMPLEX_JOIN2" target="FLATTENED_TEST_1">
-		<db-attribute-pair source="FT1_FK" target="FT1_ID"/>
-	</db-relationship>
-	<db-relationship name="toFT5" source="COMPLEX_JOIN2" target="FLATTENED_TEST_5">
-		<db-attribute-pair source="FT5_FK" target="FT5_ID"/>
-	</db-relationship>
-	<db-relationship name="side1s" source="FLATTENED_CIRCULAR" target="FLATTENED_CIRCULAR_JOIN" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="SIDE2_ID"/>
-	</db-relationship>
-	<db-relationship name="side2s" source="FLATTENED_CIRCULAR" target="FLATTENED_CIRCULAR_JOIN" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="SIDE1_ID"/>
-	</db-relationship>
-	<db-relationship name="side1" source="FLATTENED_CIRCULAR_JOIN" target="FLATTENED_CIRCULAR">
-		<db-attribute-pair source="SIDE1_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="side2" source="FLATTENED_CIRCULAR_JOIN" target="FLATTENED_CIRCULAR">
-		<db-attribute-pair source="SIDE2_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="complexJoins" source="FLATTENED_TEST_1" target="COMPLEX_JOIN" toMany="true">
-		<db-attribute-pair source="FT1_ID" target="FT1_FK"/>
-	</db-relationship>
-	<db-relationship name="complexJoins2" source="FLATTENED_TEST_1" target="COMPLEX_JOIN2" toMany="true">
-		<db-attribute-pair source="FT1_ID" target="FT1_FK"/>
-	</db-relationship>
-	<db-relationship name="ft2Array" source="FLATTENED_TEST_1" target="FLATTENED_TEST_2" toMany="true">
-		<db-attribute-pair source="FT1_ID" target="FT1_ID"/>
-	</db-relationship>
-	<db-relationship name="ft3Array" source="FLATTENED_TEST_2" target="FLATTENED_TEST_3" toMany="true">
-		<db-attribute-pair source="FT2_ID" target="FT2_ID"/>
-	</db-relationship>
-	<db-relationship name="toFT1" source="FLATTENED_TEST_2" target="FLATTENED_TEST_1">
-		<db-attribute-pair source="FT1_ID" target="FT1_ID"/>
-	</db-relationship>
-	<db-relationship name="complexJoins" source="FLATTENED_TEST_3" target="COMPLEX_JOIN" toMany="true">
-		<db-attribute-pair source="FT3_ID" target="FT3_FK"/>
-	</db-relationship>
-	<db-relationship name="ft4Array" source="FLATTENED_TEST_3" target="FLATTENED_TEST_4" toMany="true">
-		<db-attribute-pair source="FT3_ID" target="FT3_ID"/>
-	</db-relationship>
-	<db-relationship name="toFT2" source="FLATTENED_TEST_3" target="FLATTENED_TEST_2">
-		<db-attribute-pair source="FT2_ID" target="FT2_ID"/>
-	</db-relationship>
-	<db-relationship name="toFT3" source="FLATTENED_TEST_4" target="FLATTENED_TEST_3">
-		<db-attribute-pair source="FT3_ID" target="FT3_ID"/>
-	</db-relationship>
-	<db-relationship name="complexJoin2" source="FLATTENED_TEST_5" target="COMPLEX_JOIN2">
-		<db-attribute-pair source="FT5_ID" target="FT5_FK"/>
-	</db-relationship>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="COMPLEX_JOIN" name="toFT1"/>
+		<right entity="FLATTENED_TEST_1" name="complexJoins"/>
+		<db-join-condition>
+			<column-pair left="FT1_FK" right="FT1_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="COMPLEX_JOIN" name="toFT3"/>
+		<right entity="FLATTENED_TEST_3" name="complexJoins"/>
+		<db-join-condition>
+			<column-pair left="FT3_FK" right="FT3_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="COMPLEX_JOIN2" name="toFT1"/>
+		<right entity="FLATTENED_TEST_1" name="complexJoins2"/>
+		<db-join-condition>
+			<column-pair left="FT1_FK" right="FT1_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="NONE">
+		<left entity="COMPLEX_JOIN2" name="toFT5"/>
+		<right entity="FLATTENED_TEST_5" name="complexJoin2"/>
+		<db-join-condition>
+			<column-pair left="FT5_FK" right="FT5_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
+		<left entity="FLATTENED_CIRCULAR" name="side1s"/>
+		<right entity="FLATTENED_CIRCULAR_JOIN" name="side2"/>
+		<db-join-condition>
+			<column-pair left="ID" right="SIDE2_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
+		<left entity="FLATTENED_CIRCULAR" name="side2s"/>
+		<right entity="FLATTENED_CIRCULAR_JOIN" name="side1"/>
+		<db-join-condition>
+			<column-pair left="ID" right="SIDE1_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="FLATTENED_TEST_1" name="ft2Array"/>
+		<right entity="FLATTENED_TEST_2" name="toFT1"/>
+		<db-join-condition>
+			<column-pair left="FT1_ID" right="FT1_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="FLATTENED_TEST_2" name="ft3Array"/>
+		<right entity="FLATTENED_TEST_3" name="toFT2"/>
+		<db-join-condition>
+			<column-pair left="FT2_ID" right="FT2_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="FLATTENED_TEST_3" name="ft4Array"/>
+		<right entity="FLATTENED_TEST_4" name="toFT3"/>
+		<db-join-condition>
+			<column-pair left="FT3_ID" right="FT3_ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="side1s" source="FlattenedCircular" target="FlattenedCircular" db-relationship-path="side1s.side1"/>
 	<obj-relationship name="side2s" source="FlattenedCircular" target="FlattenedCircular" db-relationship-path="side2s.side2"/>
 	<obj-relationship name="ft2Array" source="FlattenedTest1" target="FlattenedTest2" db-relationship-path="ft2Array"/>

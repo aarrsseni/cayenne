@@ -19,26 +19,6 @@
 
 package org.apache.cayenne.wocompat;
 
-import org.apache.cayenne.dba.TypesMapping;
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.exp.ExpressionException;
-import org.apache.cayenne.map.DataMap;
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.apache.cayenne.map.QueryDescriptor;
-import org.apache.cayenne.map.SQLTemplateDescriptor;
-import org.apache.cayenne.map.SelectQueryDescriptor;
-import org.apache.cayenne.query.Ordering;
-import org.apache.cayenne.query.QueryMetadata;
-import org.apache.cayenne.query.SortOrder;
-import org.apache.cayenne.wocompat.parser.Parser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Types;
@@ -52,6 +32,32 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import org.apache.cayenne.dba.TypesMapping;
+import org.apache.cayenne.dbsync.naming.NameBuilder;
+import org.apache.cayenne.exp.ExpressionException;
+import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.map.SQLTemplateDescriptor;
+import org.apache.cayenne.map.SelectQueryDescriptor;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.ColumnPairsCondition;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbJoinCondition;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
+import org.apache.cayenne.query.Ordering;
+import org.apache.cayenne.query.QueryMetadata;
+import org.apache.cayenne.query.SortOrder;
+import org.apache.cayenne.wocompat.parser.Parser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for converting stored Apple EOModel mapping files to Cayenne DataMaps.
@@ -144,16 +150,19 @@ public class EOModelProcessor {
 
 		// after all entities are loaded, process relationships
 		it = modelNames.iterator();
-		while (it.hasNext()) {
-			String name = (String) it.next();
+		for(String name : modelNames) {
 			makeRelationships(helper, dataMap.getObjEntity(name));
+		}
+
+		for(String name : modelNames) {
+
 		}
 
 		// after all normal relationships are loaded, process flattened
 		// relationships
 		it = modelNames.iterator();
 		while (it.hasNext()) {
-			String name = (String) it.next();
+			String name = it.next();
 			makeFlatRelationships(helper, dataMap.getObjEntity(name));
 		}
 
@@ -161,7 +170,7 @@ public class EOModelProcessor {
 		// since Cayenne requires them
 		it = modelNames.iterator();
 		while (it.hasNext()) {
-			String name = (String) it.next();
+			String name = it.next();
 			DbEntity dbEntity = dataMap.getObjEntity(name).getDbEntity();
 
 			if (dbEntity != null) {
@@ -172,7 +181,7 @@ public class EOModelProcessor {
 		// build SelectQueries out of EOFetchSpecifications...
 		it = modelNames.iterator();
 		while (it.hasNext()) {
-			String name = (String) it.next();
+			String name = it.next();
 			Iterator queries = helper.queryNames(name);
 			while (queries.hasNext()) {
 				String queryName = (String) queries.next();
@@ -628,31 +637,34 @@ public class EOModelProcessor {
 				dbRel = dbSrc.getRelationship(relName);
 				if (dbRel == null) {
 
-					dbRel = new DbRelationship();
-					dbRel.setSourceEntity(dbSrc);
-					dbRel.setTargetEntityName(dbTarget);
-					dbRel.setToMany(toMany);
-					dbRel.setName(relName);
-					dbRel.setToDependentPK(toDependentPK);
-					dbSrc.addRelationship(dbRel);
-
 					List joins = (List) relMap.get("joins");
 					Iterator jIt = joins.iterator();
+					List<ColumnPair> columnPairs = new ArrayList<>();
 					while (jIt.hasNext()) {
 						Map joinMap = (Map) jIt.next();
-
-						DbJoin join = new DbJoin(dbRel);
-
 						// find source attribute dictionary and extract the
 						// column name
 						String sourceAttributeName = (String) joinMap.get("sourceAttribute");
-						join.setSourceName(columnName(attributes, sourceAttributeName));
-
 						String targetAttributeName = (String) joinMap.get("destinationAttribute");
-
-						join.setTargetName(columnName(targetAttributes, targetAttributeName));
-						dbRel.addJoin(join);
+						columnPairs.add(new ColumnPair(columnName(attributes, sourceAttributeName),
+								columnName(targetAttributes, targetAttributeName)));
 					}
+					DbJoinCondition dbJoinCondition = columnPairs.size() == 1 ?
+							new SinglePairCondition(columnPairs.get(0)) :
+							new ColumnPairsCondition(columnPairs.toArray(new ColumnPair[0]));
+
+					DbJoin dbJoin = new DbJoinBuilder()
+							.entities(new String[]{dbSrc.getName(), dbTarget.getName()})
+							.names(new String[]{relName, null})
+							.toManySemantics(ToManySemantics.ONE_TO_MANY)
+							.toDepPkSemantics(toDependentPK ?
+									ToDependentPkSemantics.LEFT :
+									ToDependentPkSemantics.NONE)
+							.condition(dbJoinCondition)
+							.dataMap(dbSrc.getDataMap())
+							.build();
+					dbJoin.compile(dbSrc.getDataMap());
+					dbRel = dbJoin.getRelationhsip();
 				}
 			}
 
@@ -688,7 +700,7 @@ public class EOModelProcessor {
 		for (DbRelationship relationship : new ArrayList<>(dbEntity.getRelationships())) {
 
 			if (relationship.getReverseRelationship() == null) {
-				DbRelationship reverse = relationship.createReverseRelationship();
+				DbRelationship reverse = relationship.getReverseRelationship();
 				reverse.setName(NameBuilder.builder(reverse, reverse.getSourceEntity())
 						// TODO: we can do better with ObjectNameGenerator
 						.baseName(relationship.getName() + "Reverse")

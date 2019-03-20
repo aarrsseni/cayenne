@@ -79,9 +79,14 @@ public class FiltersConfig {
         return builder.toString();
     }
 
-    public static FiltersConfig create(String catalog, String schema, TableFilter tableFilter, PatternFilter procedures) {
+    public static FiltersConfig create(String catalog,
+                                       String schema,
+                                       TableFilter tableFilter,
+                                       PatternFilter procedures) {
         return new FiltersConfig(
                     new CatalogFilter(catalog,
-                        new SchemaFilter(schema, tableFilter, procedures)));
+                        new SchemaFilter(schema,
+                                tableFilter,
+                                procedures)));
     }
 }

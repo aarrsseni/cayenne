@@ -33,7 +33,7 @@ import org.apache.cayenne.access.DataContext;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.query.ObjectSelect;
@@ -112,7 +112,7 @@ public class ASTDbPath extends ASTPath {
 				DbRelationship rel = (DbRelationship) component;
 				DbRelationship reverseRelationship = rel.getReverseRelationship();
 				if (reverseRelationship == null) {
-					reverseRelationship = rel.createReverseRelationship();
+					reverseRelationship = rel.getReverseRelationship();
 				}
 				reversedPathComponents.addFirst(reverseRelationship);
 			} else {

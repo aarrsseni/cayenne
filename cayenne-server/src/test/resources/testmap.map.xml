@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.testmap"/>
 	<property name="defaultSuperclass" value="org.apache.cayenne.CayenneDataObject"/>
 	<property name="clientSupported" value="true"/>
@@ -158,63 +158,76 @@
 	<obj-entity name="SubPainting" className="org.apache.cayenne.testdo.testmap.SubPainting" dbEntityName="PAINTING">
 		<obj-attribute name="paintingTitle" type="java.lang.String" db-attribute-path="PAINTING_TITLE"/>
 	</obj-entity>
-	<db-relationship name="artistGroupArray" source="ARTGROUP" target="ARTIST_GROUP" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="GROUP_ID" target="GROUP_ID"/>
-	</db-relationship>
-	<db-relationship name="toChildGroups" source="ARTGROUP" target="ARTGROUP" toMany="true">
-		<db-attribute-pair source="GROUP_ID" target="PARENT_GROUP_ID"/>
-	</db-relationship>
-	<db-relationship name="toParentGroup" source="ARTGROUP" target="ARTGROUP">
-		<db-attribute-pair source="PARENT_GROUP_ID" target="GROUP_ID"/>
-	</db-relationship>
-	<db-relationship name="artistExhibitArray" source="ARTIST" target="ARTIST_EXHIBIT" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="artistGroupArray" source="ARTIST" target="ARTIST_GROUP" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="paintingArray" source="ARTIST" target="PAINTING" toMany="true">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="toArtist" source="ARTIST_EXHIBIT" target="ARTIST">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="toExhibit" source="ARTIST_EXHIBIT" target="EXHIBIT">
-		<db-attribute-pair source="EXHIBIT_ID" target="EXHIBIT_ID"/>
-	</db-relationship>
-	<db-relationship name="toArtist" source="ARTIST_GROUP" target="ARTIST">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="toGroup" source="ARTIST_GROUP" target="ARTGROUP">
-		<db-attribute-pair source="GROUP_ID" target="GROUP_ID"/>
-	</db-relationship>
-	<db-relationship name="artistExhibitArray" source="EXHIBIT" target="ARTIST_EXHIBIT" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="EXHIBIT_ID" target="EXHIBIT_ID"/>
-	</db-relationship>
-	<db-relationship name="toGallery" source="EXHIBIT" target="GALLERY">
-		<db-attribute-pair source="GALLERY_ID" target="GALLERY_ID"/>
-	</db-relationship>
-	<db-relationship name="exhibitArray" source="GALLERY" target="EXHIBIT" toMany="true">
-		<db-attribute-pair source="GALLERY_ID" target="GALLERY_ID"/>
-	</db-relationship>
-	<db-relationship name="paintingArray" source="GALLERY" target="PAINTING" toMany="true">
-		<db-attribute-pair source="GALLERY_ID" target="GALLERY_ID"/>
-	</db-relationship>
-	<db-relationship name="toArtist" source="PAINTING" target="ARTIST">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="toGallery" source="PAINTING" target="GALLERY">
-		<db-attribute-pair source="GALLERY_ID" target="GALLERY_ID"/>
-	</db-relationship>
-	<db-relationship name="toPaintingInfo" source="PAINTING" target="PAINTING_INFO" toDependentPK="true">
-		<db-attribute-pair source="PAINTING_ID" target="PAINTING_ID"/>
-	</db-relationship>
-	<db-relationship name="toArtist" source="PAINTING1" target="ARTIST">
-		<db-attribute-pair source="ARTIST_ID" target="ARTIST_ID"/>
-	</db-relationship>
-	<db-relationship name="painting" source="PAINTING_INFO" target="PAINTING">
-		<db-attribute-pair source="PAINTING_ID" target="PAINTING_ID"/>
-	</db-relationship>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="ARTGROUP" name="artistGroupArray"/>
+		<right entity="ARTIST_GROUP" name="toGroup"/>
+		<db-join-condition>
+			<column-pair left="GROUP_ID" right="GROUP_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="ARTGROUP" name="toChildGroups"/>
+		<right entity="ARTGROUP" name="toParentGroup"/>
+		<db-join-condition>
+			<column-pair left="GROUP_ID" right="PARENT_GROUP_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
+		<left entity="ARTIST" name="artistExhibitArray"/>
+		<right entity="ARTIST_EXHIBIT" name="toArtist"/>
+		<db-join-condition>
+			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="ARTIST" name="artistGroupArray"/>
+		<right entity="ARTIST_GROUP" name="toArtist"/>
+		<db-join-condition>
+			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="ARTIST" name="paintingArray"/>
+		<right entity="PAINTING" name="toArtist"/>
+		<db-join-condition>
+			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="NONE">
+		<left entity="ARTIST"/>
+		<right entity="PAINTING1" name="toArtist"/>
+		<db-join-condition>
+			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="RIGHT">
+		<left entity="ARTIST_EXHIBIT" name="toExhibit"/>
+		<right entity="EXHIBIT" name="artistExhibitArray"/>
+		<db-join-condition>
+			<column-pair left="EXHIBIT_ID" right="EXHIBIT_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="EXHIBIT" name="toGallery"/>
+		<right entity="GALLERY" name="exhibitArray"/>
+		<db-join-condition>
+			<column-pair left="GALLERY_ID" right="GALLERY_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="GALLERY" name="paintingArray"/>
+		<right entity="PAINTING" name="toGallery"/>
+		<db-join-condition>
+			<column-pair left="GALLERY_ID" right="GALLERY_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_ONE" toDependentPK="LEFT">
+		<left entity="PAINTING" name="toPaintingInfo"/>
+		<right entity="PAINTING_INFO" name="painting"/>
+		<db-join-condition>
+			<column-pair left="PAINTING_ID" right="PAINTING_ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="artistArray" source="ArtGroup" target="Artist" deleteRule="Nullify" db-relationship-path="artistGroupArray.toArtist"/>
 	<obj-relationship name="childGroupsArray" source="ArtGroup" target="ArtGroup" deleteRule="Nullify" db-relationship-path="toChildGroups"/>
 	<obj-relationship name="toParentGroup" source="ArtGroup" target="ArtGroup" deleteRule="Nullify" db-relationship-path="toParentGroup"/>
@@ -296,17 +309,4 @@ VALUES (#bind($id), #bind($title), #bind($price))]]></sql>
 		<prefetch><![CDATA[paintingArray]]></prefetch>
 	</query>
 	<query name="ProcedureQuery" type="ProcedureQuery" root="procedure" root-name="cayenne_tst_select_proc" result-entity="Artist"/>
-	<cgen xmlns="http://cayenne.apache.org/schema/10/cgen">
-		<destDir>../java</destDir>
-		<mode>entity</mode>
-		<template>templates/v4_1/subclass.vm</template>
-		<superTemplate>templates/v4_1/superclass.vm</superTemplate>
-		<outputPattern>*.java</outputPattern>
-		<makePairs>true</makePairs>
-		<usePkgPath>true</usePkgPath>
-		<overwrite>false</overwrite>
-		<createPropertyNames>false</createPropertyNames>
-		<createPKProperties>true</createPKProperties>
-		<client>false</client>
-	</cgen>
 </data-map>

@@ -30,6 +30,7 @@ import org.apache.cayenne.gen.ClassGenerationAction;
 import org.apache.cayenne.gen.ClassGenerationActionFactory;
 import org.apache.cayenne.gen.ClientClassGenerationAction;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.relationship.DbJoin;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.InvalidUserDataException;
@@ -166,6 +167,7 @@ public class CgenTask extends BaseCayenneTask {
             loaderAction.setAdditionalDataMapFiles(convertAdditionalDataMaps());
 
             DataMap dataMap = loaderAction.getMainDataMap();
+            dataMap.getDbJoinList().forEach(dbJoin -> dbJoin.compile(dataMap));
             ClassGenerationAction generator = this.createGenerator(dataMap);
             CayenneGeneratorEntityFilterAction filterEntityAction = new CayenneGeneratorEntityFilterAction();
             filterEntityAction.setNameFilter(NamePatternMatcher.build(getLogger(), includeEntities, excludeEntities));

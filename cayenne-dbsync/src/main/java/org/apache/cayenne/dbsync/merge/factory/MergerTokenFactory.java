@@ -18,13 +18,13 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge.factory;
 
+import java.util.Collection;
+
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.dbsync.merge.token.ValueForNullProvider;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-
-import java.util.Collection;
+import org.apache.cayenne.map.relationship.DbJoin;
 
 public interface MergerTokenFactory {
 
@@ -66,13 +66,13 @@ public interface MergerTokenFactory {
             DbAttribute columnOriginal,
             DbAttribute columnNew);
 
-    MergerToken createAddRelationshipToDb(DbEntity entity, DbRelationship rel);
+    MergerToken createAddJoinToDb(DbJoin join);
 
-    MergerToken createAddRelationshipToModel(DbEntity entity, DbRelationship rel);
+    MergerToken createDropJoinToDb(DbJoin dbJoin);
 
-    MergerToken createDropRelationshipToDb(DbEntity entity, DbRelationship rel);
+    MergerToken createAddJoinToModel(DbJoin dbJoin);
 
-    MergerToken createDropRelationshipToModel(DbEntity entity, DbRelationship rel);
+    MergerToken createDropJoinToModel(DbJoin dbJoin);
 
     MergerToken createSetPrimaryKeyToDb(
             DbEntity entity,

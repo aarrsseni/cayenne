@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.cayenne.Persistent;
 import org.apache.cayenne.access.types.ValueObjectTypeRegistry;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.reflect.ClassDescriptor;
 import org.apache.cayenne.reflect.ClassDescriptorMap;
 import org.apache.cayenne.reflect.FaultFactory;
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
 public class EntityResolver implements MappingNamespace, Serializable {
 
     protected static final Logger logger = LoggerFactory.getLogger(EntityResolver.class);
-    protected static AtomicLong incrementer = new AtomicLong();
+    public static AtomicLong incrementer = new AtomicLong();
 
     protected Collection<DataMap> maps;
     protected transient MappingNamespace mappingCache;
@@ -102,14 +103,10 @@ public class EntityResolver implements MappingNamespace, Serializable {
                         new DbRelationship[entity.getRelationships().size()]);
 
                 for (DbRelationship relationship : relationships) {
-                    if (relationship.getReverseRelationship() == null) {
-                        DbRelationship reverse = relationship.createReverseRelationship();
-
+                    if (relationship.getReverseRelationship().isRuntime()) {
+                        DbRelationship reverse = relationship.getReverseRelationship();
                         Entity targetEntity = reverse.getSourceEntity();
-                        reverse.setName(getUniqueRelationshipName(targetEntity));
-                        reverse.setRuntime(true);
                         targetEntity.addRelationship(reverse);
-
                         logger.info("added runtime complimentary DbRelationship from " + targetEntity.getName()
                                 + " to " + reverse.getTargetEntityName());
                     }
@@ -117,16 +114,6 @@ public class EntityResolver implements MappingNamespace, Serializable {
             }
         }
 
-    }
-
-    private String getUniqueRelationshipName(Entity entity) {
-        String name;
-
-        do {
-            name = "runtimeRelationship" + incrementer.getAndIncrement();
-        } while(entity.getRelationship(name) != null);
-
-        return name;
     }
 
     /**
@@ -417,6 +404,12 @@ public class EntityResolver implements MappingNamespace, Serializable {
                 return new MappingCache(maps);
             }
         };
+
+        clientEntityResolver = null;
+    }
+
+    public void setMappingCache(MappingCache mappingCache) {
+        this.mappingCache = mappingCache;
 
         clientEntityResolver = null;
     }

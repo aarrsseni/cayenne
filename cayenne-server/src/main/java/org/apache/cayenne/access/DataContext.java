@@ -49,10 +49,12 @@ import org.apache.cayenne.graph.ChildDiffLoader;
 import org.apache.cayenne.graph.CompoundDiff;
 import org.apache.cayenne.graph.GraphDiff;
 import org.apache.cayenne.graph.GraphManager;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.EntityResultSegment;
 import org.apache.cayenne.query.MappedExec;
 import org.apache.cayenne.query.MappedSelect;
@@ -357,10 +359,26 @@ public class DataContext extends BaseContext {
                     }
 
                     DbRelationship dbRel = rel.getDbRelationships().get(0);
-                    dbRel.getJoin().accept(dbJoin -> {
-                        String key = dbJoin.getSourceName();
-                        snapshot.put(key, storedSnapshot.get(key));
-                        return true;
+                    dbRel.accept(new DirectionalJoinVisitor<Void>() {
+
+                        private void addToDataRow(DbAttribute source) {
+                            String key = source.getName();
+                            snapshot.put(key, storedSnapshot.get(key));
+                        }
+
+                        @Override
+                        public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                            for(DbAttribute attr : source) {
+                                addToDataRow(attr);
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        public Void visit(DbAttribute source, DbAttribute target) {
+                            addToDataRow(source);
+                            return null;
+                        }
                     });
 
                     return true;

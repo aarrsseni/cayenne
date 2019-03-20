@@ -31,10 +31,11 @@ import org.apache.cayenne.graph.GraphChangeHandler;
 import org.apache.cayenne.graph.GraphDiff;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 
 /**
  * Processes object diffs, generating DB diffs. Can be used for both UPDATE and
@@ -126,13 +127,30 @@ class DataDomainDBDiffBuilder implements GraphChangeHandler {
                 // In case of a vertical inheritance, ensure that it belongs to this bucket...
                 if (dbRelation.getSourceEntity() == dbEntity) {
                     ObjectId targetId = (ObjectId) entry.getValue();
-                    dbRelation.getJoin().accept(join -> {
-                        Object value = (targetId != null)
-                                ? new PropagatedValueFactory(targetId, join.getTargetName())
-                                : null;
+                    dbRelation.accept(new DirectionalJoinVisitor<Void>() {
 
-                        dbDiff.put(join.getSourceName(), value);
-                        return true;
+                        private void buildDbDiff(DbAttribute source, DbAttribute target) {
+                            Object value = (targetId != null)
+                                    ? new PropagatedValueFactory(targetId, target.getName())
+                                    : null;
+
+                            dbDiff.put(source.getName(), value);
+                        }
+
+                        @Override
+                        public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                            int length = source.length;
+                            for(int i = 0; i < length; i++) {
+                                buildDbDiff(source[i], target[i]);
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        public Void visit(DbAttribute source, DbAttribute target) {
+                            buildDbDiff(source, target);
+                            return null;
+                        }
                     });
                 }
             }

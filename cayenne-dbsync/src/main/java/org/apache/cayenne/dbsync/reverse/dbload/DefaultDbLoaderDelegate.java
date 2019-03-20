@@ -20,8 +20,7 @@
 package org.apache.cayenne.dbsync.reverse.dbload;
 
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.relationship.DbJoin;
 
 /**
  * A noop {@link DbLoaderDelegate}.
@@ -46,7 +45,7 @@ public class DefaultDbLoaderDelegate implements DbLoaderDelegate {
     }
 
     @Override
-    public boolean dbRelationshipLoaded(DbEntity entity, DbRelationship relationship) {
+    public boolean dbJoinLoaded(DbJoin dbJoin) {
         return true;
     }
 

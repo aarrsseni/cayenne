@@ -24,7 +24,8 @@ import java.awt.event.ActionEvent;
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Entity;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
@@ -101,7 +102,7 @@ public class CreateRelationshipAction extends CayenneAction {
             if (dbEnt != null) {
 
                 new DbRelationshipDialog(getProjectController())
-                        .createNewRaltionship(dbEnt)
+                        .createNewRelationship(dbEnt)
                         .startUp();
             }
         }
@@ -120,6 +121,13 @@ public class CreateRelationshipAction extends CayenneAction {
     public void createDbRelationship(DbEntity dbEntity, DbRelationship rel) {
         ProjectController mediator = getProjectController();
         dbEntity.addRelationship(rel);
+        DbJoin dbJoin = rel.getDbJoin();
+        DbEntity target = rel.getReverseRelationship().getSourceEntity();
+        DbRelationship reverseRelationship = rel.getReverseRelationship();
+        if(!reverseRelationship.isRuntime()) {
+            target.addRelationship(reverseRelationship);
+        }
+        mediator.getCurrentDataMap().addJoin(dbJoin);
 
         fireDbRelationshipEvent(this, mediator, dbEntity, rel);
     }

@@ -21,7 +21,7 @@ package org.apache.cayenne.access.translator.ejbql;
 import java.util.Iterator;
 
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.reflect.ClassDescriptor;
 import org.apache.cayenne.util.Util;
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="com.objectstyle"/>
 	<db-entity name="table1" catalog="many_to_many_test">
 		<db-attribute name="id1" type="INTEGER" isPrimaryKey="true" isMandatory="true" length="10"/>
@@ -19,23 +19,24 @@
 	<obj-entity name="Table1" className="com.objectstyle.Table1" dbEntityName="table1">
 		<obj-attribute name="table1col" type="java.lang.String" db-attribute-path="table1col"/>
 	</obj-entity>
-	<obj-entity name="Table1Table2" className="com.objectstyle.Table1Table2" dbEntityName="table1_table2">
-	</obj-entity>
+	<obj-entity name="Table1Table2" className="com.objectstyle.Table1Table2" dbEntityName="table1_table2"/>
 	<obj-entity name="Table2" className="com.objectstyle.Table2" dbEntityName="table2">
 		<obj-attribute name="table2col" type="java.lang.String" db-attribute-path="table2col"/>
 	</obj-entity>
-	<db-relationship name="table1Table2Array" source="table1" target="table1_table2" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="id1" target="fk1"/>
-	</db-relationship>
-	<db-relationship name="toTable1" source="table1_table2" target="table1" toMany="false">
-		<db-attribute-pair source="fk1" target="id1"/>
-	</db-relationship>
-	<db-relationship name="toTable2" source="table1_table2" target="table2" toMany="false">
-		<db-attribute-pair source="fk2" target="id2"/>
-	</db-relationship>
-	<db-relationship name="table1Table2Array" source="table2" target="table1_table2" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="id2" target="fk2"/>
-	</db-relationship>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
+		<left entity="table1" name="table1Table2Array"/>
+		<right entity="table1_table2" name="toTable1"/>
+		<db-join-condition>
+			<column-pair left="id1" right="fk1"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="RIGHT">
+		<left entity="table1_table2" name="toTable2"/>
+		<right entity="table2" name="table1Table2Array"/>
+		<db-join-condition>
+			<column-pair left="fk2" right="id2"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="table1Table2Array" source="Table1" target="Table1Table2" deleteRule="Deny" db-relationship-path="table1Table2Array"/>
 	<obj-relationship name="toTable1" source="Table1Table2" target="Table1" deleteRule="Nullify" db-relationship-path="toTable1"/>
 	<obj-relationship name="toTable2" source="Table1Table2" target="Table2" deleteRule="Nullify" db-relationship-path="toTable2"/>

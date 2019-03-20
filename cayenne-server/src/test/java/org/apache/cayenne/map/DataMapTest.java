@@ -19,14 +19,6 @@
 
 package org.apache.cayenne.map;
 
-import org.apache.cayenne.configuration.EmptyConfigurationNodeVisitor;
-import org.apache.cayenne.configuration.xml.XMLDataMapLoader;
-import org.apache.cayenne.resource.URLResource;
-import org.apache.cayenne.util.Util;
-import org.apache.cayenne.util.XMLEncoder;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -36,8 +28,23 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.cayenne.configuration.EmptyConfigurationNodeVisitor;
+import org.apache.cayenne.configuration.xml.XMLDataMapLoader;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
+import org.apache.cayenne.resource.URLResource;
+import org.apache.cayenne.util.Util;
+import org.apache.cayenne.util.XMLEncoder;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * DataMap unit tests.
@@ -336,38 +343,46 @@ public class DataMapTest {
     // works & does not cause a ConcurrentModificationException
     @Test
     public void testRemoveDbEntity() {
-
         DataMap map = new DataMap();
-
-        // create a twisty maze of intermingled relationships.
+//        // create a twisty maze of intermingled relationships.
         DbEntity e1 = new DbEntity();
         e1.setName("e1");
 
         DbEntity e2 = new DbEntity();
         e2.setName("e2");
 
-        DbRelationship r1 = new DbRelationship();
-        r1.setName("r1");
-        r1.setTargetEntityName(e2);
-
-        DbRelationship r2 = new DbRelationship();
-        r2.setName("r2");
-        r2.setTargetEntityName(e1);
-
-        DbRelationship r3 = new DbRelationship();
-        r3.setName("r3");
-        r3.setTargetEntityName(e2);
-
-        e1.addRelationship(r1);
-        e1.addRelationship(r2);
-        e1.addRelationship(r3);
-
-        e2.addRelationship(r1);
-        e2.addRelationship(r2);
-        e2.addRelationship(r3);
-
         map.addDbEntity(e1);
         map.addDbEntity(e2);
+
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .entities(new String[]{e2.getName(), e2.getName()})
+                .names(new String[]{"r1", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("x", "y")))
+                .dataMap(map)
+                .build();
+        dbJoin1.compile(map);
+
+        DbJoin dbJoin2 = new DbJoinBuilder()
+                .entities(new String[]{e2.getName(), e1.getName()})
+                .names(new String[]{"r2", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("y", "z")))
+                .dataMap(map)
+                .build();
+        dbJoin2.compile(map);
+
+        DbJoin dbJoin3 = new DbJoinBuilder()
+                .entities(new String[]{e2.getName(), e2.getName()})
+                .names(new String[]{"r3", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("x", "q")))
+                .dataMap(map)
+                .build();
+        dbJoin3.compile(map);
 
         // now actually test something
         map.removeDbEntity(e1.getName(), true);

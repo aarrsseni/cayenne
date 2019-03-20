@@ -19,15 +19,21 @@
 
 package org.apache.cayenne.access.translator.select;
 
+import java.sql.Types;
+
 import org.apache.cayenne.access.sqlbuilder.sqltree.ColumnNode;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.JoinType;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.junit.Test;
-
-import java.sql.Types;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
@@ -89,9 +95,17 @@ public class IdColumnExtractorTest extends BaseColumnExtractorTest {
         mockDbEntity.setDataMap(dataMap);
         entity.setDataMap(dataMap);
 
-        DbRelationship relationship = new DbRelationship();
-        relationship.setSourceEntity(mockDbEntity);
-        relationship.setTargetEntityName("mock1");
+        DbJoin dbJoin = new DbJoinBuilder()
+                .entities(new String[]{mockDbEntity.getName(), mock2DbEntity.getName()})
+                .names(new String[]{"test", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("a1", "a2")))
+                .dataMap(dataMap)
+                .build();
+        dbJoin.compile(dataMap);
+
+        DbRelationship relationship = dbJoin.getRelationhsip();
         context.getTableTree().addJoinTable("prefix", relationship, JoinType.INNER);
 
         IdColumnExtractor extractor = new IdColumnExtractor(context, entity);

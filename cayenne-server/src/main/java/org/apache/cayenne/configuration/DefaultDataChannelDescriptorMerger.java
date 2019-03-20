@@ -66,10 +66,15 @@ public class DefaultDataChannelDescriptorMerger implements DataChannelDescriptor
         merged.setName(descriptors[len - 1].getName());
         merged.getProperties().putAll(descriptors[len - 1].getProperties());
 
+        merged.setMappingCache(descriptors[len - 1].getMappingCache());
         // iterate in reverse order to reduce add/remove operations
         for (int i = len - 1; i >= 0; i--) {
             DataChannelDescriptor descriptor = descriptors[i];
 
+            merged.setMappingCache(merged
+                    .getMappingCache()
+                    .mergeMappingCache(descriptor
+                            .getMappingCache()));
             // DataMaps are merged by reference, as we don't change them
             // TODO: they still have a link to the unmerged descriptor, is it bad?
             for (DataMap map : descriptor.getDataMaps()) {

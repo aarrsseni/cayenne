@@ -19,12 +19,13 @@
 
 package org.apache.cayenne.project;
 
+import java.util.Collection;
+
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.map.ObjAttribute;
@@ -33,11 +34,11 @@ import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
 import org.apache.cayenne.map.QueryDescriptor;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.project.extension.SaverDelegate;
 import org.apache.cayenne.resource.Resource;
 import org.apache.cayenne.util.XMLEncoder;
-
-import java.util.Collection;
 
 /**
  * @since 4.1
@@ -159,6 +160,14 @@ class CompoundSaverDelegate implements SaverDelegate {
     public Void visitQuery(QueryDescriptor query) {
         for(SaverDelegate delegate : delegates) {
             delegate.visitQuery(query);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitDbJoin(DbJoin dbJoin) {
+        for(SaverDelegate delegate : delegates) {
+            delegate.visitDbJoin(dbJoin);
         }
         return null;
     }

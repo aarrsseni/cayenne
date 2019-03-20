@@ -23,7 +23,7 @@ import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.xml.DataChannelMetaData;
 import org.apache.cayenne.configuration.xml.DataMapHandler;
 import org.apache.cayenne.configuration.xml.DbEntityHandler;
-import org.apache.cayenne.configuration.xml.DbRelationshipHandler;
+import org.apache.cayenne.configuration.xml.DbJoinHandler;
 import org.apache.cayenne.configuration.xml.EmbeddableHandler;
 import org.apache.cayenne.configuration.xml.NamespaceAwareNestedTagHandler;
 import org.apache.cayenne.configuration.xml.ObjEntityHandler;
@@ -94,8 +94,8 @@ class PropertyHandler extends NamespaceAwareNestedTagHandler {
             return ((QueryDescriptorHandler) parentHandler).getQueryDescriptor();
         } else if(parentHandler instanceof ProcedureHandler) {
             return ((ProcedureHandler) parentHandler).getProcedure();
-        } else if(parentHandler instanceof DbRelationshipHandler) {
-            return ((DbRelationshipHandler) parentHandler).getDbRelationship();
+        } else if(parentHandler instanceof DbJoinHandler) {
+            return ((DbJoinHandler) parentHandler).getDbJoin();
         } else if(parentHandler instanceof ObjRelationshipHandler) {
             return ((ObjRelationshipHandler) parentHandler).getObjRelationship();
         }

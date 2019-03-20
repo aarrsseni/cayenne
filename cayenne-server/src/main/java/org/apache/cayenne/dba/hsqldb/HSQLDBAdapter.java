@@ -40,9 +40,15 @@ import org.apache.cayenne.configuration.Constants;
 import org.apache.cayenne.configuration.RuntimeProperties;
 import org.apache.cayenne.dba.JdbcAdapter;
 import org.apache.cayenne.di.Inject;
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
+import org.apache.cayenne.map.relationship.JoinVisitor;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLAction;
 import org.apache.cayenne.resource.ResourceLocator;
@@ -199,17 +205,113 @@ public class HSQLDBAdapter extends JdbcAdapter {
 		buf.append(" FOREIGN KEY (");
 
 		final AtomicBoolean first = new AtomicBoolean(true);
-		rel.getJoin().accept(join -> {
-			if (!first.get()) {
-				buf.append(", ");
-				refBuf.append(", ");
-			} else {
-				first.set(false);
+		rel.accept(new DirectionalJoinVisitor<Void>() {
+
+			private void buildString(DbAttribute source, DbAttribute target) {
+				if (!first.get()) {
+					buf.append(", ");
+					refBuf.append(", ");
+				} else {
+					first.set(false);
+				}
+
+				buf.append(quotingStrategy
+						.quotedIdentifier(source.getEntity().getDataMap(), source.getName()));
+				refBuf.append(quotingStrategy
+						.quotedIdentifier(target.getEntity().getDataMap(), target.getName()));
 			}
 
-			buf.append(quotingStrategy.quotedSourceName(join));
-			refBuf.append(quotingStrategy.quotedTargetName(join));
-			return true;
+			@Override
+			public Void visit(DbAttribute[] source, DbAttribute[] target) {
+				int length = source.length;
+				for(int i = 0; i < length; i++) {
+					buildString(source[i], target[i]);
+				}
+				return null;
+			}
+
+			@Override
+			public Void visit(DbAttribute source, DbAttribute target) {
+				buildString(source, target);
+				return null;
+			}
+		});
+
+		buf.append(") REFERENCES ");
+		buf.append(dstName);
+		buf.append(" (");
+		buf.append(refBuf.toString());
+		buf.append(')');
+
+		// also make sure we delete dependent FKs
+		buf.append(" ON DELETE CASCADE");
+
+		return buf.toString();
+	}
+
+	@Override
+	public String createFkConstraint(DbJoin dbJoin, RelationshipDirection direction) {
+		StringBuilder buf = new StringBuilder();
+		StringBuilder refBuf = new StringBuilder();
+
+		DataMap dataMap = dbJoin.getDataMap();
+		DbEntity sourceEntity = dataMap
+				.getDbEntity(dbJoin.getDbEntities()[direction.ordinal()]);
+		DbEntity targetEntity = dataMap
+				.getDbEntity(dbJoin.getDbEntities()[direction.getOppositeDirection().ordinal()]);
+		String srcName = getTableName(sourceEntity);
+		String dstName = getTableName(targetEntity);
+
+		buf.append("ALTER TABLE ");
+		buf.append(srcName);
+
+		// hsqldb requires the ADD CONSTRAINT statement
+		buf.append(" ADD CONSTRAINT ");
+
+		String name = "U_" + sourceEntity.getName() + "_"
+				+ (long) (System.currentTimeMillis() / (Math.random() * 100000));
+
+		buf.append(quotingStrategy.quotedIdentifier(sourceEntity, sourceEntity.getSchema(), name));
+		buf.append(" FOREIGN KEY (");
+
+		final AtomicBoolean first = new AtomicBoolean(true);
+		dbJoin.getDbJoinCondition().accept(new JoinVisitor<Void>() {
+
+			private void buildString(String source, String target) {
+				if (!first.get()) {
+					buf.append(", ");
+					refBuf.append(", ");
+				} else {
+					first.set(false);
+				}
+
+				buf.append(quotingStrategy
+						.quotedIdentifier(dataMap, source));
+				refBuf.append(quotingStrategy
+						.quotedIdentifier(dataMap, target));
+			}
+
+			@Override
+			public Void visit(ColumnPair columnPair) {
+				if(direction == RelationshipDirection.LEFT) {
+					buildString(columnPair.getLeft(), columnPair.getRight());
+				} else {
+					buildString(columnPair.getRight(), columnPair.getLeft());
+				}
+				return null;
+			}
+
+			@Override
+			public Void visit(ColumnPair[] columnPairs) {
+				for(ColumnPair columnPair : columnPairs) {
+					if(direction == RelationshipDirection.LEFT) {
+						buildString(columnPair.getLeft(), columnPair.getRight());
+					} else {
+						buildString(columnPair.getRight(), columnPair.getLeft());
+					}
+				}
+				return null;
+			}
 		});
 
 		buf.append(") REFERENCES ");

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.commitlog.db"/>
 	<db-entity name="AUDITABLE1">
 		<db-attribute name="CHAR_PROPERTY1" type="VARCHAR" length="200"/>
@@ -84,36 +84,41 @@
 	<obj-entity name="E2" className="org.apache.cayenne.commitlog.db.E2" dbEntityName="E2"/>
 	<obj-entity name="E3" className="org.apache.cayenne.commitlog.db.E3" dbEntityName="E3"/>
 	<obj-entity name="E4" className="org.apache.cayenne.commitlog.db.E4" dbEntityName="E4"/>
-	<db-relationship name="children1" source="AUDITABLE1" target="AUDITABLE_CHILD1" toMany="true">
-		<db-attribute-pair source="ID" target="AUDITABLE1_ID"/>
-	</db-relationship>
-	<db-relationship name="children" source="AUDITABLE2" target="AUDITABLE_CHILD3" toMany="true">
-		<db-attribute-pair source="ID" target="AUDITABLE2_ID"/>
-	</db-relationship>
-	<db-relationship name="auditable4s" source="AUDITABLE3" target="AUDITABLE4" toMany="true">
-		<db-attribute-pair source="ID" target="AUDITABLE3_ID"/>
-	</db-relationship>
-	<db-relationship name="auditable3" source="AUDITABLE4" target="AUDITABLE3">
-		<db-attribute-pair source="AUDITABLE3_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="parent" source="AUDITABLE_CHILD1" target="AUDITABLE1">
-		<db-attribute-pair source="AUDITABLE1_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="parent" source="AUDITABLE_CHILD3" target="AUDITABLE2">
-		<db-attribute-pair source="AUDITABLE2_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="e34s" source="E3" target="E34" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="E3_ID"/>
-	</db-relationship>
-	<db-relationship name="e3" source="E34" target="E3">
-		<db-attribute-pair source="E3_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="e4" source="E34" target="E4">
-		<db-attribute-pair source="E4_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="e34s" source="E4" target="E34" toDependentPK="true" toMany="true">
-		<db-attribute-pair source="ID" target="E4_ID"/>
-	</db-relationship>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="AUDITABLE1" name="children1"/>
+		<right entity="AUDITABLE_CHILD1" name="parent"/>
+		<db-join-condition>
+			<column-pair left="ID" right="AUDITABLE1_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="AUDITABLE2" name="children"/>
+		<right entity="AUDITABLE_CHILD3" name="parent"/>
+		<db-join-condition>
+			<column-pair left="ID" right="AUDITABLE2_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="AUDITABLE3" name="auditable4s"/>
+		<right entity="AUDITABLE4" name="auditable3"/>
+		<db-join-condition>
+			<column-pair left="ID" right="AUDITABLE3_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
+		<left entity="E3" name="e34s"/>
+		<right entity="E34" name="e3"/>
+		<db-join-condition>
+			<column-pair left="ID" right="E3_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="RIGHT">
+		<left entity="E34" name="e4"/>
+		<right entity="E4" name="e34s"/>
+		<db-join-condition>
+			<column-pair left="E4_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="children1" source="Auditable1" target="AuditableChild1" deleteRule="Deny" db-relationship-path="children1"/>
 	<obj-relationship name="children" source="Auditable2" target="AuditableChild3" deleteRule="Deny" db-relationship-path="children"/>
 	<obj-relationship name="auditable4s" source="Auditable3" target="Auditable4" deleteRule="Deny" db-relationship-path="auditable4s"/>

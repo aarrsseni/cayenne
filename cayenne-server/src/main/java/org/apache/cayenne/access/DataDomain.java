@@ -19,6 +19,14 @@
 
 package org.apache.cayenne.access;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.DataChannel;
 import org.apache.cayenne.DataChannelFilter;
@@ -41,20 +49,13 @@ import org.apache.cayenne.log.JdbcEventLogger;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.EntitySorter;
+import org.apache.cayenne.map.MappingCache;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.QueryChain;
 import org.apache.cayenne.tx.BaseTransaction;
 import org.apache.cayenne.tx.Transaction;
 import org.apache.cayenne.tx.TransactionManager;
 import org.apache.cayenne.util.ToStringBuilder;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * DataDomain performs query routing functions in Cayenne. DataDomain creates
@@ -574,6 +575,10 @@ public class DataDomain implements QueryEngine, DataChannel {
 		}
 
 		return entityResolver;
+	}
+
+	public void initEntityResolver(MappingCache mappingCache) {
+		getEntityResolver().setMappingCache(mappingCache);
 	}
 
 	/**

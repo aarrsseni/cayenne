@@ -18,22 +18,25 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge.factory;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.dba.QuotingStrategy;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
-import org.apache.cayenne.dbsync.merge.token.db.DropRelationshipToDb;
+import org.apache.cayenne.dbsync.merge.token.db.AddJoinToDb;
+import org.apache.cayenne.dbsync.merge.token.db.DropJoinToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetAllowNullToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetColumnTypeToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetGeneratedFlagToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetNotNullToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetPrimaryKeyToDb;
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 
 public class MySQLMergerTokenFactory extends DefaultMergerTokenFactory {
 
@@ -109,11 +112,8 @@ public class MySQLMergerTokenFactory extends DefaultMergerTokenFactory {
     }
 
     @Override
-    public MergerToken createDropRelationshipToDb(
-            final DbEntity entity,
-            DbRelationship rel) {
-
-        return new DropRelationshipToDb(entity, rel) {
+    public MergerToken createDropJoinToDb(DbJoin dbJoin) {
+        return new DropJoinToDb(dbJoin) {
 
             @Override
             public List<String> createSql(DbAdapter adapter) {
@@ -124,12 +124,17 @@ public class MySQLMergerTokenFactory extends DefaultMergerTokenFactory {
                 }
                 QuotingStrategy context = adapter.getQuotingStrategy();
 
+                RelationshipDirection direction = AddJoinToDb.getRelationshipDirection(dbJoin);
+                DataMap dataMap = dbJoin.getDataMap();
+                DbEntity entity = dataMap.getDbEntity(
+                        dbJoin.getDbEntities()[direction.ordinal()]);
                 // http://dev.mysql.com/tech-resources/articles/mysql-cluster-50.html
                 return Collections.singletonList("ALTER TABLE " + context.quotedFullyQualifiedName(entity) + " DROP FOREIGN KEY " + fkName);
             }
+
         };
     }
-    
+
     @Override
     public MergerToken createSetPrimaryKeyToDb(
             DbEntity entity,

@@ -18,12 +18,18 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge.builders;
 
+import java.util.Collections;
+
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.ObjEntity;
-
-import java.util.Collections;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 
 /**
  * @since 4.0.
@@ -87,10 +93,10 @@ public class DataMapBuilder extends DefaultBuilder<DataMap> {
     }
 
     public DataMapBuilder join(String from, String to) {
-        return join(null, from, to);
+        return join(null, null, from, to);
     }
 
-    public DataMapBuilder join(String name, String from, String to) {
+    public DataMapBuilder join(String name, String reverseName, String from, String to) {
         String[] fromSplit = from.split("\\.");
         DbEntity fromEntity = obj.getDbEntity(fromSplit[0]);
         if (fromEntity == null) {
@@ -99,11 +105,15 @@ public class DataMapBuilder extends DefaultBuilder<DataMap> {
 
         String[] toSplit = to.split("\\.");
 
-        fromEntity.addRelationship(new DbRelationshipBuilder(name)
-                .from(fromEntity, fromSplit[1])
-                .to(toSplit[0], toSplit[1])
-
-                .build());
+        DbJoin dbJoin = new DbJoinBuilder()
+                .entities(new String[]{fromEntity.getName(), toSplit[0]})
+                .names(new String[]{name, reverseName})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair(fromSplit[1], toSplit[1])))
+                .dataMap(obj)
+                .build();
+        obj.addJoin(dbJoin);
 
         return this;
     }
@@ -112,7 +122,7 @@ public class DataMapBuilder extends DefaultBuilder<DataMap> {
         if (obj.getNamespace() == null) {
             obj.setNamespace(new EntityResolver(Collections.singleton(obj)));
         }
-
+        obj.getDbJoinList().forEach(dbJoin -> dbJoin.compile(obj));
         return obj;
     }
 

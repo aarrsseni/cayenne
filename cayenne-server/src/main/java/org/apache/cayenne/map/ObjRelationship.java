@@ -19,21 +19,22 @@
 
 package org.apache.cayenne.map;
 
-import org.apache.cayenne.CayenneRuntimeException;
-import org.apache.cayenne.configuration.ConfigurationNode;
-import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
-import org.apache.cayenne.exp.ExpressionException;
-import org.apache.cayenne.exp.parser.ASTDbPath;
-import org.apache.cayenne.util.CayenneMapEntry;
-import org.apache.cayenne.util.ToStringBuilder;
-import org.apache.cayenne.util.Util;
-import org.apache.cayenne.util.XMLEncoder;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
+import org.apache.cayenne.CayenneRuntimeException;
+import org.apache.cayenne.configuration.ConfigurationNode;
+import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
+import org.apache.cayenne.exp.ExpressionException;
+import org.apache.cayenne.exp.parser.ASTDbPath;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.util.CayenneMapEntry;
+import org.apache.cayenne.util.ToStringBuilder;
+import org.apache.cayenne.util.Util;
+import org.apache.cayenne.util.XMLEncoder;
 
 /**
  * Describes an association between two Java classes mapped as source and target

@@ -18,13 +18,15 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge.factory;
 
+import java.util.Collection;
+
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.dbsync.merge.token.ValueForNullProvider;
 import org.apache.cayenne.dbsync.merge.token.db.AddColumnToDb;
-import org.apache.cayenne.dbsync.merge.token.db.AddRelationshipToDb;
+import org.apache.cayenne.dbsync.merge.token.db.AddJoinToDb;
 import org.apache.cayenne.dbsync.merge.token.db.CreateTableToDb;
 import org.apache.cayenne.dbsync.merge.token.db.DropColumnToDb;
-import org.apache.cayenne.dbsync.merge.token.db.DropRelationshipToDb;
+import org.apache.cayenne.dbsync.merge.token.db.DropJoinToDb;
 import org.apache.cayenne.dbsync.merge.token.db.DropTableToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetAllowNullToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetColumnTypeToDb;
@@ -33,10 +35,10 @@ import org.apache.cayenne.dbsync.merge.token.db.SetNotNullToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetPrimaryKeyToDb;
 import org.apache.cayenne.dbsync.merge.token.db.SetValueForNullToDb;
 import org.apache.cayenne.dbsync.merge.token.model.AddColumnToModel;
-import org.apache.cayenne.dbsync.merge.token.model.AddRelationshipToModel;
+import org.apache.cayenne.dbsync.merge.token.model.AddJoinToModel;
 import org.apache.cayenne.dbsync.merge.token.model.CreateTableToModel;
 import org.apache.cayenne.dbsync.merge.token.model.DropColumnToModel;
-import org.apache.cayenne.dbsync.merge.token.model.DropRelationshipToModel;
+import org.apache.cayenne.dbsync.merge.token.model.DropJoinToModel;
 import org.apache.cayenne.dbsync.merge.token.model.DropTableToModel;
 import org.apache.cayenne.dbsync.merge.token.model.SetAllowNullToModel;
 import org.apache.cayenne.dbsync.merge.token.model.SetColumnTypeToModel;
@@ -45,9 +47,7 @@ import org.apache.cayenne.dbsync.merge.token.model.SetNotNullToModel;
 import org.apache.cayenne.dbsync.merge.token.model.SetPrimaryKeyToModel;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
-
-import java.util.Collection;
+import org.apache.cayenne.map.relationship.DbJoin;
 
 /**
  * @since 4.0
@@ -136,23 +136,23 @@ public class DefaultMergerTokenFactory implements MergerTokenFactory {
     }
 
     @Override
-    public MergerToken createAddRelationshipToDb(DbEntity entity, DbRelationship rel) {
-        return new AddRelationshipToDb(entity, rel);
+    public MergerToken createAddJoinToDb(DbJoin join) {
+        return new AddJoinToDb(join);
     }
 
     @Override
-    public MergerToken createAddRelationshipToModel(DbEntity entity, DbRelationship rel) {
-        return new AddRelationshipToModel(entity, rel);
+    public MergerToken createDropJoinToDb(DbJoin dbJoin) {
+        return new DropJoinToDb(dbJoin);
     }
 
     @Override
-    public MergerToken createDropRelationshipToDb(DbEntity entity, DbRelationship rel) {
-        return new DropRelationshipToDb(entity, rel);
+    public MergerToken createAddJoinToModel(DbJoin dbJoin) {
+        return new AddJoinToModel(dbJoin);
     }
 
     @Override
-    public MergerToken createDropRelationshipToModel(DbEntity entity, DbRelationship rel) {
-        return new DropRelationshipToModel(entity, rel);
+    public MergerToken createDropJoinToModel(DbJoin dbJoin) {
+        return new DropJoinToModel(dbJoin);
     }
 
     @Override

@@ -19,16 +19,16 @@
 
 package org.apache.cayenne.dbsync.reverse.dbimport;
 
-import org.apache.cayenne.dbsync.naming.NameBuilder;
-import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
-import org.apache.cayenne.map.DbRelationship;
-import org.apache.cayenne.map.ObjEntity;
-import org.apache.cayenne.map.ObjRelationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.cayenne.dbsync.naming.NameBuilder;
+import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An ObjEntity that may be removed as a result of flattenning relationships.

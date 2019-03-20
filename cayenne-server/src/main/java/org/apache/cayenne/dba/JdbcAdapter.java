@@ -47,10 +47,16 @@ import org.apache.cayenne.configuration.Constants;
 import org.apache.cayenne.configuration.RuntimeProperties;
 import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.log.JdbcEventLogger;
+import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
+import org.apache.cayenne.map.relationship.JoinVisitor;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.query.FluentSelect;
 import org.apache.cayenne.query.Query;
 import org.apache.cayenne.query.SQLAction;
@@ -462,22 +468,100 @@ public class JdbcAdapter implements DbAdapter {
         }
 
         final AtomicBoolean first = new AtomicBoolean(true);
-        rel.getJoin().accept(join -> {
-            if (first.get()) {
-                first.set(false);
-            } else {
-                buf.append(", ");
-                refBuf.append(", ");
+        rel.accept(new DirectionalJoinVisitor<Void>() {
+
+            private void buildString(DbAttribute source, DbAttribute target) {
+                if (first.get()) {
+                    first.set(false);
+                } else {
+                    buf.append(", ");
+                    refBuf.append(", ");
+                }
+
+                buf.append(quotingStrategy.quotedIdentifier(source.getEntity().getDataMap(), source.getName()));
+                refBuf.append(quotingStrategy.quotedIdentifier(target.getEntity().getDataMap(), target.getName()));
             }
 
-            buf.append(quotingStrategy.quotedSourceName(join));
-            refBuf.append(quotingStrategy.quotedTargetName(join));
-            return true;
+            @Override
+            public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                int length = source.length;
+                for(int i = 0; i < length; i++) {
+                    buildString(source[i], target[i]);
+                }
+                return null;
+            }
+
+            @Override
+            public Void visit(DbAttribute source, DbAttribute target) {
+                buildString(source, target);
+                return null;
+            }
         });
 
         buf.append(") REFERENCES ");
 
         buf.append(quotingStrategy.quotedFullyQualifiedName(rel.getTargetEntity()));
+
+        buf.append(" (").append(refBuf.toString()).append(')');
+        return buf.toString();
+    }
+
+    @Override
+    public String createFkConstraint(DbJoin dbJoin, RelationshipDirection direction) {
+        DataMap dataMap = dbJoin.getDataMap();
+        DbEntity source = dataMap
+                .getDbEntity(dbJoin.getDbEntities()[direction.ordinal()]);
+
+        StringBuilder buf = new StringBuilder();
+        StringBuilder refBuf = new StringBuilder();
+
+        buf.append("ALTER TABLE ");
+
+        buf.append(quotingStrategy.quotedFullyQualifiedName(source));
+        buf.append(" ADD FOREIGN KEY (");
+
+        final AtomicBoolean first = new AtomicBoolean(true);
+        dbJoin.getDbJoinCondition().accept(new JoinVisitor<Void>() {
+
+            private void buildString(String source, String target) {
+                if (first.get()) {
+                    first.set(false);
+                } else {
+                    buf.append(", ");
+                    refBuf.append(", ");
+                }
+
+                buf.append(quotingStrategy.quotedIdentifier(dataMap, source));
+                refBuf.append(quotingStrategy.quotedIdentifier(dataMap, target));
+            }
+
+            @Override
+            public Void visit(ColumnPair columnPair) {
+                if(direction == RelationshipDirection.LEFT) {
+                    buildString(columnPair.getLeft(), columnPair.getRight());
+                } else {
+                    buildString(columnPair.getRight(), columnPair.getLeft());
+                }
+                return null;
+            }
+
+            @Override
+            public Void visit(ColumnPair[] columnPairs) {
+                for(ColumnPair columnPair : columnPairs) {
+                    if(direction == RelationshipDirection.LEFT) {
+                        buildString(columnPair.getLeft(), columnPair.getRight());
+                    } else {
+                        buildString(columnPair.getRight(), columnPair.getLeft());
+                    }
+                }
+                return null;
+            }
+        });
+        buf.append(") REFERENCES ");
+
+        buf.append(quotingStrategy.quotedFullyQualifiedName(dataMap
+                .getDbEntity(dbJoin
+                        .getDbEntities()[direction.getOppositeDirection().ordinal()])));
 
         buf.append(" (").append(refBuf.toString()).append(')');
         return buf.toString();

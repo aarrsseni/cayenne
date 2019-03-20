@@ -25,9 +25,11 @@ import org.apache.cayenne.DataRow;
 import org.apache.cayenne.ObjectId;
 import org.apache.cayenne.PersistenceState;
 import org.apache.cayenne.Persistent;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.reflect.ArcProperty;
 import org.apache.cayenne.reflect.AttributeProperty;
 import org.apache.cayenne.reflect.ClassDescriptor;
@@ -218,8 +220,22 @@ class DataRowUtils {
     }
 
     static boolean hasFK(DbRelationship relationship, Map<String, Object> snapshot) {
-        return relationship.getJoin()
-                .accept(join -> snapshot.containsKey(join.getSourceName()));
+        return relationship.accept(new DirectionalJoinVisitor<Boolean>() {
+            @Override
+            public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                for (DbAttribute dbAttribute : source) {
+                    if (!snapshot.containsKey(dbAttribute)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public Boolean visit(DbAttribute source, DbAttribute target) {
+                return snapshot.containsKey(source.getName());
+            }
+        });
     }
 
     /**

@@ -20,7 +20,6 @@
 package org.apache.cayenne.dbsync.merge.token.model;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.cayenne.dbsync.merge.context.MergeDirection;
 import org.apache.cayenne.dbsync.merge.token.AbstractMergerToken;
@@ -28,9 +27,10 @@ import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.dbsync.reverse.dbload.ModelMergeDelegate;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 
 /**
  * Common abstract superclass for all {@link MergerToken}s going from the database to the
@@ -42,21 +42,26 @@ public abstract class AbstractToModelToken extends AbstractMergerToken {
         super(tokenName, sortingWeight);
     }
 
-    protected static void remove(ModelMergeDelegate mergerContext, DbRelationship rel, boolean reverse) {
-        if (rel == null) {
+    protected static void remove(ModelMergeDelegate mergerContext, DbJoin dbJoin) {
+        if(dbJoin == null) {
             return;
         }
-        if (reverse) {
-            remove(mergerContext, rel.getReverseRelationship(), false);
+
+        DbRelationship relationship = dbJoin.getRelationhsip();
+        DbRelationship reverseRelationship = relationship.getReverseRelationship();
+
+        for (ObjEntity objEntity : relationship.getSourceEntity().mappedObjEntities()) {
+            remove(mergerContext, objEntity.getRelationshipForDbRelationship(relationship), true);
+        }
+        for (ObjEntity objEntity : reverseRelationship.getSourceEntity().mappedObjEntities()) {
+            remove(mergerContext, objEntity.getRelationshipForDbRelationship(reverseRelationship), true);
         }
 
-        DbEntity dbEntity = rel.getSourceEntity();
-        for (ObjEntity objEntity : dbEntity.mappedObjEntities()) {
-            remove(mergerContext, objEntity.getRelationshipForDbRelationship(rel), true);
-        }
-
-        rel.getSourceEntity().removeRelationship(rel.getName());
-        mergerContext.dbRelationshipRemoved(rel);
+        relationship.getSourceEntity().removeRelationship(relationship.getName());
+        reverseRelationship.getSourceEntity().removeRelationship(reverseRelationship.getName());
+        mergerContext.dbRelationshipRemoved(relationship);
+        mergerContext.dbRelationshipRemoved(reverseRelationship);
+        relationship.getSourceEntity().getDataMap().getDbJoinList().remove(dbJoin);
     }
 
     protected static void remove(ModelMergeDelegate mergerContext, ObjRelationship rel, boolean reverse) {
@@ -68,6 +73,12 @@ public abstract class AbstractToModelToken extends AbstractMergerToken {
         }
         rel.getSourceEntity().removeRelationship(rel.getName());
         mergerContext.objRelationshipRemoved(rel);
+    }
+
+    public Collection<ObjEntity> getMappedObjEntities(DbEntity entity) {
+        Collection<ObjEntity> entities = entity.mappedObjEntities();
+        entities.removeIf(objEntity -> objEntity.getSuperEntity() != null);
+        return entities;
     }
 
     @Override
@@ -93,12 +104,7 @@ public abstract class AbstractToModelToken extends AbstractMergerToken {
          */
         public Collection<ObjEntity> getMappedObjEntities() {
             Collection<ObjEntity> entities = entity.mappedObjEntities();
-            Iterator<ObjEntity> iterator = entities.iterator();
-            while(iterator.hasNext()) {
-                if(iterator.next().getSuperEntity() != null) {
-                    iterator.remove();
-                }
-            }
+            entities.removeIf(objEntity -> objEntity.getSuperEntity() != null);
             return entities;
         }
 

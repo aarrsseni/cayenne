@@ -25,6 +25,15 @@ import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ExpressionFactory;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.ColumnPairsCondition;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.JoinVisitor;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.apache.cayenne.unit.di.server.CayenneProjects;
 import org.apache.cayenne.unit.di.server.ServerCase;
 import org.apache.cayenne.unit.di.server.UseServerRuntime;
@@ -201,17 +210,20 @@ public class DbEntityIT extends ServerCase {
         a11.setPrimaryKey(false);
         otherEntity.addAttribute(a11);
 
-        DbRelationship rel = new DbRelationship("relfrom");
-        ent.addRelationship(rel);
-        rel.setTargetEntityName(otherEntity);
-        rel.addJoin(new DbJoin(rel, "a1", "a11"));
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .entities(new String[]{ent.getName(), otherEntity.getName()})
+                .names(new String[]{"relfrom", "relto"})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("a1", "a11")))
+                .dataMap(map)
+                .build();
 
-        DbRelationship rel1 = new DbRelationship("relto");
-        otherEntity.addRelationship(rel1);
-        rel1.setTargetEntityName(ent);
-        rel1.addJoin(new DbJoin(rel1, "a11", "a1"));
+        dbJoin1.compile(map);
 
-        // check that the test case is working
+        DbRelationship rel = dbJoin1.getRelationhsip();
+
+//         check that the test case is working
         assertSame(a1, ent.getAttribute(a1.getName()));
         assertSame(rel, ent.getRelationship(rel.getName()));
 
@@ -219,8 +231,69 @@ public class DbEntityIT extends ServerCase {
         ent.removeAttribute(a1.getName());
 
         assertNull(ent.getAttribute(a1.getName()));
-        assertEquals(0, rel1.getJoins().size());
-        assertEquals(0, rel.getJoins().size());
+        assertEquals(0, ent.getRelationships().size());
+        assertEquals(0, otherEntity.getRelationships().size());
+    }
+
+    @Test
+    public void removeAttrWithMultiJoinRel() {
+        DbEntity ent = new DbEntity("abc");
+
+        DataMap map = new DataMap("map");
+        ent.setName("ent");
+        map.addDbEntity(ent);
+
+        DbAttribute a1 = new DbAttribute("a1");
+        a1.setPrimaryKey(false);
+        DbAttribute a2 = new DbAttribute("a2");
+        ent.addAttribute(a1);
+        ent.addAttribute(a2);
+
+        DbEntity otherEntity = new DbEntity("22ent1");
+        assertNotNull(otherEntity.getName());
+        map.addDbEntity(otherEntity);
+        DbAttribute a11 = new DbAttribute("a11");
+        a11.setPrimaryKey(false);
+        DbAttribute a21 = new DbAttribute("a21");
+        otherEntity.addAttribute(a11);
+        otherEntity.addAttribute(a21);
+
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .entities(new String[]{ent.getName(), otherEntity.getName()})
+                .names(new String[]{"relfrom", "relto"})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new ColumnPairsCondition(new ColumnPair[]{
+                        new ColumnPair("a1", "a11"),
+                        new ColumnPair("a2", "a21")}))
+                .dataMap(map)
+                .build();
+        dbJoin1.compile(map);
+
+        DbRelationship rel = dbJoin1.getRelationhsip();
+
+//         check that the test case is working
+        assertSame(a1, ent.getAttribute(a1.getName()));
+        assertSame(rel, ent.getRelationship(rel.getName()));
+
+        // test removal
+        ent.removeAttribute(a1.getName());
+
+        assertNull(ent.getAttribute(a1.getName()));
+
+        assertTrue(rel.getDbJoin().getDbJoinCondition() instanceof SinglePairCondition);
+        SinglePairCondition singlePairCondition = (SinglePairCondition) rel.getDbJoin().getDbJoinCondition();
+        assertTrue(singlePairCondition.accept(new JoinVisitor<Boolean>() {
+            @Override
+            public Boolean visit(ColumnPair columnPair) {
+                return columnPair.getLeft().equals("a2") && columnPair.getRight().equals("a21");
+            }
+
+            @Override
+            public Boolean visit(ColumnPair[] columnPairs) {
+                return false;
+            }
+        }));
     }
 
     @Test

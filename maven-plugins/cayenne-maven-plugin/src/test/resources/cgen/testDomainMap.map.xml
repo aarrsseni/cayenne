@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="pack"/>
 	<embeddable className="pack.Embeddable">
 		<embeddable-attribute name="embAttr" type="java.lang.String" db-attribute-name="EMB_ATTR"/>
@@ -12,9 +12,9 @@
 		<db-attribute name="name" type="VARCHAR" length="255"/>
 	</db-entity>
 	<db-entity name="TestEntity">
+		<db-attribute name="TestRelEntity_ID" type="INTEGER"/>
 		<db-attribute name="id" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
 		<db-attribute name="testAttr" type="VARCHAR" length="255"/>
-        <db-attribute name="TestRelEntity_ID" type="INTEGER"/>
 	</db-entity>
 	<db-entity name="TestExcludedEntity">
 		<db-attribute name="id" type="BIGINT" isPrimaryKey="true" isMandatory="true"/>
@@ -25,23 +25,26 @@
 	</obj-entity>
 	<obj-entity name="TestEntity" className="pack.TestEntity" dbEntityName="TestEntity">
 		<embedded-attribute name="embeddedAtr" type="pack.Embeddable"/>
-		<obj-attribute name="testAttr" type="java.lang.String" db-attribute-path="testAttr">
-			<info:property xmlns:info="http://cayenne.apache.org/schema/10/info" name="comment" value="comment for test attribute"/>
-		</obj-attribute>
+		<obj-attribute name="testAttr" type="java.lang.String" db-attribute-path="testAttr"/>
 	</obj-entity>
 	<obj-entity name="TestExcludedEntity" className="pack.TestExcludedEntity" dbEntityName="TestExcludedEntity">
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="name"/>
 	</obj-entity>
-	<db-relationship name="childrenRel" source="TestEntity" target="TestEntity" toMany="true">
-		<db-attribute-pair source="id" target="id"/>
-	</db-relationship>
-	<db-relationship name="parentRel" source="TestEntity" target="TestEntity" toMany="false">
-		<db-attribute-pair source="id" target="id"/>
-	</db-relationship>
-    <db-relationship name="additionalRel" source="TestEntity" target="TestRelEntity" toMany="true">
-        <db-attribute-pair source="TestRelEntity_ID" target="ID"/>
-    </db-relationship>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="TestEntity" name="childrenRel"/>
+		<right entity="TestEntity" name="parentRel"/>
+		<db-join-condition>
+			<column-pair left="id" right="id"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="TestEntity" name="additionalRel"/>
+		<right entity="TestRelEntity"/>
+		<db-join-condition>
+			<column-pair left="TestRelEntity_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="childrenRel" source="TestEntity" target="TestEntity" deleteRule="Deny" db-relationship-path="childrenRel"/>
 	<obj-relationship name="parentRel" source="TestEntity" target="TestEntity" deleteRule="Nullify" db-relationship-path="parentRel"/>
-    <obj-relationship name="additionalRel" source="TestEntity" target="TestRelEntity" deleteRule="Deny" db-relationship-path="additionalRel"/>
+	<obj-relationship name="additionalRel" source="TestEntity" target="TestRelEntity" deleteRule="Deny" db-relationship-path="additionalRel"/>
 </data-map>

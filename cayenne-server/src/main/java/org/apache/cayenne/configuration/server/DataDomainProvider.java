@@ -18,6 +18,9 @@
  ****************************************************************/
 package org.apache.cayenne.configuration.server;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.cayenne.ConfigurationException;
 import org.apache.cayenne.DataChannel;
 import org.apache.cayenne.DataChannelFilter;
@@ -46,9 +49,6 @@ import org.apache.cayenne.resource.Resource;
 import org.apache.cayenne.resource.ResourceLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * A {@link DataChannel} provider that provides a single instance of DataDomain
@@ -143,6 +143,8 @@ public class DataDomainProvider implements Provider<DataDomain> {
 		dataDomain.setDataRowStoreFactory(injector.getInstance(DataRowStoreFactory.class));
 
 		dataDomain.initWithProperties(descriptor.getProperties());
+
+		dataDomain.initEntityResolver(descriptor.getMappingCache());
 
 		for (DataMap dataMap : descriptor.getDataMaps()) {
 			dataDomain.addDataMap(dataMap);

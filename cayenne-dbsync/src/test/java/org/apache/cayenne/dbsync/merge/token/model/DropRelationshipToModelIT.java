@@ -19,12 +19,6 @@
 
 package org.apache.cayenne.dbsync.merge.token.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
-
 import java.sql.Types;
 import java.util.List;
 
@@ -32,12 +26,23 @@ import org.apache.cayenne.dbsync.merge.MergeCase;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.junit.Test;
+
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertSame;
+import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class DropRelationshipToModelIT extends MergeCase {
 
@@ -76,18 +81,21 @@ public class DropRelationshipToModelIT extends MergeCase {
 		map.addDbEntity(dbEntity2);
 
 		// create db relationships
-		DbRelationship rel1To2 = new DbRelationship("rel1To2");
-		rel1To2.setSourceEntity(dbEntity1);
-		rel1To2.setTargetEntityName(dbEntity2);
-		rel1To2.setToMany(true);
-		rel1To2.addJoin(new DbJoin(rel1To2, e1col1.getName(), e2col2.getName()));
-		dbEntity1.addRelationship(rel1To2);
-		DbRelationship rel2To1 = new DbRelationship("rel2To1");
-		rel2To1.setSourceEntity(dbEntity2);
-		rel2To1.setTargetEntityName(dbEntity1);
-		rel2To1.setToMany(false);
-		rel2To1.addJoin(new DbJoin(rel2To1, e2col2.getName(), e1col1.getName()));
-		dbEntity2.addRelationship(rel2To1);
+		DbJoin dbJoin = new DbJoinBuilder()
+				.entities(new String[]{dbEntity1.getName(), dbEntity2.getName()})
+				.names(new String[]{"rel1To2", "rel2To1"})
+				.toManySemantics(ToManySemantics.ONE_TO_MANY)
+				.toDepPkSemantics(ToDependentPkSemantics.NONE)
+				.condition(new SinglePairCondition(new ColumnPair(e1col1.getName(), e2col2.getName())))
+				.dataMap(map)
+				.build();
+		map.addJoin(dbJoin);
+		dbJoin.compile(map);
+
+		DbRelationship rel1To2 = dbJoin.getRelationhsip();
+
+		DbRelationship rel2To1 = rel1To2.getReverseRelationship();
+
 		assertSame(rel1To2, rel2To1.getReverseRelationship());
 		assertSame(rel2To1, rel1To2.getReverseRelationship());
 
@@ -129,8 +137,7 @@ public class DropRelationshipToModelIT extends MergeCase {
 		assertSame(objRel2To1, objRel1To2.getReverseRelationship());
 
         // remove relationship and fk from model, merge to db and read to model
-        dbEntity2.removeRelationship(rel2To1.getName());
-        dbEntity1.removeRelationship(rel1To2.getName());
+        map.getDbJoinList().remove(dbJoin);
         dbEntity2.removeAttribute(e2col2.getName());
         List<MergerToken> tokens = createMergeTokens();
 
@@ -148,6 +155,7 @@ public class DropRelationshipToModelIT extends MergeCase {
 
         dbEntity2.addRelationship(rel2To1);
         dbEntity1.addRelationship(rel1To2);
+        map.addJoin(dbJoin);
         dbEntity2.addAttribute(e2col2);
 
 		// try do use the merger to remove the relationship in the model
@@ -157,7 +165,7 @@ public class DropRelationshipToModelIT extends MergeCase {
 		// order
 		MergerToken token0 = tokens.get(0).createReverse(mergerFactory());
 		MergerToken token1 = tokens.get(1).createReverse(mergerFactory());
-		if (!(token0 instanceof DropRelationshipToModel && token1 instanceof DropColumnToModel || token1 instanceof DropRelationshipToModel
+		if (!(token0 instanceof DropJoinToModel && token1 instanceof DropColumnToModel || token1 instanceof DropJoinToModel
 				&& token0 instanceof DropColumnToModel)) {
 			fail();
 		}
@@ -172,8 +180,7 @@ public class DropRelationshipToModelIT extends MergeCase {
 		assertEquals(0, objEntity2.getRelationships().size());
 
 		// clear up
-		dbEntity1.removeRelationship(rel1To2.getName());
-		dbEntity2.removeRelationship(rel2To1.getName());
+		map.getDbJoinList().remove(dbJoin);
 		map.removeObjEntity(objEntity1.getName(), true);
 		map.removeDbEntity(dbEntity1.getName(), true);
 		map.removeObjEntity(objEntity2.getName(), true);

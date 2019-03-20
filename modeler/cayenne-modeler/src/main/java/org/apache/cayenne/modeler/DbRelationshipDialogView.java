@@ -19,38 +19,32 @@
 
 package org.apache.cayenne.modeler;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import javax.swing.*;
+import java.awt.*;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.cayenne.modeler.dialog.DbRelationshipDialog;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
 import org.apache.cayenne.modeler.util.CayenneDialog;
 import org.apache.cayenne.modeler.util.CayenneTable;
 import org.apache.cayenne.modeler.util.PanelFactory;
+import org.apache.cayenne.modeler.util.TextAdapter;
+import org.apache.cayenne.validation.ValidationException;
 
 /**
  * @since 4.2
  */
 public class DbRelationshipDialogView extends CayenneDialog {
 
-    private JTextField name;
+    private TextAdapter name;
     private JComboBox<String> targetEntities;
     private JCheckBox toDepPk;
     private JCheckBox toMany;
-    private JTextField comment;
+    private TextAdapter comment;
     private JLabel sourceName;
-    private JTextField reverseName;
+    private TextAdapter reverseName;
     private CayenneTable table;
     private TableColumnPreferences tablePreferences;
     private JButton addButton;
@@ -60,23 +54,44 @@ public class DbRelationshipDialogView extends CayenneDialog {
 
     private boolean cancelPressed;
 
-    public DbRelationshipDialogView() {
-        super(Application.getFrame(), "Create dbRelationship", true);
+    private DbRelationshipDialog dbRelationshipDialog;
 
+    public DbRelationshipDialogView(DbRelationshipDialog dbRelationshipDialog) {
+        super(Application.getFrame(), "Create dbRelationship", true);
+        this.dbRelationshipDialog = dbRelationshipDialog;
         initView();
         this.pack();
         this.centerWindow();
     }
 
     private void initView() {
-        name = new JTextField(25);
+        JTextField nameField = new JTextField(25);
+        this.name = new TextAdapter(nameField) {
+            @Override
+            protected void updateModel(String text) throws ValidationException {
+                dbRelationshipDialog.getDbJoinModel().setLeftName(text);
+            }
+        };
         targetEntities = new JComboBox<>();
         toDepPk = new JCheckBox();
         toMany = new JCheckBox();
-        comment = new JTextField(25);
+        JTextField commentField = new JTextField(25);
+        this.comment = new TextAdapter(commentField) {
+            @Override
+            protected void updateModel(String text) throws ValidationException {
+                dbRelationshipDialog.getDbJoinModel().setComments(text);
+            }
+        };
 
         sourceName = new JLabel();
-        reverseName = new JTextField(25);
+
+        JTextField reverseNameField = new JTextField(25);
+        this.reverseName = new TextAdapter(reverseNameField) {
+            @Override
+            protected void updateModel(String text) throws ValidationException {
+                dbRelationshipDialog.getDbJoinModel().setRightName(text);
+            }
+        };
 
         addButton = new JButton("Add");
 
@@ -106,7 +121,7 @@ public class DbRelationshipDialogView extends CayenneDialog {
         builder.addSeparator("Create dbRelationship", cc.xywh(1, 1, 5, 1));
 
         builder.addLabel("Relationship Name:", cc.xy(1, 3));
-        builder.add(name, cc.xywh(3, 3, 1, 1));
+        builder.add(name.getComponent(), cc.xywh(3, 3, 1, 1));
 
         builder.addLabel("Source Entity:", cc.xy(1, 5));
         builder.add(sourceName, cc.xywh(3, 5, 1, 1));
@@ -121,12 +136,12 @@ public class DbRelationshipDialogView extends CayenneDialog {
         builder.add(toMany, cc.xywh(3, 11, 1, 1));
 
         builder.addLabel("Comment:", cc.xy(1, 13));
-        builder.add(comment, cc.xywh(3, 13, 1, 1));
+        builder.add(comment.getComponent(), cc.xywh(3, 13, 1, 1));
 
         builder.addSeparator("DbRelationship Information", cc.xywh(1, 15, 5, 1));
 
         builder.addLabel("Reverse Relationship Name:", cc.xy(1, 17));
-        builder.add(reverseName, cc.xywh(3, 17, 1, 1));
+        builder.add(reverseName.getComponent(), cc.xywh(3, 17, 1, 1));
 
         builder.addSeparator("Joins", cc.xywh(1, 19, 5, 1));
         builder.add(new JScrollPane(table), cc.xywh(1, 21, 3, 3, "fill, fill"));
@@ -144,7 +159,7 @@ public class DbRelationshipDialogView extends CayenneDialog {
 
     public void enableOptions(boolean enable) {
         saveButton.setEnabled(enable);
-        reverseName.setEnabled(enable);
+        reverseName.getComponent().setEnabled(enable);
         addButton.setEnabled(enable);
         removeButton.setEnabled(enable);
     }
@@ -157,7 +172,7 @@ public class DbRelationshipDialogView extends CayenneDialog {
         super.setVisible(b);
     }
 
-    public JTextField getNameField() {
+    public TextAdapter getNameField() {
         return name;
     }
 
@@ -173,7 +188,7 @@ public class DbRelationshipDialogView extends CayenneDialog {
         return toMany;
     }
 
-    public JTextField getComment() {
+    public TextAdapter getComment() {
         return comment;
     }
 
@@ -181,7 +196,7 @@ public class DbRelationshipDialogView extends CayenneDialog {
         return sourceName;
     }
 
-    public JTextField getReverseName() {
+    public TextAdapter getReverseName() {
         return reverseName;
     }
 

@@ -41,11 +41,12 @@ import org.apache.cayenne.ashwood.graph.MapDigraph;
 import org.apache.cayenne.ashwood.graph.StrongConnection;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.EntitySorter;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.query.ObjectIdQuery;
 import org.apache.cayenne.reflect.ClassDescriptor;
 
@@ -124,27 +125,43 @@ public class AshwoodEntitySorter implements EntitySorter {
 				if ((!candidate.isToMany() && !candidate.isToDependentPK()) || candidate.isToMasterPK()) {
 					DbEntity origin = candidate.getTargetEntity();
 					final AtomicBoolean newReflexive = new AtomicBoolean(destination.equals(origin));
+					candidate.accept(new DirectionalJoinVisitor<Void>() {
 
-					candidate.getJoin().accept(join -> {
-						DbAttribute targetAttribute = join.getTarget();
-						if (targetAttribute.isPrimaryKey()) {
+						private void build(DbAttribute target) {
+							if (target.isPrimaryKey()) {
 
-							if (newReflexive.get()) {
-								List<DbRelationship> reflexiveRels = reflexiveDbEntities
-										.computeIfAbsent(destination, k -> new ArrayList<>(1));
-								reflexiveRels.add(candidate);
-								newReflexive.set(false);
+								if (newReflexive.get()) {
+									List<DbRelationship> reflexiveRels = reflexiveDbEntities
+											.computeIfAbsent(destination, k ->
+													new ArrayList<>(1));
+									reflexiveRels.add(candidate);
+									newReflexive.set(false);
+								}
+
+								List<DbAttribute> fks = referentialDigraph.getArc(origin, destination);
+								if (fks == null) {
+									fks = new ArrayList<>();
+									referentialDigraph.putArc(origin, destination, fks);
+								}
+
+								fks.add(target);
 							}
-
-							List<DbAttribute> fks = referentialDigraph.getArc(origin, destination);
-							if (fks == null) {
-								fks = new ArrayList<>();
-								referentialDigraph.putArc(origin, destination, fks);
-							}
-
-							fks.add(targetAttribute);
 						}
-						return true;
+
+						@Override
+						public Void visit(DbAttribute[] source, DbAttribute[] target) {
+							int length = source.length;
+							for(int i = 0; i < length; i++) {
+								build(target[i]);
+							}
+							return null;
+						}
+
+						@Override
+						public Void visit(DbAttribute source, DbAttribute target) {
+							build(target);
+							return null;
+						}
 					});
 				}
 			}

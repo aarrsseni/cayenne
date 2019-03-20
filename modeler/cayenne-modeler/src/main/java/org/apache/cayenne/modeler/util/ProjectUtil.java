@@ -44,6 +44,8 @@ import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
 import org.apache.cayenne.map.QueryDescriptor;
 import org.apache.cayenne.map.Relationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.modeler.ProjectController;
 import org.apache.cayenne.util.Util;
 
@@ -342,9 +344,22 @@ public class ProjectUtil {
             return false;
         }
 
-        boolean sourceAttrNotFound = relationship.getJoin()
-                .accept(join -> join.getSource() != attribute);
-        return !sourceAttrNotFound;
+        return relationship.accept(new DirectionalJoinVisitor<Boolean>() {
+            @Override
+            public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                for(DbAttribute src : source) {
+                    if(src == attribute) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public Boolean visit(DbAttribute source, DbAttribute target) {
+                return source == attribute;
+            }
+        });
     }
 
     /**
@@ -357,9 +372,22 @@ public class ProjectUtil {
             return false;
         }
 
-        boolean targetAttrNotFound = relationship.getJoin()
-                .accept(join -> join.getTarget() != attribute);
-        return !targetAttrNotFound;
+        return relationship.accept(new DirectionalJoinVisitor<Boolean>() {
+            @Override
+            public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                for(DbAttribute targetAttr : target) {
+                    if(targetAttr == attribute) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public Boolean visit(DbAttribute source, DbAttribute target) {
+                return target == attribute;
+            }
+        });
     }
 
     /**

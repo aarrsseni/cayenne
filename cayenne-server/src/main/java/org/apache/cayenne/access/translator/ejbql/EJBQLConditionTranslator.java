@@ -47,8 +47,9 @@ import org.apache.cayenne.ejbql.parser.Node;
 import org.apache.cayenne.ejbql.parser.SimpleNode;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.reflect.AttributeProperty;
 import org.apache.cayenne.reflect.ClassDescriptor;
 import org.apache.cayenne.reflect.PropertyDescriptor;
@@ -193,11 +194,29 @@ public class EJBQLConditionTranslator extends EJBQLBaseVisitor {
 
         final List<String> stringList = new ArrayList<>();
         String finalSubqueryRootAlias = subqueryRootAlias;
-        correlatedJoinRelationship.getJoin().accept(join -> {
-            String builtString = " " + finalSubqueryRootAlias + '.' + join.getTargetName() + " = " +
-                    correlatedTableAlias + '.' + quoter.quotedSourceName(join);
-            stringList.add(builtString);
-            return true;
+        correlatedJoinRelationship.accept(new DirectionalJoinVisitor<Void>() {
+
+            private void buildString(DbAttribute source, DbAttribute target) {
+                String builtString = " " + finalSubqueryRootAlias + '.' + target.getName() + " = " +
+                        correlatedTableAlias + '.' +
+                        quoter.quotedIdentifier(source.getEntity().getDataMap(), source.getName());
+                stringList.add(builtString);
+            }
+
+            @Override
+            public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                int length = source.length;
+                for(int i = 0; i < length; i++) {
+                    buildString(source[i], target[i]);
+                }
+                return null;
+            }
+
+            @Override
+            public Void visit(DbAttribute source, DbAttribute target) {
+                buildString(source, target);
+                return null;
+            }
         });
         context.append(Util.join(stringList, " AND"));
         context.append(")");
@@ -273,11 +292,32 @@ public class EJBQLConditionTranslator extends EJBQLBaseVisitor {
         DbRelationship correlatedJoinRelationship = context.getIncomingRelationships(new EJBQLTableId(id)).get(0);
 
         String finalSubqueryRootAlias = subqueryRootAlias;
-        correlatedJoinRelationship.getJoin().accept(join -> {
-            context.append(' ').append(finalSubqueryRootAlias).append('.').append(join.getTargetName()).append(" = ");
-            context.append(correlatedTableAlias).append('.').append(quoter.quotedSourceName(join));
-            context.append(" AND");
-            return true;
+        correlatedJoinRelationship.accept(new DirectionalJoinVisitor<Void>() {
+
+            private void buildContext(DbAttribute source, DbAttribute target) {
+                context.append(' ').append(finalSubqueryRootAlias).append('.').append(target.getName()).append(" = ");
+                context.append(correlatedTableAlias).append('.')
+                        .append(quoter.quotedIdentifier(source
+                                        .getEntity()
+                                        .getDataMap(),
+                                source.getName()));
+                context.append(" AND");
+            }
+
+            @Override
+            public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                int length = source.length;
+                for(int i = 0; i < length; i++) {
+                    buildContext(source[i], target[i]);
+                }
+                return null;
+            }
+
+            @Override
+            public Void visit(DbAttribute source, DbAttribute target) {
+                buildContext(source, target);
+                return null;
+            }
         });
 
         // translate subquery_root_id = LHS_of_memberof
@@ -314,7 +354,7 @@ public class EJBQLConditionTranslator extends EJBQLBaseVisitor {
 
             context.append(" JOIN ");
 
-            String subquerySourceTableName = quoter.quotedFullyQualifiedName((DbEntity) dbRelationship
+            String subquerySourceTableName = quoter.quotedFullyQualifiedName(dbRelationship
                     .getSourceEntity());
             String subquerySourceAlias = context.getTableAlias(subquerySourceTableName, subquerySourceTableName);
 
@@ -323,11 +363,28 @@ public class EJBQLConditionTranslator extends EJBQLBaseVisitor {
             context.append(" ON (");
 
             final List<String> stringList = new ArrayList<>();
-            dbRelationship.getJoin().accept(join -> {
-                String resultStr = " " + subqueryTargetAlias + '.' + join.getTargetName() + " = " +
-                        subquerySourceAlias + '.' + join.getSourceName();
-                stringList.add(resultStr);
-                return true;
+            dbRelationship.accept(new DirectionalJoinVisitor<Void>() {
+
+                private void buildString(DbAttribute source, DbAttribute target) {
+                    String resultStr = " " + subqueryTargetAlias + '.' + target.getName() + " = " +
+                            subquerySourceAlias + '.' + source.getName();
+                    stringList.add(resultStr);
+                }
+
+                @Override
+                public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                    int length = source.length;
+                    for(int i = 0; i < length; i++) {
+                        buildString(source[i], target[i]);
+                    }
+                    return null;
+                }
+
+                @Override
+                public Void visit(DbAttribute source, DbAttribute target) {
+                    buildString(source, target);
+                    return null;
+                }
             });
 
             context.append(Util.join(stringList, " AND"));

@@ -19,20 +19,27 @@
 
 package org.apache.cayenne.map;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.cayenne.configuration.server.ServerRuntime;
 import org.apache.cayenne.di.Inject;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.apache.cayenne.unit.di.server.CayenneProjects;
 import org.apache.cayenne.unit.di.server.ServerCase;
 import org.apache.cayenne.unit.di.server.UseServerRuntime;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
 @UseServerRuntime(CayenneProjects.TESTMAP_PROJECT)
@@ -89,34 +96,38 @@ public class DbRelationshipIT extends ServerCase {
         // assemble mockup entity
         DataMap namespace = new DataMap();
         DbEntity e = new DbEntity("test");
+        DbAttribute a1 = new DbAttribute("a1");
+        DbAttribute a2 = new DbAttribute("a2");
+        e.addAttribute(a1);
+        e.addAttribute(a2);
         namespace.addDbEntity(e);
-        DbRelationship rforward = new DbRelationship("rforward");
-        e.addRelationship(rforward);
-        rforward.setSourceEntity(e);
-        rforward.setTargetEntityName(e);
+        DbJoin dbJoin1 = new DbJoinBuilder()
+                .entities(new String[]{e.getName(), e.getName()})
+                .names(new String[]{"rforward", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("a1", "a2")))
+                .dataMap(namespace)
+                .build();
+        dbJoin1.compile(namespace);
+        DbRelationship rforward = dbJoin1.getRelationhsip();
 
-        assertNull(rforward.getReverseRelationship());
+        assertNotNull(rforward.getReverseRelationship());
 
-        // add a joins
-        e.addAttribute(new DbAttribute("a1"));
-        e.addAttribute(new DbAttribute("a2"));
-        rforward.addJoin(new DbJoin(rforward, "a1", "a2"));
+        DbJoin dbJoin2 = new DbJoinBuilder()
+                .entities(new String[]{e.getName(), e.getName()})
+                .names(new String[]{"rback", null})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("a2", "a1")))
+                .dataMap(namespace)
+                .build();
+        dbJoin2.compile(namespace);
+        DbRelationship rback = dbJoin2.getRelationhsip();
 
-        assertNull(rforward.getReverseRelationship());
+        assertNotNull(rback.getReverseRelationship());
 
-        // create reverse
-
-        DbRelationship rback = new DbRelationship("rback");
-        e.addRelationship(rback);
-        rback.setSourceEntity(e);
-        rback.setTargetEntityName(e);
-
-        assertNull(rforward.getReverseRelationship());
-
-        // create reverse join
-        rback.addJoin(new DbJoin(rback, "a2", "a1"));
-
-        assertSame(rback, rforward.getReverseRelationship());
-        assertSame(rforward, rback.getReverseRelationship());
+        assertNotSame(rback, rforward.getReverseRelationship());
+        assertNotSame(rforward, rback.getReverseRelationship());
     }
 }

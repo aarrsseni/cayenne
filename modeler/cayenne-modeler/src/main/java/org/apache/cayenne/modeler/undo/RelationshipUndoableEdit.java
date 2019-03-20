@@ -21,15 +21,18 @@ package org.apache.cayenne.modeler.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.map.event.RelationshipEvent;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.ProjectController;
+import org.apache.cayenne.modeler.dialog.model.DbRelationshipModelConverter;
+import org.apache.cayenne.modeler.map.relationship.DbJoinModel;
+import org.apache.cayenne.modeler.map.relationship.DbJoinMutable;
+import org.apache.cayenne.project.extension.info.ObjectInfo;
 
 public class RelationshipUndoableEdit extends CayenneUndoableEdit {
 
@@ -40,6 +43,9 @@ public class RelationshipUndoableEdit extends CayenneUndoableEdit {
     private ProjectController projectController;
     private boolean useDb;
 
+    private DbJoinModel dbJoinModel;
+    private DbJoinModel prevDbJoinModel;
+
 	public RelationshipUndoableEdit(Relationship relationship) {
 		this.projectController = Application.getInstance().getFrameController().getProjectController();
 		this.relationship = relationship;
@@ -47,31 +53,38 @@ public class RelationshipUndoableEdit extends CayenneUndoableEdit {
 		this.prevRelationship = copyRelationship(relationship);
 	}
 
+	public RelationshipUndoableEdit(DbJoinModel dbJoinModel, DbRelationship relationship) {
+		this.projectController = Application.getInstance().getFrameController().getProjectController();
+		this.relationship = relationship;
+		this.dbJoinModel = dbJoinModel;
+		this.prevDbJoinModel = copyDbJoinModel(dbJoinModel);
+		this.useDb = true;
+	}
+
     @Override
 	public void redo() throws CannotRedoException {
-		fireRelationshipEvent(relationship, prevRelationship);
+		fireEvent(dbJoinModel, relationship, prevRelationship);
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
-		fireRelationshipEvent(prevRelationship, relationship);
+		fireEvent(prevDbJoinModel, prevRelationship, relationship);
 	}
 
-	private void fireRelationshipEvent(Relationship relToFire, Relationship currRel) {
+	private void fireEvent(DbJoinModel dbJoinModel,
+						   Relationship prevRelationship,
+						   Relationship relationship) {
 		if(useDb) {
-			fireDbRelationshipEvent(relToFire, currRel);
+			fireDbRelationshipEvent(buildRelationshipFromModel(dbJoinModel));
 		} else {
-			fireObjRelationshipEvent(relToFire, currRel);
+			fireObjRelationshipEvent(prevRelationship, relationship);
 		}
 	}
 
-	private void fireDbRelationshipEvent(Relationship relToFire, Relationship currRel) {
-		DbEntity dbEntity = ((DbRelationship)currRel).getSourceEntity();
-		dbEntity.removeRelationship(currRel.getName());
-		dbEntity.addRelationship(relToFire);
+	private void fireDbRelationshipEvent(Relationship relToFire) {
 		projectController
 				.fireDbRelationshipEvent(
-						new RelationshipEvent(this, relToFire, relToFire.getSourceEntity(), MapEvent.ADD));
+						new RelationshipEvent(this, relToFire, relToFire.getSourceEntity(), MapEvent.CHANGE));
 	}
 
 	private void fireObjRelationshipEvent(Relationship relToFire, Relationship currRel) {
@@ -93,19 +106,30 @@ public class RelationshipUndoableEdit extends CayenneUndoableEdit {
 		return "Undo Edit relationship";
 	}
 
-	private Relationship copyRelationship(Relationship relationship) {
-		return useDb ? getDbRelationship(relationship) : getObjRelationship(relationship);
+	private Relationship buildRelationshipFromModel(DbJoinModel dbJoinModel) {
+		DbJoinMutable dbJoin = new DbRelationshipModelConverter()
+				.updateDbRelationships(dbJoinModel, (DbRelationship) relationship);
+		DbRelationship currRelationship = dbJoin.getRelationship(((DbRelationship) relationship).getDirection());
+		ObjectInfo.putToMetaData(projectController.getApplication().getMetaData(),
+				currRelationship.getDbJoin(),
+				ObjectInfo.COMMENT, dbJoinModel.getComment());
+		return currRelationship;
 	}
 
-	private DbRelationship getDbRelationship(Relationship dbRelationship) {
-		DbRelationship rel = new DbRelationship();
-		rel.setName(dbRelationship.getName());
-		rel.setToDependentPK(((DbRelationship)dbRelationship).isToDependentPK());
-		rel.setToMany(dbRelationship.isToMany());
-		rel.setTargetEntityName(dbRelationship.getTargetEntityName());
-		rel.setSourceEntity(dbRelationship.getSourceEntity());
-		rel.setJoins(((DbRelationship)dbRelationship).getJoin());
-		return rel;
+	private DbJoinModel copyDbJoinModel(DbJoinModel dbJoinModel) {
+		DbJoinModel copiedDbJoinModel = new DbJoinModel();
+		copiedDbJoinModel.setDbEntities(dbJoinModel.getDbEntities().clone());
+		copiedDbJoinModel.setNames(dbJoinModel.getNames().clone());
+		copiedDbJoinModel.setToMany(dbJoinModel.getToMany().clone());
+		copiedDbJoinModel.setToDepPK(dbJoinModel.getToDepPK().clone());
+		copiedDbJoinModel.setComments(dbJoinModel.getComment());
+		copiedDbJoinModel.setColumnPairs(dbJoinModel.getColumnPairs());
+		copiedDbJoinModel.setDataMap(dbJoinModel.getDataMap());
+		return copiedDbJoinModel;
+	}
+
+	private Relationship copyRelationship(Relationship relationship) {
+		return getObjRelationship(relationship);
 	}
 
 	private ObjRelationship getObjRelationship(Relationship objRelationship) {

@@ -40,7 +40,9 @@ public class EntityLoaderIT extends BaseLoaderIT {
     public void testGetTablesWithWrongCatalog() throws Exception {
         DbLoaderConfiguration config = new DbLoaderConfiguration();
         config.setFiltersConfig(
-                FiltersConfig.create("WRONG", null, TableFilter.everything(), PatternFilter.INCLUDE_NOTHING)
+                FiltersConfig.create("WRONG", null,
+                        TableFilter.everything(),
+                        PatternFilter.INCLUDE_NOTHING)
         );
 
         EntityLoader loader = new EntityLoader(adapter, config, new DefaultDbLoaderDelegate());
@@ -58,7 +60,9 @@ public class EntityLoaderIT extends BaseLoaderIT {
     public void testGetTablesWithWrongSchema() throws Exception {
         DbLoaderConfiguration config = new DbLoaderConfiguration();
         config.setFiltersConfig(
-                FiltersConfig.create(null, "WRONG", TableFilter.everything(), PatternFilter.INCLUDE_NOTHING)
+                FiltersConfig.create(null, "WRONG",
+                        TableFilter.everything(),
+                        PatternFilter.INCLUDE_NOTHING)
         );
 
         EntityLoader loader = new EntityLoader(adapter, config, new DefaultDbLoaderDelegate());

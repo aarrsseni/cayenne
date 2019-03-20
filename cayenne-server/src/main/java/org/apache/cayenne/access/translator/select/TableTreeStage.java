@@ -23,6 +23,7 @@ import org.apache.cayenne.access.sqlbuilder.ExpressionNodeBuilder;
 import org.apache.cayenne.access.sqlbuilder.JoinNodeBuilder;
 import org.apache.cayenne.access.sqlbuilder.NodeBuilder;
 import org.apache.cayenne.map.DbAttribute;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 
 import static org.apache.cayenne.access.sqlbuilder.SQLBuilder.*;
 
@@ -54,20 +55,37 @@ class TableTreeStage implements TranslationStage {
     }
 
     private NodeBuilder getJoinExpression(TranslatorContext context, TableTreeNode node) {
-        final ExpressionNodeBuilder[] expressionNodeBuilder = {null};
         String sourceAlias = context.getTableTree().aliasForPath(node.getAttributePath().getParent());
-        node.getRelationship().getJoin().accept(join -> {
-            DbAttribute src = join.getSource();
-            DbAttribute dst = join.getTarget();
-            ExpressionNodeBuilder joinExp = table(sourceAlias).column(src)
-                    .eq(table(node.getTableAlias()).column(dst));
+        ExpressionNodeBuilder expressionNodeBuilder = node.getRelationship()
+                .accept(new DirectionalJoinVisitor<ExpressionNodeBuilder>() {
 
-            if (expressionNodeBuilder[0] != null) {
-                expressionNodeBuilder[0] = expressionNodeBuilder[0].and(joinExp);
-            } else {
-                expressionNodeBuilder[0] = joinExp;
+            private ExpressionNodeBuilder expressionNodeBuilder;
+
+            private void buildExpressionNode(DbAttribute source, DbAttribute target) {
+                ExpressionNodeBuilder joinExp = table(sourceAlias).column(source)
+                        .eq(table(node.getTableAlias()).column(target));
+
+                if (expressionNodeBuilder != null) {
+                    expressionNodeBuilder = expressionNodeBuilder.and(joinExp);
+                } else {
+                    expressionNodeBuilder = joinExp;
+                }
             }
-            return true;
+
+            @Override
+            public ExpressionNodeBuilder visit(DbAttribute[] source, DbAttribute[] target) {
+                int length = source.length;
+                for(int i = 0; i < length; i++) {
+                    buildExpressionNode(source[i], target[i]);
+                }
+                return expressionNodeBuilder;
+            }
+
+            @Override
+            public ExpressionNodeBuilder visit(DbAttribute source, DbAttribute target) {
+                buildExpressionNode(source, target);
+                return expressionNodeBuilder;
+            }
         });
 
         return expressionNodeBuilder;

@@ -18,25 +18,30 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge;
 
+import java.sql.Types;
+import java.util.Arrays;
+
 import org.apache.cayenne.dbsync.filter.NamePatternMatcher;
 import org.apache.cayenne.dbsync.merge.context.EntityMergeSupport;
 import org.apache.cayenne.dbsync.naming.DefaultObjectNameGenerator;
 import org.apache.cayenne.dbsync.naming.NoStemStemmer;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.DeleteRule;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.junit.Test;
 
-import java.sql.Types;
-import java.util.Arrays;
-
+import static junit.framework.TestCase.assertSame;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 public class EntityMergeSupportIT extends MergeCase {
 
@@ -67,18 +72,19 @@ public class EntityMergeSupportIT extends MergeCase {
 		map.addDbEntity(dbEntity2);
 
 		// create db relationships
-		DbRelationship rel1To2 = new DbRelationship("rel1To2");
-		rel1To2.setSourceEntity(dbEntity1);
-		rel1To2.setTargetEntityName(dbEntity2);
-		rel1To2.setToMany(true);
-		rel1To2.addJoin(new DbJoin(rel1To2, e1col1.getName(), e2col2.getName()));
-		dbEntity1.addRelationship(rel1To2);
-		DbRelationship rel2To1 = new DbRelationship("rel2To1");
-		rel2To1.setSourceEntity(dbEntity2);
-		rel2To1.setTargetEntityName(dbEntity1);
-		rel2To1.setToMany(false);
-		rel2To1.addJoin(new DbJoin(rel2To1, e2col2.getName(), e1col1.getName()));
-		dbEntity2.addRelationship(rel2To1);
+		DbJoin dbJoin1 = new DbJoinBuilder()
+				.entities(new String[]{dbEntity1.getName(), dbEntity2.getName()})
+				.names(new String[]{"rel1To2", "rel2To1"})
+				.toManySemantics(ToManySemantics.ONE_TO_MANY)
+				.toDepPkSemantics(ToDependentPkSemantics.NONE)
+				.condition(new SinglePairCondition(new ColumnPair(e1col1.getName(), e2col2.getName())))
+				.dataMap(map)
+				.build();
+		dbJoin1.compile(map);
+
+		DbRelationship rel1To2 = dbJoin1.getRelationhsip();
+		DbRelationship rel2To1 = rel1To2.getReverseRelationship();
+
 		assertSame(rel1To2, rel2To1.getReverseRelationship());
 		assertSame(rel2To1, rel1To2.getReverseRelationship());
 

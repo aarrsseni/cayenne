@@ -19,7 +19,7 @@
 
 package org.apache.cayenne.modeler.event;
 
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.Relationship;
 import org.apache.cayenne.map.event.RelationshipEvent;
 import org.junit.Test;

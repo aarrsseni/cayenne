@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.relationships_child_master"/>
 	<db-entity name="CHILD">
 		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
@@ -16,12 +16,13 @@
 	<obj-entity name="Master" className="org.apache.cayenne.testdo.relationships_child_master.Master" dbEntityName="MASTER">
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
 	</obj-entity>
-	<db-relationship name="master" source="CHILD" target="MASTER">
-		<db-attribute-pair source="MASTER_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="children" source="MASTER" target="CHILD" toMany="true">
-		<db-attribute-pair source="ID" target="MASTER_ID"/>
-	</db-relationship>
+	<db-join toMany="MANY_TO_ONE" toDependentPK="NONE">
+		<left entity="CHILD" name="master"/>
+		<right entity="MASTER" name="children"/>
+		<db-join-condition>
+			<column-pair left="MASTER_ID" right="ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="master" source="Child" target="Master" deleteRule="Nullify" db-relationship-path="master"/>
 	<obj-relationship name="children" source="Master" target="Child" deleteRule="Deny" db-relationship-path="children"/>
 </data-map>

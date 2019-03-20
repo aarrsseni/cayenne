@@ -19,13 +19,12 @@
 
 package org.apache.cayenne.project.upgrade;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.cayenne.project.upgrade.handlers.UpgradeHandler;
 import org.apache.cayenne.resource.Resource;
@@ -37,7 +36,8 @@ import org.mockito.ArgumentMatchers;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -65,9 +65,12 @@ public class DefaultUpgradeServiceTest {
         assertEquals(UpgradeType.UPGRADE_NEEDED, metaData.getUpgradeType());
 
         metaData = upgradeService.getUpgradeType(getResourceForVersion("10"));
-        assertEquals(UpgradeType.UPGRADE_NOT_NEEDED, metaData.getUpgradeType());
+        assertEquals(UpgradeType.UPGRADE_NEEDED, metaData.getUpgradeType());
 
         metaData = upgradeService.getUpgradeType(getResourceForVersion("11"));
+        assertEquals(UpgradeType.UPGRADE_NOT_NEEDED, metaData.getUpgradeType());
+
+        metaData = upgradeService.getUpgradeType(getResourceForVersion("12"));
         assertEquals(UpgradeType.DOWNGRADE_NEEDED, metaData.getUpgradeType());
     }
 
@@ -75,11 +78,11 @@ public class DefaultUpgradeServiceTest {
     public void getHandlersForVersion() throws Exception {
 
         List<UpgradeHandler> handlers = upgradeService.getHandlersForVersion("6");
-        assertEquals(4, handlers.size());
+        assertEquals(5, handlers.size());
 
-        handlers = upgradeService.getHandlersForVersion("9");
+        handlers = upgradeService.getHandlersForVersion("10");
         assertEquals(1, handlers.size());
-        assertEquals("10", handlers.get(0).getVersion());
+        assertEquals("11", handlers.get(0).getVersion());
     }
 
     @Test
@@ -134,7 +137,7 @@ public class DefaultUpgradeServiceTest {
     @Test
     public void readDocument() throws Exception {
         Document document = Util.readDocument(getClass().getResource("../cayenne-PROJECT1.xml"));
-        assertEquals("10", document.getDocumentElement().getAttribute("project-version"));
+        assertEquals("11", document.getDocumentElement().getAttribute("project-version"));
     }
 
     private Document readDocument(URL url) throws Exception {
@@ -144,7 +147,7 @@ public class DefaultUpgradeServiceTest {
 
     private void createHandlers() {
         handlers = new ArrayList<>();
-        String[] versions = {"7", "8", "9", "10"};
+        String[] versions = {"7", "8", "9", "10", "11"};
         for(String version : versions) {
             handlers.add(createHandler(version));
         }

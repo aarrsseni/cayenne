@@ -44,6 +44,14 @@ import org.apache.cayenne.map.event.DbRelationshipListener;
 import org.apache.cayenne.map.event.EntityEvent;
 import org.apache.cayenne.map.event.MapEvent;
 import org.apache.cayenne.map.event.RelationshipEvent;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.ColumnPairsCondition;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinCondition;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
+import org.apache.cayenne.map.relationship.JoinVisitor;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
 import org.apache.cayenne.util.CayenneMapEntry;
 import org.apache.cayenne.util.Util;
 import org.apache.cayenne.util.XMLEncoder;
@@ -240,7 +248,67 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
         if (map != null) {
             for (DbEntity ent : map.getDbEntities()) {
                 for (DbRelationship relationship : ent.getRelationships()) {
-                    relationship.getJoins().removeIf(join -> join.getSource() == attr || join.getTarget() == attr);
+                    // TODO make it better
+                    boolean foundAttr = relationship.accept(new DirectionalJoinVisitor<Boolean>() {
+
+                        private boolean foundAttr(DbAttribute source, DbAttribute target) {
+                            return source == attr || target == attr;
+                        }
+
+                        @Override
+                        public Boolean visit(DbAttribute[] source, DbAttribute[] target) {
+                            int length = source.length;
+                            for(int i = 0; i < length; i++) {
+                                if(foundAttr(source[i], target[i])) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+
+                        @Override
+                        public Boolean visit(DbAttribute source, DbAttribute target) {
+                            return foundAttr(source, target);
+                        }
+                    });
+                    if(foundAttr) {
+                        DbJoin dbJoin = relationship.getDbJoin();
+                        DbJoinCondition condition = dbJoin.getDbJoinCondition();
+                        if(condition instanceof SinglePairCondition) {
+                            relationship.getSourceEntity()
+                                    .removeRelationship(relationship.getName());
+                            relationship.getTargetEntity()
+                                    .removeRelationship(relationship.getReverseRelationship().getName());
+                            dataMap.getDbJoinList().remove(dbJoin);
+                        } else if(condition instanceof ColumnPairsCondition) {
+                            ColumnPairsCondition columnPairsCondition = (ColumnPairsCondition) condition;
+                            List<ColumnPair> columnPairs = columnPairsCondition
+                                    .accept(new JoinVisitor<List<ColumnPair>>() {
+                                @Override
+                                public List<ColumnPair> visit(ColumnPair columnPair) {
+                                    return Collections.emptyList();
+                                }
+
+                                @Override
+                                public List<ColumnPair> visit(ColumnPair[] columnPairs) {
+                                    List<ColumnPair> resultColumnPair = new ArrayList<>();
+                                    for(ColumnPair columnPair : columnPairs) {
+                                        if(!columnPair.getLeft().equals(attrName) &&
+                                                !columnPair.getRight().equals(attrName)) {
+                                            resultColumnPair.add(columnPair);
+                                        }
+                                    }
+                                    return resultColumnPair;
+                                }
+                            });
+                            DbJoinCondition dbJoinCondition = columnPairs.size() == 1 ?
+                                    new SinglePairCondition(columnPairs.get(0)) :
+                                    new ColumnPairsCondition(columnPairs.toArray(new ColumnPair[0]));
+                            dbJoin.setCondition(dbJoinCondition);
+                            relationship.updatePairsHandler();
+                            relationship.getReverseRelationship().updatePairsHandler();
+                        }
+                    }
                 }
             }
         }
@@ -435,14 +503,31 @@ public class DbEntity extends Entity implements ConfigurationNode, DbEntityListe
                     // handle all of the relationships / joins that use the
                     // changed attribute
                     for (DbRelationship rel : ent.getRelationships()) {
-                        rel.getJoin().accept(join -> {
-                            if (join.getSource() == dbAttribute) {
-                                join.setSourceName(newName);
+                        rel.accept(new DirectionalJoinVisitor<Void>() {
+
+                            private void updateAttr(DbAttribute source, DbAttribute target) {
+                                if (source == dbAttribute) {
+                                    source.setName(newName);
+                                }
+                                if (target == dbAttribute) {
+                                    target.setName(newName);
+                                }
                             }
-                            if (join.getTarget() == dbAttribute) {
-                                join.setTargetName(newName);
+
+                            @Override
+                            public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                                int length = source.length;
+                                for(int i = 0; i < length; i++) {
+                                    updateAttr(source[i], target[i]);
+                                }
+                                return null;
                             }
-                            return true;
+
+                            @Override
+                            public Void visit(DbAttribute source, DbAttribute target) {
+                                updateAttr(source, target);
+                                return null;
+                            }
                         });
                     }
                 }

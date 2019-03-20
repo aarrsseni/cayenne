@@ -19,10 +19,10 @@
 
 package org.apache.cayenne.dbsync.reverse.dbimport;
 
-import org.apache.cayenne.util.Util;
-
 import java.util.Collection;
 import java.util.LinkedList;
+
+import org.apache.cayenne.util.Util;
 
 
 /**
@@ -190,7 +190,8 @@ public abstract class FilterContainer {
     public boolean isEmptyContainer() {
         return includeColumnCollection.isEmpty()    && excludeColumnCollection.isEmpty()
             && includeTableCollection.isEmpty()     && excludeTableCollection.isEmpty()
-            && includeProcedureCollection.isEmpty() && excludeProcedureCollection.isEmpty() && excludeRelationshipCollection.isEmpty();
+            && includeProcedureCollection.isEmpty() && excludeProcedureCollection.isEmpty()
+                && excludeRelationshipCollection.isEmpty();
     }
 
     static boolean isBlank(Collection<?> collection) {

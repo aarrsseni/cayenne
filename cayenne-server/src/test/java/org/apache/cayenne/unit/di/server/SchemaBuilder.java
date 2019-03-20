@@ -19,6 +19,21 @@
 
 package org.apache.cayenne.unit.di.server;
 
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.cayenne.access.DataDomain;
 import org.apache.cayenne.access.DataNode;
 import org.apache.cayenne.access.DbGenerator;
@@ -42,21 +57,6 @@ import org.apache.cayenne.testdo.extended_type.StringET1ExtendedType;
 import org.apache.cayenne.unit.UnitDbAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Default implementation of the AccessStack that has a single DataNode per DataMap.
@@ -132,6 +132,10 @@ public class SchemaBuilder {
 				initNode(map);
 			}
 
+			for(DataMap map : maps) {
+				map.getDbJoinList().forEach(dbJoin -> dbJoin.compile(map));
+			}
+
 			if ("true".equalsIgnoreCase(System.getProperty(SKIP_SCHEMA_KEY))) {
 				logger.info("skipping schema generation... ");
 			} else {
@@ -146,7 +150,6 @@ public class SchemaBuilder {
 	}
 
 	private void initNode(DataMap map) {
-
 		DataNode node = new DataNode(map.getName());
 		node.setJdbcEventLogger(jdbcEventLogger);
 		node.setAdapter(dbAdapter);
@@ -159,7 +162,6 @@ public class SchemaBuilder {
 		for (Procedure proc : map.getProcedures()) {
 			unitDbAdapter.tweakProcedure(proc);
 		}
-		filterDataMap(map);
 
 		node.addDataMap(map);
 

@@ -18,6 +18,9 @@
  */
 package org.apache.cayenne.dbsync.naming;
 
+import java.util.Objects;
+import java.util.function.Predicate;
+
 import org.apache.cayenne.configuration.ConfigurationNode;
 import org.apache.cayenne.configuration.ConfigurationNodeVisitor;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
@@ -25,7 +28,6 @@ import org.apache.cayenne.configuration.DataNodeDescriptor;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.Embeddable;
 import org.apache.cayenne.map.EmbeddableAttribute;
 import org.apache.cayenne.map.ObjAttribute;
@@ -34,9 +36,8 @@ import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.map.Procedure;
 import org.apache.cayenne.map.ProcedureParameter;
 import org.apache.cayenne.map.QueryDescriptor;
-
-import java.util.Objects;
-import java.util.function.Predicate;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 
 /**
  * @since 4.0
@@ -134,6 +135,11 @@ class DeduplicationVisitor implements ConfigurationNodeVisitor<String> {
     }
 
     @Override
+    public String visitDbJoin(DbJoin dbJoin) {
+        return resolveNamesForDbJoin();
+    }
+
+    @Override
     public String visitProcedure(Procedure procedure) {
         return resolve(name -> ((DataMap) parent).getProcedure(name) != null);
     }
@@ -169,6 +175,28 @@ class DeduplicationVisitor implements ConfigurationNodeVisitor<String> {
         }
 
         return name;
+    }
+
+    private String resolveNamesForDbJoin() {
+        return resolve(name -> {
+            DbJoin dbJoin = (DbJoin) parent;
+            DataMap dataMap = dbJoin.getDataMap();
+            String[] entities = dbJoin.getDbEntities();
+            for(DbJoin currJoin : dataMap.getDbJoinList()) {
+                String[] currJoinNames = currJoin.getNames();
+                String[] currDbEntities = currJoin.getDbEntities();
+                if((entities[0].equals(currDbEntities[0]) &&
+                        entities[1].equals(currDbEntities[1])) ||
+                        (entities[0].equals(currDbEntities[1]) &&
+                                entities[1].equals(currDbEntities[0]))) {
+                    if(currJoinNames[0].equals(name) ||
+                            currJoinNames[1].equals(name)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
     }
 
     private String resolveDbEntityProperty() {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+<data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
 	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap http://cayenne.apache.org/schema/10/modelMap.xsd"
-	 project-version="10">
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+	 project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.qualified"/>
 	<property name="quoteSqlIdentifiers" value="true"/>
 	<db-entity name="TEST_QUALIFIED1">
@@ -45,18 +45,20 @@
 	<obj-entity name="Qualified4" className="org.apache.cayenne.testdo.qualified.Qualified4" dbEntityName="TEST_QUALIFIED4">
 		<obj-attribute name="name" type="java.lang.String" db-attribute-path="NAME"/>
 	</obj-entity>
-	<db-relationship name="qualified2s" source="TEST_QUALIFIED1" target="TEST_QUALIFIED2" toMany="true">
-		<db-attribute-pair source="ID" target="QUALIFIED1_ID"/>
-	</db-relationship>
-	<db-relationship name="qualified1" source="TEST_QUALIFIED2" target="TEST_QUALIFIED1">
-		<db-attribute-pair source="QUALIFIED1_ID" target="ID"/>
-	</db-relationship>
-	<db-relationship name="qualified4s" source="TEST_QUALIFIED3" target="TEST_QUALIFIED4" toMany="true">
-		<db-attribute-pair source="ID" target="QUALIFIED3_ID"/>
-	</db-relationship>
-	<db-relationship name="qualified3" source="TEST_QUALIFIED4" target="TEST_QUALIFIED3">
-		<db-attribute-pair source="QUALIFIED3_ID" target="ID"/>
-	</db-relationship>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="TEST_QUALIFIED1" name="qualified2s"/>
+		<right entity="TEST_QUALIFIED2" name="qualified1"/>
+		<db-join-condition>
+			<column-pair left="ID" right="QUALIFIED1_ID"/>
+		</db-join-condition>
+	</db-join>
+	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+		<left entity="TEST_QUALIFIED3" name="qualified4s"/>
+		<right entity="TEST_QUALIFIED4" name="qualified3"/>
+		<db-join-condition>
+			<column-pair left="ID" right="QUALIFIED3_ID"/>
+		</db-join-condition>
+	</db-join>
 	<obj-relationship name="qualified2s" source="Qualified1" target="Qualified2" db-relationship-path="qualified2s"/>
 	<obj-relationship name="qualified1" source="Qualified2" target="Qualified1" db-relationship-path="qualified1"/>
 	<obj-relationship name="qualified4s" source="Qualified3" target="Qualified4" deleteRule="Deny" db-relationship-path="qualified4s"/>

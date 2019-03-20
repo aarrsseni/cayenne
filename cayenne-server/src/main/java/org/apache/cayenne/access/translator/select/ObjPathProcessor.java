@@ -19,7 +19,7 @@
 
 package org.apache.cayenne.access.translator.select;
 
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.EmbeddedAttribute;
 import org.apache.cayenne.map.JoinType;
 import org.apache.cayenne.map.ObjAttribute;

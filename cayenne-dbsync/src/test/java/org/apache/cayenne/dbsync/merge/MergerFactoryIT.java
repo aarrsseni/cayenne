@@ -18,10 +18,6 @@
  ****************************************************************/
 package org.apache.cayenne.dbsync.merge;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.sql.Types;
 
 import org.apache.cayenne.CayenneDataObject;
@@ -29,11 +25,20 @@ import org.apache.cayenne.access.DataContext;
 import org.apache.cayenne.di.Inject;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.relationship.ColumnPair;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbJoinBuilder;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.SinglePairCondition;
+import org.apache.cayenne.map.relationship.ToDependentPkSemantics;
+import org.apache.cayenne.map.relationship.ToManySemantics;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class MergerFactoryIT extends MergeCase {
 
@@ -196,28 +201,28 @@ public class MergerFactoryIT extends MergeCase {
         DbEntity artistDbEntity = map.getDbEntity("ARTIST");
         assertNotNull(artistDbEntity);
 
+        DbJoin dbJoin = new DbJoinBuilder()
+                .entities(new String[]{dbEntity.getName(), artistDbEntity.getName()})
+                .names(new String[]{"toArtistR1", "toNewTableR2"})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("ARTIST_ID", "ARTIST_ID")))
+                .dataMap(map)
+                .build();
+        map.addJoin(dbJoin);
+        dbJoin.compile(map);
+
         // relation from new_table to artist
-        DbRelationship r1 = new DbRelationship("toArtistR1");
-        r1.setSourceEntity(dbEntity);
-        r1.setTargetEntityName(artistDbEntity);
-        r1.setToMany(false);
-        r1.addJoin(new DbJoin(r1, "ARTIST_ID", "ARTIST_ID"));
-        dbEntity.addRelationship(r1);
+        DbRelationship r1 = dbJoin.getRelationhsip();
 
         // relation from artist to new_table
-        DbRelationship r2 = new DbRelationship("toNewTableR2");
-        r2.setSourceEntity(artistDbEntity);
-        r2.setTargetEntityName(dbEntity);
-        r2.setToMany(true);
-        r2.addJoin(new DbJoin(r2, "ARTIST_ID", "ARTIST_ID"));
-        artistDbEntity.addRelationship(r2);
+        DbRelationship r2 = r1.getReverseRelationship();
 
         assertTokensAndExecute(2, 0);
         assertTokensAndExecute(0, 0);
 
         // remove relationships
-        dbEntity.removeRelationship(r1.getName());
-        artistDbEntity.removeRelationship(r2.getName());
+        map.getDbJoinList().remove(dbJoin);
         resolver.refreshMappingCache();
         /*
          * Db -Rel 'toArtistR1' - NEW_TABLE 1 -> 1 ARTIST"
@@ -257,28 +262,28 @@ r2 =     * Db -Rel 'toNewTableR2' - ARTIST 1 -> * NEW_TABLE" -- Not generated an
         assertTokensAndExecute(1, 0);
         assertTokensAndExecute(0, 0);
 
+        DbJoin dbJoin = new DbJoinBuilder()
+                .entities(new String[]{dbEntity.getName(), artistDbEntity.getName()})
+                .names(new String[]{"toArtistR1", "toNewTableR2"})
+                .toManySemantics(ToManySemantics.ONE_TO_ONE)
+                .toDepPkSemantics(ToDependentPkSemantics.NONE)
+                .condition(new SinglePairCondition(new ColumnPair("ARTIST_ID", "ARTIST_ID")))
+                .dataMap(map)
+                .build();
+        map.addJoin(dbJoin);
+        dbJoin.compile(map);
+
         // relation from new_table to artist
-        DbRelationship r1 = new DbRelationship("toArtistR1");
-        r1.setSourceEntity(dbEntity);
-        r1.setTargetEntityName(artistDbEntity);
-        r1.setToMany(false);
-        r1.addJoin(new DbJoin(r1, "ARTIST_ID", "ARTIST_ID"));
-        dbEntity.addRelationship(r1);
+        DbRelationship r1 = dbJoin.getRelationhsip();
 
         // relation from artist to new_table
-        DbRelationship r2 = new DbRelationship("toNewTableR2");
-        r2.setSourceEntity(artistDbEntity);
-        r2.setTargetEntityName(dbEntity);
-        r2.setToMany(true);
-        r2.addJoin(new DbJoin(r2, "ARTIST_ID", "ARTIST_ID"));
-        artistDbEntity.addRelationship(r2);
+        DbRelationship r2 = r1.getReverseRelationship();
 
         assertTokensAndExecute(1, 0);
         assertTokensAndExecute(0, 0);
 
         // remove relationships
-        dbEntity.removeRelationship(r1.getName());
-        artistDbEntity.removeRelationship(r2.getName());
+        map.getDbJoinList().remove(dbJoin);
         resolver.refreshMappingCache();
         /*
         * Add Relationship ARTIST->NEW_TABLE To Model -- Not generated any more
