@@ -7,7 +7,7 @@
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
  *
- *    https://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
@@ -107,7 +107,7 @@ public class DbGenerator {
 
 	/**
 	 * Creates and initializes new DbGenerator instance.
-	 * 
+	 *
 	 * @param adapter
 	 *            DbAdapter corresponding to the database
 	 * @param map
@@ -120,7 +120,7 @@ public class DbGenerator {
 	 * @since 3.1
 	 */
 	public DbGenerator(DbAdapter adapter, DataMap map, Collection<DbEntity> excludedEntities, DataDomain domain,
-			JdbcEventLogger logger) {
+					   JdbcEventLogger logger) {
 		// sanity check
 		if (adapter == null) {
 			throw new IllegalArgumentException("Adapter must not be null.");
@@ -338,7 +338,7 @@ public class DbGenerator {
 	/**
 	 * Builds and executes a SQL statement, catching and storing SQL exceptions
 	 * resulting from invalid SQL. Only non-recoverable exceptions are rethrown.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	protected boolean safeExecute(Connection connection, String sql) throws SQLException {
@@ -360,7 +360,7 @@ public class DbGenerator {
 
 	/**
 	 * Creates FK and UNIQUE constraint statements for a given table.
-	 * 
+	 *
 	 * @since 3.0
 	 */
 	public List<String> createConstraintsQueries(DbEntity table) {
@@ -392,9 +392,9 @@ public class DbGenerator {
 				if (getAdapter().supportsUniqueConstraints()) {
 
 					DbRelationship reverse = rel.getReverseRelationship();
-					if (reverse != null && !reverse.isToMany() && !reverse.isToPK()) {
+					if (!reverse.isRuntime() && !reverse.isToMany() && !reverse.isToPK()) {
 
-						String unique = getAdapter().createUniqueConstraint((DbEntity) rel.getSourceEntity(),
+						String unique = getAdapter().createUniqueConstraint(rel.getSourceEntity(),
 								rel.getSourceAttributes());
 						if (unique != null) {
 							list.add(unique);
@@ -417,7 +417,7 @@ public class DbGenerator {
 	 * Failures usually indicate problems with generated DDL (such as
 	 * "create...", "drop...", etc.) and usually happen due to the DataMap being
 	 * out of sync with the database.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	public ValidationResult getFailures() {
@@ -475,7 +475,7 @@ public class DbGenerator {
 	/**
 	 * Returns a DataDomain used by the DbGenerator to detect cross-database
 	 * relationships. By default DataDomain is null.
-	 * 
+	 *
 	 * @since 1.2
 	 */
 	public DataDomain getDomain() {

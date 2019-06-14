@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
-	 project-version="11">
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+		  project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.cay_2032"/>
 	<db-entity name="TEAM">
 		<db-attribute name="team_id" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
@@ -16,7 +16,7 @@
 		<db-attribute name="user_id" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
 	</db-entity>
 	<obj-entity name="Team" className="org.apache.cayenne.testdo.cay_2032.Team" dbEntityName="TEAM"/>
-	<obj-entity name="User" className="org.apache.cayenne.testdo.cay_2032.User" dbEntityName="USERS">
+	<obj-entity name="Users" className="org.apache.cayenne.testdo.cay_2032.Users" dbEntityName="USERS">
 		<obj-attribute name="name" type="byte[]" db-attribute-path="name"/>
 	</obj-entity>
 	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
@@ -33,6 +33,6 @@
 			<column-pair left="user_id" right="user_id"/>
 		</db-join-condition>
 	</db-join>
-	<obj-relationship name="teamUsers" source="Team" target="User" deleteRule="Deny" db-relationship-path="userHasTeam.user"/>
-	<obj-relationship name="userTeams" source="User" target="Team" deleteRule="Deny" db-relationship-path="userHasTeam.team"/>
+	<obj-relationship name="teamUsers" source="Team" target="Users" deleteRule="Deny" db-relationship-path="userHasTeam.user"/>
+	<obj-relationship name="userTeams" source="Users" target="Team" deleteRule="Deny" db-relationship-path="userHasTeam.team"/>
 </data-map>

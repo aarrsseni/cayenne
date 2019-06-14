@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-map xmlns="http://cayenne.apache.org/schema/11/modelMap"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
-	 project-version="11">
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://cayenne.apache.org/schema/11/modelMap https://cayenne.apache.org/schema/11/modelMap.xsd"
+		  project-version="11">
 	<property name="defaultPackage" value="org.apache.cayenne.testdo.testmap"/>
 	<property name="defaultSuperclass" value="org.apache.cayenne.CayenneDataObject"/>
 	<property name="clientSupported" value="true"/>
@@ -158,7 +158,7 @@
 	<obj-entity name="SubPainting" className="org.apache.cayenne.testdo.testmap.SubPainting" dbEntityName="PAINTING">
 		<obj-attribute name="paintingTitle" type="java.lang.String" db-attribute-path="PAINTING_TITLE"/>
 	</obj-entity>
-	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
 		<left entity="ARTGROUP" name="artistGroupArray"/>
 		<right entity="ARTIST_GROUP" name="toGroup"/>
 		<db-join-condition>
@@ -179,7 +179,7 @@
 			<column-pair left="ARTIST_ID" right="ARTIST_ID"/>
 		</db-join-condition>
 	</db-join>
-	<db-join toMany="ONE_TO_MANY" toDependentPK="NONE">
+	<db-join toMany="ONE_TO_MANY" toDependentPK="LEFT">
 		<left entity="ARTIST" name="artistGroupArray"/>
 		<right entity="ARTIST_GROUP" name="toArtist"/>
 		<db-join-condition>
@@ -254,13 +254,13 @@
 	<obj-relationship name="painting" source="PaintingInfo" target="Painting" deleteRule="Nullify" db-relationship-path="painting"/>
 	<obj-relationship name="paintingArray" source="ROArtist" target="Painting" deleteRule="Deny" db-relationship-path="paintingArray"/>
 	<obj-relationship name="toArtist" source="ROPainting" target="Artist" deleteRule="Nullify" db-relationship-path="toArtist"/>
-	<query name="NonSelectingQuery" type="SQLTemplate" root="data-map" root-name="testmap">
+	<query name="NonSelectingQuery" type="SQLTemplate" root="data-map" root-name="relationships-many-to-many-join">
 		<property name="cayenne.SQLTemplate.columnNameCapitalization" value="UPPER"/>
 		<sql><![CDATA[INSERT INTO PAINTING (PAINTING_ID, PAINTING_TITLE, ESTIMATED_PRICE)
 VALUES (512, 'No Painting Like This', 12.5)]]></sql>
 		<sql adapter-class="org.apache.cayenne.dba.db2.DB2Adapter"><![CDATA[INSERT INTO PAINTING (PAINTING_ID, PAINTING_TITLE, ESTIMATED_PRICE) VALUES (512, 'No Painting Like This', 12.5)]]></sql>
 	</query>
-	<query name="ParameterizedNonSelectingQuery" type="SQLTemplate" root="data-map" root-name="testmap">
+	<query name="ParameterizedNonSelectingQuery" type="SQLTemplate" root="data-map" root-name="relationships-many-to-many-join">
 		<sql><![CDATA[INSERT INTO PAINTING (PAINTING_ID, PAINTING_TITLE, ESTIMATED_PRICE)
 VALUES (#bind($id), #bind($title), #bind($price))]]></sql>
 		<sql adapter-class="org.apache.cayenne.dba.db2.DB2Adapter"><![CDATA[INSERT INTO PAINTING (PAINTING_ID, PAINTING_TITLE, ESTIMATED_PRICE) values (#bind($id), #bind($title), #bind($price))]]></sql>
@@ -276,7 +276,7 @@ VALUES (#bind($id), #bind($title), #bind($price))]]></sql>
 	<query name="QueryWithQualifier" type="SelectQuery" root="obj-entity" root-name="Artist">
 		<qualifier><![CDATA[artistName = $param1]]></qualifier>
 	</query>
-	<query name="SelectTestUpper" type="SQLTemplate" root="data-map" root-name="testmap">
+	<query name="SelectTestUpper" type="SQLTemplate" root="data-map" root-name="relationships-many-to-many-join">
 		<property name="cayenne.SQLTemplate.columnNameCapitalization" value="UPPER"/>
 		<property name="cayenne.GenericSelectQuery.fetchingDataRows" value="true"/>
 		<sql><![CDATA[select * from ARTIST]]></sql>
@@ -290,7 +290,7 @@ VALUES (#bind($id), #bind($title), #bind($price))]]></sql>
 		<property name="cayenne.GenericSelectQuery.cacheStrategy" value="SHARED_CACHE"/>
 		<qualifier><![CDATA[artistName like $name]]></qualifier>
 	</query>
-	<query name="SelectTestLower" type="SQLTemplate" root="data-map" root-name="testmap">
+	<query name="SelectTestLower" type="SQLTemplate" root="data-map" root-name="relationships-many-to-many-join">
 		<property name="cayenne.SQLTemplate.columnNameCapitalization" value="LOWER"/>
 		<property name="cayenne.GenericSelectQuery.fetchingDataRows" value="true"/>
 		<sql><![CDATA[select * from ARTIST]]></sql>

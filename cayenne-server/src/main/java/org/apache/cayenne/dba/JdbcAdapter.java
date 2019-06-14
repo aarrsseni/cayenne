@@ -22,8 +22,10 @@ package org.apache.cayenne.dba;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,10 +52,10 @@ import org.apache.cayenne.log.JdbcEventLogger;
 import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
+import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.relationship.ColumnPair;
 import org.apache.cayenne.map.relationship.DbJoin;
 import org.apache.cayenne.map.relationship.DbRelationship;
-import org.apache.cayenne.map.EntityResolver;
 import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.map.relationship.JoinVisitor;
 import org.apache.cayenne.map.relationship.RelationshipDirection;
@@ -461,10 +463,9 @@ public class JdbcAdapter implements DbAdapter {
         buf.append(quotingStrategy.quotedFullyQualifiedName(source));
         buf.append(" ADD FOREIGN KEY (");
 
-        List<DbJoin> joins = rel.getJoins();
         if(rel.isToPK()) {
             List<DbAttribute> pks = rel.getTargetEntity().getPrimaryKeys();
-            joins.sort(Comparator.comparingInt(join -> pks.indexOf(join.getTarget())));
+            rel.accept(new SortDirectionalJoinVisitor(pks));
         }
 
         final AtomicBoolean first = new AtomicBoolean(true);
@@ -519,6 +520,12 @@ public class JdbcAdapter implements DbAdapter {
 
         buf.append(quotingStrategy.quotedFullyQualifiedName(source));
         buf.append(" ADD FOREIGN KEY (");
+
+        DbRelationship rel = dbJoin.getRelationship(direction);
+        if(rel.isToPK()) {
+            List<DbAttribute> pks = rel.getTargetEntity().getPrimaryKeys();
+            rel.accept(new SortDirectionalJoinVisitor(pks));
+        }
 
         final AtomicBoolean first = new AtomicBoolean(true);
         dbJoin.getDbJoinCondition().accept(new JoinVisitor<Void>() {
@@ -718,4 +725,27 @@ public class JdbcAdapter implements DbAdapter {
         return this;
     }
 
+    private static class SortDirectionalJoinVisitor implements DirectionalJoinVisitor<Void> {
+        private final List<DbAttribute> pks;
+
+        public SortDirectionalJoinVisitor(List<DbAttribute> pks) {
+            this.pks = pks;
+        }
+
+        @Override
+        public Void visit(DbAttribute[] source, DbAttribute[] target) {
+            List<DbAttribute> sourceList = Arrays.asList(source);
+            Arrays.sort(source,
+                    Comparator
+                            .comparingInt(sourceAttr ->
+                                    pks.indexOf(target[sourceList.indexOf(sourceAttr)])));
+            Arrays.sort(target, Comparator.comparingInt(pks::indexOf));
+            return null;
+        }
+
+        @Override
+        public Void visit(DbAttribute source, DbAttribute target) {
+            return null;
+        }
+    }
 }

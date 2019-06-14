@@ -23,10 +23,10 @@ import org.apache.cayenne.ObjectId;
 import org.apache.cayenne.access.ObjectDiff;
 import org.apache.cayenne.access.flush.operation.DbRowOpWithQualifier;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjAttribute;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.reflect.AttributeProperty;
 import org.apache.cayenne.reflect.PropertyVisitor;
 import org.apache.cayenne.reflect.ToManyProperty;
@@ -67,16 +67,32 @@ class OptimisticLockQualifierBuilder implements PropertyVisitor {
         if(relationship.isUsedForLocking()) {
             ObjectId value = diff.getArcSnapshotValue(property.getName());
             DbRelationship dbRelationship = relationship.getDbRelationships().get(0);
-            for(DbJoin join : dbRelationship.getJoins()) {
-                DbAttribute source = join.getSource();
-                if(!source.isPrimaryKey()) {
-                    Object valueObjectId = value != null 
-                        ? ObjectIdValueSupplier.getFor(value, join.getTargetName()) 
-                        : null;
-                    dbRow.getQualifier()
-                            .addAdditionalQualifier(source, valueObjectId, true);
+            dbRelationship.accept(new DirectionalJoinVisitor<Void>() {
+
+                private void build(DbAttribute source, DbAttribute target) {
+                    if(!source.isPrimaryKey()) {
+                        Object valueObjectId = value != null
+                                ? ObjectIdValueSupplier.getFor(value, target.getName())
+                                : null;
+                        dbRow.getQualifier()
+                                .addAdditionalQualifier(source, valueObjectId, true);
+                    }
                 }
-            }
+
+                @Override
+                public Void visit(DbAttribute[] source, DbAttribute[] target) {
+                    for(int i = 0; i < source.length; i++) {
+                        build(source[i], target[i]);
+                    }
+                    return null;
+                }
+
+                @Override
+                public Void visit(DbAttribute source, DbAttribute target) {
+                    build(source, target);
+                    return null;
+                }
+            });
         }
         return true;
     }

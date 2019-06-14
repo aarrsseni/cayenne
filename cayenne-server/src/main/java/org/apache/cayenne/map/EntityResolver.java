@@ -360,25 +360,25 @@ public class EntityResolver implements MappingNamespace, Serializable {
     private void checkForDuplicatedNames(DataMap map) {
         for(DbEntity entity : map.getDbEntities()) {
             DbEntity foundDbEntity = getDbEntity(entity.getName());
-            if(foundDbEntity != null) {
+            if(foundDbEntity != null && foundDbEntity.getDataMap() != map) {
                 processWarning(entity.getName(), map.getName(), foundDbEntity.getDataMap().getName());
             }
         }
         for(ObjEntity entity : map.getObjEntities()) {
             ObjEntity foundObjEntity = getObjEntity(entity.getName());
-            if(foundObjEntity != null) {
+            if(foundObjEntity != null && foundObjEntity.getDataMap() != map) {
                 processWarning(entity.getName(), map.getName(), foundObjEntity.getDataMap().getName());
             }
         }
         for(Procedure procedure : map.getProcedures()) {
             Procedure foundProcedure = getProcedure(procedure.getName());
-            if(foundProcedure != null) {
+            if(foundProcedure != null && foundProcedure.getDataMap() != map) {
                 processWarning(procedure.getName(), map.getName(), foundProcedure.getDataMap().getName());
             }
         }
         for(Embeddable embeddable : map.getEmbeddables()) {
             Embeddable foundEmbeddable = getEmbeddable(embeddable.getClassName());
-            if(foundEmbeddable != null) {
+            if(foundEmbeddable != null && foundEmbeddable.getDataMap() != map) {
                 processWarning(embeddable.getClassName(), map.getName(), foundEmbeddable.getDataMap().getName());
             }
         }

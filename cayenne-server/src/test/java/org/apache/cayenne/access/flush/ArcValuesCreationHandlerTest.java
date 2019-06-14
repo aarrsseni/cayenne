@@ -31,17 +31,25 @@ import org.apache.cayenne.access.flush.operation.DbRowOpVisitor;
 import org.apache.cayenne.access.flush.operation.InsertDbRowOp;
 import org.apache.cayenne.access.flush.operation.Values;
 import org.apache.cayenne.map.DbAttribute;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.reflect.ClassDescriptor;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @since 4.2
@@ -87,7 +95,13 @@ public class ArcValuesCreationHandlerTest {
         ObjectId targetId = ObjectId.of("test2", "id2", 2);
 
         DbRelationship relationship = DbRelBuilder.of("id1", "id2")
-                .withToDepPk().withDstPk().withSrcPk().build();
+                .withToDepPk()
+                .withDstPk()
+                .withSrcPk()
+                .withObjects(srcId, targetId)
+                .withFactory(factory)
+                .withType(DbRowOpType.UPDATE)
+                .build();
 
         handler.processRelationship(relationship, srcId, targetId, true);
 
@@ -105,7 +119,12 @@ public class ArcValuesCreationHandlerTest {
         ObjectId targetId = ObjectId.of("test2", "id2", 2);
 
         DbRelationship relationship = DbRelBuilder.of("id1", "id2")
-                .withDstPk().withSrcPk().build();
+                .withDstPk()
+                .withSrcPk()
+                .withObjects(srcId, targetId)
+                .withFactory(factory)
+                .withType(DbRowOpType.INSERT)
+                .build();
 
         handler.processRelationship(relationship, srcId, targetId, true);
 
@@ -123,7 +142,11 @@ public class ArcValuesCreationHandlerTest {
         ObjectId targetId = ObjectId.of("test2", "id2", 2);
 
         DbRelationship relationship = DbRelBuilder.of("pk", "fk")
-                .withSrcPk().build();
+                .withSrcPk()
+                .withObjects(srcId, targetId)
+                .withFactory(factory)
+                .withType(DbRowOpType.UPDATE)
+                .build();
 
         handler.processRelationship(relationship, srcId, targetId, true);
 
@@ -144,7 +167,11 @@ public class ArcValuesCreationHandlerTest {
         ObjectId targetId = ObjectId.of("test2", "pk", 2);
 
         DbRelationship relationship = DbRelBuilder.of("fk", "pk")
-                .withDstPk().build();
+                .withDstPk()
+                .withObjects(srcId, targetId)
+                .withFactory(factory)
+                .withType(DbRowOpType.INSERT)
+                .build();
 
         handler.processRelationship(relationship, srcId, targetId, true);
 
@@ -165,6 +192,10 @@ public class ArcValuesCreationHandlerTest {
         private boolean srcPk;
         private boolean dstPk;
         private boolean toDepPk;
+
+        private DbRowOpFactory factory;
+        private DbRowOpType type;
+        private ObjectId[] ids;
 
         static DbRelBuilder of(String srcName, String dstName) {
             DbRelBuilder builder = new DbRelBuilder();
@@ -188,22 +219,46 @@ public class ArcValuesCreationHandlerTest {
             return this;
         }
 
+        DbRelBuilder withFactory(DbRowOpFactory factory) {
+            this.factory = factory;
+            return this;
+        }
+
+        DbRelBuilder withType(DbRowOpType type) {
+            this.type = type;
+            return this;
+        }
+
+        DbRelBuilder withObjects(ObjectId... ids) {
+            this.ids = ids;
+            return this;
+        }
+
         DbRelationship build() {
+            DbJoin dbJoin = mock(DbJoin.class);
             DbRelationship relationship = mock(DbRelationship.class);
+            DbRelationship mockRel = mock(DbRelationship.class);
+            when(dbJoin.getRelationhsip()).thenReturn(relationship);
+            when(relationship.getReverseRelationship()).thenReturn(mockRel);
+
             when(relationship.isToDependentPK()).thenReturn(toDepPk);
-            DbJoin join = mock(DbJoin.class);
+
             DbAttribute src = new DbAttribute(srcName);
             src.setPrimaryKey(srcPk);
             DbAttribute target = new DbAttribute(dstName);
             target.setPrimaryKey(dstPk);
-            when(join.getSource()).thenReturn(src);
-            when(join.getSourceName()).thenReturn(src.getName());
-            when(join.getTarget()).thenReturn(target);
-            when(join.getTargetName()).thenReturn(target.getName());
-            when(relationship.getJoins()).thenReturn(Collections.singletonList(join));
 
-            DbRelationship mockRel = mock(DbRelationship.class);
-            when(relationship.getReverseRelationship()).thenReturn(mockRel);
+            ArcValuesCreationHandler.ArcDirectionalJoinVisitor arcDirectionalJoinVisitor =
+                    new ArcValuesCreationHandler.ArcDirectionalJoinVisitor(ids[0],
+                            relationship,
+                            ids[1],
+                            true,
+                            factory,
+                            type);
+
+            Void result = arcDirectionalJoinVisitor.visit(src, target);
+            when(relationship.accept(any(ArcValuesCreationHandler.ArcDirectionalJoinVisitor.class)))
+                    .thenReturn(result);
             return relationship;
         }
     }

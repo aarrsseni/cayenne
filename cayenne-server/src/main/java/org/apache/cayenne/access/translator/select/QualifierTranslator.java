@@ -55,7 +55,7 @@ import org.apache.cayenne.exp.parser.SimpleNode;
 import org.apache.cayenne.exp.property.BaseProperty;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
 
 import static org.apache.cayenne.access.sqlbuilder.SQLBuilder.aliased;
 import static org.apache.cayenne.access.sqlbuilder.SQLBuilder.function;
@@ -259,7 +259,7 @@ class QualifierTranslator implements TraversalHandler {
         if(result.getDbAttributes().size() != targetEntity.getPrimaryKeys().size()) {
             throw new CayenneRuntimeException("Unsupported or incorrect mapping for relationship '%s.%s': " +
                     "target entity has different count of primary keys than count of joins."
-                    , relationship.getSourceEntityName(), relationship.getName());
+                    , relationship.getSourceEntity().getName(), relationship.getName());
         }
 
         expressionsToSkip.add(node);

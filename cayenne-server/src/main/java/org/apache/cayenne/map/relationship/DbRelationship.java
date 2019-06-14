@@ -49,7 +49,7 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
     }
 
     public <T> T accept(DirectionalJoinVisitor<T> joinContentVisitor) {
-        return columnPairsHandler.handle(joinContentVisitor);
+        return getColumnPairsHandler().handle(joinContentVisitor);
     }
 
     @Override
@@ -256,6 +256,10 @@ public class DbRelationship extends Relationship implements ConfigurationNode {
 
     public void setDirection(RelationshipDirection direction) {
         this.direction = direction;
+    }
+
+    public ColumnPairsHandler getColumnPairsHandler() {
+        return columnPairsHandler;
     }
 
     public void updatePairsHandler() {

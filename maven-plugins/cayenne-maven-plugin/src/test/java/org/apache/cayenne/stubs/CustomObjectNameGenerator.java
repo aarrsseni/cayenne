@@ -26,7 +26,9 @@ import org.apache.cayenne.dbsync.naming.NoStemStemmer;
 import org.apache.cayenne.dbsync.naming.ObjectNameGenerator;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbRelationship;
+import org.apache.cayenne.map.relationship.DbJoin;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.RelationshipDirection;
 import org.apache.cayenne.util.Util;
 
 public class CustomObjectNameGenerator implements ObjectNameGenerator {
@@ -43,6 +45,11 @@ public class CustomObjectNameGenerator implements ObjectNameGenerator {
 
     @Override
     public String relationshipName(DbRelationship... relationshipChain) {
+        return null;
+    }
+
+    @Override
+    public String relationshipName(DbJoin dbJoin, RelationshipDirection relationshipDirection) {
         return null;
     }
 

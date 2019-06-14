@@ -34,10 +34,10 @@ import org.apache.cayenne.graph.ArcId;
 import org.apache.cayenne.graph.GraphChangeHandler;
 import org.apache.cayenne.map.DbAttribute;
 import org.apache.cayenne.map.DbEntity;
-import org.apache.cayenne.map.DbJoin;
-import org.apache.cayenne.map.DbRelationship;
 import org.apache.cayenne.map.ObjEntity;
 import org.apache.cayenne.map.ObjRelationship;
+import org.apache.cayenne.map.relationship.DbRelationship;
+import org.apache.cayenne.map.relationship.DirectionalJoinVisitor;
 import org.apache.cayenne.util.CayenneMapEntry;
 
 /**
@@ -160,66 +160,13 @@ class ArcValuesCreationHandler implements GraphChangeHandler {
     }
 
     protected void processRelationship(DbRelationship dbRelationship, ObjectId srcId, ObjectId targetId, boolean add) {
-        for(DbJoin join : dbRelationship.getJoins()) {
-            boolean srcPK = join.getSource().isPrimaryKey();
-            boolean targetPK = join.getTarget().isPrimaryKey();
-
-            Object valueToUse;
-            DbRowOp rowOp;
-            DbAttribute attribute;
-            ObjectId id;
-            boolean processDelete;
-
-            // We manage 3 cases here:
-            // 1. PK -> FK: just propagate value from PK and to FK
-            // 2. PK -> PK: check isToDep flag and set dependent one
-            // 3. NON-PK -> FK (not supported fully for now, see CAY-2488): also check isToDep flag,
-            //    but get value from DbRow, not ObjID
-            if(srcPK != targetPK) {
-                // case 1
-                processDelete = true;
-                id = null;
-                if(srcPK) {
-                    valueToUse = ObjectIdValueSupplier.getFor(srcId, join.getSourceName());
-                    rowOp = factory.getOrCreate(dbRelationship.getTargetEntity(), targetId, DbRowOpType.UPDATE);
-                    attribute = join.getTarget();
-                } else {
-                    valueToUse = ObjectIdValueSupplier.getFor(targetId, join.getTargetName());
-                    rowOp = factory.getOrCreate(dbRelationship.getSourceEntity(), srcId, defaultType);
-                    attribute = join.getSource();
-                }
-            } else {
-                // case 2 and 3
-                processDelete = false;
-                if(dbRelationship.isToDependentPK()) {
-                    valueToUse = ObjectIdValueSupplier.getFor(srcId, join.getSourceName());
-                    rowOp = factory.getOrCreate(dbRelationship.getTargetEntity(), targetId, DbRowOpType.UPDATE);
-                    attribute = join.getTarget();
-                    id = targetId;
-                    if(dbRelationship.isToMany()) {
-                        // strange mapping toDepPK and toMany, but just skip it
-                        rowOp = null;
-                    }
-                } else {
-                    valueToUse = ObjectIdValueSupplier.getFor(targetId, join.getTargetName());
-                    rowOp = factory.getOrCreate(dbRelationship.getSourceEntity(), srcId, defaultType);
-                    attribute = join.getSource();
-                    id = srcId;
-                    if(dbRelationship.getReverseRelationship().isToMany()) {
-                        // strange mapping toDepPK and toMany, but just skip it
-                        rowOp = null;
-                    }
-                }
-            }
-
-            // propagated master -> child PK
-            if(id != null && attribute.isPrimaryKey()) {
-                id.getReplacementIdMap().put(attribute.getName(), valueToUse);
-            }
-            if(rowOp != null) {
-                rowOp.accept(new ValuePropagationVisitor(attribute, add, valueToUse, processDelete));
-            }
-        }
+        dbRelationship.accept(
+                new ArcDirectionalJoinVisitor(srcId,
+                        dbRelationship,
+                        targetId,
+                        add,
+                        factory,
+                        defaultType));
     }
 
     // not interested in following events in this handler
@@ -269,6 +216,107 @@ class ArcValuesCreationHandler implements GraphChangeHandler {
             if(processDelete) {
                 dbRow.getQualifier().addAdditionalQualifier(attribute, valueToUse);
             }
+            return null;
+        }
+    }
+
+    static class ArcDirectionalJoinVisitor implements DirectionalJoinVisitor<Void> {
+
+        private final ObjectId srcId;
+        private final DbRelationship dbRelationship;
+        private final ObjectId targetId;
+        private final boolean add;
+
+        private final DbRowOpFactory factory;
+        private final DbRowOpType defaultType;
+
+        public ArcDirectionalJoinVisitor(ObjectId srcId,
+                                               DbRelationship dbRelationship,
+                                               ObjectId targetId,
+                                               boolean add,
+                                               DbRowOpFactory factory,
+                                               DbRowOpType defaultType) {
+            this.srcId = srcId;
+            this.dbRelationship = dbRelationship;
+            this.targetId = targetId;
+            this.add = add;
+            this.factory = factory;
+            this.defaultType = defaultType;
+        }
+
+        public Void process(DbAttribute source, DbAttribute target) {
+            boolean srcPK = source.isPrimaryKey();
+            boolean targetPK = target.isPrimaryKey();
+
+            Object valueToUse;
+            DbRowOp rowOp;
+            DbAttribute attribute;
+            ObjectId id;
+            boolean processDelete;
+
+            // We manage 3 cases here:
+            // 1. PK -> FK: just propagate value from PK and to FK
+            // 2. PK -> PK: check isToDep flag and set dependent one
+            // 3. NON-PK -> FK (not supported fully for now, see CAY-2488): also check isToDep flag,
+            //    but get value from DbRow, not ObjID
+            if(srcPK != targetPK) {
+                // case 1
+                processDelete = true;
+                id = null;
+                if(srcPK) {
+                    valueToUse = ObjectIdValueSupplier.getFor(srcId, source.getName());
+                    rowOp = factory.getOrCreate(dbRelationship.getTargetEntity(), targetId, DbRowOpType.UPDATE);
+                    attribute = target;
+                } else {
+                    valueToUse = ObjectIdValueSupplier.getFor(targetId, target.getName());
+                    rowOp = factory.getOrCreate(dbRelationship.getSourceEntity(), srcId, defaultType);
+                    attribute = source;
+                }
+            } else {
+                // case 2 and 3
+                processDelete = false;
+                if(dbRelationship.isToDependentPK()) {
+                    valueToUse = ObjectIdValueSupplier.getFor(srcId, source.getName());
+                    rowOp = factory.getOrCreate(dbRelationship.getTargetEntity(), targetId, DbRowOpType.UPDATE);
+                    attribute = target;
+                    id = targetId;
+                    if(dbRelationship.isToMany()) {
+                        // strange mapping toDepPK and toMany, but just skip it
+                        rowOp = null;
+                    }
+                } else {
+                    valueToUse = ObjectIdValueSupplier.getFor(targetId, target.getName());
+                    rowOp = factory.getOrCreate(dbRelationship.getSourceEntity(), srcId, defaultType);
+                    attribute = source;
+                    id = srcId;
+                    if(dbRelationship.getReverseRelationship().isToMany()) {
+                        // strange mapping toDepPK and toMany, but just skip it
+                        rowOp = null;
+                    }
+                }
+            }
+
+            // propagated master -> child PK
+            if(id != null && attribute.isPrimaryKey()) {
+                id.getReplacementIdMap().put(attribute.getName(), valueToUse);
+            }
+            if(rowOp != null) {
+                rowOp.accept(new ValuePropagationVisitor(attribute, add, valueToUse, processDelete));
+            }
+            return null;
+        }
+
+        @Override
+        public Void visit(DbAttribute[] source, DbAttribute[] target) {
+            for(int i = 0; i < source.length; i++) {
+                process(source[i], target[i]);
+            }
+            return null;
+        }
+
+        @Override
+        public Void visit(DbAttribute source, DbAttribute target) {
+            process(source, target);
             return null;
         }
     }
