@@ -110,6 +110,10 @@ public class DbJoin implements XMLSerializable, Serializable, ConfigurationNode 
         return dataMap;
     }
 
+    public DbRelationship[] getDbRelationships() {
+        return dbRelationships;
+    }
+
     public void setDataMap(DataMap dataMap) {
         this.dataMap = dataMap;
     }

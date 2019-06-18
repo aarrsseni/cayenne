@@ -8,6 +8,7 @@ import org.apache.cayenne.map.DataMap;
 import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.relationship.ColumnPair;
 import org.apache.cayenne.map.relationship.ColumnPairsCondition;
+import org.apache.cayenne.map.relationship.DbJoin;
 import org.apache.cayenne.map.relationship.DbJoinCondition;
 import org.apache.cayenne.map.relationship.DbRelationship;
 import org.apache.cayenne.map.relationship.JoinVisitor;
@@ -44,11 +45,18 @@ public class DbRelationshipModelConverter {
     }
 
     public DbJoinModel getModel(DbRelationship relationship) {
-        DbJoinMutable dbJoin = (DbJoinMutable) relationship.getDbJoin();
+        DbJoin joinFromRelationship = relationship.getDbJoin();
+        DbJoinMutable dbJoin;
+        if(!(joinFromRelationship instanceof DbJoinMutable)) {
+            DbJoinMutableBuilder builder = new DbJoinMutableBuilder();
+            dbJoin = builder.buildFromJoin(joinFromRelationship);
+        } else {
+            dbJoin = (DbJoinMutable) relationship.getDbJoin();
+        }
         DbJoinCondition dbJoinCondition = dbJoin.getDbJoinCondition();
 
         DbJoinModel dbJoinModel = createModel(relationship);
-        dbJoinModel.setColumnPairs(buildPairs(dbJoinCondition, RelationshipDirection.LEFT));
+        dbJoinModel.setColumnPairs(buildPairs(dbJoinCondition, relationship.getDirection()));
         return dbJoinModel;
     }
 

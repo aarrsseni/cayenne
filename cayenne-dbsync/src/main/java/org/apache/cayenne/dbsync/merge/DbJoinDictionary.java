@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
-import org.apache.cayenne.dbsync.reverse.filters.CatalogFilter;
 import org.apache.cayenne.dbsync.reverse.filters.FiltersConfig;
 import org.apache.cayenne.dbsync.reverse.filters.PatternFilter;
-import org.apache.cayenne.dbsync.reverse.filters.SchemaFilter;
+import org.apache.cayenne.dbsync.reverse.filters.TableFilter;
 import org.apache.cayenne.map.DataMap;
+import org.apache.cayenne.map.DbEntity;
 import org.apache.cayenne.map.relationship.ColumnPair;
 import org.apache.cayenne.map.relationship.DbJoin;
 import org.apache.cayenne.map.relationship.JoinVisitor;
@@ -39,21 +39,25 @@ public class DbJoinDictionary extends MergerDictionary<DbJoin> {
         Collection<DbJoin> existingFiltered = new LinkedList<>();
 
         for(DbJoin dbJoin : container.getDbJoinList()) {
-            String srcEntity = dbJoin.getDbEntities()[0];
-            String targetEntity = dbJoin.getDbEntities()[1];
-            for(CatalogFilter catalogFilter : filtersConfig.getCatalogs()) {
-                for(SchemaFilter schemaFilter : catalogFilter.schemas) {
-                    if(schemaFilter.tables.isIncludeTable(srcEntity) &&
-                            schemaFilter.tables.isIncludeTable(targetEntity)) {
-                        PatternFilter srcFilter = schemaFilter.tables
-                                .getIncludeTableRelationshipFilter(dbJoin.getDbEntities()[0]);
-                        PatternFilter targetFilter = schemaFilter.tables
-                                .getIncludeTableRelationshipFilter(dbJoin.getDbEntities()[1]);
-                        String[] names = dbJoin.getNames();
-                        if(srcFilter.isIncluded(names[0]) || targetFilter.isIncluded(names[1])) {
-                            existingFiltered.add(dbJoin);
-                        }
-                    }
+            String srcEntityName = dbJoin.getDbEntities()[0];
+            String targetEntityName = dbJoin.getDbEntities()[1];
+            DbEntity srcEntity = container.getDbEntity(srcEntityName);
+            DbEntity targetEntity = container.getDbEntity(targetEntityName);
+            TableFilter srcTableFilter =
+                    filtersConfig.tableFilter(srcEntity.getCatalog(), srcEntity.getSchema());
+            TableFilter targetTableFilter =
+                    filtersConfig.tableFilter(targetEntity.getCatalog(), targetEntity.getSchema());
+            if(srcTableFilter != null &&
+                    targetTableFilter != null &&
+                    srcTableFilter.isIncludeTable(srcEntityName) &&
+                    targetTableFilter.isIncludeTable(targetEntityName)) {
+                PatternFilter srcFilter = srcTableFilter
+                        .getIncludeTableRelationshipFilter(srcEntityName);
+                PatternFilter targetFilter = targetTableFilter
+                        .getIncludeTableRelationshipFilter(targetEntityName);
+                String[] names = dbJoin.getNames();
+                if(srcFilter.isIncluded(names[0]) || targetFilter.isIncluded(names[1])) {
+                    existingFiltered.add(dbJoin);
                 }
             }
         }

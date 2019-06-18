@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class UpgradeHandler_V11Test extends BaseUpgradeHandlerTest{
@@ -70,11 +71,21 @@ public class UpgradeHandler_V11Test extends BaseUpgradeHandlerTest{
         assertEquals("ID", columnPair.getAttribute("left"));
         assertEquals("ARTIST_ID", columnPair.getAttribute("right"));
 
+        Element comment = (Element) join.getElementsByTagName("info:property").item(0);
+        assertNotNull(comment);
+        assertEquals("LEFT:test paintings, RIGHT:test toArtist", comment.getAttribute("value"));
+
         Element join1 = (Element) joins.item(1);
+        Element comment1 = (Element) join1.getElementsByTagName("info:property").item(0);
+        assertNotNull(comment1);
+        assertEquals("RIGHT:comment", comment1.getAttribute("value"));
+        assertEquals("http://cayenne.apache.org/schema/11/info", comment.getAttribute("xmlns:info"));
         assertEquals(ToManySemantics.MANY_TO_MANY.name(), join1.getAttribute("toMany"));
         assertEquals(ToDependentPkSemantics.LEFT.name(), join1.getAttribute("toDependentPK"));
 
         Element join2 = (Element) joins.item(2);
+        Element comment2 = (Element) join2.getElementsByTagName("info:property").item(0);
+        assertNull(comment2);
         assertEquals(ToManySemantics.MANY_TO_ONE.name(), join2.getAttribute("toMany"));
         assertEquals(ToDependentPkSemantics.RIGHT.name(), join2.getAttribute("toDependentPK"));
 

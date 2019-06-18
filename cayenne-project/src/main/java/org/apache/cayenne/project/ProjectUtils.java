@@ -37,8 +37,8 @@ public class ProjectUtils {
                                           String rightName) {
         int compare = leftEntity.compareTo(rightEntity);
         return compare == 0 ?
-                leftName.compareTo(rightName) > 0 :
-                compare > 0;
+                rightName != null && leftName.compareTo(rightName) > 0
+                : compare > 0;
     }
 
 }

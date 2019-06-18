@@ -26,6 +26,7 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.cayenne.modeler.dialog.DbRelationshipDialog;
+import org.apache.cayenne.modeler.map.relationship.DbJoinModel;
 import org.apache.cayenne.modeler.pref.TableColumnPreferences;
 import org.apache.cayenne.modeler.util.CayenneDialog;
 import org.apache.cayenne.modeler.util.CayenneTable;
@@ -79,7 +80,15 @@ public class DbRelationshipDialogView extends CayenneDialog {
         this.comment = new TextAdapter(commentField) {
             @Override
             protected void updateModel(String text) throws ValidationException {
-                dbRelationshipDialog.getDbJoinModel().setComments(text);
+                DbJoinModel dbJoinModel = dbRelationshipDialog.getDbJoinModel();
+                String prevValue = dbJoinModel.getComment();
+                if(text.isEmpty()) {
+                    dbJoinModel.setComments(text);
+                } else {
+                    dbJoinModel.setComments(prevValue == null || prevValue.isEmpty() ?
+                            text :
+                            prevValue + ", " + text);
+                }
             }
         };
 

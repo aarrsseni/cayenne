@@ -19,7 +19,8 @@ public class DbJoinMutableBuilder extends DbJoinBuilder {
                 dbJoin.getNames(),
                 dbJoin.getToDependentPkSemantics(),
                 dbJoin.getToManySemantics(),
-                dbJoin.getDataMap());
+                dbJoin.getDataMap(),
+                dbJoin.getDbRelationships());
         ObjectInfo.putToMetaData(metaData, dbJoinMutable, ObjectInfo.COMMENT, comment);
         return dbJoinMutable;
     }

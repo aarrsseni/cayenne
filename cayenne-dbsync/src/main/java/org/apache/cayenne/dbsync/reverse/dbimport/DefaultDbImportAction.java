@@ -200,8 +200,7 @@ public class DefaultDbImportAction implements DbImportAction {
             targetDataMap = newTargetDataMap(config);
         }
         DataMap finalTargetDataMap = targetDataMap;
-        finalTargetDataMap.getDbJoinList().forEach(dbJoin -> dbJoin.compile(finalTargetDataMap));
-        this.loadedDataMap = finalTargetDataMap;
+        this.loadedDataMap = dataMapNeedsToCompileJoins(finalTargetDataMap);
 
         // In that moment our data map fills with sorce map
         // transform source DataMap before merging
@@ -223,6 +222,11 @@ public class DefaultDbImportAction implements DbImportAction {
         hasChanges |= hasTokensToImport(tokens);
         hasChanges |= checkIncludedProcedures(sourceDataMap, filters);
         return sourceDataMap;
+    }
+
+    protected DataMap dataMapNeedsToCompileJoins(DataMap dataMap) {
+        dataMap.getDbJoinList().forEach(dbJoin -> dbJoin.compile(dataMap));
+        return dataMap;
     }
 
     private void putReverseEngineeringToConfig(ReverseEngineering reverseEngineering, DbImportConfiguration config) {

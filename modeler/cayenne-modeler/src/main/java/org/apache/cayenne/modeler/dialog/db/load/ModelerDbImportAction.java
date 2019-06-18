@@ -19,8 +19,7 @@
 
 package org.apache.cayenne.modeler.dialog.db.load;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
@@ -82,6 +81,13 @@ public class ModelerDbImportAction extends DefaultDbImportAction {
 
     public void commit() throws Exception {
         commit(config, sourceDataMap);
+    }
+
+    @Override
+    protected DataMap dataMapNeedsToCompileJoins(DataMap dataMap) {
+        // do nothing
+
+        return dataMap;
     }
 
     @Override

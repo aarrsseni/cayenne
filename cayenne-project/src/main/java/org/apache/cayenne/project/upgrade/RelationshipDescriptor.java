@@ -12,6 +12,8 @@ public class RelationshipDescriptor {
     private String targetToMany;
     private String toDependentPk;
     private String targetToDependentPk;
+    private String comment;
+    private String targetComment;
 
     private List<AttributePair> attributePairs;
 
@@ -20,12 +22,14 @@ public class RelationshipDescriptor {
                                   String targetEntity,
                                   String toMany,
                                   String toDependentPk,
+                                  String comment,
                                   List<AttributePair> attributePairs) {
         this.name = name;
         this.srcEntity = srcEntity;
         this.targetEntity = targetEntity;
         this.toMany = toMany;
         this.toDependentPk = toDependentPk;
+        this.comment = comment;
         this.attributePairs = attributePairs;
     }
 
@@ -40,6 +44,7 @@ public class RelationshipDescriptor {
                         this.reverseName = currDescriptor.getName();
                         this.targetToMany = currDescriptor.getToMany();
                         this.targetToDependentPk = currDescriptor.getToDependentPk();
+                        this.targetComment = currDescriptor.getComment();
                         wasFound = true;
                     }
                 }
@@ -86,5 +91,13 @@ public class RelationshipDescriptor {
 
     public String getTargetToDependentPk() {
         return targetToDependentPk;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public String getTargetComment() {
+        return targetComment;
     }
 }

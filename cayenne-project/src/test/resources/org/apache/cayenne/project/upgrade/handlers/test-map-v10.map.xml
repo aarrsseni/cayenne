@@ -40,15 +40,18 @@
     </db-entity>
     <db-relationship name="paintings" source="ARTIST" target="PAINTING" toMany="true">
         <db-attribute-pair source="ID" target="ARTIST_ID"/>
+        <info:property xmlns:info="http://cayenne.apache.org/schema/11/info" name="comment" value="test paintings"/>
     </db-relationship>
     <db-relationship name="toArtist" source="PAINTING" target="ARTIST">
         <db-attribute-pair source="ARTIST_ID" target="ID"/>
+        <info:property xmlns:info="http://cayenne.apache.org/schema/11/info" name="comment" value="test toArtist"/>
     </db-relationship>
     <db-relationship name="test2" source="TEST1" target="TEST2" toMany="true" toDependentPK="true">
         <db-attribute-pair source="ID" target="TEST1_ID"/>
     </db-relationship>
     <db-relationship name="test1" source="TEST2" target="TEST1" toMany="true">
         <db-attribute-pair source="TEST1_ID" target="ID"/>
+        <info:property xmlns:info="http://cayenne.apache.org/schema/11/info" name="comment" value="comment"/>
     </db-relationship>
     <db-relationship name="test4" source="TEST3" target="TEST4">
         <db-attribute-pair source="ID" target="TEST3_ID"/>

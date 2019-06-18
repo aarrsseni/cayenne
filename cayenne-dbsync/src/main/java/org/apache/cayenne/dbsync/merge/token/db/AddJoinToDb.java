@@ -3,6 +3,7 @@ package org.apache.cayenne.dbsync.merge.token.db;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.dba.DbAdapter;
 import org.apache.cayenne.dbsync.merge.factory.MergerTokenFactory;
 import org.apache.cayenne.dbsync.merge.token.MergerToken;
@@ -49,6 +50,8 @@ public class AddJoinToDb extends AbstractToDbToken {
         DataMap dataMap = dbJoin.getDataMap();
         DbEntity rightEntity = dataMap.getDbEntity(dbJoin
                 .getDbEntities()[RelationshipDirection.RIGHT.ordinal()]);
+        DbEntity leftEntity = dataMap.getDbEntity(dbJoin
+                .getDbEntities()[RelationshipDirection.LEFT.ordinal()]);
         ToDependentPkSemantics toDependentPkSemantics = dbJoin.getToDependentPkSemantics();
         if(toDependentPkSemantics == ToDependentPkSemantics.NONE) {
             return dbJoin.getDbJoinCondition().accept(new JoinVisitor<RelationshipDirection>() {
@@ -58,22 +61,37 @@ public class AddJoinToDb extends AbstractToDbToken {
                     return rightAttr.isPrimaryKey();
                 }
 
+                private boolean isLeftPk(ColumnPair columnPair) {
+                    DbAttribute leftAttr = leftEntity.getAttribute(columnPair.getLeft());
+                    return leftAttr.isPrimaryKey();
+                }
+
                 @Override
                 public RelationshipDirection visit(ColumnPair columnPair) {
-                    return isRightPk(columnPair) ?
-                            RelationshipDirection.LEFT :
-                            RelationshipDirection.RIGHT;
+                    if(isRightPk(columnPair)) {
+                        if(isLeftPk(columnPair)) {
+                            throw new CayenneRuntimeException("Try to process relationship " +
+                                    "with no toDepPk flag.");
+                        }
+                        return RelationshipDirection.LEFT;
+                    }
+                    return RelationshipDirection.RIGHT;
                 }
 
                 @Override
                 public RelationshipDirection visit(ColumnPair[] columnPairs) {
                     for(ColumnPair columnPair : columnPairs) {
                         boolean isRightPk = isRightPk(columnPair);
-                        if(!isRightPk) {
-                            return RelationshipDirection.RIGHT;
+                        boolean isLeftPk = isLeftPk(columnPair);
+                        if(isRightPk) {
+                            if(isLeftPk) {
+                                throw new CayenneRuntimeException("Try to process relationship " +
+                                        "with no toDepPk flag.");
+                            }
+                            return RelationshipDirection.LEFT;
                         }
                     }
-                    return RelationshipDirection.LEFT;
+                    return RelationshipDirection.RIGHT;
                 }
             });
         }

@@ -19,7 +19,19 @@ public class DbJoinMutable extends DbJoin {
                   String[] dbEntities,
                   String[] names,
                   ToDependentPkSemantics toDependentPkSemantics,
-                  ToManySemantics toManySemantics, DataMap dataMap) {
+                  ToManySemantics toManySemantics,
+                  DataMap dataMap,
+                  DbRelationship[] dbRelationships) {
+        super(dbJoinCondition, dbEntities, names, toDependentPkSemantics, toManySemantics, dataMap);
+        this.dbRelationships = dbRelationships;
+    }
+
+    DbJoinMutable(DbJoinCondition dbJoinCondition,
+                  String[] dbEntities,
+                  String[] names,
+                  ToDependentPkSemantics toDependentPkSemantics,
+                  ToManySemantics toManySemantics,
+                  DataMap dataMap) {
         super(dbJoinCondition, dbEntities, names, toDependentPkSemantics, toManySemantics, dataMap);
     }
 

@@ -45,11 +45,10 @@ public class DbJoinMerger extends AbstractMerger<DataMap, DbJoin> {
 
     @Override
     MergerDictionaryDiff<DbJoin> createDiff(DataMap original, DataMap imported) {
-        MergerDictionaryDiff<DbJoin> diff = new MergerDictionaryDiff.Builder<DbJoin>()
+        return new MergerDictionaryDiff.Builder<DbJoin>()
                 .originalDictionary(new DbJoinDictionary(original, filtersConfig))
                 .importedDictionary(new DbJoinDictionary(imported, filtersConfig))
                 .build();
-        return diff;
     }
 
     @Override

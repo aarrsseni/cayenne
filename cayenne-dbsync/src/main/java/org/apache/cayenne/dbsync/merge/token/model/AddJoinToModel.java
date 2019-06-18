@@ -42,8 +42,8 @@ public class AddJoinToModel extends AbstractToModelToken {
                 .build();
         dataMap.addJoin(addedJoin);
 
-        dbJoin.compile(dataMap);
-        DbRelationship relationship = dbJoin.getRelationhsip();
+        addedJoin.compile(dataMap);
+        DbRelationship relationship = addedJoin.getRelationhsip();
         DbRelationship reverseRelationship = relationship.getReverseRelationship();
 
         DbEntity srcEntity = relationship.getSourceEntity();

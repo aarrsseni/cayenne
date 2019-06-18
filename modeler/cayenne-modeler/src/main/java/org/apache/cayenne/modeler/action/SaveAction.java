@@ -27,6 +27,7 @@ import java.io.File;
 import org.apache.cayenne.configuration.DataChannelDescriptor;
 import org.apache.cayenne.modeler.Application;
 import org.apache.cayenne.modeler.map.relationship.DbJoinMutable;
+import org.apache.cayenne.modeler.map.relationship.DbJoinMutableBuilder;
 import org.apache.cayenne.pref.RenamedPreferences;
 import org.apache.cayenne.project.Project;
 import org.apache.cayenne.project.ProjectSaver;
@@ -69,8 +70,13 @@ public class SaveAction extends SaveAsAction {
 
         ((DataChannelDescriptor) getProjectController().getProject().getRootNode())
                 .getDataMaps().forEach(dataMap ->
-                dataMap.getDbJoinList().forEach(dbJoin ->
-                        ((DbJoinMutable) dbJoin).mergeAndNormalize()));
+                dataMap.getDbJoinList().forEach(dbJoin -> {
+                    if(!(dbJoin instanceof DbJoinMutable)) {
+                        DbJoinMutableBuilder builder = new DbJoinMutableBuilder();
+                        dbJoin = builder.buildFromJoin(dbJoin);
+                    }
+                    ((DbJoinMutable) dbJoin).mergeAndNormalize();
+                }));
 
         saver.save(p);
 
