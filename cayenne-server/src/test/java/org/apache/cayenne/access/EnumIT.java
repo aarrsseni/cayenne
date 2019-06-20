@@ -18,10 +18,14 @@
  ****************************************************************/
 package org.apache.cayenne.access;
 
+import java.util.List;
+
 import org.apache.cayenne.Cayenne;
 import org.apache.cayenne.ObjectContext;
 import org.apache.cayenne.di.Inject;
+import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.query.CapsStrategy;
+import org.apache.cayenne.query.ObjectSelect;
 import org.apache.cayenne.query.SQLTemplate;
 import org.apache.cayenne.query.SelectQuery;
 import org.apache.cayenne.test.jdbc.DBHelper;
@@ -29,6 +33,7 @@ import org.apache.cayenne.test.jdbc.TableHelper;
 import org.apache.cayenne.testdo.enum_test.Enum1;
 import org.apache.cayenne.testdo.enum_test.EnumEntity;
 import org.apache.cayenne.testdo.enum_test.EnumEntity2;
+import org.apache.cayenne.testdo.enum_test.EnumEntity3;
 import org.apache.cayenne.unit.di.server.CayenneProjects;
 import org.apache.cayenne.unit.di.server.ServerCase;
 import org.apache.cayenne.unit.di.server.UseServerRuntime;
@@ -91,6 +96,37 @@ public class EnumIT extends ServerCase {
     @Test
     public void createObjectWithEnumQualifier() {
         EnumEntity2 test = context.newObject(EnumEntity2.class);
+        context.commitChanges();
+
+        assertEquals(Enum1.two, test.getEnumAttribute());
+    }
+
+    @Test
+    public void testQualifier() throws Exception {
+        createDataSet();
+        List<EnumEntity> enumEntities = ObjectSelect.query(EnumEntity.class)
+                .where(ExpressionFactory.exp("enumAttribute = 'two'"))
+                .select(context);
+        assertEquals(1, enumEntities.size());
+        assertEquals(Enum1.two, enumEntities.get(0).getEnumAttribute());
+
+        List<EnumEntity> enumEntities1 = ObjectSelect.query(EnumEntity.class)
+                .where(ExpressionFactory
+                        .exp("enumAttribute = enum:org.apache.cayenne.testdo.enum_test.Enum1.two"))
+                .select(context);
+        assertEquals(1, enumEntities1.size());
+        assertEquals(Enum1.two, enumEntities1.get(0).getEnumAttribute());
+
+        List<EnumEntity> enumEntities2 = ObjectSelect.query(EnumEntity.class)
+                .where(ExpressionFactory.matchExp("enumAttribute", Enum1.two))
+                .select(context);
+        assertEquals(1, enumEntities2.size());
+        assertEquals(Enum1.two, enumEntities2.get(0).getEnumAttribute());
+    }
+
+    @Test
+    public void createObjectWithEnumQualifierWithoutPrefix() {
+        EnumEntity3 test = context.newObject(EnumEntity3.class);
         context.commitChanges();
 
         assertEquals(Enum1.two, test.getEnumAttribute());

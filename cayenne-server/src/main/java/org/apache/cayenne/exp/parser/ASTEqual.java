@@ -21,8 +21,14 @@ package org.apache.cayenne.exp.parser;
 
 import java.util.Collection;
 
+import org.apache.cayenne.ObjectContext;
+import org.apache.cayenne.ObjectId;
+import org.apache.cayenne.Persistent;
 import org.apache.cayenne.exp.Expression;
 import org.apache.cayenne.exp.ValueInjector;
+import org.apache.cayenne.map.ObjAttribute;
+import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.util.CayenneMapEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,10 +146,31 @@ public class ASTEqual extends ConditionNode implements ValueInjector {
 			// inject
 			ASTObjPath path = (ASTObjPath) args[1 - scalarIndex];
 			try {
-				path.injectValue(o, evaluateChild(scalarIndex, o));
+				path.injectValue(o, castValue(path, o, evaluateChild(scalarIndex, o)));
 			} catch (Exception ex) {
 				LOGGER.warn("Failed to inject value " + " on path " + path.getPath() + " to " + o, ex);
 			}
 		}
+	}
+
+	private Object castValue(ASTObjPath path, Object o, Object value) {
+		Persistent persistent = (Persistent) o;
+		ObjectContext context = persistent.getObjectContext();
+		ObjectId objectId = persistent.getObjectId();
+
+		if(!(value instanceof String) || context == null || objectId == null) {
+			return value;
+		}
+
+		ObjEntity entity = context.getEntityResolver().getObjEntity(objectId.getEntityName());
+		CayenneMapEntry entry = path.evaluateEntityNode(entity);
+		if(entry instanceof ObjAttribute) {
+			ObjAttribute attribute = (ObjAttribute) entry;
+			if(attribute.getJavaClass().isEnum()) {
+				value = new ASTEnum.EnumValue(attribute.getType(), (String) value).resolve();
+			}
+		}
+
+		return value;
 	}
 }
