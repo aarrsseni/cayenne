@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-map xmlns="http://cayenne.apache.org/schema/10/modelMap"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://cayenne.apache.org/schema/10/modelMap https://cayenne.apache.org/schema/10/modelMap.xsd"
+	 project-version="10">
+	<property name="defaultPackage" value="org.apache.cayenne.testdo.meaningful"/>
+	<db-entity name="CALENDAR_EVENT">
+		<db-attribute name="AFFILIATION_COMPANY_FK" type="INTEGER" isMandatory="true"/>
+		<db-attribute name="AFFILIATION_CONTACT_FK" type="INTEGER" isMandatory="true"/>
+		<db-attribute name="EVENT_NAME" type="VARCHAR" length="100"/>
+		<db-attribute name="ID" type="INTEGER" isPrimaryKey="true" isGenerated="true" isMandatory="true"/>
+	</db-entity>
+	<db-entity name="CONTACT_AFFLIATION">
+		<db-attribute name="COMPANY_ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
+		<db-attribute name="CONTACT_AFFILIATION_NAME" type="VARCHAR" length="100"/>
+		<db-attribute name="CONTACT_ID" type="INTEGER" isPrimaryKey="true" isMandatory="true"/>
+	</db-entity>
+	<obj-entity name="CalendarEvent" className="org.apache.cayenne.testdo.meaningful.CalendarEvent" dbEntityName="CALENDAR_EVENT">
+		<obj-attribute name="eventName" type="java.lang.String" db-attribute-path="EVENT_NAME"/>
+	</obj-entity>
+	<obj-entity name="ContactAffliation" className="org.apache.cayenne.testdo.meaningful.ContactAffliation" dbEntityName="CONTACT_AFFLIATION">
+		<obj-attribute name="contactAffiliationName" type="java.lang.String" db-attribute-path="CONTACT_AFFILIATION_NAME"/>
+		<obj-attribute name="contactId" type="java.lang.Integer" db-attribute-path="CONTACT_ID"/>
+		<obj-attribute name="companyId" type="java.lang.Integer" db-attribute-path="COMPANY_ID"/>
+	</obj-entity>
+	<db-relationship name="toAffiliation" source="CALENDAR_EVENT" target="CONTACT_AFFLIATION">
+		<db-attribute-pair source="AFFILIATION_COMPANY_FK" target="COMPANY_ID"/>
+		<db-attribute-pair source="AFFILIATION_CONTACT_FK" target="CONTACT_ID"/>
+	</db-relationship>
+	<db-relationship name="events" source="CONTACT_AFFLIATION" target="CALENDAR_EVENT" toMany="true">
+		<db-attribute-pair source="COMPANY_ID" target="AFFILIATION_COMPANY_FK"/>
+		<db-attribute-pair source="CONTACT_ID" target="AFFILIATION_CONTACT_FK"/>
+	</db-relationship>
+	<obj-relationship name="toAffiliation" source="CalendarEvent" target="ContactAffliation" deleteRule="Nullify" db-relationship-path="toAffiliation"/>
+	<obj-relationship name="events" source="ContactAffliation" target="CalendarEvent" deleteRule="Deny" db-relationship-path="events"/>
+</data-map>

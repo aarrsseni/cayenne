@@ -22,12 +22,12 @@ package org.apache.cayenne.access.flush;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cayenne.ObjectId;
 import org.apache.cayenne.PersistenceState;
 import org.apache.cayenne.Persistent;
-import org.apache.cayenne.access.flush.DefaultDataDomainFlushAction;
 import org.apache.cayenne.access.flush.operation.BaseDbRowOp;
 import org.apache.cayenne.access.flush.operation.DbRowOp;
 import org.apache.cayenne.access.flush.operation.DeleteDbRowOp;
@@ -41,9 +41,12 @@ import org.apache.cayenne.query.Query;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @since 4.2
@@ -89,6 +92,24 @@ public class DefaultDataDomainFlushActionTest {
         assertThat(merged, not(hasItem(sameInstance(op[6]))));
         assertThat(merged, not(hasItem(sameInstance(op[8]))));
         assertThat(merged, not(hasItem(sameInstance(op[9]))));
+    }
+
+    @Test
+    public void testMergeInsertUpdateWithDatabaseGeneratedPk() {
+        ObjectId id = ObjectId.of("test", Collections.emptyMap());
+
+        DbEntity test = mockEntity("test");
+
+        BaseDbRowOp[] op = new BaseDbRowOp[2];
+        op[0] = new InsertDbRowOp(mockObject(id),  test, id);
+        op[1] = new UpdateDbRowOp(mockObject(id),  test,  id);
+
+        MeaningfulPkAwareDataDomainFlushAction action = mock(MeaningfulPkAwareDataDomainFlushAction.class);
+        when(action.mergeSameObjectIds((List<DbRowOp>) any(List.class))).thenCallRealMethod();
+
+        Collection<DbRowOp> merged = action.mergeSameObjectIds(new ArrayList<>(Arrays.asList(op)));
+        assertEquals(1, merged.size());
+        assertThat(merged, hasItems(op[0]));
     }
 
     @Test
