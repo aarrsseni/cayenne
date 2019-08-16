@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.exp.Expression;
+import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.exp.TraversalHandler;
 import org.apache.cayenne.exp.property.BaseProperty;
 import org.apache.cayenne.map.EntityResolver;
@@ -80,6 +81,14 @@ class ObjectSelectMetadata extends BaseQueryMetadata {
 			for (BaseProperty<?> property : query.getColumns()) {
 				key.append("/c:");
 				property.getExpression().traverse(traversalHandler);
+			}
+		}
+
+		if(query.getColumnsFromString() != null && !query.getColumnsFromString().isEmpty()) {
+			traversalHandler = new ToCacheKeyTraversalHandler(resolver.getValueObjectTypeRegistry(), key);
+			for(String property : query.getColumnsFromString()) {
+				key.append("/c:");
+				ExpressionFactory.pathExp(property).traverse(traversalHandler);
 			}
 		}
 

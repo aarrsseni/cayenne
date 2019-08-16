@@ -19,6 +19,7 @@
 
 package org.apache.cayenne.access.translator.select;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -26,10 +27,12 @@ import org.apache.cayenne.CayenneRuntimeException;
 import org.apache.cayenne.Persistent;
 import org.apache.cayenne.access.sqlbuilder.sqltree.Node;
 import org.apache.cayenne.exp.Expression;
+import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.exp.parser.ASTDbPath;
 import org.apache.cayenne.exp.property.BaseProperty;
 import org.apache.cayenne.map.JoinType;
 import org.apache.cayenne.map.ObjEntity;
+import org.apache.cayenne.map.ObjRelationship;
 import org.apache.cayenne.reflect.ClassDescriptor;
 import org.apache.cayenne.util.Util;
 
@@ -40,21 +43,59 @@ class CustomColumnSetExtractor implements ColumnExtractor {
 
     private final TranslatorContext context;
     private final Collection<BaseProperty<?>> columns;
+    private final Collection<String> columnNames;
 
     CustomColumnSetExtractor(TranslatorContext context, Collection<BaseProperty<?>> columns) {
         this.context = context;
         this.columns = columns;
+        this.columnNames = new ArrayList<>();
+    }
+
+    CustomColumnSetExtractor(TranslatorContext context,
+                             Collection<BaseProperty<?>> columns,
+                             Collection<String> columnNames) {
+        this.context = context;
+        this.columns = columns;
+        this.columnNames = columnNames;
     }
 
     @Override
     public void extract(String prefix) {
-        for (BaseProperty<?> property : columns) {
-            if (isFullObjectProp(property)) {
-                extractFullObject(prefix, property);
-            } else {
-                extractSimpleProperty(property);
+        if(columns != null) {
+            for (BaseProperty<?> property : columns) {
+                if (isFullObjectProp(property)) {
+                    prefix = calculatePrefix(prefix, property);
+                    ensureJoin(prefix);
+                    ObjEntity entity = context.getResolver().getObjEntity(property.getType());
+                    extractFullObject(prefix, entity);
+                } else {
+                    extractSimpleProperty(property);
+                }
             }
         }
+        if(columnNames != null) {
+            for (String columnName : columnNames) {
+                Expression expression = ExpressionFactory.pathExp(columnName);
+                Object result = expression
+                        .evaluate(context.getMetadata().getObjEntity());
+                if(isFullObjectProp(result)) {
+                    prefix = dbPathOrDefault(
+                            ExpressionFactory.pathExp(columnName),
+                            prefix);
+                    ensureJoin(prefix);
+                    extractFullObject(prefix, ((ObjRelationship)result).getTargetEntity());
+                } else {
+                    extractSimpleProperty(columnName);
+                }
+            }
+        }
+    }
+
+    private void extractSimpleProperty(String property) {
+        Expression expression = ExpressionFactory.pathExp(property);
+        Node sqlNode = context.getQualifierTranslator().translate(expression);
+        context.addResultNode(sqlNode, property);
+        context.getSqlResult().addColumnResult(property);
     }
 
     private void extractSimpleProperty(BaseProperty<?> property) {
@@ -62,6 +103,18 @@ class CustomColumnSetExtractor implements ColumnExtractor {
         context.addResultNode(sqlNode, true, property, property.getAlias());
         String name = property.getName() == null ? property.getExpression().expName() : property.getName();
         context.getSqlResult().addColumnResult(name);
+    }
+
+    private boolean isFullObjectProp(Object result) {
+        if(result instanceof ObjRelationship) {
+            if(((ObjRelationship)result).isToMany()) {
+                throw new CayenneRuntimeException("Can't directly select toMany relationship columns. " +
+                        "Either select it with aggregate functions like count() or with flat() function to select full related objects.");
+            }
+            return true;
+        }
+
+        return false;
     }
 
     private boolean isFullObjectProp(BaseProperty<?> property) {
@@ -82,12 +135,7 @@ class CustomColumnSetExtractor implements ColumnExtractor {
                     && Persistent.class.isAssignableFrom(property.getType()));
     }
 
-    private void extractFullObject(String prefix, BaseProperty<?> property) {
-        prefix = calculatePrefix(prefix, property);
-        ensureJoin(prefix);
-
-        ObjEntity entity = context.getResolver().getObjEntity(property.getType());
-
+    private void extractFullObject(String prefix, ObjEntity entity) {
         ColumnExtractor extractor;
         if(context.getMetadata().getPageSize() > 0) {
             extractor = new IdColumnExtractor(context, entity);

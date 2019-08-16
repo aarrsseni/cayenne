@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.cayenne.exp.Expression;
+import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.cayenne.exp.property.BaseProperty;
 import org.apache.cayenne.map.DefaultEntityResultSegment;
 import org.apache.cayenne.map.DefaultScalarResultSegment;
@@ -78,6 +79,13 @@ class ColumnSelectMetadata extends ObjectSelectMetadata {
                 }
             }
         }
+        Collection<String> columnNames = query.getColumnsFromString();
+        if(columnNames != null) {
+        	for(String columnName : columnNames) {
+        		Expression propertyExpression = ExpressionFactory.pathExp(columnName);
+        		resolveAutoAliases(propertyExpression);
+			}
+		}
     }
 
 	@Override
@@ -94,29 +102,40 @@ class ColumnSelectMetadata extends ObjectSelectMetadata {
 	 * result column descriptors.
 	 */
 	private void buildResultSetMappingForColumns(ColumnSelect<?> query) {
-		if(query.getColumns() == null || query.getColumns().isEmpty()) {
-			return;
+		resultSetMapping = new ArrayList<>();
+
+		if(query.getColumns() != null) {
+			for(BaseProperty<?> column : query.getColumns()) {
+				// for each column we need only to know if it's entity or scalar
+				Expression exp = column.getExpression();
+				boolean fullObject = false;
+				if(exp.getType() == Expression.OBJ_PATH) {
+					// check if this is toOne relation
+					Object rel = exp.evaluate(getObjEntity());
+					// it this path is toOne relation, than select full object for it
+					fullObject = rel instanceof ObjRelationship && !((ObjRelationship) rel).isToMany();
+				} else if(exp.getType() == Expression.FULL_OBJECT) {
+					fullObject = true;
+				}
+				addToResultSetMapping(fullObject);
+			}
 		}
 
-		resultSetMapping = new ArrayList<>(query.getColumns().size());
-		for(BaseProperty<?> column : query.getColumns()) {
-			// for each column we need only to know if it's entity or scalar
-			Expression exp = column.getExpression();
-			boolean fullObject = false;
-			if(exp.getType() == Expression.OBJ_PATH) {
-				// check if this is toOne relation
+		if(query.getColumnsFromString() != null) {
+			for(String column : query.getColumnsFromString()) {
+				Expression exp = ExpressionFactory.pathExp(column);
 				Object rel = exp.evaluate(getObjEntity());
-				// it this path is toOne relation, than select full object for it
-				fullObject = rel instanceof ObjRelationship && !((ObjRelationship) rel).isToMany();
-			} else if(exp.getType() == Expression.FULL_OBJECT) {
-				fullObject = true;
+				addToResultSetMapping(rel instanceof ObjRelationship &&
+						!((ObjRelationship) rel).isToMany());
 			}
+		}
+	}
 
-			if(fullObject) {
-				resultSetMapping.add(ENTITY_RESULT_SEGMENT);
-			} else {
-				resultSetMapping.add(SCALAR_RESULT_SEGMENT);
-			}
+	private void addToResultSetMapping(boolean fullObject) {
+		if(fullObject) {
+			resultSetMapping.add(ENTITY_RESULT_SEGMENT);
+		} else {
+			resultSetMapping.add(SCALAR_RESULT_SEGMENT);
 		}
 	}
 

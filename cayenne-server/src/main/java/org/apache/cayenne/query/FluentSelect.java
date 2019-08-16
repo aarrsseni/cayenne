@@ -208,6 +208,10 @@ public abstract class FluentSelect<T> extends AbstractQuery implements Select<T>
         return null;
     }
 
+    public Collection<String> getColumnsFromString() {
+        return null;
+    }
+
     /**
      * @since 4.2
      */

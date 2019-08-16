@@ -547,6 +547,10 @@ public class ObjectSelect<T> extends FluentSelect<T> {
         return new ColumnSelect<>(this).columns(firstProperty, properties);
     }
 
+    public ColumnSelect<Object[]> columns(String firstProperty, String... properties) {
+        return new ColumnSelect<>(this).columns(firstProperty, properties);
+    }
+
     /**
      * <p>Select one specific property.</p>
      * <p>Can be any property that can be resolved against root entity type

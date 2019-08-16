@@ -108,6 +108,12 @@ public class ColumnSelectIT extends ServerCase {
             tPaintings.insert(i, "painting" + i, i % 5 + 1, 1, 22 - i);
         }
         tPaintings.insert(21, "painting21", 2, 1, 30);
+
+        TableHelper tPaintingInfo = new TableHelper(dbHelper, "PAINTING_INFO");
+        tPaintingInfo.setColumns("IMAGE_BLOB", "PAINTING_ID");
+        tPaintingInfo
+                .insert(new byte[]{(byte)1, (byte)2, (byte)3, (byte)4, (byte)5}, 1)
+                .insert(new byte[]{(byte)5, (byte)4, (byte)3, (byte)2}, 2);
     }
 
     @Test
@@ -1077,12 +1083,6 @@ public class ColumnSelectIT extends ServerCase {
 
     @Test
     public void testByteArraySelect() throws SQLException {
-        new TableHelper(dbHelper, "PAINTING_INFO")
-                .setColumns("IMAGE_BLOB", "PAINTING_ID")
-                .setColumnTypes(Types.LONGVARBINARY, Types.INTEGER)
-                .insert(new byte[]{(byte)1, (byte)2, (byte)3, (byte)4, (byte)5}, 1)
-                .insert(new byte[]{(byte)5, (byte)4, (byte)3, (byte)2}, 2);
-
         List<byte[]> blobs = ObjectSelect.columnQuery(PaintingInfo.class, PaintingInfo.IMAGE_BLOB)
                 .orderBy("db:" + PaintingInfo.PAINTING_ID_PK_COLUMN)
                 .select(context);
@@ -1151,5 +1151,18 @@ public class ColumnSelectIT extends ServerCase {
         assertEquals("artist1", results.get(0)[0]);
         assertEquals("artist1", ((Artist)results.get(0)[1]).getArtistName());
         assertEquals(1, results.get(0)[2]);
+    }
+
+    @Test
+    public void testColumnsFromString() {
+        List<Object[]> result = ObjectSelect.query(Painting.class)
+                .columns("paintingTitle", "paintingDescription",
+                        "toPaintingInfo.painting", "toArtist")
+                .where(Painting.PAINTING_TITLE.eq("painting1"))
+                .select(context);
+        assertEquals(1, result.size());
+        assertEquals("painting1", result.get(0)[0]);
+        assertTrue(result.get(0)[2] instanceof Painting);
+        assertTrue(result.get(0)[3] instanceof Artist);
     }
 }

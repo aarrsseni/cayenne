@@ -66,6 +66,11 @@ public class FluentSelectWrapper implements TranslatableQueryWrapper {
     }
 
     @Override
+    public Collection<String> getColumnsFromString() {
+        return select.getColumnsFromString();
+    }
+
+    @Override
     public Expression getHavingQualifier() {
         return select.getHaving();
     }

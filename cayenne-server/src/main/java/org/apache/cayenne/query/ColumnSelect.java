@@ -67,6 +67,8 @@ import org.apache.cayenne.map.ObjEntity;
 public class ColumnSelect<T> extends FluentSelect<T> {
 
     private Collection<BaseProperty<?>> columns;
+    private Collection<String> columnsFromString;
+
     // package private for tests
     boolean singleColumn = true;
     boolean distinct;
@@ -400,6 +402,16 @@ public class ColumnSelect<T> extends FluentSelect<T> {
         return (ColumnSelect<Object[]>)this;
     }
 
+    public ColumnSelect<Object[]> columns(String firstProperty, String... otherProperties) {
+        if(columnsFromString == null) {
+            columnsFromString = new ArrayList<>(otherProperties.length + 1);
+        }
+        columnsFromString.add(firstProperty);
+        Collections.addAll(columnsFromString, otherProperties);
+        singleColumn = false;
+        return (ColumnSelect<Object[]>)this;
+    }
+
     /**
      * <p>Add properties to select.</p>
      * <p>Can be any properties that can be resolved against root entity type
@@ -600,6 +612,11 @@ public class ColumnSelect<T> extends FluentSelect<T> {
     @Override
     public Collection<BaseProperty<?>> getColumns() {
         return columns;
+    }
+
+    @Override
+    public Collection<String> getColumnsFromString() {
+        return columnsFromString;
     }
 
     /**

@@ -46,11 +46,14 @@ public interface TranslatableQueryWrapper {
 
     Collection<BaseProperty<?>> getColumns();
 
+    Collection<String> getColumnsFromString();
+
     Expression getHavingQualifier();
 
     Select<?> unwrap();
 
     default boolean needsResultSetMapping() {
-        return getColumns() != null && !getColumns().isEmpty();
+        return (getColumns() != null && !getColumns().isEmpty())
+                || (getColumnsFromString() != null && !getColumnsFromString().isEmpty());
     }
 }

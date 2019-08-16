@@ -66,6 +66,11 @@ public class SelectQueryWrapper implements TranslatableQueryWrapper {
     }
 
     @Override
+    public Collection<String> getColumnsFromString() {
+        return null;
+    }
+
+    @Override
     public Expression getHavingQualifier() {
         return selectQuery.getHavingQualifier();
     }

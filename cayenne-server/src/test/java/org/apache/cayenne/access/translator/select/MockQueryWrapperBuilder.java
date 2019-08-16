@@ -125,6 +125,11 @@ class MockQueryWrapperBuilder {
             }
 
             @Override
+            public Collection<String> getColumnsFromString() {
+                return null;
+            }
+
+            @Override
             public Expression getHavingQualifier() {
                 return havingQualifier;
             }
